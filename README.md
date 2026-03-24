@@ -4,7 +4,9 @@
 This repository contains all the work for my master thesis in collaboration with Telefonica Research, focused on conversational recommender RAG systems for e-commerce and benchmarking advertising strategies.
 
 
-You can access my [Master Thesis](https://www.overleaf.com/read/jmpfyvkdxcnt#deeda3), my [Presentation](https://www.overleaf.com/read/tvwscngdpyfp#e86fdc) and my [Final Paper](https://www.overleaf.com/read/tcggxdnhjgmm#739137) on Overleaf.
+You can access my [Master Thesis](https://www.overleaf.com/read/jmpfyvkdxcnt#deeda3), my [Presentation](https://www.overleaf.com/read/tvwscngdpyfp#e86fdc) and my [Final Paper](https://www.overleaf.com/read/tcggxdnhjgmm#739137) and the intial [idea draft](https://www.overleaf.com/read/bddrrckbkvhc#a1c122) on Overleaf.
+
+The following [huggingface collection](https://huggingface.co/collections/eZWALT/tfm) keeps track of the open source datasets and models used throughout this work.
 
 ---
 
