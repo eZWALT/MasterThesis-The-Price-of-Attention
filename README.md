@@ -56,6 +56,18 @@ LICENSE
 
 WIP
 
+## Main sources of Literature
+
+In order to be sure of the SOTA and to be fully aware of the trends in RecSys, the following extensive compilation has been crafted:
+
+- [ACM RecSys Conference YT](https://www.youtube.com/@acmrecsys/playlists)
+- [Awesome RecSys (Basic) Repository](https://github.com/jihoo-kim/awesome-RecSys)
+- [Ludo's Recsys Blog at Google](https://machinelearningatscale.substack.com/p/deep-dive-series)
+- [Awesome LLMs for RecSys](https://github.com/WLiK/LLM4Rec-Awesome-Papers)
+- [Awesome LLMs in RecSys (Multiple purposes)](https://github.com/CHIANGEL/Awesome-LLM-for-RecSys)
+- [Awesome LLM enhanced RecSys](https://github.com/nancheng58/Awesome-LLM4RS-Papers)
+
+From the industry side (Anthropic, OpenAI, Gemini)... not much can be said as they don't reveal their
 
 ## Contributing
 In order to contribute to this project please submit github issues, feel free to post pull requests!
