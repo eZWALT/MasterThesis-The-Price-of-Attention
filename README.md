@@ -72,6 +72,8 @@ From the industry side (Anthropic, OpenAI, Gemini)... not much can be said as th
 - [LinkedIn LLM Advertisement News](https://www.linkedin.com/pulse/llm-advertising-marketing-channel-shift-define-next-decade-velinov-jshif/)
 - [LLM Ads blogpost](http://incrmntal.com/resources/llm-advertising)
 - [Perplexity vs Gemini vs OpenAI in Ads](https://searchengineland.com/perplexity-stops-testing-advertising-469452)
+- [Thrad: LLM-Driven Advertisement Startup](https://www.thrad.ai/)
+- [Thrad CEO Podcast talk](https://www.youtube.com/watch?v=CxAxt1xUpW0)
 
 As a footnote, [this paper](https://openreview.net/forum?id=kioO6a0oHM&referrer=%5Bthe%20profile%20of%20Thomas%20L.%20Griffiths%5D(%2Fprofile%3Fid%3D~Thomas_L._Griffiths1)) hasn't yet seen the public eye but can be extremely benefitial to read once it gets published.
 
@@ -80,4 +82,3 @@ In order to contribute to this project please submit github issues, feel free to
 
 ## License
 This project is licensed under the terms of the MIT License. See the [LICENSE](LICENSE) file for details.
-
