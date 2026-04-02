@@ -6,7 +6,6 @@ services:
       - "${VLLM_PORT}:${VLLM_PORT}"
     environment:
       - NVIDIA_VISIBLE_DEVICES=${VLLM_VISIBLE_DEVICES}
-      - VLLM_PORT=8000
     #volumes:
     #  - ./models:/models  # Optional: for local models
     command: >
@@ -15,3 +14,12 @@ services:
       --port ${VLLM_PORT}
       --tensor-parallel-size ${VLLM_TENSOR_PARALLEL_SIZE}
       --max-model-len ${VLLM_MAX_MODEL_LEN}
+
+  streamlit:
+    build: .
+    ports:
+      - "7777:7777"
+    volumes:
+      - .:/app
+    depends_on:
+      - vllm
