@@ -5,10 +5,12 @@ Centralizes all tunables and defaults so no magic values float
 around the codebase.
 """
 
+import os
+
 # =========================
 # API / MODEL DEFAULTS
 # =========================
-API_URL = "http://localhost:8000/v1/chat/completions"
+API_URL = os.getenv("API_URL", "http://localhost:8888/v1/chat/completions")
 DEFAULT_MODEL = "Qwen/Qwen3.5-9B"
 DEFAULT_TEMPERATURE = 0.7
 DEFAULT_MAX_TOKENS = 400

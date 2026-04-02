@@ -19,6 +19,8 @@ services:
     build: .
     ports:
       - "7777:7777"
+    environment:
+      - API_URL=http://vllm:${VLLM_PORT}/v1/chat/completions
     volumes:
       - .:/app
     depends_on:

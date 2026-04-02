@@ -29,11 +29,18 @@ WIP
 ```text
 resources/
     papers/
-        Advertising/
-        EEG/
-        RL/
+        ADS/                 # Advertising in LLMs research
+        CRS/                 # Conversational recommender systems
+        Dimension-User/      # User modeling & archetypes
+        EEG/                 # Neuroscience / attention studies
+        LLM/                 # LLM fundamentals for RecSys
+        RAG/                 # Retrieval-augmented generation
+        RecSys/              # Recommender systems (general)
+        RL/                  # Reinforcement learning for RecSys
+    blogs/                   # Industry blog posts & reports
+    books/                   # Reference textbooks
 src/
-    project/
+    project/                 # TARA — main application
         .streamlit/          # Streamlit theme & server config
         app.py               # Streamlit entrypoint (main chat)
         pages/               # Multi-page views (dashboard, etc.)
@@ -43,24 +50,16 @@ src/
         Dockerfile           # Container definition
         requirements.txt     # Python dependencies
         .env                 # Environment variables
-    data/
-    models/
-    evaluation/
-    notebooks/
-results/
-    figures/
-    tables/
-    experiments/
-docs/
-    paper_proposal.md
-    thesis_draft.md
+    scripts/                 # Standalone utility scripts
+    notebooks/               # Jupyter notebooks for exploration
+docs/                        # Project documentation (WIP)
 README.md
 LICENSE
 ```
-- **resources/**: Collected papers and reference materials.
-- **src/project/**: Main application — Streamlit UI, Docker setup, and config.
-- **src/**: Source code for data processing, models, and utilities, plus notebooks for experimentation.
-- **results/**: Output figures, tables, and logs.
+- **resources/**: Collected papers, blogs, and books organized by topic.
+- **src/project/**: TARA — the main Streamlit application, Docker setup, and backend modules.
+- **src/scripts/**: Standalone utility scripts and exploratory code.
+- **src/notebooks/**: Jupyter notebooks for experimentation.
 - **docs/**: Project documentation and drafts.
 
 ## Usage
