@@ -28,33 +28,44 @@ WIP
 ## Repository Structure
 ```text
 resources/
-	papers/
-		Advertising/
-		EEG/
-		RL/
+    papers/
+        Advertising/
+        EEG/
+        RL/
 src/
-	data/
-	models/
-	evaluation/
-	notebooks/
+    project/
+        .streamlit/          # Streamlit theme & server config
+        app.py               # Streamlit entrypoint (main chat)
+        pages/               # Multi-page views (dashboard, etc.)
+        core/                # Backend modules (config, ad injection,
+                             #   attention shift, conversation, logger)
+        docker-compose.yml   # vLLM + Streamlit orchestration
+        Dockerfile           # Container definition
+        requirements.txt     # Python dependencies
+        .env                 # Environment variables
+    data/
+    models/
+    evaluation/
+    notebooks/
 results/
-	figures/
-	tables/
+    figures/
+    tables/
     experiments/
 docs/
-	paper_proposal.md
-	thesis_draft.md
+    paper_proposal.md
+    thesis_draft.md
 README.md
 LICENSE
 ```
 - **resources/**: Collected papers and reference materials.
-- **src/**: Source code for data processing, models, and utilities, plus notebooks for experimentation. 
+- **src/project/**: Main application — Streamlit UI, Docker setup, and config.
+- **src/**: Source code for data processing, models, and utilities, plus notebooks for experimentation.
 - **results/**: Output figures, tables, and logs.
 - **docs/**: Project documentation and drafts.
 
 ## Usage
 
-WIP
+See the [project README](src/project/README.md) for detailed setup instructions, environment variables, and how to run with Docker or locally.
 
 ## Main sources of Literature
 
