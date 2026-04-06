@@ -1,0 +1,3 @@
+[submodule "resources/papers/repositories/ad-insertion-llms"]
+	path = resources/papers/repositories/ad-insertion-llms
+	url = git@github.com:DavidXu999/Ad-Insertion-in-LLM-Generated-Responses.git
