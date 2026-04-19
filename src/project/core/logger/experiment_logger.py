@@ -8,6 +8,8 @@ Keeps an in-memory log buffer that can be:
 
 Every log entry captures: timestamp, conversation_id, ad_mode,
 event type, and free-form data payload.
+
+Paper reference: Section 6.5 — Multimodal Logging System.
 """
 
 from __future__ import annotations
@@ -17,6 +19,8 @@ from datetime import datetime
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Optional
 from pathlib import Path
+
+from core.config import DEFAULT_LOG_EXPORT_FILENAME
 
 
 @dataclass
@@ -76,7 +80,10 @@ class ExperimentLogger:
         """Serialize the full log to a JSON string."""
         return json.dumps(self.to_dicts(), indent=indent, default=str)
 
-    def export_json(self, filename: str = "experiment_log.json") -> Path:
+    def export_json(
+        self,
+        filename: str = DEFAULT_LOG_EXPORT_FILENAME,
+    ) -> Path:
         """Write logs to a JSON file."""
         out_dir = self.export_dir or Path(".")
         out_dir.mkdir(parents=True, exist_ok=True)

@@ -14,6 +14,12 @@ services:
       --port ${VLLM_PORT}
       --tensor-parallel-size ${VLLM_TENSOR_PARALLEL_SIZE}
       --max-model-len ${VLLM_MAX_MODEL_LEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${VLLM_PORT}/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
 
   streamlit:
     build: .
@@ -24,4 +30,5 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - vllm
+      vllm:
+        condition: service_healthy
