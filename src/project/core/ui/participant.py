@@ -46,14 +46,25 @@ from core.ui.screens import (
 # SESSION STATE
 # ═══════════════════════════════════════════════════════════════
 
-def init_session_state():
-    """Ensure every expected key exists in st.session_state."""
+def init_session_state(params):
+    """Ensure every expected key exists in st.session_state, using ExperimentParams for config."""
     if "logger" not in st.session_state:
         st.session_state.logger = ExperimentLogger()
 
     if "controller" not in st.session_state:
-        pid = str(uuid.uuid4())[:8]
-        ctrl = ExperimentController(participant_id=pid, n_trials=TRIALS_PER_SESSION)
+        pid = params.participant_id or str(uuid.uuid4())[:8]
+        ctrl = ExperimentController(
+            participant_id=pid,
+            n_trials=params.n_trials,
+            tasks=params.tasks,
+            ad_modes=params.ad_modes,
+            model=params.model or DEFAULT_MODEL,
+            seed=params.seed,
+            cb_group=params.cb_group,
+            turns_min=params.turns_min,
+            turns_max=params.turns_max,
+            ad_turns=params.ad_turns,
+        )
         ctrl.build_trial_plan()
         st.session_state.controller = ctrl
 
@@ -76,6 +87,7 @@ def init_session_state():
 def _get_or_create_practice_manager() -> ConversationManager:
     mgr = st.session_state.practice_manager
     if mgr is None:
+        ctrl: ExperimentController = st.session_state.controller
         practice_task = TaskDefinition(
             id="practice",
             title="Practice",
@@ -85,11 +97,14 @@ def _get_or_create_practice_manager() -> ConversationManager:
         )
         mgr = ConversationManager(
             ad_mode="1_classical_ui",
-            model=DEFAULT_MODEL,
+            model=ctrl.model or DEFAULT_MODEL,
             temperature=DEFAULT_TEMPERATURE,
             max_tokens=DEFAULT_MAX_TOKENS,
             task=practice_task,
             logger=st.session_state.logger,
+            min_turns=ctrl.turns_min,
+            max_turns=ctrl.turns_max,
+            ad_turns=ctrl.ad_turns,
         )
         st.session_state.practice_manager = mgr
     return mgr
@@ -97,14 +112,18 @@ def _get_or_create_practice_manager() -> ConversationManager:
 
 def _get_or_create_trial_manager(task: TaskDefinition, ad_mode: str) -> ConversationManager:
     mgr = st.session_state.trial_manager
+    ctrl: ExperimentController = st.session_state.controller
     if mgr is None or mgr.task.id != task.id:
         mgr = ConversationManager(
             ad_mode=ad_mode,
-            model=DEFAULT_MODEL,
+            model=ctrl.model or DEFAULT_MODEL,
             temperature=DEFAULT_TEMPERATURE,
             max_tokens=DEFAULT_MAX_TOKENS,
             task=task,
             logger=st.session_state.logger,
+            min_turns=ctrl.turns_min,
+            max_turns=ctrl.turns_max,
+            ad_turns=ctrl.ad_turns,
         )
         st.session_state.trial_manager = mgr
     return mgr
@@ -197,12 +216,19 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False)
 # PARTICIPANT SCREEN DISPATCHER
 # ═══════════════════════════════════════════════════════════════
 
-def run_participant_mode(flow_test: bool = False):
-    """Drive the participant through the full experiment protocol."""
+def run_participant_mode(params):
+    """Drive the participant through the full experiment protocol, using ExperimentParams for config."""
     ctrl: ExperimentController = st.session_state.controller
     scr = ctrl.current_screen
 
-    render_progress_sidebar(ctrl, flow_test=flow_test)
+    render_progress_sidebar(ctrl, flow_test=params.flow_test)
+
+    # Handle skip logic for screens
+    if scr in params.skip_screens:
+        dev_inject_stub_data(ctrl)
+        ctrl.advance()
+        st.rerun()
+        return
 
     if scr == SCREEN_CONSENT:
         if render_consent():

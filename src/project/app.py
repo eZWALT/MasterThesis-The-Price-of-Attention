@@ -1,51 +1,46 @@
 """
-Streamlit entrypoint.
+Streamlit entrypoint — routing only.
 
-Routing only — all logic lives in core/ui/.
+All experiment configuration is driven by URL query parameters.
+See core/experiment/query_params.py for the full parameter reference.
 
-Modes (via ?dev= query param):
-  (none)   → participant experiment flow  [production]
-  flow     → participant flow + skip buttons  [dev testing]
-  true/1   → free-form dev chat with full controls  [dev]
+Quick reference:
+  /                                          production participant session
+  ?dev=true                                  developer free-chat mode
+  ?dev=flow                                  participant flow + skip buttons
+  ?dev=flow&skip=consent,baseline            skip boring screens in testing
+  ?n=1&modes=5_implicit&skip=consent,baseline,demographics,ocean  single-trial debug
+  ?pid=p01&tasks=trans_plan_trip&modes=2_in_chat&store=file       specific assignment
 """
 
 import streamlit as st
 
-from core.config import APP_TITLE, PAGE_TITLE, DEV_QUERY_PARAM
+from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON
+from core.experiment.query_params import parse_query_params
 from core.ui.participant import init_session_state, run_participant_mode
 from core.ui.dev import run_dev_mode
 
 
-def _dev_param() -> str:
-    return st.query_params.get(DEV_QUERY_PARAM, "").lower()
-
-
-def is_dev_mode() -> bool:
-    return _dev_param() in ("true", "1", "yes")
-
-
-def is_flow_test() -> bool:
-    return _dev_param() == "flow"
-
-
 def main():
-    st.set_page_config(page_title=PAGE_TITLE, layout="wide")
-    init_session_state()
+    params = parse_query_params()
 
-    # Hide multi-page nav for participants — devs see full nav
-    if not is_dev_mode() and not is_flow_test():
+    st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout="wide")
+    init_session_state(params)
+
+    # Hide multi-page nav for participants — devs get full nav
+    if not params.dev_mode and not params.flow_test:
         st.markdown(
             "<style>[data-testid='stSidebarNav'] {display: none;}</style>",
             unsafe_allow_html=True,
         )
 
-    if is_dev_mode() or is_flow_test():
+    if params.dev_mode or params.flow_test:
         st.title(APP_TITLE)
 
-    if is_dev_mode():
+    if params.dev_mode:
         run_dev_mode()
     else:
-        run_participant_mode(flow_test=is_flow_test())
+        run_participant_mode(params)
 
 
 if __name__ == "__main__":
