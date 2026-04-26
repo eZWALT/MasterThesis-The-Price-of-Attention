@@ -29,39 +29,56 @@ This project provides a ChatGPT-like interface with configurable advertising mod
 
 ## Prerequisites
 
-- **Docker & Docker Compose** with NVIDIA runtime (for GPU inference via vLLM)
+- **Docker & Docker Compose v2** (`docker compose`, not `docker-compose`)
 - **Python 3.13+** (for local development without Docker)
+- **Ollama mode** (default): your own `ollama` binary installed
+- **vLLM mode**: requires `nvidia-container-toolkit` configured in Docker daemon (needs sysadmin)
 
 ## Quick Start
 
-### Local (Streamlit only, no GPU needed)
-
 ```bash
 cd src/project
+cp .env.example .env   # edit OLLAMA_BIN to your path, adjust other values as needed
+./launch.sh            # starts ollama + pulls model + starts Streamlit (default)
+```
+
+Open [http://localhost:7777](http://localhost:7777) — participant mode.  
+Open [http://localhost:7777?dev=true](http://localhost:7777?dev=true) — developer mode.
+
+### Switching backends
+
+```bash
+./launch.sh            # ollama (default)
+./launch.sh --ollama   # explicit ollama
+./launch.sh --vllm     # vLLM (requires nvidia-container-toolkit)
+```
+
+### Local (no Docker)
+
+```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Open [http://localhost:7777](http://localhost:7777) — participant mode.
-Open [http://localhost:7777?dev=true](http://localhost:7777?dev=true) — developer mode.
-
-> Without a running vLLM backend, LLM calls will fail gracefully. You can
-> change `API_URL` in `core/config.py` to point to any OpenAI-compatible
-> endpoint (e.g. `http://localhost:11434/v1/chat/completions` for Ollama).
-
-### Docker Compose (full stack with GPU)
-
-```bash
-cd src/project
-cp .env.example .env   # edit as needed
-docker compose up --build
-```
+> `API_URL` and `DEFAULT_MODEL` are read from env vars — set them to point at
+> any running OpenAI-compatible endpoint, or leave them to use the defaults
+> from `core/config.py`.
 
 ## Environment Variables
 
-Create a `.env` file (or copy `.env.example`):
+All values live in `.env` (copy from `.env.example`). The launch script sources
+it automatically — no value is hardcoded in the compose files.
 
 ```dotenv
+# Streamlit
+STREAMLIT_PORT=7777
+
+# Ollama
+OLLAMA_BIN=/home/<user>/ollama-local/bin/ollama
+OLLAMA_PORT=11435
+OLLAMA_MODEL=qwen3.6:35b
+
+# vLLM
 VLLM_PORT=8888
 VLLM_MODEL=Qwen/Qwen3.5-9B
 VLLM_TENSOR_PARALLEL_SIZE=2
@@ -69,34 +86,25 @@ VLLM_MAX_MODEL_LEN=2048
 VLLM_VISIBLE_DEVICES=0,1
 ```
 
-| Variable | Description | Default |
-|---|---|---|
-| `VLLM_PORT` | Port for the vLLM OpenAI-compatible API | `8888` |
-| `VLLM_MODEL` | HuggingFace model identifier | `Qwen/Qwen3.5-9B` |
-| `VLLM_TENSOR_PARALLEL_SIZE` | Number of GPUs for tensor parallelism | `2` |
-| `VLLM_MAX_MODEL_LEN` | Maximum context length | `2048` |
-| `VLLM_VISIBLE_DEVICES` | CUDA visible devices | `0,1` |
+| Variable | Description |
+|---|---|
+| `STREAMLIT_PORT` | Port Streamlit listens on |
+| `OLLAMA_BIN` | Absolute path to your `ollama` binary |
+| `OLLAMA_PORT` | Port for your ollama instance (avoid 11434 if shared) |
+| `OLLAMA_MODEL` | Ollama model tag to pull and serve |
+| `VLLM_PORT` | Port for the vLLM OpenAI-compatible API |
+| `VLLM_MODEL` | HuggingFace model identifier for vLLM |
+| `VLLM_TENSOR_PARALLEL_SIZE` | Number of GPUs for tensor parallelism |
+| `VLLM_MAX_MODEL_LEN` | Maximum context length |
+| `VLLM_VISIBLE_DEVICES` | CUDA visible devices |
 
 ## Running with Docker Compose
 
-```bash
-docker compose up --build
-```
+Use `launch.sh` — it handles ollama lifecycle, model pulling, and compose startup.
+The two compose files are:
 
-This starts:
-1. **vLLM** — OpenAI-compatible LLM inference server on port `VLLM_PORT` (waits for health check)
-2. **Streamlit** — Chat UI on [http://localhost:7777](http://localhost:7777)
-
-## Running Locally
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-> Port and address are configured in `.streamlit/config.toml`.
-> You need a running LLM endpoint — set `API_URL` in `core/config.py`
-> or the `API_URL` environment variable.
+- `docker-compose.ollama.yml` — Streamlit only, connects to host ollama
+- `docker-compose.vllm.yml` — vLLM + Streamlit (requires nvidia-container-toolkit)
 
 ## Project Structure
 
@@ -135,7 +143,9 @@ src/project/
 │       ├── divergence.py              #    KL, cosine, JSD functions
 │       ├── estimators.py             #    AttentionEstimator, DummyEstimator
 │       └── shift.py                   #    compute_attention_shift()
-├── docker-compose.yml                  # vLLM + Streamlit orchestration
+├── docker-compose.ollama.yml           # Ollama backend (default)
+├── docker-compose.vllm.yml             # vLLM + Streamlit orchestration
+├── launch.sh                           # Unified launcher (--ollama / --vllm)
 ├── Dockerfile                          # Streamlit container
 ├── requirements.txt                    # Python deps (Streamlit container only)
 ├── .env.example                        # Template for Docker env vars
