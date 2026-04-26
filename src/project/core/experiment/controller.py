@@ -15,9 +15,14 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+import random
+
 from core.config import (
     TRIALS_PER_SESSION,
     AD_MODES,
+    MIN_TURNS_PER_TRIAL,
+    MAX_TURNS_PER_TRIAL,
+    AD_INJECTION_TURNS,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
     SCREEN_OCEAN,
@@ -68,9 +73,27 @@ class ExperimentController:
         self,
         participant_id: str,
         n_trials: int = TRIALS_PER_SESSION,
+        tasks: Optional[List[TaskDefinition]] = None,
+        ad_modes: Optional[List[str]] = None,
+        model: Optional[str] = None,
+        seed: Optional[int] = None,
+        cb_group: Optional[int] = None,
+        turns_min: int = MIN_TURNS_PER_TRIAL,
+        turns_max: int = MAX_TURNS_PER_TRIAL,
+        ad_turns: Optional[List[int]] = None,
     ):
         self.participant_id = participant_id
         self.n_trials = n_trials
+        self.model = model
+        self.seed = seed
+        self.cb_group = cb_group
+        self.turns_min = turns_min
+        self.turns_max = turns_max
+        self.ad_turns: List[int] = ad_turns if ad_turns is not None else list(AD_INJECTION_TURNS)
+
+        # Pre-resolved tasks/modes from params (may be None → auto)
+        self._param_tasks = tasks
+        self._param_modes = ad_modes
 
         # ── Screen state ──────────────────────────────────────
         self.current_screen: str = SCREEN_CONSENT
@@ -98,10 +121,46 @@ class ExperimentController:
         """
         Generate a counterbalanced assignment of tasks × ad conditions.
 
-        TODO: Implement Latin-square rotation keyed on participant_id.
+        Counterbalancing strategy
+        ─────────────────────────
+        Latin-square rotation is applied to ad_modes so every participant
+        group sees each ad mode in a different trial position.
+
+        The rotation row is chosen by:
+          1. ``cb_group`` if explicitly set via ?cb=N
+          2. Otherwise derived as ``hash(participant_id) % len(ad_modes)``
+
+        ``seed`` (via ?seed=N) makes the task shuffle reproducible across
+        re-runs — useful for within-participant repeat sessions or debugging.
         """
-        tasks = tasks or TASK_CATALOG[: self.n_trials]
-        ad_modes = ad_modes or AD_MODES[: self.n_trials]
+        tasks    = tasks    or self._param_tasks    or TASK_CATALOG[: self.n_trials]
+        ad_modes = ad_modes or self._param_modes    or AD_MODES[: self.n_trials]
+
+        # Pad / trim to n_trials
+        while len(tasks)    < self.n_trials:
+            tasks.append(tasks[len(tasks) % len(tasks)])
+        while len(ad_modes) < self.n_trials:
+            ad_modes.append(ad_modes[len(ad_modes) % len(ad_modes)])
+        tasks    = tasks[:    self.n_trials]
+        ad_modes = ad_modes[: self.n_trials]
+
+        # ── Optional task shuffle (seed-locked) ───────────────
+        if self.seed is not None:
+            rng = random.Random(self.seed)
+            combined = list(zip(tasks, ad_modes))
+            rng.shuffle(combined)
+            tasks, ad_modes = zip(*combined) if combined else (tasks, ad_modes)
+            tasks    = list(tasks)
+            ad_modes = list(ad_modes)
+
+        # ── Latin-square rotation of ad_modes ─────────────────
+        n = len(ad_modes)
+        if self.cb_group is not None:
+            row = self.cb_group % n
+        else:
+            row = hash(self.participant_id) % n
+        ad_modes = ad_modes[row:] + ad_modes[:row]   # circular rotation
+
         self.trial_plan = [
             {"task": t, "ad_mode": m}
             for t, m in zip(tasks, ad_modes)
