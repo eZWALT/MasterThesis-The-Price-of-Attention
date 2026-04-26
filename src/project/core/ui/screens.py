@@ -12,10 +12,13 @@ never hardcoded.
 from __future__ import annotations
 
 import time
+import threading
 import streamlit as st
 from typing import Optional
 
 from core.config import (
+    DEFAULT_MAX_TOKENS,
+    OLLAMA_API_BASE,
     # Consent
     CONSENT_TITLE,
     CONSENT_TEXT,
@@ -42,6 +45,77 @@ from core.config import (
 )
 from core.ad_injection import get_ad, get_injector
 from core.conversation import ConversationManager
+from core.conversation.ollama_stats import estimate_eta, record_timing
+
+
+# ═══════════════════════════════════════════════════════════════
+# LLM SPINNER HELPER
+# ═══════════════════════════════════════════════════════════════
+
+def _call_llm_with_spinner(manager: ConversationManager, user_input: str) -> None:
+    """
+    Call manager.process_user_message in a background thread while
+    showing a live loading indicator with an ETA derived from Ollama /api/ps.
+    Blocks until the LLM call is complete, then returns.
+    """
+    model = getattr(manager, "model", None)
+    eta_secs = estimate_eta(
+        max_tokens=DEFAULT_MAX_TOKENS,
+        model=model,
+        base_url=OLLAMA_API_BASE,
+    )
+
+    exc_holder: list = []
+    t0 = time.perf_counter()
+
+    def _run() -> None:
+        try:
+            manager.process_user_message(user_input)
+        except Exception as e:  # noqa: BLE001
+            exc_holder.append(e)
+
+    thread = threading.Thread(target=_run, daemon=True)
+    thread.start()
+
+    placeholder = st.empty()
+    while thread.is_alive():
+        elapsed = time.perf_counter() - t0
+        if eta_secs is not None:
+            remaining = max(0.0, eta_secs - elapsed)
+            label = (
+                f"Generating response\u2026 "
+                f"{elapsed:.0f}s elapsed \u2014 "
+                f"est. {remaining:.0f}s remaining"
+            )
+        else:
+            label = f"Generating response\u2026 {elapsed:.0f}s elapsed"
+        placeholder.markdown(
+            f"""<div style='
+                display:flex; align-items:center; gap:12px;
+                padding:12px 16px; border-radius:8px;
+                background:#1a1d24; color:#e0e0e0;
+                font-size:0.95em; margin:8px 0;'>
+                <span style='font-size:1.4em;'>&#9203;</span>
+                <span>{label}</span>
+            </div>""",
+            unsafe_allow_html=True,
+        )
+        time.sleep(0.25)
+
+    thread.join()
+    elapsed = time.perf_counter() - t0
+    placeholder.empty()
+
+    # Update rolling tokens/s estimate for future ETA predictions
+    if manager.messages:
+        last_reply = next(
+            (m["content"] for m in reversed(manager.messages) if m["role"] == "assistant"),
+            "",
+        )
+        record_timing(elapsed=elapsed, reply=last_reply)
+
+    if exc_holder:
+        raise exc_holder[0]
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -193,7 +267,7 @@ def render_practice(manager: ConversationManager) -> bool:
 
     # Input
     if user_input := st.chat_input("Send a message..."):
-        manager.process_user_message(user_input)
+        _call_llm_with_spinner(manager, user_input)
         st.rerun()
 
     # Allow ending practice at any time after ≥1 exchange
@@ -306,7 +380,7 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
 
     # Chat input
     if user_input := st.chat_input("Send a message..."):
-        manager.process_user_message(user_input)
+        _call_llm_with_spinner(manager, user_input)
         st.rerun()
 
     return False

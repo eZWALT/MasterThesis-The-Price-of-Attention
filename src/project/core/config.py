@@ -88,9 +88,13 @@ KL_EPSILON: float = 1e-10
 # ═══════════════════════════════════════════════════════════════
 # UI
 # ═══════════════════════════════════════════════════════════════
-APP_TITLE: str = "🤖 Conversational Assistant"
-PAGE_TITLE: str = "🤖 Chat"
+APP_TITLE: str = "Conversational Assistant"
+PAGE_TITLE: str = "Chat"
+PAGE_ICON: str = "🤖"
 DEV_QUERY_PARAM: str = "dev"
+
+# Ollama native API base (for ETA probing via /api/ps)
+OLLAMA_API_BASE: str = "http://localhost:11434"
 
 # ═══════════════════════════════════════════════════════════════
 # LOGGING
