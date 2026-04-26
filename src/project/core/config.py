@@ -1,5 +1,5 @@
 """
-TARA — Configuration constants.
+Configuration constants.
 
 Single source of truth for every tunable value and magic constant
 in the system.  No other module should hardcode numbers, prompts,
@@ -13,8 +13,8 @@ import os
 # ═══════════════════════════════════════════════════════════════
 # API / MODEL DEFAULTS
 # ═══════════════════════════════════════════════════════════════
-API_URL: str = os.getenv("API_URL", "http://localhost:8888/v1/chat/completions")
-DEFAULT_MODEL: str = "Qwen/Qwen3.5-9B"
+API_URL: str = os.getenv("API_URL", "http://localhost:11435/v1/chat/completions")
+DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "qwen3.6:35b")
 DEFAULT_TEMPERATURE: float = 0.7
 DEFAULT_MAX_TOKENS: int = 400
 TEMPERATURE_RANGE: tuple[float, float] = (0.0, 1.0)
@@ -88,8 +88,8 @@ KL_EPSILON: float = 1e-10
 # ═══════════════════════════════════════════════════════════════
 # UI
 # ═══════════════════════════════════════════════════════════════
-APP_TITLE: str = "📡 TARA — Telefonica Advertising RAG Assistant"
-PAGE_TITLE: str = "TARA"
+APP_TITLE: str = "🤖 Conversational Assistant"
+PAGE_TITLE: str = "🤖 Chat"
 DEV_QUERY_PARAM: str = "dev"
 
 # ═══════════════════════════════════════════════════════════════
