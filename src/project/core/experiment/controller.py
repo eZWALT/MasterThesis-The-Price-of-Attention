@@ -1,5 +1,5 @@
 """
-TARA — Experiment Controller.
+Experiment Controller.
 
 Manages the progression of an experimental session as a linear screen
 state machine:

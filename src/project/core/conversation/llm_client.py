@@ -1,5 +1,5 @@
 """
-TARA — LLM Client.
+LLM Client.
 
 Thin wrapper around the vLLM-compatible OpenAI chat completions API.
 Responsible only for sending messages and returning the assistant reply.

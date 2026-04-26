@@ -1,5 +1,5 @@
 """
-TARA — Attention shift computation.
+Attention shift computation.
 
 Theory (from paper §2):
   Let Z be a latent space of intents / topics / semantic concepts.

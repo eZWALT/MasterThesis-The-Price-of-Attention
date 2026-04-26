@@ -1,5 +1,5 @@
 """
-TARA — Attention estimators.
+Attention estimators.
 
 An AttentionEstimator maps a conversation history C to a distribution
 P(Z | C) over a latent concept space Z.

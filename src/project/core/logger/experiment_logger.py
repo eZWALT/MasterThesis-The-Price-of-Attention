@@ -1,5 +1,5 @@
 """
-TARA — Experiment Logger.
+Experiment Logger.
 
 Structured logging for every event in the experimental pipeline.
 Keeps an in-memory log buffer that can be:
