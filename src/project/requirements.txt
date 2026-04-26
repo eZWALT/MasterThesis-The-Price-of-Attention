@@ -1,3 +1,14 @@
+# Pinned for reproducibility — update intentionally, not accidentally
 streamlit==1.56.0
-requests>=2.31.0
-numpy>=1.26.0
+requests==2.32.3
+numpy==2.2.6
+
+# Optional: uncomment when attention shift moves beyond DummyEstimator
+# sentence-transformers==3.4.1
+# scikit-learn==1.6.1
+# torch==2.10.0
+
+# Optional: uncomment when multimodal integration is active
+# mne==1.9.0              # EEG preprocessing
+# brainflow==6.1.0        # BrainFlow LSL stream
+# tobii-research==1.11.2  # Tobii eye-tracking SDK
