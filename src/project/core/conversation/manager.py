@@ -81,6 +81,9 @@ class ConversationManager:
         llm_client: LLMClient | None = None,
         logger: ExperimentLogger | None = None,
         attention_estimator: AttentionEstimator | None = None,
+        min_turns: int = MIN_TURNS_PER_TRIAL,
+        max_turns: int = MAX_TURNS_PER_TRIAL,
+        ad_turns: Optional[List[int]] = None,
     ):
         self.ad_mode = ad_mode
         self.model = model
@@ -90,6 +93,9 @@ class ConversationManager:
         self.llm = llm_client or LLMClient()
         self.logger = logger or ExperimentLogger()
         self.attention_estimator = attention_estimator
+        self.min_turns = min_turns
+        self.max_turns = max_turns
+        self.ad_turns: List[int] = ad_turns if ad_turns is not None else list(AD_INJECTION_TURNS)
 
         self.conversation_id: str = str(uuid.uuid4())
         self.messages: List[Dict[str, str]] = []
@@ -124,22 +130,22 @@ class ConversationManager:
     @property
     def can_end(self) -> bool:
         """Whether the trial has reached the minimum number of turns."""
-        return self.turn_count >= MIN_TURNS_PER_TRIAL
+        return self.turn_count >= self.min_turns
 
     @property
     def must_end(self) -> bool:
         """Whether the trial has reached the maximum number of turns."""
-        return self.turn_count >= MAX_TURNS_PER_TRIAL
+        return self.turn_count >= self.max_turns
 
     @property
     def is_ad_turn(self) -> bool:
         """Whether the *next* user turn triggers an ad."""
-        return (self.turn_count + 1) in AD_INJECTION_TURNS
+        return (self.turn_count + 1) in self.ad_turns
 
     @property
     def should_inject_ad(self) -> bool:
         """Whether the current turn (just completed) is an ad injection turn."""
-        return self.turn_count in AD_INJECTION_TURNS
+        return self.turn_count in self.ad_turns
 
     # ── Public API ────────────────────────────────────────────
 
