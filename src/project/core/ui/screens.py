@@ -1,5 +1,5 @@
 """
-TARA — Screen renderers for the experiment flow.
+Screen renderers for the experiment flow.
 
 Each function renders one screen and returns True when the user
 has completed it (so the flow controller can advance).  All state
@@ -249,25 +249,43 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
             if st.button("✅ End Conversation"):
                 return True
 
-    # Chat layout
+    # Chat layout — side panel ads float next to the latest message
     show_side = ad_mode in AD_SIDE_PANEL_MODES
-    if show_side:
-        col_main, col_side = st.columns([3, 1])
-    else:
-        col_main, col_side = st.columns([1, 0.001])
 
-    with col_main:
+    if show_side:
+        # Render all messages except the last assistant turn flat,
+        # then render the last assistant message + ad card side-by-side
+        msgs = manager.messages
+        # All but last assistant message render normally
+        cutoff = len(msgs)
+        for i, msg in enumerate(msgs):
+            # Find last assistant message to pair with ad
+            if i == cutoff - 1 and msg["role"] == "assistant" and manager.should_inject_ad:
+                col_msg, col_ad = st.columns([3, 1])
+                with col_msg:
+                    with st.chat_message(msg["role"]):
+                        st.markdown(msg["content"])
+                # ad rendered outside loop below
+            else:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+    else:
+        col_ad = None
         for msg in manager.messages:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
 
-    # Side-panel ads (only rendered on ad turns)
+    # Side-panel ads — rendered next to the latest assistant message
     if show_side and manager.should_inject_ad:
         ad = get_ad()
         injector = get_injector(ad_mode)
         result = injector.inject(ad, manager.messages)
         if result.display_payload:
-            _render_ad_card(col_side, result.display_payload)
+            # col_ad was set in the loop above when last msg was assistant
+            try:
+                _render_ad_card(col_ad, result.display_payload)
+            except Exception:
+                _render_ad_card(st, result.display_payload)
 
     # Suggestion ads
     if ad_mode == "3_suggestions" and manager.should_inject_ad:

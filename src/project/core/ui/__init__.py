@@ -1,9 +1,11 @@
 """
-TARA UI — Screen renderers for the Streamlit experiment flow.
+UI package — screen renderers, participant flow, and developer tools.
 
-Each render_*() function draws one screen and returns a value
-(True or a data dict) when the user completes it, allowing the
-ExperimentController to advance.
+Submodules
+----------
+screens     : individual screen render functions (participant-facing)
+participant : session state, flow dispatcher, sidebar, skip helpers
+dev         : developer sidebar and free-form chat mode
 """
 
 from core.ui.screens import (             # noqa: F401
@@ -18,4 +20,14 @@ from core.ui.screens import (             # noqa: F401
     render_final_survey,
     render_done,
     _render_ad_card,
+)
+
+from core.ui.participant import (          # noqa: F401
+    init_session_state,
+    run_participant_mode,
+    export_session_data,
+)
+
+from core.ui.dev import (                  # noqa: F401
+    run_dev_mode,
 )

@@ -1,5 +1,5 @@
 """
-TARA — Experiment Dashboard page.
+Experiment Dashboard page.
 
 Provides an overview of logged experiment data, attention shift
 metrics, and export options. This is a secondary page accessible
@@ -8,7 +8,7 @@ via Streamlit's built-in multi-page navigation.
 
 import streamlit as st
 
-st.set_page_config(page_title="TARA · Dashboard", layout="wide")
+st.set_page_config(page_title="Experiment Dashboard", layout="wide")
 st.title("📊 Experiment Dashboard")
 
 # ── Guard: session must exist ─────────────────────────────────
@@ -71,6 +71,6 @@ with col_b:
     st.download_button(
         "⬇️ Download JSON",
         data=logger.to_json(),
-        file_name="tara_experiment_log.json",
+        file_name="experiment_log.json",
         mime="application/json",
     )
