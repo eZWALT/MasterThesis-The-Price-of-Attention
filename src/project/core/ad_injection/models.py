@@ -1,5 +1,5 @@
 """
-TARA — Ad Injection data models.
+Ad Injection data models.
 
 Pure dataclasses with no business logic — shared by injectors,
 the conversation manager, and the UI layer.

@@ -1,5 +1,5 @@
 """
-TARA — Participant State.
+Participant State.
 
 Maintains all session-specific information for one participant:
   - Participant ID and metadata

@@ -1,5 +1,5 @@
 """
-TARA core package — backend modules for the advertising experiment system.
+backend modules for the advertising experiment system.
 
 Subpackages mirror the five system components from the paper (§6):
 

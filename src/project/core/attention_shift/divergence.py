@@ -1,5 +1,5 @@
 """
-TARA — Divergence functions for attention shift computation.
+Divergence functions for attention shift computation.
 
 All magic constants (epsilon, etc.) are imported from config.
 """

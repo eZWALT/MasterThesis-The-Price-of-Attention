@@ -1,5 +1,5 @@
 """
-TARA — Conversation Manager.
+Conversation Manager.
 
 Owns the multi-turn conversation state and orchestrates the
 per-turn pipeline:

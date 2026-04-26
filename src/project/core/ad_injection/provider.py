@@ -1,5 +1,5 @@
 """
-TARA — Ad provider & injector factory.
+Ad provider & injector factory.
 
 `get_ad()`       — returns the current ad unit (mock for now; will be
                    replaced by a RAG pipeline).

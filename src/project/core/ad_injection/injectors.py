@@ -1,5 +1,5 @@
 """
-TARA — Ad injection strategies.
+Ad injection strategies.
 
 Each advertising mode has a dedicated AdInjector subclass that
 knows *how* to modify the conversation or produce display payloads.

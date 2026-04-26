@@ -1,5 +1,5 @@
 """
-TARA — Task definitions for experimental trials.
+Task definitions for experimental trials.
 
 Each task induces a specific intent genre (Informational, Transactional,
 Social) and provides both a participant-facing prompt and a system-prompt

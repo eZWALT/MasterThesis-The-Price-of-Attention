@@ -1,5 +1,5 @@
 """
-TARA — Survey scoring utilities.
+Survey scoring utilities.
 
 Computes derived scores from raw Likert responses.
 All item definitions and scale bounds live in config.py.
