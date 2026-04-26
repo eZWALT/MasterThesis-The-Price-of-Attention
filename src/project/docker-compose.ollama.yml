@@ -1,0 +1,12 @@
+services:
+  streamlit:
+    build: .
+    ports:
+      - "${STREAMLIT_PORT}:${STREAMLIT_PORT}"
+    environment:
+      - API_URL=http://host.docker.internal:${OLLAMA_PORT}/v1/chat/completions
+      - DEFAULT_MODEL=${OLLAMA_MODEL}
+    volumes:
+      - .:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -1,11 +1,19 @@
 services:
+
   vllm:
     image: vllm/vllm-openai:latest
-    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     ports:
       - "${VLLM_PORT}:${VLLM_PORT}"
     environment:
       - NVIDIA_VISIBLE_DEVICES=${VLLM_VISIBLE_DEVICES}
+      - CUDA_VISIBLE_DEVICES=${VLLM_VISIBLE_DEVICES}
     #volumes:
     #  - ./models:/models  # Optional: for local models
     command: >
@@ -21,12 +29,17 @@ services:
       retries: 20
       start_period: 120s
 
+
+
+
+
   streamlit:
     build: .
     ports:
-      - "7777:7777"
+      - "${STREAMLIT_PORT}:${STREAMLIT_PORT}"
     environment:
       - API_URL=http://vllm:${VLLM_PORT}/v1/chat/completions
+      - DEFAULT_MODEL=${VLLM_MODEL}
     volumes:
       - .:/app
     depends_on:
