@@ -22,11 +22,6 @@ from core.config import (
     # Consent
     CONSENT_TITLE,
     CONSENT_TEXT,
-    # OCEAN
-    OCEAN_ITEMS,
-    OCEAN_SCALE_MIN,
-    OCEAN_SCALE_MAX,
-    OCEAN_SCALE_LABELS,
     # Baseline
     BASELINE_DURATION_SECONDS,
     # Practice
@@ -35,6 +30,14 @@ from core.config import (
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     AD_SIDE_PANEL_MODES,
+)
+from core.experiment.surveys import (
+    # OCEAN
+    OCEAN_ITEMS,
+    OCEAN_SCALE_MIN,
+    OCEAN_SCALE_MAX,
+    OCEAN_SCALE_LABELS,
+    OCEAN_INSTRUCTIONS,
     # Post-trial survey
     POST_TRIAL_SCALE_MIN,
     POST_TRIAL_SCALE_MAX,
@@ -163,19 +166,16 @@ def render_demographics() -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# SCREEN 3 — OCEAN PERSONALITY (BFI-10)
+# SCREEN 3 — OCEAN PERSONALITY (BFI-44)
 # ═══════════════════════════════════════════════════════════════
 
 def render_ocean() -> Optional[list[int]]:
     """
-    Render BFI-10 questionnaire with progress bar.
-    Returns list of 10 raw Likert responses on submit, None otherwise.
+    Render BFI-44 questionnaire with progress bar.
+    Returns list of 44 raw Likert responses on submit, None otherwise.
     """
     st.header("Personality Questionnaire")
-    st.caption(
-        "For each statement, indicate how much you agree or disagree. "
-        "There are no right or wrong answers."
-    )
+    st.info(OCEAN_INSTRUCTIONS)
 
     n = len(OCEAN_ITEMS)
     responses: list[int] = []
