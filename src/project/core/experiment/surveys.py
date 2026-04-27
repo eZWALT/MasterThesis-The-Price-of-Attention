@@ -1,15 +1,119 @@
 """
-Survey scoring utilities.
+Survey definitions and scoring utilities.
 
-Computes derived scores from raw Likert responses.
-All item definitions and scale bounds live in config.py.
+All item definitions, scale bounds, and scoring logic live here.
 """
 
 from __future__ import annotations
 
 from typing import Dict, List
 
-from core.config import OCEAN_ITEMS, OCEAN_SCALE_MAX
+# ═══════════════════════════════════════════════════════════════
+# OCEAN — BFI-44 (John & Srivastava, 1999)
+# Source: John, O. P., & Srivastava, S. (1999). The Big Five trait
+# taxonomy: History, measurement, and theoretical perspectives.
+# In L. A. Pervin & O. P. John (Eds.), Handbook of personality:
+# Theory and research (Vol. 2, pp. 102-138). Guilford Press.
+# Items & scoring key sourced from:
+# https://github.com/coppermare/ai-like-humans (MIT licence)
+# ═══════════════════════════════════════════════════════════════
+# Each item: (text, trait, reversed)
+# Scoring: 1–5 Likert.  Reversed items: score = 6 − raw.
+# Trait score = mean of domain items (after reversal).
+# Domain sizes: E=8, A=9, C=9, N=8, O=10  (total 44)
+OCEAN_SCALE_MIN: int = 1
+OCEAN_SCALE_MAX: int = 5
+OCEAN_SCALE_LABELS: dict[int, str] = {
+    1: "Disagree strongly",
+    2: "Disagree a little",
+    3: "Neither agree nor disagree",
+    4: "Agree a little",
+    5: "Agree strongly",
+}
+
+# Instruction prefix shown once above the item list
+OCEAN_INSTRUCTIONS: str = (
+    "Describe yourself as you generally are now, not as you wish to be in the "
+    "future. Describe yourself as you honestly see yourself, in relation to "
+    "other people you know of the same sex as you are, and roughly your same "
+    "age. Rate how much each statement applies to you."
+)
+
+OCEAN_ITEMS: list[tuple[str, str, bool]] = [
+    # (statement, trait_key, is_reversed)
+    # --- Extraversion (E): items 1, 6R, 11, 16, 21R, 26, 31R, 36
+    ("I see myself as someone who is talkative.",                           "E", False),  #  1
+    ("I see myself as someone who tends to find fault with others.",        "A", True),   #  2
+    ("I see myself as someone who does a thorough job.",                    "C", False),  #  3
+    ("I see myself as someone who is depressed, blue.",                     "N", False),  #  4
+    ("I see myself as someone who is original, comes up with new ideas.",   "O", False),  #  5
+    ("I see myself as someone who is reserved.",                            "E", True),   #  6R
+    ("I see myself as someone who is helpful and unselfish with others.",   "A", False),  #  7
+    ("I see myself as someone who can be somewhat careless.",               "C", True),   #  8R
+    ("I see myself as someone who is relaxed, handles stress well.",        "N", True),   #  9R
+    ("I see myself as someone who is curious about many different things.", "O", False),  # 10
+    ("I see myself as someone who is full of energy.",                      "E", False),  # 11
+    ("I see myself as someone who starts quarrels with others.",            "A", True),   # 12R
+    ("I see myself as someone who is a reliable worker.",                   "C", False),  # 13
+    ("I see myself as someone who can be tense.",                           "N", False),  # 14
+    ("I see myself as someone who is ingenious, a deep thinker.",           "O", False),  # 15
+    ("I see myself as someone who generates a lot of enthusiasm.",          "E", False),  # 16
+    ("I see myself as someone who has a forgiving nature.",                 "A", False),  # 17
+    ("I see myself as someone who tends to be disorganized.",               "C", True),   # 18R
+    ("I see myself as someone who worries a lot.",                          "N", False),  # 19
+    ("I see myself as someone who has an active imagination.",              "O", False),  # 20
+    ("I see myself as someone who tends to be quiet.",                      "E", True),   # 21R
+    ("I see myself as someone who is generally trusting.",                  "A", False),  # 22
+    ("I see myself as someone who tends to be lazy.",                       "C", True),   # 23R
+    ("I see myself as someone who is emotionally stable, not easily upset.","N", True),   # 24R
+    ("I see myself as someone who is inventive.",                           "O", False),  # 25
+    ("I see myself as someone who has an assertive personality.",           "E", False),  # 26
+    ("I see myself as someone who can be cold and aloof.",                  "A", True),   # 27R
+    ("I see myself as someone who perseveres until the task is finished.",  "C", False),  # 28
+    ("I see myself as someone who can be moody.",                           "N", False),  # 29
+    ("I see myself as someone who values artistic, aesthetic experiences.", "O", False),  # 30
+    ("I see myself as someone who is sometimes shy, inhibited.",            "E", True),   # 31R
+    ("I see myself as someone who is considerate and kind to almost everyone.", "A", False),  # 32
+    ("I see myself as someone who does things efficiently.",                "C", False),  # 33
+    ("I see myself as someone who remains calm in tense situations.",       "N", True),   # 34R
+    ("I see myself as someone who prefers work that is routine.",           "O", True),   # 35R
+    ("I see myself as someone who is outgoing, sociable.",                  "E", False),  # 36
+    ("I see myself as someone who is sometimes rude to others.",            "A", True),   # 37R
+    ("I see myself as someone who makes plans and follows through with them.", "C", False),  # 38
+    ("I see myself as someone who gets nervous easily.",                    "N", False),  # 39
+    ("I see myself as someone who likes to reflect, play with ideas.",      "O", False),  # 40
+    ("I see myself as someone who has few artistic interests.",             "O", True),   # 41R
+    ("I see myself as someone who likes to cooperate with others.",         "A", False),  # 42
+    ("I see myself as someone who is easily distracted.",                   "C", True),   # 43R
+    ("I see myself as someone who is sophisticated in art, music, or literature.", "O", False),  # 44
+]
+
+# ═══════════════════════════════════════════════════════════════
+# POST-TRIAL SURVEY  (after each chat trial)
+# ═══════════════════════════════════════════════════════════════
+POST_TRIAL_SCALE_MIN: int = 1
+POST_TRIAL_SCALE_MAX: int = 7
+POST_TRIAL_ITEMS: list[dict[str, str]] = [
+    {"id": "trust",         "text": "I trusted the assistant during this conversation."},
+    {"id": "intrusiveness", "text": "Some of the assistant's responses felt intrusive or out of place."},
+    {"id": "relevance",     "text": "The assistant's suggestions were relevant to what I needed."},
+    {"id": "annoyance",     "text": "I felt annoyed at some point during the conversation."},
+    {"id": "helpfulness",   "text": "Overall, the assistant was helpful."},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# FINAL SURVEY  (end of session)
+# ═══════════════════════════════════════════════════════════════
+FINAL_SURVEY_ITEMS: list[dict[str, str]] = [
+    {"id": "overall_trust",    "text": "Overall, I trusted the AI assistant across all conversations."},
+    {"id": "ad_awareness",     "text": "I noticed promotional or sponsored content during the conversations."},
+    {"id": "ad_disruption",    "text": "The promotional content disrupted my experience."},
+    {"id": "willingness_reuse","text": "I would use a similar AI assistant again in the future."},
+]
+FINAL_OPEN_ENDED_PROMPT: str = (
+    "Did you notice anything unusual during the conversations? "
+    "Any other comments? (optional)"
+)
 
 
 def score_ocean(raw_responses: List[int]) -> Dict[str, float]:
@@ -18,11 +122,11 @@ def score_ocean(raw_responses: List[int]) -> Dict[str, float]:
 
     Parameters
     ----------
-    raw_responses : list of 10 ints (1–7 Likert), one per OCEAN_ITEMS.
+    raw_responses : list of 44 ints (1–5 Likert), one per OCEAN_ITEMS.
 
     Returns
     -------
-    Dict with keys O, C, E, A, N → float (1.0–7.0 each).
+    Dict with keys O, C, E, A, N → float (1.0–5.0 each).
     """
     if len(raw_responses) != len(OCEAN_ITEMS):
         raise ValueError(
