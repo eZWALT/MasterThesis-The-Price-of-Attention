@@ -40,11 +40,14 @@ class AdRetrievalPipeline:
 
     Stages (default)
     ----------------
-    1. IntentClassifier  — infers conversational intent (CPU, BERT)
-    2. DenseRetriever    — ANN search over FAISS index (GPU 1)
-    3. HybridRefiner     — BM25 + metadata filter + RRF (CPU, optional)
-    4. Reranker          — cross-encoder precision pass (GPU 1)
-    5. AdFormatter       — top-1 candidate → Ad dataclass
+    0a. ContextSummaryStage  — optional; compress history → context_summary
+    0b. QueryExpansionStage  — optional; HyDE / expand query → expanded_query
+    1.  IntentClassifier     — infers conversational intent (CPU, BERT)
+    2.  DenseRetriever       — ANN search over FAISS index (GPU 1)
+    3.  HybridRefiner        — BM25 + metadata filter + RRF (CPU, optional)
+    4.  Reranker             — cross-encoder precision pass (GPU 1)
+    5.  AdFormatter          — top-1 candidate → Ad dataclass
+    6.  SummarizationStage   — optional; rewrite ad text → concise sentence
 
     All configuration is read from core.config unless overridden via
     constructor arguments.

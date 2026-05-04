@@ -67,6 +67,15 @@ class PipelineState:
     query: str
     context: List[Dict[str, str]] = field(default_factory=list)
 
+    # ── Stage 0-pre: query preprocessing (optional) ───
+    # context_summary : one-sentence compression of the conversation history.
+    #                   Written by ContextSummaryStage before dense retrieval.
+    # expanded_query  : HyDE doc / LLM-rewritten query used for embedding.
+    #                   Written by QueryExpansionStage; falls back to `query`
+    #                   when empty.
+    context_summary: str = ""
+    expanded_query: str = ""
+
     # ── Stage 1 output ────────────────────────────────
     intent: str = ""
 
