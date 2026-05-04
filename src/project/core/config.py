@@ -56,6 +56,44 @@ SUMMARIZATION_PROMPT: str = (
     "Description: {text}"
 )
 
+# 4. Conversation context summarizer (pre-retrieval, optional).
+#    Compresses chat history into a one-sentence user-intent summary that
+#    is stored in state.context_summary and fed to query expansion.
+#    {history} is a newline-separated "role: content" dump of recent turns.
+#    Enable via USE_CONTEXT_SUMMARY / env var CONTEXT_SUMMARY=1.
+CONTEXT_SUMMARY_PROMPT: str = (
+    "Summarise the user's current product or information need in one concise "
+    "sentence based on the conversation so far. "
+    "Focus only on what they are looking for; ignore small talk.\n\n"
+    "Conversation:\n{history}\n\n"
+    "User intent summary (one sentence):"
+)
+
+# 5. HyDE — Hypothetical Document Embedding.
+#    Generates a fake product description that the ideal result would have.
+#    Embedding this doc instead of the raw query shifts the query vector
+#    closer to the catalog's document distribution.
+#    {query} = raw or reduced query; {context_summary} = output of stage 4 above.
+HYDE_PROMPT: str = (
+    "Write a short product description (2-3 sentences) that would perfectly "
+    "match what the user is looking for. Be specific about features and "
+    "use-cases. Do NOT include brand, price, or availability.\n\n"
+    "User query: {query}\n"
+    "Conversation context: {context_summary}\n\n"
+    "Hypothetical product description:"
+)
+
+# 6. Query expansion — LLM rewrites the raw query into a richer form.
+#    {query} = raw query; {context_summary} = context summary.
+QUERY_EXPANSION_PROMPT: str = (
+    "Rewrite the following search query to be more specific and information-rich "
+    "for a semantic product search engine. Keep the rewrite under 30 words; "
+    "use noun phrases and relevant attributes, no filler words.\n\n"
+    "Original query: {query}\n"
+    "Conversation context: {context_summary}\n\n"
+    "Improved query:"
+)
+
 
 # ═══════════════════════════════════════════════════════════════
 # EXPERIMENT — TURNS & TRIALS
@@ -144,6 +182,18 @@ RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads are returned to the injector
 # When enabled, calls the LLM with SUMMARIZATION_PROMPT to rewrite the
 # ad text into a single pithy sentence before injection.
 USE_SUMMARIZATION: bool = os.getenv("SUMMARIZATION", "").lower() in ("1", "true", "yes")
+
+# Stage 0-pre — Conversation Context Summarizer (optional, runs BEFORE dense retrieval)
+# Compresses the conversation history into a single intent sentence that is
+# appended to (or replaces) the raw query before embedding.
+USE_CONTEXT_SUMMARY: bool = os.getenv("CONTEXT_SUMMARY", "").lower() in ("1", "true", "yes")
+
+# Stage 0-pre — Query Expansion (optional, runs BEFORE dense retrieval)
+# Modes:
+#   none   — pass query as-is (default)
+#   hyde   — generate a hypothetical product description and embed that instead
+#   expand — LLM rewrites query into a richer keyword-diverse form
+QUERY_EXPANSION_MODE: str = os.getenv("QUERY_EXPANSION_MODE", "none").lower()
 
 # Template for auto-generated follow-up suggestion questions.
 # {title} is filled by the catalog adapter at ingest time.
