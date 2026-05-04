@@ -63,6 +63,11 @@ ad_turns    1-indexed user turns at which ads are injected (comma-separated)
             Example: ?ad_turns=2,5
             Default: AD_INJECTION_TURNS from config
 
+bfi         BFI version used for the OCEAN personality screen
+            Values : 10 → BFI-10 (10 items, ~1 min)
+                     44 → BFI-44 (44 items, ~10 min)
+            Default: 44
+
 ───────────────────────────────────────────────────────────────────────────────
 EXAMPLE URLS
 ───────────────────────────────────────────────────────────────────────────────
@@ -157,6 +162,9 @@ class ExperimentParams:
     turns_max: int = MAX_TURNS_PER_TRIAL
     ad_turns: List[int] = field(default_factory=lambda: list(AD_INJECTION_TURNS))
 
+    # BFI version for OCEAN screen
+    bfi_version: str = "10"                  # "10" | "44"
+
     # Persistence
     store_backend: str = "null"             # null | file
 
@@ -222,6 +230,11 @@ def parse_query_params() -> ExperimentParams:
     model_raw = p.get("model", "").strip()
     if model_raw:
         params.model = model_raw
+
+    # ── BFI version ───────────────────────────────────────────
+    bfi_raw = p.get("bfi", "").strip()
+    if bfi_raw in ("10", "44"):
+        params.bfi_version = bfi_raw
 
     # ── Persistence backend ───────────────────────────────────
     store_raw = p.get("store", "null").lower()
