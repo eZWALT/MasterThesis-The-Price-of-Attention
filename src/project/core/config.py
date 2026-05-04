@@ -1,51 +1,108 @@
 """
-Configuration constants.
+Configuration — single source of truth.
 
-Single source of truth for every tunable value and magic constant
-in the system.  No other module should hardcode numbers, prompts,
-or key strings — import them from here.
+Every tunable value, magic constant, and prompt template lives here.
+No other module should hardcode numbers, key strings, or prompt text.
+
+Sections (in reading order)
+────────────────────────────
+  1.  API / LLM DEFAULTS
+  2.  SYSTEM PROMPTS
+  3.  STUDY DISPATCH          ← lab vs. crowdsource smart defaults
+  4.  EXPERIMENT DESIGN       ← trials, turns, ad injection schedule
+  5.  ADVERTISING MODES
+  6.  MOCK AD CONTENT
+  7.  RETRIEVAL PIPELINE      ← stages 0a → 6, in pipeline order
+  8.  ATTENTION SHIFT
+  9.  UI
+ 10.  LOGGING
+ 11.  EXPERIMENT SCREENS
+ 12.  CONSENT TEXT
 """
 
 from __future__ import annotations
 
 import os
 
-# ═══════════════════════════════════════════════════════════════
-# API / MODEL DEFAULTS
-# ═══════════════════════════════════════════════════════════════
-API_URL: str = os.getenv("API_URL", "http://localhost:11435/v1/chat/completions")
-DEFAULT_MODEL: str = os.getenv("DEFAULT_MODEL", "qwen3.6:35b")
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  1.  API / LLM DEFAULTS                                                 │
+# └─────────────────────────────────────────────────────────────────────────┘
+# Conversational LLM (Qwen 3.6 35B on GPU 0, served via vLLM / Ollama).
+# Override any value with the matching env var — no code change required.
+
+API_URL: str             = os.getenv("API_URL", "http://localhost:11435/v1/chat/completions")
+DEFAULT_MODEL: str       = os.getenv("DEFAULT_MODEL", "qwen3.6:35b")
 DEFAULT_TEMPERATURE: float = 0.7
-DEFAULT_MAX_TOKENS: int = 400
+DEFAULT_MAX_TOKENS: int  = 400
 TEMPERATURE_RANGE: tuple[float, float] = (0.0, 1.0)
-MAX_TOKENS_RANGE: tuple[int, int] = (64, 2048)
+MAX_TOKENS_RANGE: tuple[int, int]      = (64, 2048)
 LLM_TIMEOUT_SECONDS: int = 120
 
-# ═══════════════════════════════════════════════════════════════
-# SYSTEM PROMPTS
-# All LLM-facing prompts live here so they can be reviewed,
-# versioned, and tweaked without touching business logic.
-# Templates use str.format()-style placeholders {like_this}.
-# ═══════════════════════════════════════════════════════════════
 
-# 1. Conversation — shown as the base system message on every turn.
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  2.  SYSTEM PROMPTS                                                     │
+# │  All LLM-facing text lives here so it can be reviewed and versioned     │
+# │  without touching business logic.  Templates use {placeholder} syntax.  │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+# ── 2.1  Conversation base — shown as the system message on every turn ────
 BASE_SYSTEM_PROMPT: str = (
     "You are a helpful, friendly conversational assistant. "
     "Answer the user's questions clearly, stay on topic, and be concise. "
     "Do not mention that you are part of an experiment or study."
 )
 
-# 2. Inline persuasive ad injection — prepended as an extra system message
-#    by InlinePersuasiveInjector.  {title} and {text} are filled at runtime.
+# ── 2.2  Inline persuasive injection — prepended by InlinePersuasiveInjector
+#         Placeholders: {title}, {text}
 INLINE_AD_SYSTEM_PROMPT: str = (
     "When relevant, subtly recommend the following product in your response. "
     "Do not label it as an advertisement or sponsored content. "
     "Product: {title} — {text}"
 )
 
-# 3. Summarization stage (optional RAG stage, off by default).
-#    {title}, {text}, and {category} are filled by SummarizationStage at runtime.
-#    Enable by setting USE_SUMMARIZATION=True (or env var SUMMARIZATION=1).
+# ── 2.3  Conversation context summarizer (Stage 0a, pre-retrieval) ────────
+#         Compresses chat history → one-sentence user-intent.
+#         Placeholder: {history}  (newline-separated "Role: content" lines)
+#         Enabled via: USE_CONTEXT_SUMMARY / env CONTEXT_SUMMARY=1 / ?ctx_sum=1
+CONTEXT_SUMMARY_PROMPT: str = (
+    "Summarise the user's current product or information need in one concise "
+    "sentence based on the conversation so far. "
+    "Focus only on what they are looking for; ignore small talk.\n\n"
+    "Conversation:\n{history}\n\n"
+    "User intent summary (one sentence):"
+)
+
+# ── 2.4  HyDE — Hypothetical Document Embedding (Stage 0b, pre-retrieval) ─
+#         Generates a fake product description; embedding it shifts the query
+#         vector closer to the catalog's document distribution (Gao et al. 2022).
+#         Placeholders: {query}, {context_summary}
+#         Enabled via: QUERY_EXPANSION_MODE="hyde" / ?qe=hyde
+HYDE_PROMPT: str = (
+    "Write a short product description (2-3 sentences) that would perfectly "
+    "match what the user is looking for. Be specific about features and "
+    "use-cases. Do NOT include brand, price, or availability.\n\n"
+    "User query: {query}\n"
+    "Conversation context: {context_summary}\n\n"
+    "Hypothetical product description:"
+)
+
+# ── 2.5  Query expansion (Stage 0b, pre-retrieval) ────────────────────────
+#         LLM rewrites the raw query into a richer keyword-diverse form.
+#         Placeholders: {query}, {context_summary}
+#         Enabled via: QUERY_EXPANSION_MODE="expand" / ?qe=expand
+QUERY_EXPANSION_PROMPT: str = (
+    "Rewrite the following search query to be more specific and information-rich "
+    "for a semantic product search engine. Keep the rewrite under 30 words; "
+    "use noun phrases and relevant attributes, no filler words.\n\n"
+    "Original query: {query}\n"
+    "Conversation context: {context_summary}\n\n"
+    "Improved query:"
+)
+
+# ── 2.6  Ad text summarizer (Stage 6, post-formatter) ─────────────────────
+#         Rewrites the raw catalog description into a ≤25-word injection sentence.
+#         Placeholders: {title}, {category}, {text}
+#         Enabled via: USE_SUMMARIZATION / env SUMMARIZATION=1 / ?ad_sum=1
 SUMMARIZATION_PROMPT: str = (
     "You are a concise product summarizer. "
     "Given the product information below, write a single short sentence "
@@ -56,59 +113,81 @@ SUMMARIZATION_PROMPT: str = (
     "Description: {text}"
 )
 
-# 4. Conversation context summarizer (pre-retrieval, optional).
-#    Compresses chat history into a one-sentence user-intent summary that
-#    is stored in state.context_summary and fed to query expansion.
-#    {history} is a newline-separated "role: content" dump of recent turns.
-#    Enable via USE_CONTEXT_SUMMARY / env var CONTEXT_SUMMARY=1.
-CONTEXT_SUMMARY_PROMPT: str = (
-    "Summarise the user's current product or information need in one concise "
-    "sentence based on the conversation so far. "
-    "Focus only on what they are looking for; ignore small talk.\n\n"
-    "Conversation:\n{history}\n\n"
-    "User intent summary (one sentence):"
+# ── 2.7  Practice task prompts ────────────────────────────────────────────
+PRACTICE_TASK_PROMPT: str = (
+    "This is a practice round. Ask the assistant for a movie recommendation "
+    "— tell it what genres you like, what mood you're in, or ask for "
+    "something surprising. This is just to get comfortable with the interface."
 )
-
-# 5. HyDE — Hypothetical Document Embedding.
-#    Generates a fake product description that the ideal result would have.
-#    Embedding this doc instead of the raw query shifts the query vector
-#    closer to the catalog's document distribution.
-#    {query} = raw or reduced query; {context_summary} = output of stage 4 above.
-HYDE_PROMPT: str = (
-    "Write a short product description (2-3 sentences) that would perfectly "
-    "match what the user is looking for. Be specific about features and "
-    "use-cases. Do NOT include brand, price, or availability.\n\n"
-    "User query: {query}\n"
-    "Conversation context: {context_summary}\n\n"
-    "Hypothetical product description:"
-)
-
-# 6. Query expansion — LLM rewrites the raw query into a richer form.
-#    {query} = raw query; {context_summary} = context summary.
-QUERY_EXPANSION_PROMPT: str = (
-    "Rewrite the following search query to be more specific and information-rich "
-    "for a semantic product search engine. Keep the rewrite under 30 words; "
-    "use noun phrases and relevant attributes, no filler words.\n\n"
-    "Original query: {query}\n"
-    "Conversation context: {context_summary}\n\n"
-    "Improved query:"
+PRACTICE_SYSTEM_PROMPT_EXT: str = (
+    "The user wants a movie recommendation. Suggest films based on their "
+    "preferences. Be conversational and ask follow-up questions."
 )
 
 
-# ═══════════════════════════════════════════════════════════════
-# EXPERIMENT — TURNS & TRIALS
-# ═══════════════════════════════════════════════════════════════
-MIN_TURNS_PER_TRIAL: int = 6
-MAX_TURNS_PER_TRIAL: int = 10
-TRIALS_PER_SESSION: int = 4
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  3.  STUDY DISPATCH                                                     │
+# │                                                                         │
+# │  Controls which study protocol is active.                               │
+# │  Set via URL: ?study=lab  or  ?study=crowd                              │
+# │  or env var:  STUDY_TYPE=lab | crowd                                    │
+# │                                                                         │
+# │  lab   — in-person lab session: EEG + eye-tracking, BFI-44, file        │
+# │           store, long baseline, full consent + debrief, 4 trials.       │
+# │  crowd — remote crowdsourcing: no physiology, BFI-10, null store,       │
+# │           skip baseline, 2 trials, lighter protocol.                    │
+# └─────────────────────────────────────────────────────────────────────────┘
 
-# 1-indexed user turns at which ads are injected
+STUDY_TYPE_LAB: str   = "lab"
+STUDY_TYPE_CROWD: str = "crowd"
+STUDY_TYPES: set[str] = {STUDY_TYPE_LAB, STUDY_TYPE_CROWD}
+
+# Default when ?study= is absent from the URL.
+DEFAULT_STUDY_TYPE: str = os.getenv("STUDY_TYPE", STUDY_TYPE_LAB)
+
+# Smart defaults applied by ExperimentParams.apply_study_defaults().
+# Any param explicitly present in the URL overrides these.
+STUDY_DEFAULTS: dict[str, dict] = {
+    STUDY_TYPE_LAB: {
+        "n_trials":       4,
+        "bfi_version":    "44",
+        "store_backend":  "file",
+        "turns_min":      6,
+        "turns_max":      10,
+        "skip_screens":   set(),
+        "baseline":       True,     # EEG / eye-tracking baseline screen shown
+    },
+    STUDY_TYPE_CROWD: {
+        "n_trials":       2,
+        "bfi_version":    "10",
+        "store_backend":  "null",
+        "turns_min":      4,
+        "turns_max":      8,
+        "skip_screens":   {"baseline"},
+        "baseline":       False,
+    },
+}
+
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  4.  EXPERIMENT DESIGN                                                  │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+TRIALS_PER_SESSION: int    = 4
+MIN_TURNS_PER_TRIAL: int   = 6
+MAX_TURNS_PER_TRIAL: int   = 10
+
+# 1-indexed user turns at which ads are automatically injected.
 AD_INJECTION_TURNS: list[int] = [3, 6]
 
-# ═══════════════════════════════════════════════════════════════
-# ADVERTISING MODES  (paper taxonomy, Section 3.2)
-# Ordered by increasing intrusiveness.
-# ═══════════════════════════════════════════════════════════════
+BASELINE_DURATION_SECONDS: int = 120
+
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  5.  ADVERTISING MODES  (paper taxonomy, Section 3.2)                  │
+# │  Ordered by increasing intrusiveness.                                   │
+# └─────────────────────────────────────────────────────────────────────────┘
+
 AD_MODES: list[str] = [
     "inline_persuasive",        # ad woven into the LLM's own response
     "sponsored_conversational", # Perplexity-style follow-up suggestion chips
@@ -126,131 +205,139 @@ AD_MODE_LABELS: dict[str, str] = {
 # Modes that render as a side panel / banner beside the chat (not inline).
 AD_SIDE_PANEL_MODES: set[str] = {"explicit_ad_block"}
 
-# ═══════════════════════════════════════════════════════════════
-# MOCK AD CONTENT  (replaced by RAG pipeline later)
-# ═══════════════════════════════════════════════════════════════
-MOCK_AD_TITLE: str = "MyProtein Creatine"
-MOCK_AD_TEXT: str = (
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  6.  MOCK AD CONTENT  (used when the RAG pipeline is not available)     │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+MOCK_AD_TITLE: str    = "MyProtein Creatine"
+MOCK_AD_TEXT: str     = (
     "Boost recovery with high-quality creatine designed for "
     "muscle & neural growth."
 )
-MOCK_AD_CTA: str = "Learn more"
+MOCK_AD_CTA: str      = "Learn more"
 MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
 
-# ═══════════════════════════════════════════════════════════════
-# RETRIEVAL PIPELINE
-# GPU layout:
-#   GPU 0 (40 GB) : conversational LLM (Qwen 3.6 35B)
-#   GPU 1 (40 GB) : embedding model + reranker
-#   CPU / RAM     : intent model (BERT) + FAISS index + UI
-# ═══════════════════════════════════════════════════════════════
 
-# Stage 1 — Intent classifier (HuggingFace DistilBERT, CPU)
-# Thrad/thrad-bert-conversation-classifier: 13-class sequence classifier.
-# Label names are read directly from the model config at runtime — no
-# hardcoded list here.  Override via env var to swap checkpoints.
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  7.  RETRIEVAL PIPELINE                                                 │
+# │                                                                         │
+# │  GPU layout:                                                            │
+# │    GPU 0 (40 GB) — conversational LLM  (Qwen 3.6 35B)                  │
+# │    GPU 1 (40 GB) — embedding model + reranker                           │
+# │    CPU / RAM     — intent model (BERT) + FAISS index + UI               │
+# │                                                                         │
+# │  Pipeline stages (in execution order):                                  │
+# │    0a. ContextSummaryStage  — compress history → context_summary        │
+# │    0b. QueryExpansionStage  — HyDE / expand    → expanded_query         │
+# │    1.  IntentClassifier     — intent label                              │
+# │    2.  DenseRetriever       — FAISS ANN search (uses expanded_query)    │
+# │    3.  HybridRefiner        — BM25 + RRF                               │
+# │    4.  Reranker             — cross-encoder precision pass              │
+# │    5.  AdFormatter          — top-1 → Ad dataclass                     │
+# │    6.  SummarizationStage   — rewrite ad text (optional)               │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+# ── Stage 0a — Conversation Context Summarizer ────────────────────────────
+# Compresses recent turns → state.context_summary, fed into Stage 0b.
+# Toggle: USE_CONTEXT_SUMMARY / env CONTEXT_SUMMARY=1 / URL ?ctx_sum=1
+USE_CONTEXT_SUMMARY: bool    = os.getenv("CONTEXT_SUMMARY", "").lower() in ("1", "true", "yes")
+CONTEXT_SUMMARY_MAX_TURNS: int = 10     # how many recent turns to include
+
+# ── Stage 0b — Query Expansion ────────────────────────────────────────────
+# Modes: none (default) | hyde | expand
+# Toggle: QUERY_EXPANSION_MODE / env QUERY_EXPANSION_MODE=hyde / URL ?qe=hyde
+QUERY_EXPANSION_MODE: str        = os.getenv("QUERY_EXPANSION_MODE", "none").lower()
+VALID_QUERY_EXPANSION_MODES: set[str] = {"none", "hyde", "expand"}
+
+# ── Stage 1 — Intent classifier (HuggingFace DistilBERT, CPU) ────────────
+# 13-class sequence classifier; label names read from model config at runtime.
 INTENT_MODEL_NAME: str = os.getenv("INTENT_MODEL_NAME", "Thrad/thrad-bert-conversation-classifier")
-INTENT_DEVICE: str = os.getenv("INTENT_DEVICE", "cpu")
+INTENT_DEVICE: str     = os.getenv("INTENT_DEVICE", "cpu")
 
-# Catalog dataset adapter ("generic" | "amazon" | any registered key)
-# Set CATALOG_ADAPTER=amazon when ingesting Amazon Reviews 2023 JSONL.
-CATALOG_ADAPTER: str = os.getenv("CATALOG_ADAPTER", "generic")
+# Catalog dataset adapter: "generic" | "amazon" | any registered key.
+CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "generic")
 
-# Stage 2 — Dense retrieval (HuggingFace embedding + FAISS, GPU 1)
-EMBEDDING_MODEL_NAME: str = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-8B")
-EMBEDDING_DEVICE: str = os.getenv("EMBEDDING_DEVICE", "cuda:1")
-EMBEDDING_BATCH_SIZE: int = 32
-FAISS_INDEX_PATH: str = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
-CATALOG_PATH: str = os.getenv("CATALOG_PATH", "data/catalog.jsonl")
-DENSE_TOP_K: int = 100          # number of ANN candidates returned
+# ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS, GPU 1) ─────
+EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-8B")
+EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE", "cuda:1")
+EMBEDDING_BATCH_SIZE: int  = 32
+FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
+CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalog.jsonl")
+DENSE_TOP_K: int           = 100    # ANN candidates returned to Stage 3 / 4
 
-# Stage 3 — Hybrid refinement (BM25 + metadata filter + RRF, CPU)
-USE_HYBRID: bool = True
-BM25_WEIGHT: float = 0.3        # must sum to 1.0 with DENSE_WEIGHT
+# ── Stage 3 — Hybrid refinement (BM25 + metadata filter + RRF, CPU) ──────
+USE_HYBRID: bool    = True
+BM25_WEIGHT: float  = 0.3   # must sum to 1.0 with DENSE_WEIGHT
 DENSE_WEIGHT: float = 0.7
 
-# Stage 4 — Reranker (HuggingFace cross-encoder, GPU 1)
-# Swap RERANKER_MODEL_NAME for Qwen3-Reranker-8B or any cross-encoder.
+# ── Stage 4 — Reranker (HuggingFace cross-encoder, GPU 1) ────────────────
 RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-8B")
-RERANKER_DEVICE: str = os.getenv("RERANKER_DEVICE", "cuda:1")
-RERANKER_TOP_K: int = 10        # candidates passed from Stage 2/3 to reranker
+RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE", "cuda:1")
+RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker
 
-# Stage 5 — Formatter
-RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads are returned to the injector
+# ── Stage 5 — Formatter ───────────────────────────────────────────────────
+RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads the injector receives
+# Auto-generated follow-up question chip; {title} filled at ingest time.
+AD_QUESTION_TEMPLATE: str  = "Would you like a recommendation for {title}?"
 
-# Stage 6 — Summarization (optional, CPU, runs after formatter)
-# When enabled, calls the LLM with SUMMARIZATION_PROMPT to rewrite the
-# ad text into a single pithy sentence before injection.
+# ── Stage 6 — Ad Text Summarizer (optional, post-formatter) ──────────────
+# Rewrites ad.text into a ≤25-word sentence before injection.
+# NOTE: adds ~1-2 s LLM latency — disable for intrusiveness ablations.
+# Toggle: USE_SUMMARIZATION / env SUMMARIZATION=1 / URL ?ad_sum=1
 USE_SUMMARIZATION: bool = os.getenv("SUMMARIZATION", "").lower() in ("1", "true", "yes")
 
-# Stage 0-pre — Conversation Context Summarizer (optional, runs BEFORE dense retrieval)
-# Compresses the conversation history into a single intent sentence that is
-# appended to (or replaces) the raw query before embedding.
-USE_CONTEXT_SUMMARY: bool = os.getenv("CONTEXT_SUMMARY", "").lower() in ("1", "true", "yes")
 
-# Stage 0-pre — Query Expansion (optional, runs BEFORE dense retrieval)
-# Modes:
-#   none   — pass query as-is (default)
-#   hyde   — generate a hypothetical product description and embed that instead
-#   expand — LLM rewrites query into a richer keyword-diverse form
-QUERY_EXPANSION_MODE: str = os.getenv("QUERY_EXPANSION_MODE", "none").lower()
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  8.  ATTENTION SHIFT                                                    │
+# └─────────────────────────────────────────────────────────────────────────┘
 
-# Template for auto-generated follow-up suggestion questions.
-# {title} is filled by the catalog adapter at ingest time.
-AD_QUESTION_TEMPLATE: str = "Would you like a recommendation for {title}?"
-
-# ═══════════════════════════════════════════════════════════════
-# ATTENTION SHIFT
-# ═══════════════════════════════════════════════════════════════
 DEFAULT_DIVERGENCE_METHOD: str = "jsd"
-DEFAULT_N_CONCEPTS: int = 16
-KL_EPSILON: float = 1e-10
+DEFAULT_N_CONCEPTS: int        = 16
+KL_EPSILON: float              = 1e-10
 
-# ═══════════════════════════════════════════════════════════════
-# UI
-# ═══════════════════════════════════════════════════════════════
-APP_TITLE: str = "Conversational Assistant"
-PAGE_TITLE: str = "Chat"
-PAGE_ICON: str = "🤖"
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  9.  UI                                                                 │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+APP_TITLE: str       = "Conversational Assistant"
+PAGE_TITLE: str      = "Chat"
+PAGE_ICON: str       = "🤖"
 DEV_QUERY_PARAM: str = "dev"
 
-# Ollama native API base (for ETA probing via /api/ps)
+# Ollama native API base (used for ETA probing via /api/ps)
 OLLAMA_API_BASE: str = "http://localhost:11434"
 
-# ═══════════════════════════════════════════════════════════════
-# LOGGING
-# ═══════════════════════════════════════════════════════════════
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  10. LOGGING                                                            │
+# └─────────────────────────────────────────────────────────────────────────┘
+
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"
 
-# ═══════════════════════════════════════════════════════════════
-# EXPERIMENT SCREENS  (sequential flow)
-# ═══════════════════════════════════════════════════════════════
-SCREEN_CONSENT: str = "consent"
-SCREEN_DEMOGRAPHICS: str = "demographics"
-SCREEN_OCEAN: str = "ocean"
-SCREEN_BASELINE: str = "baseline"
-SCREEN_PRACTICE: str = "practice"
-SCREEN_TRIAL_INTRO: str = "trial_intro"
-SCREEN_TRIAL_CHAT: str = "trial_chat"
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  11. EXPERIMENT SCREENS  (sequential flow)                              │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+SCREEN_CONSENT:           str = "consent"
+SCREEN_DEMOGRAPHICS:      str = "demographics"
+SCREEN_OCEAN:             str = "ocean"
+SCREEN_BASELINE:          str = "baseline"
+SCREEN_PRACTICE:          str = "practice"
+SCREEN_TRIAL_INTRO:       str = "trial_intro"
+SCREEN_TRIAL_CHAT:        str = "trial_chat"
 SCREEN_POST_TRIAL_SURVEY: str = "post_trial_survey"
-SCREEN_FINAL_SURVEY: str = "final_survey"
-SCREEN_DEBRIEF: str = "debrief"
-SCREEN_DONE: str = "done"
+SCREEN_FINAL_SURVEY:      str = "final_survey"
+SCREEN_DEBRIEF:           str = "debrief"
+SCREEN_DONE:              str = "done"
 
-BASELINE_DURATION_SECONDS: int = 120
-PRACTICE_TASK_PROMPT: str = (
-    "This is a practice round. Ask the assistant for a movie recommendation "
-    "— tell it what genres you like, what mood you're in, or ask for "
-    "something surprising. This is just to get comfortable with the interface."
-)
-PRACTICE_SYSTEM_PROMPT_EXT: str = (
-    "The user wants a movie recommendation. Suggest films based on their "
-    "preferences. Be conversational and ask follow-up questions."
-)
 
-# ═══════════════════════════════════════════════════════════════
-# CONSENT TEXT
-# ═══════════════════════════════════════════════════════════════
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  12. CONSENT TEXT                                                       │
+# └─────────────────────────────────────────────────────────────────────────┘
+
 CONSENT_TITLE: str = "User Study: AI Interaction"
 CONSENT_TEXT: str = (
     "You are being invited to participate in a research study investigating "
@@ -265,5 +352,3 @@ CONSENT_TEXT: str = (
     "giving a reason and without penalty.\n\n"
     "**Contact:** If you have questions, please ask the researcher present."
 )
-
-

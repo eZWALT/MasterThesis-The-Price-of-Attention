@@ -44,7 +44,11 @@ AD_BACKEND: str = os.getenv("AD_BACKEND", "mock")
 
 # ── Ad provider ───────────────────────────────────────────────
 
-def get_ad(query: str = "", context: List[Dict] | None = None) -> Ad:
+def get_ad(
+    query: str = "",
+    context: List[Dict] | None = None,
+    backend: str | None = None,
+) -> Ad:
     """
     Return the Ad to inject at the current conversation turn.
 
@@ -52,13 +56,18 @@ def get_ad(query: str = "", context: List[Dict] | None = None) -> Ad:
     ----------
     query   : the user's latest message (used by the RAG backend).
     context : full conversation history (used by the RAG backend).
+    backend : optional per-call override — "mock" | "rag".
+              Defaults to the module-level AD_BACKEND setting.
+              Use backend="mock" in dev mode (?rag=0) to bypass
+              the retrieval pipeline without changing env vars.
 
     Returns
     -------
     Ad dataclass populated either from the mock catalog or the
-    retrieval pipeline, depending on AD_BACKEND.
+    retrieval pipeline.
     """
-    if AD_BACKEND == "rag":
+    effective = backend if backend in ("mock", "rag") else AD_BACKEND
+    if effective == "rag":
         return _rag_ad(query, context or [])
     return _mock_ad()
 
