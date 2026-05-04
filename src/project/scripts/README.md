@@ -6,23 +6,22 @@ Utility scripts for data preparation and offline processing.
 
 ## `prepare_amazon_catalog.py`
 
-Pulls **Amazon Reviews 2023 item metadata** from Hugging Face, converts it to
-`data/catalog.jsonl` (the schema `AdCatalog` / `AmazonAdapter` expect), and
-optionally precomputes embeddings or pushes the result back to your own HF repo.
+Converts the [`milistu/AMAZON-Products-2023`](https://huggingface.co/datasets/milistu/AMAZON-Products-2023)
+dataset into the project's `data/catalog.jsonl`, and optionally builds the
+FAISS index or uploads the result to your own HF Hub repo.
 
-Uses the official `datasets` library — HF handles caching, retries, and auth.
+**Dataset facts:**
+- 117,243 products, single `train` split
+- Filtered to items first available in 2023
+- Category is stored in the `filename` column (e.g. `meta_Electronics`)
+- Already has an `embeddings` column (text-embedding-3-small), but it is
+  empty for most rows — use `--build-index` to re-embed with the project model
 
-### Install dependencies
+### Install
 
 ```bash
-pip install datasets huggingface_hub
-# or just: pip install -r requirements.txt
-```
-
-For protected repos or upload, log in first:
-```bash
-huggingface-cli login   # paste your HF token once
-# or set env var: export HF_TOKEN=hf_...
+pip install -r requirements.txt   # datasets + huggingface_hub already included
+huggingface-cli login             # only needed for --push-to-hub
 ```
 
 ---
@@ -37,61 +36,56 @@ python scripts/prepare_amazon_catalog.py --list-categories
 
 ### Common recipes
 
-**Quick sanity check** (≈ 2 k items, no GPU needed):
+**Quick sanity check** (small slice, no GPU):
 ```bash
 python scripts/prepare_amazon_catalog.py \
-    --category All_Beauty \
-    --max-items 2000 \
-    --out data/catalog.jsonl
+    --category meta_Electronics \
+    --max-items 500
 ```
 
-**Full single category** (streams to avoid keeping the whole split in RAM):
+**Single full category** (~7.7 k Electronics items):
 ```bash
-python scripts/prepare_amazon_catalog.py \
-    --category Electronics \
-    --streaming
+python scripts/prepare_amazon_catalog.py --category meta_Electronics
 ```
 
-**Merge multiple categories, cap each at 50 k items**:
+**Multiple categories merged**:
 ```bash
 python scripts/prepare_amazon_catalog.py \
-    --category Electronics Cell_Phones_and_Accessories Sports_and_Outdoors \
-    --max-items 50000
+    --category meta_Electronics meta_Cell_Phones_and_Accessories meta_Sports_and_Outdoors
 ```
 
-**Append more categories to an existing catalog**:
+**Append a new category to an existing catalog**:
 ```bash
 python scripts/prepare_amazon_catalog.py \
-    --category Home_and_Kitchen \
+    --category meta_Home_and_Kitchen \
     --append
 ```
 
-**Convert + precompute embeddings** (writes `data/embeddings/embeddings.npy` +
-`data/embeddings/item_ids.json`):
+**Full dataset** (all 117 k products):
 ```bash
-python scripts/prepare_amazon_catalog.py \
-    --category All_Beauty \
-    --max-items 5000 \
-    --embed
+python scripts/prepare_amazon_catalog.py
 ```
-Model and device are read from `EMBEDDING_MODEL_NAME` / `EMBEDDING_DEVICE` in
-`core/config.py` (defaults: `Qwen/Qwen3-Embedding-8B` on `cuda:1`).
 
 **Convert + build the FAISS index in one go**:
 ```bash
 python scripts/prepare_amazon_catalog.py \
-    --category All_Beauty \
-    --max-items 5000 \
+    --category meta_Electronics \
     --build-index
 ```
 
-**Upload processed catalog (+ embeddings) to your HF Hub repo**:
+**Stream from HF** (skips local cache download; useful when filtering a tiny
+subset and disk space is tight):
 ```bash
 python scripts/prepare_amazon_catalog.py \
-    --category All_Beauty \
-    --max-items 5000 \
-    --embed \
-    --push-to-hub your-username/tara-amazon-catalog
+    --category meta_Software \
+    --streaming
+```
+
+**Push processed catalog to your HF Hub repo**:
+```bash
+python scripts/prepare_amazon_catalog.py \
+    --category meta_Electronics \
+    --push-to-hub your-username/tara-catalog
 # add --hub-public to make the repo public
 ```
 
@@ -102,9 +96,30 @@ python scripts/prepare_amazon_catalog.py \
 | File | Description |
 |------|-------------|
 | `data/catalog.jsonl` | Normalised product records (one JSON per line) |
-| `data/embeddings/embeddings.npy` | float32 array `(N, dim)` — only with `--embed` |
-| `data/embeddings/item_ids.json` | `item_id` list aligned with embedding rows |
 | `data/faiss.index` | FAISS flat-IP index — only with `--build-index` |
+
+### Catalog JSONL schema
+
+```json
+{
+  "item_id":  "B0XXXXXXXX",
+  "title":    "Product name",
+  "text":     "title + features + description (embedding input)",
+  "category": "Electronics",
+  "price":    29.99,
+  "cta":      "Shop now",
+  "question": "Looking for Product name?",
+  "metadata": {
+    "store": "BrandName",
+    "average_rating": 4.3,
+    "rating_number": 120,
+    "image": "https://...",
+    "categories": ["Electronics", "Accessories"],
+    "details": "{...}",
+    "date_first_available": "2023-03-15"
+  }
+}
+```
 
 ### Environment variables
 
@@ -112,6 +127,6 @@ python scripts/prepare_amazon_catalog.py \
 |----------|---------|---------|
 | `CATALOG_PATH` | `data/catalog.jsonl` | Override `--out` default |
 | `FAISS_INDEX_PATH` | `data/faiss.index` | Override `--index-path` default |
-| `EMBEDDING_MODEL_NAME` | `Qwen/Qwen3-Embedding-8B` | Model used by `--embed` / `--build-index` |
+| `EMBEDDING_MODEL_NAME` | `Qwen/Qwen3-Embedding-8B` | Model used by `--build-index` |
 | `EMBEDDING_DEVICE` | `cuda:1` | Device for embedding model |
-| `HF_TOKEN` | — | HF auth token (for upload or gated repos) |
+| `HF_TOKEN` | — | HF auth token (for `--push-to-hub`) |
