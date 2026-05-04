@@ -1,12 +1,14 @@
 # Pinned for reproducibility — update intentionally, not accidentally
 streamlit==1.56.0
+loguru==0.7.3
+transformers==4.57.6
+sentence_transformers==5.4.1
 requests==2.32.3
 numpy==2.2.6
-
-# Optional: uncomment when attention shift moves beyond DummyEstimator
-# sentence-transformers==3.4.1
-# scikit-learn==1.6.1
-# torch==2.10.0
+faiss-cpu==1.13.2
+scikit-learn==1.8.0
+torch==2.10.0
+rank-bm25==0.2.2 
 
 # Optional: uncomment when multimodal integration is active
 # mne==1.9.0              # EEG preprocessing
