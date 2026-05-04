@@ -256,7 +256,8 @@ INTENT_MODEL_NAME: str = os.getenv("INTENT_MODEL_NAME", "Thrad/thrad-bert-conver
 INTENT_DEVICE: str     = os.getenv("INTENT_DEVICE", "cpu")
 
 # Catalog dataset adapter: "generic" | "amazon" | any registered key.
-CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "generic")
+# Run scripts/prepare_amazon_catalog.py to populate data/catalog.jsonl first.
+CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "amazon")
 
 # ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS, GPU 1) ─────
 EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-8B")
