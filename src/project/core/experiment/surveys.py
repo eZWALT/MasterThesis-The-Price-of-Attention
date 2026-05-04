@@ -6,7 +6,13 @@ All item definitions, scale bounds, and scoring logic live here.
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Literal
+
+# ─────────────────────────────────────────────────────────────
+# Supported BFI versions
+# ─────────────────────────────────────────────────────────────
+BFI_VERSION = Literal["10", "44"]
+BFI_VERSIONS = {"10", "44"}
 
 # ═══════════════════════════════════════════════════════════════
 # OCEAN — BFI-44 (John & Srivastava, 1999)
@@ -89,6 +95,39 @@ OCEAN_ITEMS: list[tuple[str, str, bool]] = [
 ]
 
 # ═══════════════════════════════════════════════════════════════
+# OCEAN — BFI-10 (Rammstedt & John, 2007)
+# Source: Rammstedt, B., & John, O. P. (2007). Measuring personality
+# in one minute or less: A 10-item short version of the Big Five
+# Inventory in English and German. Journal of Research in Personality,
+# 41(1), 203-212. https://doi.org/10.1016/j.jrp.2006.02.001
+# ═══════════════════════════════════════════════════════════════
+# Each item: (text, trait, reversed)
+# Scoring: 1–5 Likert.  Reversed items: score = 6 − raw.
+# Trait score = mean of 2 domain items (after reversal).
+# Domain sizes: E=2, A=2, C=2, N=2, O=2  (total 10)
+BFI10_ITEMS: list[tuple[str, str, bool]] = [
+    # (statement, trait_key, is_reversed)
+    ("I see myself as someone who is reserved.",                              "E", True),   #  1R
+    ("I see myself as someone who is generally trusting.",                    "A", False),  #  2
+    ("I see myself as someone who tends to be lazy.",                         "C", True),   #  3R
+    ("I see myself as someone who is relaxed, handles stress well.",          "N", True),   #  4R
+    ("I see myself as someone who has few artistic interests.",               "O", True),   #  5R
+    ("I see myself as someone who is outgoing, sociable.",                    "E", False),  #  6
+    ("I see myself as someone who tends to find fault with others.",          "A", True),   #  7R
+    ("I see myself as someone who does a thorough job.",                      "C", False),  #  8
+    ("I see myself as someone who gets nervous easily.",                      "N", False),  #  9
+    ("I see myself as someone who has an active imagination.",                "O", False),  # 10
+]
+
+
+def get_ocean_items(version: str = "44") -> list[tuple[str, str, bool]]:
+    """Return the BFI item list for the requested version ("10" or "44")."""
+    if version == "10":
+        return BFI10_ITEMS
+    return OCEAN_ITEMS
+
+
+# ═══════════════════════════════════════════════════════════════
 # POST-TRIAL SURVEY  (after each chat trial)
 # ═══════════════════════════════════════════════════════════════
 POST_TRIAL_SCALE_MIN: int = 1
@@ -116,27 +155,34 @@ FINAL_OPEN_ENDED_PROMPT: str = (
 )
 
 
-def score_ocean(raw_responses: List[int]) -> Dict[str, float]:
+def score_ocean(
+    raw_responses: List[int],
+    items: list[tuple[str, str, bool]] | None = None,
+) -> Dict[str, float]:
     """
-    Compute Big Five trait scores from BFI-10 raw responses.
+    Compute Big Five trait scores from raw BFI responses.
 
     Parameters
     ----------
-    raw_responses : list of 44 ints (1–5 Likert), one per OCEAN_ITEMS.
+    raw_responses : list of ints (1–5 Likert), one per item in *items*.
+    items : item list to score against.  Defaults to OCEAN_ITEMS (BFI-44).
+            Pass ``get_ocean_items("10")`` for BFI-10.
 
     Returns
     -------
     Dict with keys O, C, E, A, N → float (1.0–5.0 each).
     """
-    if len(raw_responses) != len(OCEAN_ITEMS):
+    if items is None:
+        items = OCEAN_ITEMS
+    if len(raw_responses) != len(items):
         raise ValueError(
-            f"Expected {len(OCEAN_ITEMS)} responses, got {len(raw_responses)}"
+            f"Expected {len(items)} responses, got {len(raw_responses)}"
         )
 
     trait_sums: Dict[str, float] = {}
     trait_counts: Dict[str, int] = {}
 
-    for raw, (_, trait, reversed_) in zip(raw_responses, OCEAN_ITEMS):
+    for raw, (_, trait, reversed_) in zip(raw_responses, items):
         score = (OCEAN_SCALE_MAX + 1) - raw if reversed_ else raw
         trait_sums[trait] = trait_sums.get(trait, 0.0) + score
         trait_counts[trait] = trait_counts.get(trait, 0) + 1

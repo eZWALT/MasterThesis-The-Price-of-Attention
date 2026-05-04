@@ -38,6 +38,7 @@ from core.experiment.surveys import (
     OCEAN_SCALE_MAX,
     OCEAN_SCALE_LABELS,
     OCEAN_INSTRUCTIONS,
+    get_ocean_items,
     # Post-trial survey
     POST_TRIAL_SCALE_MIN,
     POST_TRIAL_SCALE_MAX,
@@ -166,22 +167,28 @@ def render_demographics() -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# SCREEN 3 — OCEAN PERSONALITY (BFI-44)
+# SCREEN 3 — OCEAN PERSONALITY (BFI-44 or BFI-10)
 # ═══════════════════════════════════════════════════════════════
 
-def render_ocean() -> Optional[list[int]]:
+def render_ocean(bfi_version: str = "44") -> Optional[list[int]]:
     """
-    Render BFI-44 questionnaire with progress bar.
-    Returns list of 44 raw Likert responses on submit, None otherwise.
+    Render BFI questionnaire with progress bar.
+
+    Parameters
+    ----------
+    bfi_version : "10" for BFI-10 (10 items) or "44" for BFI-44 (44 items).
+
+    Returns list of raw Likert responses on submit, None otherwise.
     """
+    items = get_ocean_items(bfi_version)
     st.header("Personality Questionnaire")
     st.info(OCEAN_INSTRUCTIONS)
 
-    n = len(OCEAN_ITEMS)
+    n = len(items)
     responses: list[int] = []
     all_answered = True
 
-    for i, (text, _trait, _rev) in enumerate(OCEAN_ITEMS):
+    for i, (text, _trait, _rev) in enumerate(items):
         # Progress
         st.progress((i + 1) / n, text=f"Question {i + 1} of {n}")
 

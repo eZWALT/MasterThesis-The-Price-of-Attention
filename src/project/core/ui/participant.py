@@ -27,7 +27,7 @@ from core.config import (
 )
 from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
-from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, score_ocean
+from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, score_ocean, get_ocean_items
 from core.ui.screens import (
     render_consent,
     render_demographics,
@@ -243,10 +243,11 @@ def run_participant_mode(params):
             st.rerun()
 
     elif scr == SCREEN_OCEAN:
-        result = render_ocean()
+        result = render_ocean(params.bfi_version)
         if result is not None:
             ctrl.ocean_raw = result
-            ctrl.ocean_scores = score_ocean(result)
+            items = get_ocean_items(params.bfi_version)
+            ctrl.ocean_scores = score_ocean(result, items=items)
             ctrl.advance()
             st.rerun()
 
