@@ -68,24 +68,72 @@ bfi         BFI version used for the OCEAN personality screen
                      44 → BFI-44 (44 items, ~10 min)
             Default: 44
 
+study       Study protocol type — sets smart defaults for the session.
+            Values : lab   → BFI-44, file store, 4 trials, baseline, full consent
+                     crowd → BFI-10, null store, 2 trials, skip baseline
+            Default: lab (or env var STUDY_TYPE)
+            Note: any other param explicitly in the URL overrides the
+                  corresponding study default.
+
+qe          Query expansion mode for the retrieval pipeline (Stage 0b).
+            Values : none   → pass raw query to dense retriever (default)
+                     hyde   → generate hypothetical product doc and embed that
+                     expand → LLM rewrites query into a richer keyword form
+            Default: none (or env var QUERY_EXPANSION_MODE)
+            Example: ?qe=hyde
+
+ctx_sum     Enable conversation context summarizer before retrieval (Stage 0a).
+            Values : 1 / true / yes → enabled
+                     0 / false / no  → disabled
+            Default: off (or env var CONTEXT_SUMMARY=1)
+            Example: ?ctx_sum=1
+
+ad_sum      Enable ad text summarizer after formatter (Stage 6).
+            Rewrites raw catalog description into a ≤25-word sentence.
+            Values : 1 / true / yes → enabled
+                     0 / false / no  → disabled
+            Default: off (or env var SUMMARIZATION=1)
+            Example: ?ad_sum=1
+
+force_ad    ⚠ DEV MODE ONLY (requires dev=true or dev=flow)
+            Inject an ad on every turn, ignoring the ad_turns schedule.
+            Useful for rapidly testing all UI renderers without waiting N turns.
+            Values : 1 / true / yes → force inject every turn
+            Default: off
+            Example: ?dev=flow&force_ad=1
+
+rag         ⚠ DEV MODE ONLY (requires dev=true or dev=flow)
+            Override the AD_BACKEND for this session.
+            Values : 0 → force mock backend (instant, no GPU, placeholder ad)
+                     1 → force RAG backend (full retrieval pipeline)
+            Default: (absent) → use AD_BACKEND env var / module default
+            Example: ?dev=flow&rag=0   (iterate UI without GPU)
+                     ?dev=flow&rag=1   (end-to-end pipeline check)
+
 ───────────────────────────────────────────────────────────────────────────────
 EXAMPLE URLS
 ───────────────────────────────────────────────────────────────────────────────
 
-Full prod session, specific task/mode assignment, file persistence:
-  http://localhost:7777?pid=p01&tasks=trans_plan_trip,social_new_hobby&modes=2_in_chat,4_adjacent&store=file
+Lab session — full protocol, specific task/mode assignment, file persistence:
+  http://localhost:7777?study=lab&pid=p01&tasks=trans_plan_trip,social_new_hobby&modes=inline_persuasive,explicit_ad_block&store=file
+
+Crowdsourcing session — lightweight, 2 trials, BFI-10, skip baseline:
+  http://localhost:7777?study=crowd&pid=p42
+
+Crowdsourcing with HyDE query expansion + context summarizer:
+  http://localhost:7777?study=crowd&pid=p42&qe=hyde&ctx_sum=1
 
 Reproducible counterbalance group B, seed fixed:
-  http://localhost:7777?pid=p02&cb=1&seed=7&store=file
+  http://localhost:7777?study=lab&pid=p02&cb=1&seed=7
 
-Reduced turns, early ad injection for pilot:
-  http://localhost:7777?dev=flow&turns_min=2&turns_max=4&ad_turns=1,3
+Dev — force mock ads (no pipeline), inject on every turn, skip all setup screens:
+  http://localhost:7777?dev=flow&rag=0&force_ad=1&skip=consent,baseline,demographics,ocean
 
-Dev flow test, skip consent and baseline:
-  http://localhost:7777?dev=flow&skip=consent,baseline,demographics
+Dev — force RAG pipeline + HyDE, check end-to-end ad injection:
+  http://localhost:7777?dev=flow&rag=1&qe=hyde&force_ad=1&skip=consent,baseline,demographics,ocean
 
-Single-trial debug with implicit ads:
-  http://localhost:7777?dev=flow&n=1&modes=5_implicit&skip=consent,baseline,demographics,ocean
+Dev — single trial, specific mode, reduced turns:
+  http://localhost:7777?dev=flow&n=1&modes=explicit_ad_block&turns_min=2&turns_max=4&skip=consent,baseline,demographics,ocean
 
 ───────────────────────────────────────────────────────────────────────────────
 """
@@ -100,11 +148,15 @@ import streamlit as st
 from core.config import (
     AD_MODES,
     DEFAULT_MODEL,
+    DEFAULT_STUDY_TYPE,
     DEV_QUERY_PARAM,
+    STUDY_DEFAULTS,
+    STUDY_TYPES,
     TRIALS_PER_SESSION,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     AD_INJECTION_TURNS,
+    VALID_QUERY_EXPANSION_MODES,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
     SCREEN_OCEAN,
@@ -133,65 +185,115 @@ SKIPPABLE_SCREENS = {
 class ExperimentParams:
     """
     Fully resolved experiment parameters derived from URL query params.
-    All fields have safe defaults — absent params → config defaults.
+    All fields have safe defaults — absent params → study type defaults.
     """
-    # Routing
+    # ── Routing ──────────────────────────────────────
     dev_mode: bool = False
     flow_test: bool = False
 
-    # Session identity
+    # ── Study type ───────────────────────────────────
+    # lab   → BFI-44, file store, 4 trials, baseline, full protocol
+    # crowd → BFI-10, null store, 2 trials, skip baseline, lighter protocol
+    study_type: str = DEFAULT_STUDY_TYPE
+
+    # ── Session identity ─────────────────────────────
     participant_id: Optional[str] = None    # None → auto-generate
 
-    # Trial plan
+    # ── Trial plan ───────────────────────────────────
     n_trials: int = TRIALS_PER_SESSION
     tasks: List[TaskDefinition] = field(default_factory=list)
     ad_modes: List[str] = field(default_factory=list)
 
-    # Screens to auto-skip
+    # ── Screens to auto-skip ─────────────────────────
     skip_screens: set = field(default_factory=set)
 
-    # LLM override
+    # ── LLM override ─────────────────────────────────
     model: Optional[str] = None             # None → DEFAULT_MODEL
 
-    # Counterbalancing & reproducibility
+    # ── Counterbalancing & reproducibility ───────────
     seed: Optional[int] = None              # None → non-deterministic
     cb_group: Optional[int] = None          # None → derived from pid hash
 
-    # Turn constraints (per trial)
+    # ── Turn constraints (per trial) ─────────────────
     turns_min: int = MIN_TURNS_PER_TRIAL
     turns_max: int = MAX_TURNS_PER_TRIAL
     ad_turns: List[int] = field(default_factory=lambda: list(AD_INJECTION_TURNS))
 
-    # BFI version for OCEAN screen
-    bfi_version: str = "10"                  # "10" | "44"
+    # ── BFI version for OCEAN screen ─────────────────
+    bfi_version: str = "10"                 # "10" | "44"
 
-    # Persistence
+    # ── Persistence ──────────────────────────────────
     store_backend: str = "null"             # null | file
+
+    # ── RAG pipeline overrides (per-session via URL) ─
+    # None = "use whatever config.py / env var says"
+    ctx_sum: Optional[bool] = None          # ?ctx_sum=1  → ContextSummaryStage
+    query_expansion: Optional[str] = None   # ?qe=hyde|expand|none
+    ad_summarize: Optional[bool] = None     # ?ad_sum=1  → SummarizationStage
+
+    # ── Dev-only overrides ────────────────────────────
+    # Available only when dev=true|flow; silently ignored in production.
+    force_ad: bool = False                  # ?force_ad=1 → inject ad on every turn
+    use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
+
+    def apply_study_defaults(self, explicitly_set: set) -> None:
+        """
+        Fill in per-study smart defaults for any param NOT explicitly set
+        in the URL.  Called by parse_query_params() after all URL params
+        have been parsed.
+        """
+        defaults = STUDY_DEFAULTS.get(self.study_type, {})
+        for key, value in defaults.items():
+            if key not in explicitly_set:
+                setattr(self, key, value)
 
 
 def parse_query_params() -> ExperimentParams:
     """
     Read st.query_params and return a fully resolved ExperimentParams.
     Invalid values are silently ignored (fallback to defaults).
+
+    New parameters
+    --------------
+    study     : lab | crowd — dispatches protocol + smart defaults
+    qe        : none | hyde | expand — query expansion mode (Stage 0b)
+    ctx_sum   : 1 | 0 — enable/disable conversation context summarizer (Stage 0a)
+    ad_sum    : 1 | 0 — enable/disable ad text summarizer (Stage 6)
+    force_ad  : 1 (DEV ONLY) — inject an ad on every turn, ignoring ad_turns schedule
+    rag       : 0 | 1 (DEV ONLY) — force mock (0) or RAG (1) backend for this session
     """
     p = st.query_params
     params = ExperimentParams()
+
+    # Track which params were explicitly set in the URL so that
+    # apply_study_defaults() does not overwrite them.
+    explicitly_set: set = set()
 
     # ── Routing ──────────────────────────────────────────────
     dev_raw = p.get(DEV_QUERY_PARAM, "").lower()
     params.dev_mode   = dev_raw in ("true", "1", "yes")
     params.flow_test  = dev_raw == "flow"
 
+    # ── Study type ───────────────────────────────────────────
+    # Sets protocol-wide smart defaults (BFI version, store, n_trials, …).
+    # Any param that is also explicitly in the URL overrides the default.
+    study_raw = p.get("study", "").lower()
+    if study_raw in STUDY_TYPES:
+        params.study_type = study_raw
+        explicitly_set.add("study_type")
+
     # ── Participant ID ────────────────────────────────────────
     pid = p.get("pid", "").strip()
     if pid:
         params.participant_id = pid
+        explicitly_set.add("participant_id")
 
     # ── Number of trials ─────────────────────────────────────
     try:
         n = int(p.get("n", ""))
         if 1 <= n <= 20:
             params.n_trials = n
+            explicitly_set.add("n_trials")
     except (ValueError, TypeError):
         pass
 
@@ -225,6 +327,7 @@ def parse_query_params() -> ExperimentParams:
     skip_raw = p.get("skip", "").strip()
     if skip_raw:
         params.skip_screens = {s for s in skip_raw.split(",") if s in SKIPPABLE_SCREENS}
+        explicitly_set.add("skip_screens")
 
     # ── Model override ────────────────────────────────────────
     model_raw = p.get("model", "").strip()
@@ -235,11 +338,13 @@ def parse_query_params() -> ExperimentParams:
     bfi_raw = p.get("bfi", "").strip()
     if bfi_raw in ("10", "44"):
         params.bfi_version = bfi_raw
+        explicitly_set.add("bfi_version")
 
     # ── Persistence backend ───────────────────────────────────
-    store_raw = p.get("store", "null").lower()
+    store_raw = p.get("store", "").lower()
     if store_raw in ("null", "file"):
         params.store_backend = store_raw
+        explicitly_set.add("store_backend")
 
     # ── Seed ─────────────────────────────────────────────────
     try:
@@ -260,6 +365,7 @@ def parse_query_params() -> ExperimentParams:
         tmin = int(p.get("turns_min", ""))
         if 1 <= tmin <= 30:
             params.turns_min = tmin
+            explicitly_set.add("turns_min")
     except (ValueError, TypeError):
         pass
 
@@ -267,6 +373,7 @@ def parse_query_params() -> ExperimentParams:
         tmax = int(p.get("turns_max", ""))
         if 1 <= tmax <= 30:
             params.turns_max = tmax
+            explicitly_set.add("turns_max")
     except (ValueError, TypeError):
         pass
 
@@ -287,5 +394,43 @@ def parse_query_params() -> ExperimentParams:
                 pass
         if parsed:
             params.ad_turns = sorted(set(parsed))
+            explicitly_set.add("ad_turns")
+
+    # ── RAG pipeline overrides ────────────────────────────────
+    # ?qe=none | hyde | expand  — query expansion mode for Stage 0b
+    qe_raw = p.get("qe", "").lower()
+    if qe_raw in VALID_QUERY_EXPANSION_MODES:
+        params.query_expansion = qe_raw
+
+    # ?ctx_sum=1 | 0  — enable/disable conversation context summarizer (Stage 0a)
+    ctx_raw = p.get("ctx_sum", "").strip()
+    if ctx_raw in ("1", "true", "yes"):
+        params.ctx_sum = True
+    elif ctx_raw in ("0", "false", "no"):
+        params.ctx_sum = False
+
+    # ?ad_sum=1 | 0  — enable/disable ad text summarizer (Stage 6)
+    ad_sum_raw = p.get("ad_sum", "").strip()
+    if ad_sum_raw in ("1", "true", "yes"):
+        params.ad_summarize = True
+    elif ad_sum_raw in ("0", "false", "no"):
+        params.ad_summarize = False
+
+    # ── Dev-only overrides (silently ignored outside dev mode) ────────────
+    if params.dev_mode or params.flow_test:
+        # ?force_ad=1  — inject an ad on every turn regardless of ad_turns schedule
+        if p.get("force_ad", "").strip() in ("1", "true", "yes"):
+            params.force_ad = True
+
+        # ?rag=0  — force mock backend (skip retrieval pipeline, instant response)
+        # ?rag=1  — force RAG backend regardless of AD_BACKEND env var
+        rag_raw = p.get("rag", "").strip()
+        if rag_raw == "0":
+            params.use_rag = False
+        elif rag_raw == "1":
+            params.use_rag = True
+
+    # ── Apply study-type smart defaults for unset params ──────
+    params.apply_study_defaults(explicitly_set)
 
     return params

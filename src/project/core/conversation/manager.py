@@ -84,6 +84,8 @@ class ConversationManager:
         min_turns: int = MIN_TURNS_PER_TRIAL,
         max_turns: int = MAX_TURNS_PER_TRIAL,
         ad_turns: Optional[List[int]] = None,
+        force_ad: bool = False,
+        use_rag: Optional[bool] = None,
     ):
         self.ad_mode = ad_mode
         self.model = model
@@ -96,6 +98,11 @@ class ConversationManager:
         self.min_turns = min_turns
         self.max_turns = max_turns
         self.ad_turns: List[int] = ad_turns if ad_turns is not None else list(AD_INJECTION_TURNS)
+        # Dev overrides — None means "respect module-level defaults"
+        self._force_ad: bool = force_ad
+        self._ad_backend: str | None = (
+            "rag" if use_rag is True else "mock" if use_rag is False else None
+        )
 
         self.conversation_id: str = str(uuid.uuid4())
         self.messages: List[Dict[str, str]] = []
@@ -144,7 +151,12 @@ class ConversationManager:
 
     @property
     def should_inject_ad(self) -> bool:
-        """Whether the current turn (just completed) is an ad injection turn."""
+        """Whether the current turn (just completed) is an ad injection turn.
+
+        When force_ad=True (dev mode ?force_ad=1), every turn injects an ad.
+        """
+        if self._force_ad:
+            return True
         return self.turn_count in self.ad_turns
 
     # ── Public API ────────────────────────────────────────────
@@ -190,7 +202,7 @@ class ConversationManager:
 
         # 4 — ad injection decision
         inject_ad = self.should_inject_ad
-        ad = get_ad() if inject_ad else None
+        ad = get_ad(query=user_input, context=self.messages, backend=self._ad_backend) if inject_ad else None
         injector = get_injector(self.ad_mode) if inject_ad else None
         injection = (
             injector.inject(ad, self.messages)

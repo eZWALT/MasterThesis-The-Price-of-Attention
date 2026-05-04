@@ -21,6 +21,8 @@ from core.conversation import ConversationManager
 from core.experiment import TASK_CATALOG, TASK_BY_ID
 from core.ad_injection import get_ad, get_injector
 from core.ui.screens import _render_ad_card
+# DEV helpers live in participant to avoid circular imports
+from core.ui.participant import _render_dev_ad_controls, _sync_dev_overrides
 
 
 def render_dev_sidebar():
@@ -63,6 +65,9 @@ def render_dev_sidebar():
             st.rerun()
         st.divider()
         mgr = st.session_state.dev_manager
+        with st.expander("🎯 Ad overrides", expanded=bool(st.session_state.get("dev_force_ad"))):
+            _render_dev_ad_controls(mgr=mgr)
+        st.divider()
         if mgr:
             st.markdown(f"**Turn:** {mgr.turn_count} / {MAX_TURNS_PER_TRIAL}")
             st.markdown(f"**Can end:** {mgr.can_end}")
@@ -149,5 +154,6 @@ def run_dev_mode():
         return
 
     if user_input := st.chat_input("Send a message..."):
+        _sync_dev_overrides(mgr)
         mgr.process_user_message(user_input)
         st.rerun()
