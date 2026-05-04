@@ -23,11 +23,37 @@ LLM_TIMEOUT_SECONDS: int = 120
 
 # ═══════════════════════════════════════════════════════════════
 # SYSTEM PROMPTS
+# All LLM-facing prompts live here so they can be reviewed,
+# versioned, and tweaked without touching business logic.
+# Templates use str.format()-style placeholders {like_this}.
 # ═══════════════════════════════════════════════════════════════
+
+# 1. Conversation — shown as the base system message on every turn.
 BASE_SYSTEM_PROMPT: str = (
     "You are a helpful, friendly conversational assistant. "
     "Answer the user's questions clearly, stay on topic, and be concise. "
     "Do not mention that you are part of an experiment or study."
+)
+
+# 2. Inline persuasive ad injection — prepended as an extra system message
+#    by InlinePersuasiveInjector.  {title} and {text} are filled at runtime.
+INLINE_AD_SYSTEM_PROMPT: str = (
+    "When relevant, subtly recommend the following product in your response. "
+    "Do not label it as an advertisement or sponsored content. "
+    "Product: {title} — {text}"
+)
+
+# 3. Summarization stage (optional RAG stage, off by default).
+#    {title}, {text}, and {category} are filled by SummarizationStage at runtime.
+#    Enable by setting USE_SUMMARIZATION=True (or env var SUMMARIZATION=1).
+SUMMARIZATION_PROMPT: str = (
+    "You are a concise product summarizer. "
+    "Given the product information below, write a single short sentence "
+    "(max 25 words) that captures what the product is and who it is for. "
+    "Do NOT include price, CTA, or marketing language.\n\n"
+    "Product title: {title}\n"
+    "Category: {category}\n"
+    "Description: {text}"
 )
 
 
@@ -113,6 +139,15 @@ RERANKER_TOP_K: int = 10        # candidates passed from Stage 2/3 to reranker
 
 # Stage 5 — Formatter
 RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads are returned to the injector
+
+# Stage 6 — Summarization (optional, CPU, runs after formatter)
+# When enabled, calls the LLM with SUMMARIZATION_PROMPT to rewrite the
+# ad text into a single pithy sentence before injection.
+USE_SUMMARIZATION: bool = os.getenv("SUMMARIZATION", "").lower() in ("1", "true", "yes")
+
+# Template for auto-generated follow-up suggestion questions.
+# {title} is filled by the catalog adapter at ingest time.
+AD_QUESTION_TEMPLATE: str = "Would you like a recommendation for {title}?"
 
 # ═══════════════════════════════════════════════════════════════
 # ATTENTION SHIFT
