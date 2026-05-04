@@ -35,6 +35,7 @@ from __future__ import annotations
 import re
 from typing import Any, Dict, List, Union
 
+from core.config import AD_QUESTION_TEMPLATE
 from core.retrieval.adapters.base import DatasetAdapter, CatalogItemDict
 
 # Fields consumed directly; everything else → metadata.
@@ -100,7 +101,7 @@ class AmazonAdapter(DatasetAdapter):
             "category": category,
             "price":    price,
             "cta":      "Shop now",
-            "question": f"Would you like a recommendation for {title}?",
+            "question": AD_QUESTION_TEMPLATE.format(title=title),
             "metadata": metadata,
         }
 
