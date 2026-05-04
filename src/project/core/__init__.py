@@ -22,7 +22,6 @@ from core.config import (                                   # noqa: F401
     MAX_TOKENS_RANGE,
     LLM_TIMEOUT_SECONDS,
     BASE_SYSTEM_PROMPT,
-    IMPLICIT_AD_SYSTEM_PROMPT,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     TRIALS_PER_SESSION,

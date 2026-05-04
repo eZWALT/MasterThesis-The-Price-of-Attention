@@ -358,7 +358,11 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
 
     # Side-panel ads — rendered next to the latest assistant message
     if show_side and manager.should_inject_ad:
-        ad = get_ad()
+        last_user = next(
+            (m["content"] for m in reversed(manager.messages) if m["role"] == "user"),
+            "",
+        )
+        ad = get_ad(query=last_user, context=manager.messages)
         injector = get_injector(ad_mode)
         result = injector.inject(ad, manager.messages)
         if result.display_payload:
@@ -369,8 +373,12 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
                 _render_ad_card(st, result.display_payload)
 
     # Suggestion ads
-    if ad_mode == "3_suggestions" and manager.should_inject_ad:
-        ad = get_ad()
+    if ad_mode == "sponsored_conversational" and manager.should_inject_ad:
+        last_user = next(
+            (m["content"] for m in reversed(manager.messages) if m["role"] == "user"),
+            "",
+        )
+        ad = get_ad(query=last_user, context=manager.messages)
         injector = get_injector(ad_mode)
         result = injector.inject(ad, manager.messages)
         if result.suggestions:
