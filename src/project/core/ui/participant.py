@@ -242,13 +242,15 @@ def _render_dev_ad_controls(mgr=None) -> None:
     if mgr is not None and st.button("💉 Inject ad NOW", use_container_width=True,
                                       help="Fire one ad immediately, regardless of turn schedule."):
         backend = None if chosen == "default" else chosen
-        ad = get_ad(query="", context=mgr.messages, backend=backend)
+        last_user = next(
+            (m["content"] for m in reversed(mgr.messages) if m["role"] == "user"),
+            "",
+        )
+        ad = get_ad(query=last_user, context=mgr.messages, backend=backend)
         injector = get_injector(mgr.ad_mode)
         result = injector.inject(ad, mgr.messages)
-        # Show the ad card inline (reuses the ad_mode render path)
-        if result.display_payload:
-            from core.ui.screens import _render_ad_card
-            _render_ad_card(st.sidebar, result.display_payload)
+        # Store result in session state so run_dev_mode can render it in the main area
+        st.session_state["dev_manual_ad"] = result
         st.caption(f"📦 {ad.title}")
 
 
