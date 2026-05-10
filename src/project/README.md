@@ -1,4 +1,4 @@
-# 📡 TARA — Telefonica Advertising RAG Assistant (Experimentation)
+# 📡 Conversational Ad Retrieval — RAG RecSys (Experimentation)
 
 Streamlit-based conversational AI interface for benchmarking advertising strategies
 in LLM-powered recommender systems. Built in collaboration with Telefonica Research.
@@ -20,7 +20,7 @@ in LLM-powered recommender systems. Built in collaboration with Telefonica Resea
 
 ## Overview
 
-TARA provides a ChatGPT-like interface with configurable advertising modes
+The platform provides a ChatGPT-like interface with configurable advertising modes
 to study how different ad placements affect user interaction in conversational AI systems.
 
 **Features:**
@@ -133,7 +133,7 @@ append, HF Hub upload, env var overrides).
 | Variable | Default | Description |
 |---|---|---|
 | `LOG_LEVEL` | `INFO` | Loguru verbosity: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
-| `LOG_FILE` | *(unset)* | If set, write rotating logs to this path (e.g. `logs/tara.log`) |
+| `LOG_FILE` | *(unset)* | If set, write rotating logs to this path (e.g. `logs/experiment.log`) |
 
 ---
 

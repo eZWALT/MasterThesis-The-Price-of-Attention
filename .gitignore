@@ -206,6 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# TARA — generated data (large binaries, not tracked)
+# Generated data (large binaries, not tracked)
 src/project/data/
 src/project/sessions/

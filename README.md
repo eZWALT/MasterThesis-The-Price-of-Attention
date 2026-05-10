@@ -40,7 +40,7 @@ resources/
     blogs/                   # Industry blog posts & reports
     books/                   # Reference textbooks
 src/
-    project/                 # TARA — main application
+    project/                 # Main application
         .streamlit/          # Streamlit theme & server config
         app.py               # Streamlit entrypoint (main chat)
         pages/               # Multi-page views (dashboard, etc.)
@@ -57,7 +57,7 @@ README.md
 LICENSE
 ```
 - **resources/**: Collected papers, blogs, and books organized by topic.
-- **src/project/**: TARA — the main Streamlit application, Docker setup, and backend modules.
+- **src/project/**: The main Streamlit application, Docker setup, and backend modules.
 - **src/scripts/**: Standalone utility scripts and exploratory code.
 - **src/notebooks/**: Jupyter notebooks for experimentation.
 - **docs/**: Project documentation and drafts.
