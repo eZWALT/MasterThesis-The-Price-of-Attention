@@ -45,6 +45,7 @@ echo "[launch.sh] mode: $MODE"
 # ─────────────────────────────────────────────────────────────────────────────
 launch_ollama() {
     export OLLAMA_HOST="0.0.0.0:${OLLAMA_PORT}"
+    export OLLAMA_KEEP_ALIVE="${OLLAMA_KEEP_ALIVE:--1}"   # default: keep model loaded forever
 
     echo "[1/4] Starting ollama on port ${OLLAMA_PORT}..."
     "$OLLAMA_BIN" serve &

@@ -37,6 +37,12 @@ DEFAULT_MAX_TOKENS: int  = 400
 TEMPERATURE_RANGE: tuple[float, float] = (0.0, 1.0)
 MAX_TOKENS_RANGE: tuple[int, int]      = (64, 2048)
 LLM_TIMEOUT_SECONDS: int = 120
+# Backend routing: "ollama" uses the native /api/chat endpoint (supports think:false);
+# "openai" uses the OpenAI-compatible /v1/chat/completions endpoint (vLLM, OpenAI, etc.).
+LLM_BACKEND: str = os.getenv("LLM_BACKEND", "ollama")   # "ollama" | "openai"
+# Qwen3 extended thinking/reasoning mode.
+# False = fast conversational replies (recommended); True = chain-of-thought.
+LLM_THINK: bool = os.getenv("LLM_THINK", "false").lower() in ("1", "true", "yes")
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
@@ -326,7 +332,9 @@ PAGE_ICON: str       = "🤖"
 DEV_QUERY_PARAM: str = "dev"
 
 # Ollama native API base (used for ETA probing via /api/ps)
-OLLAMA_API_BASE: str = os.getenv("OLLAMA_API_BASE", "http://localhost:9999")
+OLLAMA_API_BASE: str  = os.getenv("OLLAMA_API_BASE", "http://localhost:9999")
+OLLAMA_NUM_CTX: int   = int(os.getenv("OLLAMA_NUM_CTX", "16384"))  # context window (tokens)
+OLLAMA_KEEP_ALIVE: str = os.getenv("OLLAMA_KEEP_ALIVE", "-1")      # -1 = always loaded
 
 # ── Thinking spinner (shown while waiting for LLM response) ──────────────
 SPINNER_PHRASES: list[str] = [
