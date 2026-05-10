@@ -63,6 +63,40 @@ Open http://localhost:7777?dev=flow — participant flow walkthrough.
 
 ---
 
+## Data Setup
+
+The RAG pipeline needs a product catalog (`data/catalog.jsonl`) and a FAISS
+index (`data/faiss.index`). Both are gitignored and must be built before
+starting the app with `AD_BACKEND=rag`.
+
+Use the provided script to pull from
+[`milistu/AMAZON-Products-2023`](https://huggingface.co/datasets/milistu/AMAZON-Products-2023)
+(117 k products, pre-filtered to 2023 listings):
+
+```bash
+# Quick test — 500 Electronics items, no GPU needed
+python scripts/prepare_amazon_catalog.py \
+    --category meta_Electronics \
+    --max-items 500 \
+    --build-index
+
+# Full Electronics + Mobile catalog, then build FAISS index
+python scripts/prepare_amazon_catalog.py \
+    --category meta_Electronics meta_Cell_Phones_and_Accessories \
+    --build-index
+
+# All 117 k products
+python scripts/prepare_amazon_catalog.py --build-index
+
+# List all available categories
+python scripts/prepare_amazon_catalog.py --list-categories
+```
+
+See [`scripts/README.md`](scripts/README.md) for the full reference (streaming,
+append, HF Hub upload, env var overrides).
+
+---
+
 ## Environment Variables
 
 ### Core / LLM
@@ -222,6 +256,9 @@ pipeline = AdRetrievalPipeline(
 2. Implement `to_catalog_item(raw)` mapping raw fields → normalised schema.
 3. Register it in `core/retrieval/adapters/__init__.py` under `_REGISTRY`.
 4. Set `CATALOG_ADAPTER=my_dataset` (env var or `CATALOG_ADAPTER` in `core/config.py`).
+
+The default adapter is `amazon`, used by `scripts/prepare_amazon_catalog.py`.
+See [`scripts/README.md`](scripts/README.md) for data preparation details.
 
 ---
 
