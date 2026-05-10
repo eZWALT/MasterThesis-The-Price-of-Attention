@@ -15,6 +15,8 @@ from __future__ import annotations
 import requests
 from typing import List, Dict
 
+import logging
+
 from core.config import (
     API_URL,
     OLLAMA_API_BASE,
@@ -24,6 +26,8 @@ from core.config import (
     OLLAMA_NUM_CTX,
     OLLAMA_KEEP_ALIVE,
 )
+
+log = logging.getLogger(__name__)
 
 
 class LLMClient:
@@ -46,6 +50,41 @@ class LLMClient:
         self.api_url = api_url
         self.ollama_api_base = ollama_api_base
         self.timeout = timeout
+
+    def warmup(self, model: str) -> None:
+        """
+        Send a minimal 1-token request to force Ollama to load the model into
+        GPU memory.  Call this once at application startup so the first real
+        generation does not pay the cold-start penalty (~15 s).
+
+        No-ops silently when the backend is not Ollama or if the request fails
+        (warmup errors should never block startup).
+        """
+        if LLM_BACKEND != "ollama":
+            return
+        log.info("Warming up Ollama model '%s' …", model)
+        try:
+            url = f"{self.ollama_api_base.rstrip('/')}/api/chat"
+            try:
+                keep_alive: int | str = int(OLLAMA_KEEP_ALIVE)
+            except (ValueError, TypeError):
+                keep_alive = OLLAMA_KEEP_ALIVE
+            payload = {
+                "model": model,
+                "messages": [{"role": "user", "content": "hi"}],
+                "think": False,
+                "stream": False,
+                "keep_alive": keep_alive,
+                "options": {
+                    "num_predict": 1,
+                    "num_ctx": OLLAMA_NUM_CTX,
+                },
+            }
+            response = requests.post(url, json=payload, timeout=self.timeout)
+            response.raise_for_status()
+            log.info("Ollama warmup complete.")
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Ollama warmup failed (non-fatal): %s", exc)
 
     def chat(
         self,
