@@ -6,6 +6,11 @@ services:
     environment:
       - API_URL=http://host.docker.internal:${OLLAMA_PORT}/v1/chat/completions
       - DEFAULT_MODEL=${OLLAMA_MODEL}
+      - LLM_BACKEND=ollama
+      - OLLAMA_API_BASE=http://host.docker.internal:${OLLAMA_PORT}
+      - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-16384}
+      - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
+      - LLM_THINK=${LLM_THINK:-false}
     volumes:
       - .:/app
     extra_hosts:
