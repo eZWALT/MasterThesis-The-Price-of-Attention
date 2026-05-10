@@ -15,13 +15,21 @@ Quick reference:
 
 import streamlit as st
 
-from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON
+from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON, DEFAULT_MODEL
+from core.conversation.llm_client import LLMClient
 from core.experiment.query_params import parse_query_params
 from core.ui.participant import init_session_state, run_participant_mode
 from core.ui.dev import run_dev_mode
 
 
+@st.cache_resource
+def _warmup_llm() -> None:
+    """Run once per Streamlit process to pre-load the model into GPU memory."""
+    LLMClient().warmup(DEFAULT_MODEL)
+
+
 def main():
+    _warmup_llm()
     params = parse_query_params()
 
     st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout="wide")
