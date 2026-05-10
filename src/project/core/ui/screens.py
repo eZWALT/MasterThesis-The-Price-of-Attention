@@ -210,6 +210,9 @@ def render_demographics() -> Optional[dict]:
     )
 
     if st.button("Continue", type="primary"):
+        if age < 0 or age > 120:
+            st.error("Please enter a valid age (0–120).")
+            return None
         return {
             "age": age if age > 0 else None,
             "gender": gender,
@@ -222,30 +225,28 @@ def render_demographics() -> Optional[dict]:
 # SCREEN 3 — OCEAN PERSONALITY (BFI-44 or BFI-10)
 # ═══════════════════════════════════════════════════════════════
 
-def render_ocean(bfi_version: str = "44") -> Optional[list[int]]:
+def render_ocean(bfi_version: str = "10") -> Optional[list[int]]:
     """
-    Render BFI questionnaire with progress bar.
+    Render BFI questionnaire (all questions at once).
 
     Parameters
     ----------
-    bfi_version : "10" for BFI-10 (10 items) or "44" for BFI-44 (44 items).
+    bfi_version : "10" for BFI-10 (10 items, default) or "44" for BFI-44 (44 items).
 
     Returns list of raw Likert responses on submit, None otherwise.
     """
     items = get_ocean_items(bfi_version)
+    n = len(items)
+
     st.header("Personality Questionnaire")
     st.info(OCEAN_INSTRUCTIONS)
 
-    n = len(items)
     responses: list[int] = []
-    all_answered = True
+    answered = 0
 
     for i, (text, _trait, _rev) in enumerate(items):
-        # Progress
-        st.progress((i + 1) / n, text=f"Question {i + 1} of {n}")
-
         value = st.radio(
-            text,
+            f"**{i + 1}.** {text}",
             options=list(range(OCEAN_SCALE_MIN, OCEAN_SCALE_MAX + 1)),
             format_func=lambda v: f"{v} — {OCEAN_SCALE_LABELS.get(v, '')}",
             horizontal=True,
@@ -253,15 +254,18 @@ def render_ocean(bfi_version: str = "44") -> Optional[list[int]]:
             key=f"ocean_{i}",
         )
         if value is None:
-            all_answered = False
-            responses.append(0)  # placeholder
+            responses.append(0)  # placeholder; submission blocked below
         else:
             responses.append(value)
+            answered += 1
+
+    # Single progress bar reflects how many questions are answered
+    st.progress(answered / n, text=f"{answered} of {n} answered")
 
     st.divider()
-    if all_answered and st.button("Continue", type="primary"):
+    if answered == n and st.button("Continue", type="primary"):
         return responses
-    elif not all_answered:
+    elif answered < n:
         st.info("Please answer all questions to continue.")
     return None
 
@@ -326,8 +330,11 @@ def render_practice(manager: ConversationManager) -> bool:
 
     # Input
     if user_input := st.chat_input("Send a message..."):
-        _call_llm_with_spinner(manager, user_input)
-        st.rerun()
+        if not user_input.strip():
+            st.warning("Please enter a message before sending.")
+        else:
+            _call_llm_with_spinner(manager, user_input.strip())
+            st.rerun()
 
     # Allow ending practice at any time after ≥1 exchange
     if manager.turn_count >= 1:
@@ -447,8 +454,11 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
 
     # Chat input
     if user_input := st.chat_input("Send a message..."):
-        _call_llm_with_spinner(manager, user_input)
-        st.rerun()
+        if not user_input.strip():
+            st.warning("Please enter a message before sending.")
+        else:
+            _call_llm_with_spinner(manager, user_input.strip())
+            st.rerun()
 
     return False
 
@@ -500,6 +510,14 @@ def render_post_trial_survey(trial_number: int) -> Optional[dict]:
 
     st.divider()
     if all_answered and st.button("Continue", type="primary"):
+        # Validate all values are within the expected scale before returning
+        invalid = [
+            iid for iid, v in responses.items()
+            if not (POST_TRIAL_SCALE_MIN <= v <= POST_TRIAL_SCALE_MAX)
+        ]
+        if invalid:
+            st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
+            return None
         return responses
     elif not all_answered:
         st.info("Please answer all questions to continue.")
@@ -541,6 +559,13 @@ def render_final_survey() -> Optional[dict]:
     responses["open_ended"] = open_text
 
     if all_answered and st.button("Submit", type="primary"):
+        invalid = [
+            iid for iid, v in responses.items()
+            if isinstance(v, int) and not (POST_TRIAL_SCALE_MIN <= v <= POST_TRIAL_SCALE_MAX)
+        ]
+        if invalid:
+            st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
+            return None
         return responses
     elif not all_answered:
         st.info("Please answer all Likert questions to continue.")

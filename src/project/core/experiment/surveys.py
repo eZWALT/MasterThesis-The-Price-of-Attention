@@ -179,6 +179,14 @@ def score_ocean(
             f"Expected {len(items)} responses, got {len(raw_responses)}"
         )
 
+    for i, (raw, (text, _trait, _rev)) in enumerate(zip(raw_responses, items)):
+        if not (OCEAN_SCALE_MIN <= raw <= OCEAN_SCALE_MAX):
+            raise ValueError(
+                f"Response {i + 1} is out of range: got {raw!r}, "
+                f"expected {OCEAN_SCALE_MIN}–{OCEAN_SCALE_MAX} "
+                f"(item: '{text[:40]}')"
+            )
+
     trait_sums: Dict[str, float] = {}
     trait_counts: Dict[str, int] = {}
 
