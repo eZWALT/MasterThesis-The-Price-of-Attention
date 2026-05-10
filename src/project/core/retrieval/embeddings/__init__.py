@@ -20,6 +20,7 @@ _REGISTRY = {
 def build_embedding_model(
     model_name: str,
     device: str = "cpu",
+    batch_size: int | None = None,
     backend: str = "huggingface",
 ) -> EmbeddingModel:
     """
@@ -29,13 +30,20 @@ def build_embedding_model(
     ----------
     model_name : HuggingFace model id passed to the backend constructor.
     device     : target device string (e.g. "cuda:1").
+    batch_size : forward-pass batch size; defaults to config.EMBEDDING_BATCH_SIZE.
     backend    : key in _REGISTRY (default "huggingface").
     """
+    from core.config import EMBEDDING_BATCH_SIZE
+
     cls = _REGISTRY.get(backend)
     if cls is None:
         raise ValueError(f"Unknown embedding backend '{backend}'. "
                          f"Available: {list(_REGISTRY)}")
-    return cls(model_name=model_name, device=device)
+    return cls(
+        model_name=model_name,
+        device=device,
+        batch_size=batch_size if batch_size is not None else EMBEDDING_BATCH_SIZE,
+    )
 
 
 __all__ = ["EmbeddingModel", "HuggingFaceEmbedding", "build_embedding_model"]

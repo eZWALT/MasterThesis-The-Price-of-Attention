@@ -31,8 +31,10 @@ from typing import Dict, List, Optional
 import faiss
 import numpy as np
 
+from core.config import DEFAULT_CATALOG_PRICE, FAISS_INDEX_BATCH_SIZE, FAISS_INDEX_LOG_INTERVAL
 from core.retrieval.stages.state import CatalogItem
 from core.retrieval.adapters.base import DatasetAdapter
+from core.log import logger
 
 
 class AdCatalog:
@@ -144,11 +146,12 @@ class AdCatalog:
                 title=norm["title"],
                 text=norm["text"],
                 category=norm.get("category", ""),
-                price=float(norm.get("price", 0.0)),
+                price=float(norm.get("price", DEFAULT_CATALOG_PRICE)),
                 metadata=norm.get("metadata", {}),
             )
             items[item.item_id] = item
             id_map.append(item.item_id)
+        logger.info("Catalog loaded: {} items from {}", len(items), path)
         return items, id_map
 
     @staticmethod
@@ -157,13 +160,36 @@ class AdCatalog:
         id_map: List[str],
         embedding_model,
         save_path: Path,
+        batch_size: int = FAISS_INDEX_BATCH_SIZE,
     ) -> faiss.Index:
-        texts = [items[iid].text for iid in id_map]
-        vectors = embedding_model.encode(texts)   # (N, D)
-        dim = vectors.shape[1]
+        """Encode items in batches and add to FAISS incrementally.
 
-        index = faiss.IndexFlatIP(dim)   # inner product == cosine on normalised vecs
-        index.add(vectors)
+        Encoding the full corpus in one shot allocates a single (N, D) float32
+        array, which can OOM for large catalogs.  Batching keeps peak memory
+        bounded to ``batch_size * D * 4`` bytes for the vector slice, at the
+        cost of slightly more Python loop overhead.
+        """
+        if not id_map:
+            raise ValueError("id_map is empty — nothing to index.")
+
+        index: faiss.Index | None = None
+        total = len(id_map)
+        log_interval = batch_size * FAISS_INDEX_LOG_INTERVAL
+
+        for start in range(0, total, batch_size):
+            batch_ids = id_map[start : start + batch_size]
+            texts = [items[iid].text for iid in batch_ids]
+            vectors = embedding_model.encode(texts)   # (B, D)
+
+            if index is None:
+                dim = vectors.shape[1]
+                index = faiss.IndexFlatIP(dim)  # cosine via inner product on normalised vecs
+
+            index.add(vectors)
+
+            indexed_count = min(start + batch_size, total)
+            if indexed_count % log_interval < batch_size or indexed_count == total:
+                logger.info("  indexed {}/{} items", indexed_count, total)
 
         save_path.parent.mkdir(parents=True, exist_ok=True)
         faiss.write_index(index, str(save_path))

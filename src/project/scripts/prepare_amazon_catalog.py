@@ -304,8 +304,13 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--streaming",
-        action="store_true",
-        help="Stream from HF (saves local disk; good when filtering a small subset)",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Stream rows from HF instead of downloading the full dataset first "
+            "(default: True). Use --no-streaming for full-dataset builds where "
+            "the parallel chunk download is faster."
+        ),
     )
     p.add_argument(
         "--build-index",

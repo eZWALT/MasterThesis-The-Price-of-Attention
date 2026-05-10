@@ -33,7 +33,7 @@ touching this file.
 
 from __future__ import annotations
 
-from core.config import INTENT_MODEL_NAME, INTENT_DEVICE
+from core.config import INTENT_MODEL_NAME, INTENT_DEVICE, INTENT_TOKENIZER_NAME, INTENT_MAX_SEQ_LENGTH
 from core.log import logger
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState
@@ -106,7 +106,7 @@ class IntentClassifier(PipelineStage):
         # The ThradBERT repo ships model weights + config but no tokenizer files.
         # DistilBERT/BERT share the same WordPiece vocabulary, so we load the
         # tokenizer from bert-base-uncased and the model from the checkpoint.
-        tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
+        tokenizer = BertTokenizerFast.from_pretrained(INTENT_TOKENIZER_NAME)
         model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
         target = torch.device(device)
@@ -133,7 +133,7 @@ class IntentClassifier(PipelineStage):
             text,
             return_tensors="pt",
             truncation=True,
-            max_length=512,
+            max_length=INTENT_MAX_SEQ_LENGTH,
         )
         # DistilBERT does not accept token_type_ids — drop it if present.
         inputs = {k: v.to(device) for k, v in inputs.items()

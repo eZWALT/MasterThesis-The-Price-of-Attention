@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from typing import List
 
-from core.config import USE_HYBRID, BM25_WEIGHT, DENSE_WEIGHT
+from core.config import USE_HYBRID, BM25_WEIGHT, DENSE_WEIGHT, RRF_K
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState, CatalogItem
 
@@ -86,8 +86,7 @@ class HybridRefiner(PipelineStage):
             )
         }
 
-        # Reciprocal Rank Fusion (k=60 is a standard default).
-        k = 60
+        k = RRF_K
         rrf_scores = [
             self._dense_w * (1.0 / (k + dense_rank + 1))
             + self._bm25_w * (1.0 / (k + bm25_rank_of[dense_rank] + 1))

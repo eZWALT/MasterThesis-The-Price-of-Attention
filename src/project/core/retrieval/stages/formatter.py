@@ -13,7 +13,7 @@ No model inference happens here — pure data transformation.
 
 from __future__ import annotations
 
-from core.config import RETRIEVAL_FINAL_TOP_N
+from core.config import RETRIEVAL_FINAL_TOP_N, DEFAULT_AD_CTA
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState
 
@@ -48,7 +48,7 @@ class AdFormatter(PipelineStage):
         state.top_ad = Ad(
             title=best.item.title,
             text=best.item.text,
-            cta=best.item.metadata.get("cta", "Learn more"),
+            cta=best.item.metadata.get("cta", DEFAULT_AD_CTA),
             question=best.item.metadata.get("question", ""),
             source_item_id=best.item.item_id,
             relevance_score=best.score,
