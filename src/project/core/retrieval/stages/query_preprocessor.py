@@ -74,9 +74,16 @@ from typing import Any, Dict, List
 
 from core.config import (
     CONTEXT_SUMMARY_PROMPT,
+    CONTEXT_SUMMARY_MIN_TURNS,
+    CONTEXT_SUMMARY_MAX_TOKENS,
+    CONTEXT_SUMMARY_TEMPERATURE,
     HYDE_PROMPT,
+    HYDE_MAX_TOKENS,
+    HYDE_TEMPERATURE,
     QUERY_EXPANSION_PROMPT,
     QUERY_EXPANSION_MODE,
+    QUERY_EXPAND_MAX_TOKENS,
+    QUERY_EXPAND_TEMPERATURE,
     USE_CONTEXT_SUMMARY,
     API_URL,
     DEFAULT_MODEL,
@@ -85,9 +92,6 @@ from core.config import (
 from core.log import logger
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState
-
-# Minimum turns in context before we bother summarising.
-_MIN_CONTEXT_TURNS = 2
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -124,7 +128,7 @@ class ContextSummaryStage(PipelineStage):
         if not self._enabled:
             return state
 
-        if len(state.context) < _MIN_CONTEXT_TURNS:
+        if len(state.context) < CONTEXT_SUMMARY_MIN_TURNS:
             logger.debug(
                 "ContextSummaryStage: skipped — only {} turns in context",
                 len(state.context),
@@ -168,8 +172,8 @@ class ContextSummaryStage(PipelineStage):
         payload: Dict[str, Any] = {
             "model": DEFAULT_MODEL,
             "messages": [{"role": "user", "content": user_message}],
-            "max_tokens": 80,
-            "temperature": 0.0,
+            "max_tokens": CONTEXT_SUMMARY_MAX_TOKENS,
+            "temperature": CONTEXT_SUMMARY_TEMPERATURE,
         }
         resp = httpx.post(API_URL, json=payload, timeout=LLM_TIMEOUT_SECONDS)
         resp.raise_for_status()
@@ -260,10 +264,8 @@ class QueryExpansionStage(PipelineStage):
     def _call_llm(self, user_message: str) -> str:
         import httpx
 
-        # HyDE benefits from a tiny amount of creativity; expand stays grounded.
-        temperature = 0.3 if self._mode == "hyde" else 0.0
-        # HyDE doc can be a bit longer; expansion must stay tight.
-        max_tokens = 120 if self._mode == "hyde" else 50
+        temperature = HYDE_TEMPERATURE if self._mode == "hyde" else QUERY_EXPAND_TEMPERATURE
+        max_tokens = HYDE_MAX_TOKENS if self._mode == "hyde" else QUERY_EXPAND_MAX_TOKENS
 
         payload: Dict[str, Any] = {
             "model": DEFAULT_MODEL,

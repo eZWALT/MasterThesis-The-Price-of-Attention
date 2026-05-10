@@ -18,7 +18,12 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List, Dict
 
-from core.config import INLINE_AD_SYSTEM_PROMPT
+from core.config import (
+    INLINE_AD_SYSTEM_PROMPT,
+    AD_FALLBACK_QUESTION_TEMPLATE,
+    DEFAULT_AD_CTA,
+    SPONSORED_LABEL,
+)
 from core.ad_injection.models import Ad, InjectionResult
 
 
@@ -71,7 +76,7 @@ class SponsoredConversationalInjector(AdInjector):
     """
 
     def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
-        chip_text = ad.question or f"Would you like to know more about {ad.title}?"
+        chip_text = ad.question or AD_FALLBACK_QUESTION_TEMPLATE.format(title=ad.title)
         return InjectionResult(suggestions=[chip_text])
 
 
@@ -86,7 +91,7 @@ class SponsoredRecommendationInjector(AdInjector):
     """
 
     def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
-        content = f"**Sponsored** — {ad.title}\n\n{ad.text}"
+        content = f"**{SPONSORED_LABEL}** — {ad.title}\n\n{ad.text}"
         if ad.cta:
             content += f"\n\n*{ad.cta}*"
         return InjectionResult(
@@ -108,9 +113,9 @@ class ExplicitAdBlockInjector(AdInjector):
     def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
         return InjectionResult(
             display_payload={
-                "header": "Sponsored",
+                "header": SPONSORED_LABEL,
                 "title": ad.title,
                 "text": ad.text,
-                "cta": ad.cta or "Learn more",
+                "cta": ad.cta or DEFAULT_AD_CTA,
             }
         )

@@ -241,14 +241,21 @@ MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
 # ── Stage 0a — Conversation Context Summarizer ────────────────────────────
 # Compresses recent turns → state.context_summary, fed into Stage 0b.
 # Toggle: USE_CONTEXT_SUMMARY / env CONTEXT_SUMMARY=1 / URL ?ctx_sum=1
-USE_CONTEXT_SUMMARY: bool    = os.getenv("CONTEXT_SUMMARY", "").lower() in ("1", "true", "yes")
+USE_CONTEXT_SUMMARY: bool      = os.getenv("CONTEXT_SUMMARY", "").lower() in ("1", "true", "yes")
 CONTEXT_SUMMARY_MAX_TURNS: int = 10     # how many recent turns to include
+CONTEXT_SUMMARY_MIN_TURNS: int = 2      # skip summarisation below this
+CONTEXT_SUMMARY_MAX_TOKENS: int = 80    # LLM generation limit for summary
+CONTEXT_SUMMARY_TEMPERATURE: float = 0.0
 
 # ── Stage 0b — Query Expansion ────────────────────────────────────────────
 # Modes: none (default) | hyde | expand
 # Toggle: QUERY_EXPANSION_MODE / env QUERY_EXPANSION_MODE=hyde / URL ?qe=hyde
 QUERY_EXPANSION_MODE: str        = os.getenv("QUERY_EXPANSION_MODE", "none").lower()
 VALID_QUERY_EXPANSION_MODES: set[str] = {"none", "hyde", "expand"}
+HYDE_TEMPERATURE: float          = 0.3   # slight creativity for hypothetical docs
+HYDE_MAX_TOKENS: int             = 120
+QUERY_EXPAND_TEMPERATURE: float  = 0.0   # deterministic rewrite
+QUERY_EXPAND_MAX_TOKENS: int     = 50
 
 # ── Stage 1 — Intent classifier (HuggingFace DistilBERT, CPU) ────────────
 # 13-class sequence classifier; label names read from model config at runtime.
@@ -259,18 +266,26 @@ INTENT_DEVICE: str     = os.getenv("INTENT_DEVICE", "cpu")
 # Run scripts/prepare_amazon_catalog.py to populate data/catalog.jsonl first.
 CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "amazon")
 
+# ── Stage 1 — Intent classifier tunables ─────────────────────────────────
+INTENT_TOKENIZER_NAME: str   = "bert-base-uncased"  # WordPiece vocab for ThradBERT
+INTENT_MAX_SEQ_LENGTH: int   = 512                  # truncation limit for input
+
 # ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS, GPU 1) ─────
 EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-8B")
 EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE", "cuda:1")
 EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
+FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
+FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
 CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalog.jsonl")
+DEFAULT_CATALOG_PRICE: float = 0.0  # fallback price when catalog omits it
 DENSE_TOP_K: int           = 100    # ANN candidates returned to Stage 3 / 4
 
 # ── Stage 3 — Hybrid refinement (BM25 + metadata filter + RRF, CPU) ──────
 USE_HYBRID: bool    = True
 BM25_WEIGHT: float  = 0.3   # must sum to 1.0 with DENSE_WEIGHT
 DENSE_WEIGHT: float = 0.7
+RRF_K: int          = 60    # Reciprocal Rank Fusion smoothing constant
 
 # ── Stage 4 — Reranker (HuggingFace cross-encoder, GPU 1) ────────────────
 RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-8B")
@@ -279,8 +294,11 @@ RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
 RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads the injector receives
+DEFAULT_AD_CTA: str       = "Learn more"  # fallback CTA when catalog omits it
 # Auto-generated follow-up question chip; {title} filled at ingest time.
 AD_QUESTION_TEMPLATE: str  = "Would you like a recommendation for {title}?"
+AD_FALLBACK_QUESTION_TEMPLATE: str = "Would you like to know more about {title}?"
+SPONSORED_LABEL: str       = "Sponsored"  # disclosure prefix / header
 
 # ── Stage 6 — Ad Text Summarizer (optional, post-formatter) ──────────────
 # Rewrites ad.text into a ≤25-word sentence before injection.
