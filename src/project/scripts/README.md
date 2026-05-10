@@ -85,7 +85,7 @@ python scripts/prepare_amazon_catalog.py \
 ```bash
 python scripts/prepare_amazon_catalog.py \
     --category meta_Electronics \
-    --push-to-hub your-username/tara-catalog
+    --push-to-hub your-username/my-catalog
 # add --hub-public to make the repo public
 ```
 

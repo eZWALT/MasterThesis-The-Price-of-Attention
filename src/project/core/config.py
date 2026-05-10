@@ -328,6 +328,24 @@ DEV_QUERY_PARAM: str = "dev"
 # Ollama native API base (used for ETA probing via /api/ps)
 OLLAMA_API_BASE: str = "http://localhost:11434"
 
+# ── Thinking spinner (shown while waiting for LLM response) ──────────────
+SPINNER_PHRASES: list[str] = [
+    "Thinking…",
+    "Working…",
+    "Processing…",
+    "Reading context…",
+    "Building response…",
+    "Reasoning…",
+    "Analyzing…",
+    "Composing reply…",
+    "Synthesizing…",
+    "Almost there…",
+    "One moment…",
+    "Wrapping up…",
+]
+SPINNER_ROTATE_MIN_SEC: float = 1.0   # min seconds before switching phrase
+SPINNER_ROTATE_MAX_SEC: float = 3.0   # max seconds before switching phrase
+
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  10. LOGGING                                                            │

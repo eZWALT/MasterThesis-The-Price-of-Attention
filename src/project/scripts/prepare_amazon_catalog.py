@@ -304,13 +304,8 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--streaming",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help=(
-            "Stream rows from HF instead of downloading the full dataset first "
-            "(default: True). Use --no-streaming for full-dataset builds where "
-            "the parallel chunk download is faster."
-        ),
+        action="store_true",
+        help="Stream from HF (saves local disk; good when filtering a small subset)",
     )
     p.add_argument(
         "--build-index",
@@ -329,7 +324,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "Upload processed catalog to this HF Hub repo "
-            "(e.g. your-username/tara-catalog). "
+            "(e.g. your-username/ads-rag-catalog). "
             "Requires HF_TOKEN or `huggingface-cli login`."
         ),
     )

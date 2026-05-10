@@ -18,7 +18,7 @@ Environment variables
 LOG_LEVEL  : verbosity level (default "INFO").
              Set "DEBUG" to see detailed per-stage traces.
 LOG_FILE   : path to a rotating log file (optional).
-             Example: LOG_FILE=logs/tara.log
+             Example: LOG_FILE=logs/experiment.log
 """
 
 from __future__ import annotations
