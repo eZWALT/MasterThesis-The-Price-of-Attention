@@ -20,7 +20,7 @@ from core.config import (
 from core.conversation import ConversationManager
 from core.experiment import TASK_CATALOG, TASK_BY_ID
 from core.ad_injection import get_ad, get_injector
-from core.ui.screens import _render_ad_card
+from core.ui.screens import _render_ad_card, _call_llm_with_spinner
 # DEV helpers live in participant to avoid circular imports
 from core.ui.participant import _render_dev_ad_controls, _sync_dev_overrides
 
@@ -154,6 +154,9 @@ def run_dev_mode():
         return
 
     if user_input := st.chat_input("Send a message..."):
-        _sync_dev_overrides(mgr)
-        mgr.process_user_message(user_input)
-        st.rerun()
+        if not user_input.strip():
+            st.warning("Please enter a message before sending.")
+        else:
+            _sync_dev_overrides(mgr)
+            _call_llm_with_spinner(mgr, user_input.strip())
+            st.rerun()
