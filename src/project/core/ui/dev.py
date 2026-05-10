@@ -97,7 +97,6 @@ def run_dev_mode():
     mgr = st.session_state.dev_manager
     needs_new = (
         mgr is None
-        or mgr.ad_mode != ad_mode
         or mgr.model != model
         or mgr.temperature != temperature
         or mgr.max_tokens != max_tokens
@@ -112,13 +111,25 @@ def run_dev_mode():
             max_tokens=max_tokens,
             task=task,
             logger=st.session_state.logger,
+            force_ad=st.session_state.get("dev_force_ad", False),
         )
         st.session_state.dev_manager = mgr
+    elif mgr.ad_mode != ad_mode:
+        # Switch ad mode in-place — preserves conversation history
+        mgr.ad_mode = ad_mode
+        st.session_state.dev_manager = mgr
+
+    # Always sync force_ad / rag_mode onto the live manager
+    _sync_dev_overrides(mgr)
 
     if task:
         with st.expander("📝 Task Prompt", expanded=False):
             st.markdown(f"**{task.title}** ({task.genre})")
             st.write(task.participant_prompt)
+
+    # Active ad mode badge
+    from core.config import AD_MODE_LABELS
+    st.caption(f"**Ad mode:** {AD_MODE_LABELS.get(ad_mode, ad_mode)}")
 
     if st.session_state.dev_trial_complete:
         st.divider()
@@ -140,6 +151,11 @@ def run_dev_mode():
         for msg in mgr.messages:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
+
+        # Render manually-injected ad from sidebar button
+        manual_ad_result = st.session_state.pop("dev_manual_ad", None)
+        if manual_ad_result and manual_ad_result.display_payload:
+            _render_ad_card(col_main, manual_ad_result.display_payload)
 
     if show_side and mgr.should_inject_ad and col_side:
         last_user = next(
