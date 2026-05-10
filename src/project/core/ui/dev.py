@@ -69,7 +69,8 @@ def render_dev_sidebar():
             _render_dev_ad_controls(mgr=mgr)
         st.divider()
         if mgr:
-            st.markdown(f"**Turn:** {mgr.turn_count} / {MAX_TURNS_PER_TRIAL}")
+            progress = min(mgr.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
+            st.progress(progress, text=f"Turn {mgr.turn_count} / {MAX_TURNS_PER_TRIAL}")
             st.markdown(f"**Can end:** {mgr.can_end}")
             st.markdown("**System prompt:**")
             st.code(mgr.system_prompt, language="text")
@@ -141,11 +142,32 @@ def run_dev_mode():
                 st.markdown(msg["content"])
 
     if show_side and mgr.should_inject_ad and col_side:
-        ad = get_ad()
+        last_user = next(
+            (m["content"] for m in reversed(mgr.messages) if m["role"] == "user"),
+            "",
+        )
+        ad = get_ad(query=last_user, context=mgr.messages)
         injector = get_injector(ad_mode)
         result = injector.inject(ad, mgr.messages)
         if result.display_payload:
             _render_ad_card(col_side, result.display_payload)
+
+    # Sponsored suggestion chips
+    if ad_mode == "sponsored_conversational" and mgr.should_inject_ad:
+        last_user = next(
+            (m["content"] for m in reversed(mgr.messages) if m["role"] == "user"),
+            "",
+        )
+        ad = get_ad(query=last_user, context=mgr.messages)
+        injector = get_injector(ad_mode)
+        result = injector.inject(ad, mgr.messages)
+        if result.suggestions:
+            st.markdown("### 🔍 Sponsored Suggestions")
+            for suggestion in result.suggestions:
+                if st.button(suggestion, key=f"dev_sug_{suggestion[:20]}"):
+                    _sync_dev_overrides(mgr)
+                    _call_llm_with_spinner(mgr, suggestion)
+                    st.rerun()
 
     if mgr.must_end:
         st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
