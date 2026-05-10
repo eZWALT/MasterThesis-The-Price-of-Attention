@@ -444,7 +444,7 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
             st.markdown("### 🔍 Sponsored Suggestions")
             for suggestion in result.suggestions:
                 if st.button(suggestion, key=f"sug_{suggestion[:20]}"):
-                    manager.process_user_message(suggestion)
+                    _call_llm_with_spinner(manager, suggestion)
                     st.rerun()
 
     # Max turns reached → auto-end
