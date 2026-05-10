@@ -30,7 +30,7 @@ import os
 # Conversational LLM (Qwen 3.6 35B on GPU 0, served via vLLM / Ollama).
 # Override any value with the matching env var — no code change required.
 
-API_URL: str             = os.getenv("API_URL", "http://localhost:11435/v1/chat/completions")
+API_URL: str             = os.getenv("API_URL", "http://localhost:9999/v1/chat/completions")
 DEFAULT_MODEL: str       = os.getenv("DEFAULT_MODEL", "qwen3.6:35b")
 DEFAULT_TEMPERATURE: float = 0.7
 DEFAULT_MAX_TOKENS: int  = 400
@@ -149,20 +149,20 @@ DEFAULT_STUDY_TYPE: str = os.getenv("STUDY_TYPE", STUDY_TYPE_LAB)
 # Any param explicitly present in the URL overrides these.
 STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_LAB: {
-        "n_trials":       4,
-        "bfi_version":    "44",
+        "n_trials":       3,
+        "bfi_version":    "10",
         "store_backend":  "file",
-        "turns_min":      6,
-        "turns_max":      10,
+        "turns_min":      5,
+        "turns_max":      20,
         "skip_screens":   set(),
         "baseline":       True,     # EEG / eye-tracking baseline screen shown
     },
     STUDY_TYPE_CROWD: {
-        "n_trials":       2,
+        "n_trials":       3,
         "bfi_version":    "10",
         "store_backend":  "null",
-        "turns_min":      4,
-        "turns_max":      8,
+        "turns_min":      3,
+        "turns_max":      20,
         "skip_screens":   {"baseline"},
         "baseline":       False,
     },
@@ -173,9 +173,9 @@ STUDY_DEFAULTS: dict[str, dict] = {
 # │  4.  EXPERIMENT DESIGN                                                  │
 # └─────────────────────────────────────────────────────────────────────────┘
 
-TRIALS_PER_SESSION: int    = 4
-MIN_TURNS_PER_TRIAL: int   = 6
-MAX_TURNS_PER_TRIAL: int   = 10
+TRIALS_PER_SESSION: int    = 3
+MIN_TURNS_PER_TRIAL: int   = 3
+MAX_TURNS_PER_TRIAL: int   = 20
 
 # 1-indexed user turns at which ads are automatically injected.
 AD_INJECTION_TURNS: list[int] = [3, 6]
@@ -326,7 +326,7 @@ PAGE_ICON: str       = "🤖"
 DEV_QUERY_PARAM: str = "dev"
 
 # Ollama native API base (used for ETA probing via /api/ps)
-OLLAMA_API_BASE: str = "http://localhost:11434"
+OLLAMA_API_BASE: str = os.getenv("OLLAMA_API_BASE", "http://localhost:9999")
 
 # ── Thinking spinner (shown while waiting for LLM response) ──────────────
 SPINNER_PHRASES: list[str] = [
