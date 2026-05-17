@@ -95,9 +95,25 @@ class AdCatalog:
         items, id_map = cls._load_catalog(catalog_path, adapter)
 
         index_file = Path(index_path)
+        index = None
         if index_file.exists() and not force_rebuild:
             index = faiss.read_index(str(index_file))
-        else:
+            # Sanity checks — rebuild if the index is stale or from a different model.
+            expected_dim = embedding_model.encode(["test"]).shape[1]
+            if index.d != expected_dim:
+                logger.warning(
+                    "FAISS index dim {} ≠ embedding dim {} — rebuilding.",
+                    index.d, expected_dim,
+                )
+                index = None
+            elif index.ntotal != len(id_map):
+                logger.warning(
+                    "FAISS index has {} vectors but catalog has {} items — rebuilding.",
+                    index.ntotal, len(id_map),
+                )
+                index = None
+
+        if index is None:
             index = cls._build_index(items, id_map, embedding_model, index_file)
 
         return cls(items=items, index=index, id_map=id_map)

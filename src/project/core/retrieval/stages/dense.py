@@ -42,12 +42,15 @@ class DenseRetriever(PipelineStage):
     state.candidates : list of CatalogItem, length <= DENSE_TOP_K.
     """
 
-    def __init__(self, catalog) -> None:
-        from core.retrieval.embeddings import build_embedding_model
-        self._embed = build_embedding_model(
-            model_name=EMBEDDING_MODEL_NAME,
-            device=EMBEDDING_DEVICE,
-        )
+    def __init__(self, catalog, embedding_model=None) -> None:
+        if embedding_model is not None:
+            self._embed = embedding_model
+        else:
+            from core.retrieval.embeddings import build_embedding_model
+            self._embed = build_embedding_model(
+                model_name=EMBEDDING_MODEL_NAME,
+                device=EMBEDDING_DEVICE,
+            )
         self._catalog = catalog
         self._top_k = DENSE_TOP_K
 

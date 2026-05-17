@@ -24,6 +24,26 @@ from __future__ import annotations
 
 import os
 
+
+def _best_cuda_device(default: str = "cuda:0") -> str:
+    """
+    Return the CUDA device with the most free memory.
+    Falls back to `default` when CUDA is unavailable or torch is not installed.
+    """
+    try:
+        import torch
+        if not torch.cuda.is_available():
+            return "cpu"
+        best_idx, best_free = 0, 0
+        for i in range(torch.cuda.device_count()):
+            free, _ = torch.cuda.mem_get_info(i)
+            if free > best_free:
+                best_free, best_idx = free, i
+        return f"cuda:{best_idx}"
+    except Exception:
+        return default
+
+
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  1.  API / LLM DEFAULTS                                                 │
 # └─────────────────────────────────────────────────────────────────────────┘
@@ -269,16 +289,17 @@ INTENT_MODEL_NAME: str = os.getenv("INTENT_MODEL_NAME", "Thrad/thrad-bert-conver
 INTENT_DEVICE: str     = os.getenv("INTENT_DEVICE", "cpu")
 
 # Catalog dataset adapter: "generic" | "amazon" | any registered key.
-# Run scripts/prepare_amazon_catalog.py to populate data/catalog.jsonl first.
-CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "amazon")
+# Use "generic" when catalog.jsonl was already normalized by prepare_amazon_catalog.py.
+# Use "amazon" only when loading raw Amazon JSONL (parent_asin / asin fields).
+CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "generic")
 
 # ── Stage 1 — Intent classifier tunables ─────────────────────────────────
 INTENT_TOKENIZER_NAME: str   = "bert-base-uncased"  # WordPiece vocab for ThradBERT
 INTENT_MAX_SEQ_LENGTH: int   = 512                  # truncation limit for input
 
 # ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS, GPU 1) ─────
-EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-8B")
-EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE", "cuda:1")
+EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-4B")
+EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or _best_cuda_device("cuda:1")
 EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
@@ -294,8 +315,8 @@ DENSE_WEIGHT: float = 0.7
 RRF_K: int          = 60    # Reciprocal Rank Fusion smoothing constant
 
 # ── Stage 4 — Reranker (HuggingFace cross-encoder, GPU 1) ────────────────
-RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-8B")
-RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE", "cuda:1")
+RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-4B")
+RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or EMBEDDING_DEVICE  # share GPU with embedder
 RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
