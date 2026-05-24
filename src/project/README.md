@@ -427,7 +427,7 @@ src/project/
 │   │   └── hobby.jsonl
 │   └── faiss.index                # Auto-built, gitignored
 │
-├── logs/                          # Experiment JSONL logs (gitignored)
+├── logs/                          # Experiment JSONL logs (git-tracked)
 │
 └── scripts/
     └── prepare_amazon_catalog.py  # Amazon dataset → catalog.jsonl builder
