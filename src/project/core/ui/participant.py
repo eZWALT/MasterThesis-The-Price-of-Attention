@@ -153,18 +153,23 @@ def _get_or_create_trial_manager(
 def export_session_data(ctrl: ExperimentController):
     """Persist all collected data via the experiment logger."""
     logger: ExperimentLogger = st.session_state.logger
-    logger.log("session_complete", {
-        "participant_id": ctrl.participant_id,
-        "demographics": ctrl.demographics,
-        "ocean_raw": ctrl.ocean_raw,
-        "ocean_scores": ctrl.ocean_scores,
-        "trial_results": [
-            {k: v for k, v in tr.items() if k != "messages"}
-            for tr in ctrl.trial_results
-        ],
-        "post_trial_surveys": ctrl.post_trial_surveys,
-        "final_survey": ctrl.final_survey,
-    })
+    logger.log(
+        "session_complete",
+        {
+            "participant_id": ctrl.participant_id,
+            "demographics": ctrl.demographics,
+            "ocean_raw": ctrl.ocean_raw,
+            "ocean_scores": ctrl.ocean_scores,
+            "trial_results": [
+                {k: v for k, v in tr.items() if k != "messages"}
+                for tr in ctrl.trial_results
+            ],
+            "post_trial_surveys": ctrl.post_trial_surveys,
+            "final_survey": ctrl.final_survey,
+        },
+        ad_mode="session",
+        conversation_id=ctrl.participant_id,
+    )
     logger.export_json()
 
 
