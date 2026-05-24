@@ -172,14 +172,15 @@ def export_session_data(ctrl: ExperimentController):
 # DEV-FLOW SKIP HELPERS
 # ═══════════════════════════════════════════════════════════════
 
-def dev_inject_stub_data(ctrl: ExperimentController):
+def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
     """Inject minimal stub data so the controller doesn't break on skip."""
     scr = ctrl.current_screen
     if scr == SCREEN_DEMOGRAPHICS and not ctrl.demographics:
         ctrl.demographics = {"age": 0, "gender": "skip", "education": "skip"}
     elif scr == SCREEN_OCEAN and not ctrl.ocean_raw:
-        ctrl.ocean_raw = {str(i): 4 for i in range(10)}
-        ctrl.ocean_scores = score_ocean(ctrl.ocean_raw)
+        items = get_ocean_items(bfi_version)
+        ctrl.ocean_raw = [4] * len(items)
+        ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
     elif scr == SCREEN_POST_TRIAL_SURVEY:
         ctrl.post_trial_surveys.append({"skipped": True})
     elif scr == SCREEN_FINAL_SURVEY:
@@ -265,14 +266,14 @@ def _sync_dev_overrides(mgr) -> None:
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════════
 
-def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False):
+def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False, bfi_version: str = "10"):
     with st.sidebar:
         if flow_test:
             st.caption(f"pid: `{ctrl.participant_id}`")
             st.divider()
             st.caption("🛠 Dev mode — flow test")
             if st.button("⏭ Skip screen", use_container_width=True):
-                dev_inject_stub_data(ctrl)
+                dev_inject_stub_data(ctrl, bfi_version=bfi_version)
                 ctrl.advance()
                 st.rerun()
             # Ad controls — only shown on the chat screen, manager may be None
@@ -305,11 +306,11 @@ def run_participant_mode(params):
     ctrl: ExperimentController = st.session_state.controller
     scr = ctrl.current_screen
 
-    render_progress_sidebar(ctrl, flow_test=params.flow_test)
+    render_progress_sidebar(ctrl, flow_test=params.flow_test, bfi_version=params.bfi_version)
 
     # Handle skip logic for screens
     if scr in params.skip_screens:
-        dev_inject_stub_data(ctrl)
+        dev_inject_stub_data(ctrl, bfi_version=params.bfi_version)
         ctrl.advance()
         st.rerun()
         return

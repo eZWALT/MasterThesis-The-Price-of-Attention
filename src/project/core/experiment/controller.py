@@ -4,9 +4,9 @@ Experiment Controller.
 Manages the progression of an experimental session as a linear screen
 state machine:
 
-  consent → demographics → ocean → baseline → practice
+  consent → demographics → baseline → practice
   → [trial_intro → trial_chat → post_trial_survey] × N
-  → final_survey → done
+  → ocean (BFI-10) → final_survey → done
 
 Paper reference: Section 6.3 — Experiment Controller.
 """
@@ -41,7 +41,6 @@ from core.experiment.tasks import TaskDefinition, TASK_CATALOG
 _PRE_TRIAL_SCREENS: list[str] = [
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
-    SCREEN_OCEAN,
     SCREEN_BASELINE,
     SCREEN_PRACTICE,
 ]
@@ -53,6 +52,7 @@ _TRIAL_SCREENS: list[str] = [
 ]
 
 _POST_TRIAL_SCREENS: list[str] = [
+    SCREEN_OCEAN,
     SCREEN_FINAL_SURVEY,
     SCREEN_DONE,
 ]

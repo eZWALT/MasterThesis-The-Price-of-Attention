@@ -141,10 +141,10 @@ PRACTICE_SYSTEM_PROMPT_EXT: str = (
 # │  Set via URL: ?study=lab  or  ?study=crowd                              │
 # │  or env var:  STUDY_TYPE=lab | crowd                                    │
 # │                                                                         │
-# │  lab   — in-person lab session: EEG + eye-tracking, BFI-44, file        │
-# │           store, long baseline, full consent + debrief, 4 trials.       │
+# │  lab   — in-person lab session: EEG + eye-tracking, BFI-10, file        │
+# │           store, long baseline, full consent + debrief, 3 trials.       │
 # │  crowd — remote crowdsourcing: no physiology, BFI-10, null store,       │
-# │           skip baseline, 2 trials, lighter protocol.                    │
+# │           skip baseline, 3 trials, lighter protocol.                    │
 # └─────────────────────────────────────────────────────────────────────────┘
 
 STUDY_TYPE_LAB: str   = "lab"
