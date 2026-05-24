@@ -65,9 +65,9 @@ Open http://localhost:7777?dev=flow — participant flow walkthrough.
 
 ## Data Setup
 
-The RAG pipeline needs a product catalog (`data/catalog.jsonl`) and a FAISS
-index (`data/faiss.index`). Both are gitignored and must be built before
-starting the app with `AD_BACKEND=rag`.
+The RAG pipeline needs ad catalog(s) (`data/catalogs/*.jsonl`) and a FAISS
+index (`data/faiss.index`). The index is auto-rebuilt when missing; catalog
+JSONL files are git-tracked.
 
 Use the provided script to pull from
 [`milistu/AMAZON-Products-2023`](https://huggingface.co/datasets/milistu/AMAZON-Products-2023)
@@ -91,6 +91,9 @@ python scripts/prepare_amazon_catalog.py --build-index
 # List all available categories
 python scripts/prepare_amazon_catalog.py --list-categories
 ```
+
+Additional catalogs (travel, hobby, etc.) are already provided in
+`data/catalogs/` — just delete `data/faiss.index` to rebuild.
 
 See [`scripts/README.md`](scripts/README.md) for the full reference (streaming,
 append, HF Hub upload, env var overrides).
@@ -120,20 +123,24 @@ append, HF Hub upload, env var overrides).
 | `AD_BACKEND` | `mock` | `mock` — static placeholder ad; `rag` — full retrieval |
 | `INTENT_MODEL_NAME` | `Thrad/thrad-bert-conversation-classifier` | Intent classifier checkpoint (HF) |
 | `INTENT_DEVICE` | `cpu` | Device for the intent model |
-| `EMBEDDING_MODEL_NAME` | `Qwen/Qwen3-Embedding-8B` | Embedding model (sentence-transformers) |
-| `EMBEDDING_DEVICE` | `cuda:1` | Device for the embedding model |
-| `RERANKER_MODEL_NAME` | `Qwen/Qwen3-Reranker-8B` | Cross-encoder reranker (sentence-transformers) |
-| `RERANKER_DEVICE` | `cuda:1` | Device for the reranker |
-| `CATALOG_PATH` | `data/catalog.jsonl` | Path to the product catalog |
+| `EMBEDDING_MODEL_NAME` | `Qwen/Qwen3-Embedding-4B` | Embedding model (BF16, sentence-transformers) |
+| `EMBEDDING_DEVICE` | `cuda:1` | Device for the embedding model (auto-detected) |
+| `RERANKER_MODEL_NAME` | `Qwen/Qwen3-Reranker-4B` | Cross-encoder reranker (BF16, sentence-transformers) |
+| `RERANKER_DEVICE` | `cuda:1` | Device for the reranker (auto-detected) |
+| `CATALOG_DIR` | `data/catalogs/` | Directory with JSONL ad sources (merged at load) |
 | `FAISS_INDEX_PATH` | `data/faiss.index` | Path to the FAISS index (rebuilt if missing) |
 | `CATALOG_ADAPTER` | `generic` | Dataset adapter: `generic` or `amazon` |
+| `FORCE_CPU` | `0` | Force all retrieval models to CPU |
 
-### Logging
+### Logging & Experiment
 
 | Variable | Default | Description |
 |---|---|---|
 | `LOG_LEVEL` | `INFO` | Loguru verbosity: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 | `LOG_FILE` | *(unset)* | If set, write rotating logs to this path (e.g. `logs/experiment.log`) |
+| `LOG_DIR` | `logs/` | Experiment JSONL output directory |
+| `LOG_FLUSH_EVERY_N` | `25` | Flush after N queued events |
+| `LOG_FLUSH_EVERY_S` | `60.0` | Flush at least every N seconds |
 
 ---
 
@@ -183,10 +190,10 @@ PYTHONPATH=$(pwd) \
   streamlit run app.py
 ```
 
-**With Amazon dataset:**
+**With Amazon adapter:**
 
 ```bash
-CATALOG_ADAPTER=amazon CATALOG_PATH=data/amazon_electronics.jsonl streamlit run app.py
+CATALOG_ADAPTER=amazon streamlit run app.py
 ```
 
 **Headless pipeline test (no UI):**
@@ -223,14 +230,84 @@ query ──▶ 1. IntentClassifier ──▶ 2. DenseRetriever ──▶ 3. Hyb
 | # | Stage | Model | Device |
 |---|---|---|---|
 | 1 | `IntentClassifier` | `Thrad/thrad-bert-conversation-classifier` (DistilBERT) | CPU |
-| 2 | `DenseRetriever` | Configurable HF embedding (default: Qwen3-Embedding-8B) | GPU 1 |
+| 2 | `DenseRetriever` | `Qwen/Qwen3-Embedding-4B` (BF16) | GPU 1 |
 | 3 | `HybridRefiner` | BM25 Okapi + RRF score fusion | CPU |
-| 4 | `Reranker` | Configurable cross-encoder (default: Qwen3-Reranker-8B) | GPU 1 |
+| 4 | `Reranker` | `Qwen/Qwen3-Reranker-4B` (BF16) | GPU 1 |
 | 5 | `AdFormatter` | Pure transform — no inference | — |
 
-The embedding model is loaded once and **shared** between `AdCatalog` (index
-build) and `DenseRetriever` (query encoding) to avoid duplicating a large
-model in memory.
+### Smart Device Allocation
+
+Models are placed automatically by `core/device.py`:
+- Probes VRAM on all GPUs, excludes LLM GPU(s)
+- Falls back to CPU if no GPU has enough free memory
+- Override with env vars: `EMBEDDING_DEVICE`, `RERANKER_DEVICE`, `FORCE_CPU=1`
+
+### Multi-Source Ad Catalogs
+
+All ad sources live as equal JSONL files in `data/catalogs/`:
+
+```
+data/catalogs/
+  amazon.jsonl     ← 1000 Amazon products
+  travel.jsonl     ← synthetic travel ads
+  hobby.jsonl      ← synthetic hobby ads
+```
+
+Drop a new `.jsonl` file → delete `data/faiss.index` → pipeline auto-rebuilds.  
+Each item can have `"metadata": {"source": "synthetic_travel"}` for filtering.
+
+---
+
+## Per-Turn Parallel Execution
+
+After the LLM reply arrives, CPU-bound post-processing runs in a shared
+`ThreadPoolExecutor(4)` — never blocking the UI or future modality streams:
+
+```
+LLM reply arrives (2-5s wall-clock)
+       │
+       ├───── _CPU_POOL (4 daemon threads) ─────────────────────┐
+       │                                                        │
+       │  Thread 1: compute_attention_shift()         ~1ms      │
+       │  Thread 2: BERT intent classification        ~30ms     │
+       │  Thread 3: EEG marker emission (LSL)         ~0ms      │
+       │  Thread 4: Eye-tracking gaze snapshot        ~0ms      │
+       │                                                        │
+       ├────────────────────────────────────────────────────────┘
+       │          .result() ← blocks only on shift + intent
+       │          (modality hooks are fire-and-forget)
+       │
+       └── Return TurnResult to Streamlit UI
+```
+
+Register modality hooks (non-blocking, best-effort):
+
+```python
+from core.modalities.eeg import eeg_turn_hook
+from core.modalities.eye_tracking import eye_tracking_turn_hook
+
+manager.register_modality_hook(eeg_turn_hook)
+manager.register_modality_hook(eye_tracking_turn_hook)
+```
+
+---
+
+## Experiment Logging
+
+Production-grade structured event logging with zero-copy async writes:
+
+```
+logs/{experiment_id}/{run_id}.jsonl
+```
+
+- **Experiment ID**: `exp_20260524T154233Z_a83f2c1d` (timestamp + config hash)
+- **Non-blocking**: `log()` puts to queue (~0.02ms), background writer does disk I/O
+- **Flush policy**: every 25 events OR every 60s (whichever first)
+- **Crash-safe**: `atexit` + daemon thread drain
+- **Export**: `.export_csv()` for pandas, `.export_jsonl()` for clean validated copy
+
+Events logged per turn: `user_message`, `retrieval`, `assistant_reply`,
+`ad_injected`, `attention_shift`, `eye_tracking_ad_exposure`
 
 ### Adding a custom stage or swapping a stage
 
@@ -275,11 +352,12 @@ src/project/
 │
 ├── core/
 │   ├── config.py                  # Single source of truth for all constants
+│   ├── device.py                  # Smart GPU/CPU device allocator
 │   ├── log.py                     # Loguru configuration (LOG_LEVEL, LOG_FILE)
 │   │
 │   ├── conversation/
 │   │   ├── llm_client.py          # Stateless HTTP client (OpenAI-compat API)
-│   │   ├── manager.py             # Multi-turn conversation orchestrator
+│   │   ├── manager.py             # Multi-turn orchestrator + ThreadPoolExecutor
 │   │   └── ollama_stats.py        # ETA estimation helper
 │   │
 │   ├── ad_injection/
@@ -290,20 +368,20 @@ src/project/
 │   ├── retrieval/                 # 5-stage RAG pipeline
 │   │   ├── __init__.py            # retrieve_ad() public entry point
 │   │   ├── pipeline.py            # AdRetrievalPipeline (injectable stages)
-│   │   ├── catalog.py             # AdCatalog + FAISS index management
+│   │   ├── catalog.py             # AdCatalog + multi-source FAISS index
 │   │   │
 │   │   ├── adapters/              # Dataset schema adapters
 │   │   │   ├── base.py            # DatasetAdapter ABC
-│   │   │   ├── generic.py         # Generic normalized JSONL
+│   │   │   ├── generic.py         # Generic normalized JSONL (+ metadata merge)
 │   │   │   └── amazon.py          # Amazon Reviews 2023 format
 │   │   │
 │   │   ├── embeddings/            # Embedding model backends
 │   │   │   ├── base.py            # EmbeddingModel ABC
-│   │   │   └── huggingface.py     # SentenceTransformer backend
+│   │   │   └── huggingface.py     # SentenceTransformer backend (BF16)
 │   │   │
 │   │   ├── rerankers/             # Reranker backends
 │   │   │   ├── base.py            # RerankerModel ABC
-│   │   │   └── cross_encoder.py   # CrossEncoder backend
+│   │   │   └── cross_encoder.py   # CrossEncoder backend (BF16)
 │   │   │
 │   │   └── stages/                # Individual pipeline stages
 │   │       ├── state.py           # PipelineState, CatalogItem, RankedCandidate
@@ -322,7 +400,12 @@ src/project/
 │   │   └── state.py               # ParticipantState + OCEAN scores
 │   │
 │   ├── logger/
-│   │   └── experiment_logger.py   # Structured experiment event log
+│   │   ├── experiment_logger.py   # Async queue-based JSONL event logger
+│   │   └── identity.py            # Deterministic experiment/run ID generation
+│   │
+│   ├── modalities/
+│   │   ├── eeg/                   # EEG LSL marker hooks
+│   │   └── eye_tracking/          # Tobii Pro gaze snapshot hooks
 │   │
 │   ├── persistence/
 │   │   └── store.py               # SessionStore (Null / File / Redis)
@@ -337,7 +420,17 @@ src/project/
 │       ├── dev.py                 # Developer free-chat + flow-test mode
 │       └── screens.py             # Screen rendering helpers
 │
-└── data/                          # Gitignored: catalog.jsonl, faiss.index
+├── data/
+│   ├── catalogs/                  # Multi-source ad JSONL files (git-tracked)
+│   │   ├── amazon.jsonl
+│   │   ├── travel.jsonl
+│   │   └── hobby.jsonl
+│   └── faiss.index                # Auto-built, gitignored
+│
+├── logs/                          # Experiment JSONL logs (gitignored)
+│
+└── scripts/
+    └── prepare_amazon_catalog.py  # Amazon dataset → catalog.jsonl builder
 ```
 
 ---
