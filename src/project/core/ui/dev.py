@@ -84,8 +84,8 @@ def render_dev_sidebar():
                     st.write(f"Δ = {s.data['divergence']:.6f}  ({s.data['method']})")
             else:
                 st.caption("No attention shifts recorded yet.")
-        if st.button("💾 Export Logs (JSON)"):
-            path = st.session_state.logger.export_json()
+        if st.button("💾 Export Logs (JSONL)"):
+            path = st.session_state.logger.export_jsonl()
             st.success(f"Exported to {path}")
     return model, temperature, max_tokens, ad_mode, task
 

@@ -49,7 +49,12 @@ from core.ui.screens import (
 def init_session_state(params):
     """Ensure every expected key exists in st.session_state, using ExperimentParams for config."""
     if "logger" not in st.session_state:
-        st.session_state.logger = ExperimentLogger()
+        from core.config import LOG_DIR, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
+        st.session_state.logger = ExperimentLogger(
+            log_dir=LOG_DIR,
+            flush_every_n=LOG_FLUSH_EVERY_N,
+            flush_every_s=LOG_FLUSH_EVERY_S,
+        )
 
     if "controller" not in st.session_state:
         pid = params.participant_id or str(uuid.uuid4())[:8]
