@@ -120,7 +120,7 @@ BFI10_ITEMS: list[tuple[str, str, bool]] = [
 ]
 
 
-def get_ocean_items(version: str = "44") -> list[tuple[str, str, bool]]:
+def get_ocean_items(version: str = "10") -> list[tuple[str, str, bool]]:
     """Return the BFI item list for the requested version ("10" or "44")."""
     if version == "10":
         return BFI10_ITEMS
@@ -165,15 +165,15 @@ def score_ocean(
     Parameters
     ----------
     raw_responses : list of ints (1–5 Likert), one per item in *items*.
-    items : item list to score against.  Defaults to OCEAN_ITEMS (BFI-44).
-            Pass ``get_ocean_items("10")`` for BFI-10.
+    items : item list to score against.  Defaults to BFI10_ITEMS (BFI-10).
+            Pass ``get_ocean_items("44")`` for BFI-44.
 
     Returns
     -------
     Dict with keys O, C, E, A, N → float (1.0–5.0 each).
     """
     if items is None:
-        items = OCEAN_ITEMS
+        items = BFI10_ITEMS
     if len(raw_responses) != len(items):
         raise ValueError(
             f"Expected {len(items)} responses, got {len(raw_responses)}"

@@ -66,11 +66,11 @@ ad_turns    1-indexed user turns at which ads are injected (comma-separated)
 bfi         BFI version used for the OCEAN personality screen
             Values : 10 → BFI-10 (10 items, ~1 min)
                      44 → BFI-44 (44 items, ~10 min)
-            Default: 44
+            Default: 10
 
 study       Study protocol type — sets smart defaults for the session.
-            Values : lab   → BFI-44, file store, 4 trials, baseline, full consent
-                     crowd → BFI-10, null store, 2 trials, skip baseline
+            Values : lab   → BFI-10, file store, 3 trials, baseline, full consent
+                     crowd → BFI-10, null store, 3 trials, skip baseline
             Default: lab (or env var STUDY_TYPE)
             Note: any other param explicitly in the URL overrides the
                   corresponding study default.
@@ -192,8 +192,8 @@ class ExperimentParams:
     flow_test: bool = False
 
     # ── Study type ───────────────────────────────────
-    # lab   → BFI-44, file store, 4 trials, baseline, full protocol
-    # crowd → BFI-10, null store, 2 trials, skip baseline, lighter protocol
+    # lab   → BFI-10, file store, 3 trials, baseline, full protocol
+    # crowd → BFI-10, null store, 3 trials, skip baseline, lighter protocol
     study_type: str = DEFAULT_STUDY_TYPE
 
     # ── Session identity ─────────────────────────────
