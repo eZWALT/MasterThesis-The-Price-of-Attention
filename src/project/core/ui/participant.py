@@ -278,6 +278,10 @@ def _sync_dev_overrides(mgr) -> None:
     mgr._force_ad = st.session_state.get("dev_force_ad", False)
     mode = st.session_state.get("dev_rag_mode", "default")
     mgr._ad_backend = None if mode == "default" else mode
+    # Ad mode override (flow-test sidebar selector)
+    ad_mode_override = st.session_state.get("dev_ad_mode_override")
+    if ad_mode_override:
+        mgr.ad_mode = ad_mode_override
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -294,6 +298,21 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
                 dev_inject_stub_data(ctrl, bfi_version=bfi_version)
                 ctrl.advance()
                 st.rerun()
+
+            # Ad mode override — lets dev switch injection style mid-session
+            from core.config import AD_MODES, AD_MODE_LABELS
+            trial_cfg = ctrl.current_trial_config
+            default_mode = trial_cfg["ad_mode"] if trial_cfg else AD_MODES[0]
+            default_idx = AD_MODES.index(default_mode) if default_mode in AD_MODES else 0
+            selected_mode = st.selectbox(
+                "📊 Ad Mode",
+                AD_MODES,
+                index=default_idx,
+                format_func=lambda k: AD_MODE_LABELS.get(k, k),
+                key="dev_flow_ad_mode",
+            )
+            st.session_state.dev_ad_mode_override = selected_mode
+
             # Ad controls — only shown on the chat screen, manager may be None
             mgr = st.session_state.get("trial_manager")
             with st.expander("🎯 Ad overrides", expanded=bool(st.session_state.get("dev_force_ad"))):
