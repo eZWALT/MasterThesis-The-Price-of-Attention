@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor, Future
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Callable, Any
 from dataclasses import dataclass, field
 
 from core.config import (
@@ -70,6 +71,13 @@ class TurnResult:
     must_end: bool = False
     attention_shift: Optional[AttentionShiftResult] = None
     error: Optional[str] = None
+
+
+# ── Shared thread pool for CPU-bound post-turn work ───────────
+# Used for BERT intent classification, attention shift, and future
+# modality processing (EEG markers, eye-tracking AOI, etc.).
+# Daemon threads — die with main. Max 4 workers for CPU tasks.
+_CPU_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="turn-cpu")
 
 
 # ── Conversation Manager ──────────────────────────────────────
@@ -137,6 +145,29 @@ class ConversationManager:
         # per-turn intent: classified each turn from compact context
         self.initial_intent: str = self._classify_initial_intent()
         self.intent_history: List[str] = []           # one label per user turn
+
+        # ── Modality hooks (EEG, eye-tracking, etc.) ──────────
+        # Each hook is called with (turn: int, ad_injected: bool, ad: Ad|None)
+        # in the thread pool after LLM reply — non-blocking.
+        self._modality_hooks: List[Callable[[int, bool, Any], None]] = []
+
+    # ── Modality Registration ─────────────────────────────────
+
+    def register_modality_hook(self, hook: Callable[[int, bool, Any], None]) -> None:
+        """
+        Register a callback for parallel post-turn processing.
+
+        Hooks run in the CPU thread pool AFTER the LLM reply is ready,
+        in parallel with attention shift and intent classification.
+
+        Signature: hook(turn: int, ad_injected: bool, ad: Ad | None)
+
+        Use cases:
+          - EEG marker emission (LSL push)
+          - Eye-tracking AOI fixation logging
+          - Physiological signal snapshotting
+        """
+        self._modality_hooks.append(hook)
 
     # ── Intent Classification ─────────────────────────────────
 
@@ -287,14 +318,42 @@ class ConversationManager:
              "time_to_reply_ms": time_to_reply_ms},
             self.ad_mode,
             self.conversation_id,
+            source="user",
+            turn=current_turn,
         )
 
         # 3 — pre-ad snapshot
         C_pre = list(self.messages)
 
-        # 4 — ad injection decision
+        # 4 — ad injection decision (timed for logging)
         inject_ad = self.should_inject_ad
-        ad = get_ad(query=user_input, context=self.messages, backend=self._ad_backend) if inject_ad else None
+        ad = None
+        if inject_ad:
+            retrieval_t0 = time.perf_counter()
+            ad = get_ad(query=user_input, context=self.messages, backend=self._ad_backend)
+            retrieval_latency_ms = (time.perf_counter() - retrieval_t0) * 1000.0
+
+            # Log retrieval event with full ad metadata
+            self.logger.log(
+                "retrieval",
+                {
+                    "query": user_input,
+                    "turn": current_turn,
+                    "ad_title": ad.title,
+                    "ad_item_id": ad.source_item_id,
+                    "ad_source": ad.metadata.get("source", "amazon"),
+                    "ad_category": ad.metadata.get("category", ""),
+                    "ad_relevance_score": ad.relevance_score,
+                    "ad_cta": ad.cta,
+                    "retrieval_latency_ms": round(retrieval_latency_ms, 1),
+                    "retrieval_backend": self._ad_backend or "default",
+                },
+                self.ad_mode,
+                self.conversation_id,
+                source="retrieval",
+                turn=current_turn,
+            )
+
         injector = get_injector(self.ad_mode) if inject_ad else None
         injection = (
             injector.inject(ad, self.messages)
@@ -317,6 +376,8 @@ class ConversationManager:
              "llm_latency_ms": round(llm_latency_ms, 1)},
             self.ad_mode,
             self.conversation_id,
+            source="model",
+            turn=current_turn,
         )
 
         # 7 — post-response injection
@@ -331,19 +392,40 @@ class ConversationManager:
                         "turn": current_turn,
                         "ad_mode": self.ad_mode,
                         "ad_title": ad.title if ad else None,
+                        "ad_item_id": ad.source_item_id if ad else None,
+                        "ad_source": ad.metadata.get("source", "amazon") if ad else None,
                         "ad_relevance_score": ad.relevance_score if ad else None,
                     },
                     self.ad_mode,
                     self.conversation_id,
+                    source="system",
+                    turn=current_turn,
                 )
 
         # 8 — post-ad snapshot
         C_post = list(self.messages)
 
-        # 9 — attention shift
-        shift = compute_attention_shift(
-            C_pre, C_post, estimator=self.attention_estimator,
+        # 9+10 — PARALLEL: attention shift + intent classification
+        # These are CPU-bound (numpy divergence + BERT forward pass) and
+        # independent of each other. Run in thread pool to avoid blocking
+        # the main thread (Streamlit / UI / future modality streams).
+        shift_future: Future = _CPU_POOL.submit(
+            compute_attention_shift, C_pre, C_post, self.attention_estimator
         )
+        intent_future: Future = _CPU_POOL.submit(
+            self._classify_turn_intent, user_input
+        )
+
+        # Fire modality hooks in parallel (non-blocking, best-effort)
+        for hook in self._modality_hooks:
+            _CPU_POOL.submit(hook, current_turn, inject_ad, ad)
+
+        # Collect parallel results
+        shift = shift_future.result()
+        turn_intent = intent_future.result()
+        self.intent_history.append(turn_intent)
+
+        # Log attention shift (after result is ready)
         self.logger.log(
             "attention_shift",
             {
@@ -353,11 +435,9 @@ class ConversationManager:
             },
             self.ad_mode,
             self.conversation_id,
+            source="system",
+            turn=current_turn,
         )
-
-        # 10 — classify current-turn intent (ThradBERT)
-        turn_intent = self._classify_turn_intent(user_input)
-        self.intent_history.append(turn_intent)
 
         # 11 — record per-turn metrics for offline analysis
         metrics = TurnMetrics(
