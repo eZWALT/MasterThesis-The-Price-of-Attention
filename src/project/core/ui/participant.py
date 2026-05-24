@@ -376,11 +376,18 @@ def run_participant_mode(params):
             if params.flow_test:
                 _sync_dev_overrides(mgr)
             if render_trial_chat(mgr, ad_mode):
+                from dataclasses import asdict
                 ctrl.trial_results.append({
                     "trial": ctrl.trial_number,
                     "task_id": task.id,
+                    "task_genre": task.genre,
                     "ad_mode": ad_mode,
+                    "conversation_id": mgr.conversation_id,
                     "turns": mgr.turn_count,
+                    "ad_turns_actual": list(mgr.ad_turns_actual),
+                    "trial_start_ts": mgr.trial_start_ts,
+                    "trial_end_ts": __import__("datetime").datetime.now().isoformat(),
+                    "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
                     "messages": list(mgr.messages),
                 })
                 st.session_state.trial_manager = None

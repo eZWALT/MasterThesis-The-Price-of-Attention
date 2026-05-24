@@ -5,6 +5,6 @@ Paper reference: Section 6.1 — Conversation Engine.
 """
 
 from core.conversation.llm_client import LLMClient
-from core.conversation.manager import ConversationManager, TurnResult
+from core.conversation.manager import ConversationManager, TurnResult, TurnMetrics
 
-__all__ = ["LLMClient", "ConversationManager", "TurnResult"]
+__all__ = ["LLMClient", "ConversationManager", "TurnResult", "TurnMetrics"]

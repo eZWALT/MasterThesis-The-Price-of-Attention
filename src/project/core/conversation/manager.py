@@ -18,9 +18,11 @@ It should never talk to the LLM directly.
 
 from __future__ import annotations
 
+import time
 import uuid
+from datetime import datetime
 from typing import List, Dict, Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from core.config import (
     BASE_SYSTEM_PROMPT,
@@ -40,6 +42,20 @@ from core.conversation.llm_client import LLMClient
 
 
 # ── Turn result (returned to the UI) ─────────────────────────
+
+@dataclass
+class TurnMetrics:
+    """Per-turn behavioural metrics logged for offline analysis."""
+    turn: int
+    user_msg_len: int                        # chars in user message
+    assistant_msg_len: int                    # chars in assistant reply
+    llm_latency_ms: float                    # LLM call wall-clock time in ms
+    ad_injected: bool                        # was an ad injected this turn?
+    ad_title: Optional[str] = None           # ad title if injected
+    ad_relevance_score: Optional[float] = None  # retrieval relevance score
+    attention_divergence: Optional[float] = None  # attention shift KL
+    time_to_reply_ms: Optional[float] = None  # user delay since last assistant msg (set by UI)
+
 
 @dataclass
 class TurnResult:
@@ -107,6 +123,12 @@ class ConversationManager:
         self.conversation_id: str = str(uuid.uuid4())
         self.messages: List[Dict[str, str]] = []
         self._system_prompt = self._build_system_prompt()
+
+        # ── Per-turn metrics (paper DVs) ──────────────────────
+        self.turn_metrics: List[TurnMetrics] = []
+        self.ad_turns_actual: List[int] = []          # turns where ads were actually injected
+        self.trial_start_ts: str = datetime.now().isoformat()
+        self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
 
     # ── System Prompt ─────────────────────────────────────────
 
@@ -187,12 +209,19 @@ class ConversationManager:
                 error="Trial has reached the maximum number of turns.",
             )
 
+        # ── Compute user reply delay (time since last assistant message)
+        time_to_reply_ms: Optional[float] = None
+        if self._last_assistant_ts is not None:
+            time_to_reply_ms = (time.perf_counter() - self._last_assistant_ts) * 1000.0
+
         # 2 — user message
         self.messages.append({"role": "user", "content": user_input})
         current_turn = self.turn_count
         self.logger.log(
             "user_message",
-            {"content": user_input, "turn": current_turn},
+            {"content": user_input, "turn": current_turn,
+             "msg_len": len(user_input),
+             "time_to_reply_ms": time_to_reply_ms},
             self.ad_mode,
             self.conversation_id,
         )
@@ -210,20 +239,26 @@ class ConversationManager:
             else InjectionResult()
         )
 
-        # 5 — LLM call
+        # 5 — LLM call (timed)
+        llm_t0 = time.perf_counter()
         assistant_reply = self._call_llm(injection.system_overrides)
+        llm_latency_ms = (time.perf_counter() - llm_t0) * 1000.0
 
         # 6 — record assistant reply
         self.messages.append({"role": "assistant", "content": assistant_reply})
+        self._last_assistant_ts = time.perf_counter()
         self.logger.log(
             "assistant_reply",
-            {"content": assistant_reply, "turn": current_turn},
+            {"content": assistant_reply, "turn": current_turn,
+             "msg_len": len(assistant_reply),
+             "llm_latency_ms": round(llm_latency_ms, 1)},
             self.ad_mode,
             self.conversation_id,
         )
 
         # 7 — post-response injection
         if inject_ad:
+            self.ad_turns_actual.append(current_turn)
             for msg in injection.messages_to_append:
                 self.messages.append(msg)
                 self.logger.log(
@@ -232,6 +267,8 @@ class ConversationManager:
                         "content": msg["content"],
                         "turn": current_turn,
                         "ad_mode": self.ad_mode,
+                        "ad_title": ad.title if ad else None,
+                        "ad_relevance_score": ad.relevance_score if ad else None,
                     },
                     self.ad_mode,
                     self.conversation_id,
@@ -254,6 +291,20 @@ class ConversationManager:
             self.ad_mode,
             self.conversation_id,
         )
+
+        # 10 — record per-turn metrics for offline analysis
+        metrics = TurnMetrics(
+            turn=current_turn,
+            user_msg_len=len(user_input),
+            assistant_msg_len=len(assistant_reply),
+            llm_latency_ms=round(llm_latency_ms, 1),
+            ad_injected=inject_ad,
+            ad_title=ad.title if (inject_ad and ad) else None,
+            ad_relevance_score=ad.relevance_score if (inject_ad and ad) else None,
+            attention_divergence=shift.divergence if shift else None,
+            time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
+        )
+        self.turn_metrics.append(metrics)
 
         return TurnResult(
             assistant_reply=assistant_reply,

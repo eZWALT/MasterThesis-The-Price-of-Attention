@@ -444,6 +444,18 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
             st.markdown("### 🔍 Sponsored Suggestions")
             for suggestion in result.suggestions:
                 if st.button(suggestion, key=f"sug_{suggestion[:20]}"):
+                    # Log ad click / conversion
+                    manager.logger.log(
+                        "ad_clicked",
+                        {
+                            "turn": manager.turn_count,
+                            "ad_mode": ad_mode,
+                            "suggestion": suggestion,
+                            "ad_title": ad.title if ad else None,
+                        },
+                        ad_mode,
+                        manager.conversation_id,
+                    )
                     _call_llm_with_spinner(manager, suggestion)
                     st.rerun()
 
