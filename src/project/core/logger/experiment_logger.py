@@ -294,6 +294,9 @@ class ExperimentLogger:
           None         → flush signal (write buffer to disk now)
           Event        → flush + set event (for flush_sync)
           _STOP        → exit the loop
+
+        Flush also triggers on 1-second idle timeout so data never sits
+        in memory indefinitely.
         """
         buffer: List[str] = []
 
@@ -301,6 +304,10 @@ class ExperimentLogger:
             try:
                 item = self._write_queue.get(timeout=1.0)
             except queue.Empty:
+                # Idle timeout — flush whatever is buffered so far
+                if buffer:
+                    self._write_lines(buffer)
+                    buffer = []
                 continue
 
             if item is _STOP:
