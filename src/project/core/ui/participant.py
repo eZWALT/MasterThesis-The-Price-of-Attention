@@ -380,9 +380,10 @@ def run_participant_mode(params):
                 ctrl.trial_results.append({
                     "trial": ctrl.trial_number,
                     "task_id": task.id,
-                    "task_genre": task.genre,
                     "ad_mode": ad_mode,
                     "conversation_id": mgr.conversation_id,
+                    "initial_intent": mgr.initial_intent,
+                    "intent_history": list(mgr.intent_history),
                     "turns": mgr.turn_count,
                     "ad_turns_actual": list(mgr.ad_turns_actual),
                     "trial_start_ts": mgr.trial_start_ts,

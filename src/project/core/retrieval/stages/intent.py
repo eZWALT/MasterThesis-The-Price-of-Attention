@@ -157,3 +157,67 @@ class IntentClassifier(PipelineStage):
             logger.opt(exception=True).error("IntentClassifier inference error: {}", exc)
             state.intent = ""
         return state
+
+    # ── Public standalone API ────────────────────────────────────────────
+
+    def classify(self, text: str) -> str:
+        """
+        Classify a standalone text snippet and return the intent label.
+
+        This is the public API for use *outside* the retrieval pipeline,
+        e.g. for per-turn intent tracking in the conversation manager.
+
+        Truncates to INTENT_MAX_SEQ_LENGTH tokens internally.
+        Returns "" if the model is not loaded or inference fails.
+        """
+        if self._model is None:
+            return ""
+        try:
+            return self._classify(text)
+        except Exception as exc:
+            logger.opt(exception=True).warning("IntentClassifier.classify error: {}", exc)
+            return ""
+
+
+# ── Module-level singleton ────────────────────────────────────────────────
+# Lazy-loaded so import doesn't trigger model loading; call get_intent_classifier()
+# to get the shared instance.
+
+_INTENT_SINGLETON: IntentClassifier | None = None
+
+
+def get_intent_classifier() -> IntentClassifier:
+    """Return a shared IntentClassifier singleton (lazy-loaded on first call)."""
+    global _INTENT_SINGLETON
+    if _INTENT_SINGLETON is None:
+        _INTENT_SINGLETON = IntentClassifier()
+    return _INTENT_SINGLETON
+
+
+def classify_intent(text: str) -> str:
+    """
+    Convenience function: classify a text snippet's conversational intent.
+
+    Uses the shared model singleton.  Safe to call from anywhere —
+    returns "" if the model fails to load or inference errors.
+    """
+    return get_intent_classifier().classify(text)
+
+
+def truncate_to_tokens(text: str, max_tokens: int) -> str:
+    """
+    Truncate text to at most `max_tokens` WordPiece tokens, returning
+    the decoded string.  Uses the shared tokenizer from the intent singleton.
+
+    Falls back to a char-based heuristic (~4 chars/token) if the model
+    isn't loaded.
+    """
+    clf = get_intent_classifier()
+    if clf._tokenizer is None:
+        # Fallback: ~4 chars per WordPiece token on average
+        return text[: max_tokens * 4]
+    ids = clf._tokenizer.encode(text, add_special_tokens=False, truncation=False)
+    if len(ids) <= max_tokens:
+        return text
+    truncated_ids = ids[:max_tokens]
+    return clf._tokenizer.decode(truncated_ids, skip_special_tokens=True)
