@@ -42,18 +42,18 @@ class TestADBackendConfig:
 
 @pytest.mark.unit
 class TestWarmupRetrieval:
-    def test_warmup_skips_when_not_rag(self):
-        """_warmup_retrieval should be a no-op when AD_BACKEND != 'rag'."""
-        with patch("core.config.AD_BACKEND", "mock"):
-            # Import fresh — the function checks AD_BACKEND at call time
-            import importlib
-            import app
-            importlib.reload(app)
-            # Should not raise even without GPU/models
-            # (it returns immediately when not rag)
-            # We can't easily test st.cache_resource in unit tests,
-            # so just verify the function exists and is callable
-            assert callable(app._warmup_retrieval.__wrapped__)
+    def test_warmup_function_exists(self):
+        """_warmup_retrieval exists and is callable."""
+        import app
+        assert callable(app._warmup_retrieval.__wrapped__)
+
+    def test_warmup_always_runs(self):
+        """_warmup_retrieval no longer gates on AD_BACKEND (always eager)."""
+        import app
+        import inspect
+        source = inspect.getsource(app._warmup_retrieval.__wrapped__)
+        # Should NOT contain an early-return guard on AD_BACKEND
+        assert "if AD_BACKEND" not in source
 
 
 @pytest.mark.unit

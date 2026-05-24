@@ -15,7 +15,7 @@ Quick reference:
 
 import streamlit as st
 
-from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON, DEFAULT_MODEL, AD_BACKEND
+from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON, DEFAULT_MODEL
 from core.conversation.llm_client import LLMClient
 from core.experiment.query_params import parse_query_params
 from core.ui.participant import init_session_state, run_participant_mode
@@ -36,13 +36,13 @@ def _warmup_retrieval() -> None:
     HuggingFace downloads model shards and builds the FAISS index.
     After this call the pipeline singleton is populated and all subsequent
     retrieve_ad() calls are instantaneous.
+
+    Always runs regardless of AD_BACKEND — the dev UI can switch to RAG
+    at any time, and participants should never experience loading delays.
     """
-    if AD_BACKEND != "rag":
-        return
     from core.retrieval import retrieve_ad
     from core.log import logger
     logger.info("Warming up retrieval pipeline (eager load)...")
-    # Run a dummy query to trigger full pipeline construction + model load.
     retrieve_ad("warmup", [])
     logger.info("Retrieval pipeline warm — ready to serve.")
 

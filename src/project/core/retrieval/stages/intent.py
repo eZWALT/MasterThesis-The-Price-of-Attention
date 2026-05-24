@@ -107,10 +107,16 @@ class IntentClassifier(PipelineStage):
         # DistilBERT/BERT share the same WordPiece vocabulary, so we load the
         # tokenizer from bert-base-uncased and the model from the checkpoint.
         tokenizer = BertTokenizerFast.from_pretrained(INTENT_TOKENIZER_NAME)
-        model = AutoModelForSequenceClassification.from_pretrained(model_name)
 
         target = torch.device(device)
-        model = model.to(target)
+        # Some safetensors checkpoints load onto 'meta' device first;
+        # we must specify device_map to avoid "cannot copy out of meta tensor".
+        model = AutoModelForSequenceClassification.from_pretrained(
+            model_name,
+            device_map=device if device != "cpu" else None,
+        )
+        if device == "cpu" or not hasattr(model, "hf_device_map"):
+            model = model.to(target)
         model.eval()
 
         # Read label mapping from model config.
