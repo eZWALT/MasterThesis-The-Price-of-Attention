@@ -11,7 +11,12 @@ services:
       - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-16384}
       - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
       - LLM_THINK=${LLM_THINK:-false}
+      - HF_HOME=/app/.hf_cache
     volumes:
       - .:/app
+      - hf_cache:/app/.hf_cache
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+volumes:
+  hf_cache:

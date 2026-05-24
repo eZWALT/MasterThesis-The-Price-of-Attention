@@ -210,3 +210,4 @@ __marimo__/
 src/project/data/faiss.index
 src/project/data/__pycache__/
 src/project/sessions/
+src/project/.hf_cache/
