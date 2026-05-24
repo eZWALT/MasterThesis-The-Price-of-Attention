@@ -240,16 +240,16 @@ def _render_dev_ad_controls(mgr=None) -> None:
     )
 
     # Backend selector
-    rag_options  = ["default", "mock", "rag"]
-    rag_labels   = {"default": "⚙️ default (env)", "mock": "🧸 mock (no GPU)", "rag": "🔍 RAG pipeline"}
-    current_idx  = rag_options.index(st.session_state.get("dev_rag_mode", "default"))
+    from core.config import AD_BACKEND
+    rag_options = ["mock", "rag"]
+    rag_labels  = {"mock": "🧸 Mock (fast, no GPU)", "rag": "🔍 RAG pipeline"}
+    current_idx = rag_options.index(st.session_state.get("dev_rag_mode", AD_BACKEND))
     chosen = st.radio(
         "Ad backend",
         rag_options,
         index=current_idx,
         format_func=lambda k: rag_labels[k],
         horizontal=True,
-        help="Override AD_BACKEND for this session only.",
     )
     st.session_state.dev_rag_mode = chosen
 
@@ -276,8 +276,7 @@ def _render_dev_ad_controls(mgr=None) -> None:
 def _sync_dev_overrides(mgr) -> None:
     """Push current dev session-state overrides onto a live ConversationManager."""
     mgr._force_ad = st.session_state.get("dev_force_ad", False)
-    mode = st.session_state.get("dev_rag_mode", "default")
-    mgr._ad_backend = None if mode == "default" else mode
+    mgr._ad_backend = st.session_state.get("dev_rag_mode")  # "mock" or "rag"
     # Ad mode override (flow-test sidebar selector)
     ad_mode_override = st.session_state.get("dev_ad_mode_override")
     if ad_mode_override:
