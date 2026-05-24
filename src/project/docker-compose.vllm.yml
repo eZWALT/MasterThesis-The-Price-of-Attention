@@ -41,8 +41,13 @@ services:
       - API_URL=http://vllm:${VLLM_PORT}/v1/chat/completions
       - DEFAULT_MODEL=${VLLM_MODEL}
       - LLM_BACKEND=openai
+      - HF_HOME=/app/.hf_cache
     volumes:
       - .:/app
+      - hf_cache:/app/.hf_cache
     depends_on:
       vllm:
         condition: service_healthy
+
+volumes:
+  hf_cache:

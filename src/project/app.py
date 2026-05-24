@@ -15,7 +15,7 @@ Quick reference:
 
 import streamlit as st
 
-from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON, DEFAULT_MODEL
+from core.config import APP_TITLE, PAGE_TITLE, PAGE_ICON, DEFAULT_MODEL, AD_BACKEND
 from core.conversation.llm_client import LLMClient
 from core.experiment.query_params import parse_query_params
 from core.ui.participant import init_session_state, run_participant_mode
@@ -28,8 +28,28 @@ def _warmup_llm() -> None:
     LLMClient().warmup(DEFAULT_MODEL)
 
 
+@st.cache_resource
+def _warmup_retrieval() -> None:
+    """Pre-load embedding + reranker models and FAISS index at startup.
+
+    Without this, the first ad injection causes a 2-3 min hang while
+    HuggingFace downloads model shards and builds the FAISS index.
+    After this call the pipeline singleton is populated and all subsequent
+    retrieve_ad() calls are instantaneous.
+    """
+    if AD_BACKEND != "rag":
+        return
+    from core.retrieval import retrieve_ad
+    from core.log import logger
+    logger.info("Warming up retrieval pipeline (eager load)...")
+    # Run a dummy query to trigger full pipeline construction + model load.
+    retrieve_ad("warmup", [])
+    logger.info("Retrieval pipeline warm — ready to serve.")
+
+
 def main():
     _warmup_llm()
+    _warmup_retrieval()
     params = parse_query_params()
 
     st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout="wide")
