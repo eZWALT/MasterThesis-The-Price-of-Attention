@@ -243,7 +243,8 @@ def _render_dev_ad_controls(mgr=None) -> None:
     from core.config import AD_BACKEND
     rag_options = ["mock", "rag"]
     rag_labels  = {"mock": "🧸 Mock (fast, no GPU)", "rag": "🔍 RAG pipeline"}
-    current_idx = rag_options.index(st.session_state.get("dev_rag_mode", AD_BACKEND))
+    stored = st.session_state.get("dev_rag_mode", AD_BACKEND)
+    current_idx = rag_options.index(stored) if stored in rag_options else 0
     chosen = st.radio(
         "Ad backend",
         rag_options,

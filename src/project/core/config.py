@@ -197,6 +197,9 @@ BASELINE_DURATION_SECONDS: int = 60
 # │  Ordered by increasing intrusiveness.                                   │
 # └─────────────────────────────────────────────────────────────────────────┘
 
+# Ad retrieval backend: "mock" (placeholder, no GPU) or "rag" (full pipeline)
+AD_BACKEND: str = os.getenv("AD_BACKEND", "mock")
+
 AD_MODES: list[str] = [
     "inline_persuasive",        # ad woven into the LLM's own response
     "sponsored_conversational", # Perplexity-style follow-up suggestion chips

@@ -23,6 +23,7 @@ import os
 from typing import Dict, List
 
 from core.config import (
+    AD_BACKEND,
     MOCK_AD_TITLE,
     MOCK_AD_TEXT,
     MOCK_AD_CTA,
@@ -38,8 +39,7 @@ from core.ad_injection.injectors import (
 )
 
 # ── Backend selector ──────────────────────────────────────────
-# Override with env var AD_BACKEND=rag to activate the retrieval pipeline.
-AD_BACKEND: str = os.getenv("AD_BACKEND", "mock")
+# AD_BACKEND is defined in core/config.py (reads AD_BACKEND env var).
 
 
 # ── Ad provider ───────────────────────────────────────────────
