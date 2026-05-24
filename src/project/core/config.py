@@ -299,6 +299,7 @@ FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
 FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
 CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalog.jsonl")
+CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")  # multi-source ad directory
 DEFAULT_CATALOG_PRICE: float = 0.0  # fallback price when catalog omits it
 DENSE_TOP_K: int           = 100    # ANN candidates returned to Stage 3 / 4
 

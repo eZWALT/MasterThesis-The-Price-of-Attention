@@ -22,7 +22,7 @@ from typing import Any, Dict
 from core.retrieval.adapters.base import DatasetAdapter, CatalogItemDict
 
 # Fields consumed by the normalised schema; everything else → metadata.
-_KNOWN_FIELDS = {"item_id", "title", "text", "category", "price", "cta", "question"}
+_KNOWN_FIELDS = {"item_id", "title", "text", "category", "price", "cta", "question", "metadata"}
 
 
 class GenericAdapter(DatasetAdapter):
@@ -34,7 +34,11 @@ class GenericAdapter(DatasetAdapter):
     """
 
     def to_catalog_item(self, raw: Dict[str, Any]) -> CatalogItemDict:
-        metadata = {k: v for k, v in raw.items() if k not in _KNOWN_FIELDS}
+        # Extra fields (not in schema) go into metadata automatically.
+        extra = {k: v for k, v in raw.items() if k not in _KNOWN_FIELDS}
+        # If the raw record has an explicit "metadata" dict, merge it in.
+        explicit_meta = raw.get("metadata") or {}
+        metadata = {**explicit_meta, **extra}
         return {
             "item_id":  str(raw["item_id"]),
             "title":    str(raw["title"]),
