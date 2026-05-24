@@ -24,24 +24,7 @@ from __future__ import annotations
 
 import os
 
-
-def _best_cuda_device(default: str = "cuda:0") -> str:
-    """
-    Return the CUDA device with the most free memory.
-    Falls back to `default` when CUDA is unavailable or torch is not installed.
-    """
-    try:
-        import torch
-        if not torch.cuda.is_available():
-            return "cpu"
-        best_idx, best_free = 0, 0
-        for i in range(torch.cuda.device_count()):
-            free, _ = torch.cuda.mem_get_info(i)
-            if free > best_free:
-                best_free, best_idx = free, i
-        return f"cuda:{best_idx}"
-    except Exception:
-        return default
+from core.device import allocate_device, log_device_map, LLM_GPU_INDICES
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
@@ -248,10 +231,10 @@ MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  7.  RETRIEVAL PIPELINE                                                 │
 # │                                                                         │
-# │  GPU layout:                                                            │
-# │    GPU 0 (40 GB) — conversational LLM  (Qwen 3.6 35B)                  │
-# │    GPU 1 (40 GB) — embedding model + reranker                           │
-# │    CPU / RAM     — intent model (BERT) + FAISS index + UI               │
+# │  GPU layout (dynamically allocated — see _allocate_device):             │
+# │    LLM GPUs (env LLM_GPU_INDICES, default "0") — excluded from alloc   │
+# │    Remaining GPUs — embedding + reranker spread by free VRAM            │
+# │    CPU fallback — used when no GPU has enough free memory               │
 # │                                                                         │
 # │  Pipeline stages (in execution order):                                  │
 # │    0a. ContextSummaryStage  — compress history → context_summary        │
@@ -286,7 +269,11 @@ QUERY_EXPAND_MAX_TOKENS: int     = 50
 # ── Stage 1 — Intent classifier (HuggingFace DistilBERT, CPU) ────────────
 # 13-class sequence classifier; label names read from model config at runtime.
 INTENT_MODEL_NAME: str = os.getenv("INTENT_MODEL_NAME", "Thrad/thrad-bert-conversation-classifier")
-INTENT_DEVICE: str     = os.getenv("INTENT_DEVICE", "cpu")
+INTENT_DEVICE: str     = os.getenv("INTENT_DEVICE") or allocate_device(
+    model_name="intent-bert",
+    preferred="cpu",           # BERT is tiny; CPU is fine and saves GPU VRAM
+    role="intent-classifier",
+)
 
 # Catalog dataset adapter: "generic" | "amazon" | any registered key.
 # Use "generic" when catalog.jsonl was already normalized by prepare_amazon_catalog.py.
@@ -297,9 +284,16 @@ CATALOG_ADAPTER: str   = os.getenv("CATALOG_ADAPTER", "generic")
 INTENT_TOKENIZER_NAME: str   = "bert-base-uncased"  # WordPiece vocab for ThradBERT
 INTENT_MAX_SEQ_LENGTH: int   = 512                  # truncation limit for input
 
-# ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS, GPU 1) ─────
+# ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS) ────────────
 EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-4B")
-EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or _best_cuda_device("cuda:1")
+# Load precision: "bfloat16" (recommended), "float16", or "float32" (2x VRAM).
+EMBEDDING_DTYPE: str       = os.getenv("EMBEDDING_DTYPE", "bfloat16")
+EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or allocate_device(
+    model_name=EMBEDDING_MODEL_NAME,
+    preferred="cuda:1",
+    role="embedding",
+    exclude_gpus=LLM_GPU_INDICES,
+)
 EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
@@ -314,9 +308,15 @@ BM25_WEIGHT: float  = 0.3   # must sum to 1.0 with DENSE_WEIGHT
 DENSE_WEIGHT: float = 0.7
 RRF_K: int          = 60    # Reciprocal Rank Fusion smoothing constant
 
-# ── Stage 4 — Reranker (HuggingFace cross-encoder, GPU 1) ────────────────
+# ── Stage 4 — Reranker (HuggingFace cross-encoder) ──────────────────────
 RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-4B")
-RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or EMBEDDING_DEVICE  # share GPU with embedder
+RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "bfloat16")
+RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
+    model_name=RERANKER_MODEL_NAME,
+    preferred=EMBEDDING_DEVICE,   # co-locate with embedder if room exists
+    role="reranker",
+    exclude_gpus=LLM_GPU_INDICES,
+)
 RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
@@ -332,6 +332,9 @@ SPONSORED_LABEL: str       = "Sponsored"  # disclosure prefix / header
 # NOTE: adds ~1-2 s LLM latency — disable for intrusiveness ablations.
 # Toggle: USE_SUMMARIZATION / env SUMMARIZATION=1 / URL ?ad_sum=1
 USE_SUMMARIZATION: bool = os.getenv("SUMMARIZATION", "").lower() in ("1", "true", "yes")
+
+# ── Device allocation summary (logged at import time) ─────────────────────
+log_device_map(INTENT_DEVICE, EMBEDDING_DEVICE, RERANKER_DEVICE)
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐

@@ -10,12 +10,26 @@ with no other code changes.
 
 from __future__ import annotations
 
-from typing import List
+import logging
+from typing import List, Optional
 
+import torch
 from sentence_transformers import CrossEncoder
 
 from core.retrieval.rerankers.base import RerankerModel
 from core.retrieval.stages.state import CatalogItem, RankedCandidate
+
+_log = logging.getLogger(__name__)
+
+# Map string dtype names → torch dtypes
+_DTYPE_MAP = {
+    "float32": torch.float32,
+    "fp32": torch.float32,
+    "float16": torch.float16,
+    "fp16": torch.float16,
+    "bfloat16": torch.bfloat16,
+    "bf16": torch.bfloat16,
+}
 
 
 class CrossEncoderReranker(RerankerModel):
@@ -26,8 +40,9 @@ class CrossEncoderReranker(RerankerModel):
     ----------
     model_name : any HuggingFace cross-encoder model id.
                  Example: "cross-encoder/ms-marco-MiniLM-L-6-v2"
-                          "Qwen/Qwen3-Reranker-8B"
+                          "Qwen/Qwen3-Reranker-0.6B"
     device     : "cpu", "cuda:0", "cuda:1", etc.
+    dtype      : "bfloat16", "float16", or "float32". Half precision halves VRAM.
 
     Notes
     -----
@@ -36,8 +51,15 @@ class CrossEncoderReranker(RerankerModel):
     Applied only to the top reranker_top_k candidates from Stage 2/3.
     """
 
-    def __init__(self, model_name: str, device: str = "cpu") -> None:
-        self._model = CrossEncoder(model_name, device=device)
+    def __init__(self, model_name: str, device: str = "cpu", dtype: Optional[str] = None) -> None:
+        model_kwargs = {}
+        if dtype and dtype in _DTYPE_MAP:
+            model_kwargs["dtype"] = _DTYPE_MAP[dtype]
+            _log.info("[Reranker] Loading %s on %s with dtype=%s", model_name, device, dtype)
+        else:
+            _log.info("[Reranker] Loading %s on %s with default dtype (FP32)", model_name, device)
+
+        self._model = CrossEncoder(model_name, device=device, model_kwargs=model_kwargs)
 
     def rerank(self, query: str, candidates: List[CatalogItem]) -> List[RankedCandidate]:
         """

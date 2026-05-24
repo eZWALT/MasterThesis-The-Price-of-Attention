@@ -19,6 +19,7 @@ _REGISTRY = {
 def build_reranker(
     model_name: str,
     device: str = "cpu",
+    dtype: str | None = None,
     backend: str = "cross_encoder",
 ) -> RerankerModel:
     """
@@ -28,13 +29,20 @@ def build_reranker(
     ----------
     model_name : HuggingFace model id passed to the backend constructor.
     device     : target device string (e.g. "cuda:1").
+    dtype      : "bfloat16", "float16", or "float32"; defaults to config.RERANKER_DTYPE.
     backend    : key in _REGISTRY (default "cross_encoder").
     """
+    from core.config import RERANKER_DTYPE
+
     cls = _REGISTRY.get(backend)
     if cls is None:
         raise ValueError(f"Unknown reranker backend '{backend}'. "
                          f"Available: {list(_REGISTRY)}")
-    return cls(model_name=model_name, device=device)
+    return cls(
+        model_name=model_name,
+        device=device,
+        dtype=dtype if dtype is not None else RERANKER_DTYPE,
+    )
 
 
 __all__ = ["RerankerModel", "CrossEncoderReranker", "build_reranker"]

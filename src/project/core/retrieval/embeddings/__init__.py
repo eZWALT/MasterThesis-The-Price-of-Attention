@@ -21,6 +21,7 @@ def build_embedding_model(
     model_name: str,
     device: str = "cpu",
     batch_size: int | None = None,
+    dtype: str | None = None,
     backend: str = "huggingface",
 ) -> EmbeddingModel:
     """
@@ -31,9 +32,10 @@ def build_embedding_model(
     model_name : HuggingFace model id passed to the backend constructor.
     device     : target device string (e.g. "cuda:1").
     batch_size : forward-pass batch size; defaults to config.EMBEDDING_BATCH_SIZE.
+    dtype      : "bfloat16", "float16", or "float32"; defaults to config.EMBEDDING_DTYPE.
     backend    : key in _REGISTRY (default "huggingface").
     """
-    from core.config import EMBEDDING_BATCH_SIZE
+    from core.config import EMBEDDING_BATCH_SIZE, EMBEDDING_DTYPE
 
     cls = _REGISTRY.get(backend)
     if cls is None:
@@ -43,6 +45,7 @@ def build_embedding_model(
         model_name=model_name,
         device=device,
         batch_size=batch_size if batch_size is not None else EMBEDDING_BATCH_SIZE,
+        dtype=dtype if dtype is not None else EMBEDDING_DTYPE,
     )
 
 
