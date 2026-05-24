@@ -36,9 +36,9 @@ from core.device import allocate_device, log_device_map, LLM_GPU_INDICES
 API_URL: str             = os.getenv("API_URL", "http://localhost:9999/v1/chat/completions")
 DEFAULT_MODEL: str       = os.getenv("DEFAULT_MODEL", "qwen3.6:35b")
 DEFAULT_TEMPERATURE: float = 0.7
-DEFAULT_MAX_TOKENS: int  = 400
+DEFAULT_MAX_TOKENS: int  = 2048
 TEMPERATURE_RANGE: tuple[float, float] = (0.0, 1.0)
-MAX_TOKENS_RANGE: tuple[int, int]      = (64, 2048)
+MAX_TOKENS_RANGE: tuple[int, int]      = (64, 4096)
 LLM_TIMEOUT_SECONDS: int = 120
 # Backend routing: "ollama" uses the native /api/chat endpoint (supports think:false);
 # "openai" uses the OpenAI-compatible /v1/chat/completions endpoint (vLLM, OpenAI, etc.).
