@@ -90,8 +90,17 @@ def _to_catalog_item(row: dict) -> dict:
 
     title = str(row.get("title") or "").strip()
 
+    # Resolve category early so it can be prepended to the embedding text.
+    category = (
+        str(row.get("main_category") or "").strip()
+        or str(row.get("filename") or "").replace("meta_", "").replace("_", " ").strip()
+    )
+
     # Build a dense text field for embedding / BM25
+    # Category is prepended as a topic frame to improve retrieval.
     parts: List[str] = []
+    if category:
+        parts.append(category)
     if title:
         parts.append(title)
 
@@ -112,18 +121,13 @@ def _to_catalog_item(row: dict) -> dict:
 
     text = " ".join(parts).strip() or title
 
-    category = (
-        str(row.get("main_category") or "").strip()
-        or str(row.get("filename") or "").replace("meta_", "").replace("_", " ").strip()
-    )
-
     price_raw = row.get("price")
     try:
         price = float(price_raw) if price_raw is not None else 0.0
     except (ValueError, TypeError):
         price = 0.0
 
-    from core.config import AD_QUESTION_TEMPLATE
+    from core.config import AD_QUESTION_TEMPLATE, DEFAULT_AD_CTA
 
     metadata: dict = {}
     if row.get("store"):
@@ -147,7 +151,7 @@ def _to_catalog_item(row: dict) -> dict:
         "text":     text,
         "category": category,
         "price":    price,
-        "cta":      "Shop now",
+        "cta":      DEFAULT_AD_CTA,
         "question": AD_QUESTION_TEMPLATE.format(title=title),
         "metadata": metadata,
     }

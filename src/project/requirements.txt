@@ -1,16 +1,30 @@
-# Pinned for reproducibility — update intentionally, not accidentally
+# Pinned for reproducibility — update intentionally, not accidentally.
+# Python >=3.11, <3.14 required.
+#
+# PyTorch with CUDA 12.x (adjust for your CUDA version):
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu124
+#
+# CPU-only install (no GPU):
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+
+# ── Core ──────────────────────────────────────────────────────────────────────
 streamlit==1.56.0
 loguru==0.7.3
-huggingface_hub==0.34.0
-transformers==4.57.6
-sentence_transformers==5.4.1
-datasets==4.8.5
 requests==2.32.3
 numpy==2.2.6
+
+# ── ML / Retrieval ───────────────────────────────────────────────────────────
+torch==2.10.0
+transformers==4.57.6
+sentence_transformers==5.4.1
+huggingface_hub==0.34.0
+datasets==4.8.5
 faiss-cpu==1.13.2
 scikit-learn==1.8.0
-torch==2.10.0
-rank-bm25==0.2.2 
+rank-bm25==0.2.2
+
+# ── Dev / Testing ────────────────────────────────────────────────────────────
+pytest>=8.0
 
 # Optional: uncomment when multimodal integration is active
 # mne==1.9.0              # EEG preprocessing

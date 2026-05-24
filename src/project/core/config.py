@@ -224,7 +224,7 @@ MOCK_AD_TEXT: str     = (
     "Boost recovery with high-quality creatine designed for "
     "muscle & neural growth."
 )
-MOCK_AD_CTA: str      = "Learn more"
+MOCK_AD_CTA: str      = "Discover More"
 MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
 
 
@@ -321,7 +321,8 @@ RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
 RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads the injector receives
-DEFAULT_AD_CTA: str       = "Learn more"  # fallback CTA when catalog omits it
+AD_CTA_OPTIONS: list       = ["Discover More", "Shop Now", "Learn More", "See Details", "Check It Out"]
+DEFAULT_AD_CTA: str       = AD_CTA_OPTIONS[0]  # default CTA applied during catalog prep
 # Auto-generated follow-up question chip; {title} filled at ingest time.
 AD_QUESTION_TEMPLATE: str  = "Would you like a recommendation for {title}?"
 AD_FALLBACK_QUESTION_TEMPLATE: str = "Would you like to know more about {title}?"
