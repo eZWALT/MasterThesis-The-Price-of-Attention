@@ -29,6 +29,7 @@ from core.config import (
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     AD_INJECTION_TURNS,
+    INTENT_MAX_SEQ_LENGTH,
 )
 from core.ad_injection import Ad, InjectionResult, get_ad, get_injector
 from core.attention_shift import (
@@ -39,6 +40,7 @@ from core.attention_shift import (
 from core.logger import ExperimentLogger
 from core.experiment.tasks import TaskDefinition
 from core.conversation.llm_client import LLMClient
+from core.retrieval.stages.intent import classify_intent, truncate_to_tokens
 
 
 # ── Turn result (returned to the UI) ─────────────────────────
@@ -55,6 +57,7 @@ class TurnMetrics:
     ad_relevance_score: Optional[float] = None  # retrieval relevance score
     attention_divergence: Optional[float] = None  # attention shift KL
     time_to_reply_ms: Optional[float] = None  # user delay since last assistant msg (set by UI)
+    intent_label: str = ""                   # ThradBERT intent classification for this turn
 
 
 @dataclass
@@ -129,6 +132,66 @@ class ConversationManager:
         self.ad_turns_actual: List[int] = []          # turns where ads were actually injected
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
+        # ── Intent tracking (ThradBERT, paper §RQ3) ──────────
+        # initial_intent: classified from task prompt at conversation start
+        # per-turn intent: classified each turn from compact context
+        self.initial_intent: str = self._classify_initial_intent()
+        self.intent_history: List[str] = []           # one label per user turn
+
+    # ── Intent Classification ─────────────────────────────────
+
+    def _classify_initial_intent(self) -> str:
+        """Classify the task prompt to get the initial (s₀) intent label."""
+        if self.task and self.task.participant_prompt:
+            return classify_intent(self.task.participant_prompt)
+        return ""
+
+    def _classify_turn_intent(self, user_input: str) -> str:
+        """
+        Classify the current conversation intent (sₜ) for this turn.
+
+        Token budget allocation (510 tokens total, 2 reserved for [CLS]/[SEP]):
+          - Current user message: 50% (255 tokens) — strongest signal
+          - Recent history:       35% (178 tokens) — conversation drift
+          - Task/system prompt:   15% (77 tokens)  — initial anchor
+
+        Truncation is done at the WordPiece token level using the
+        ThradBERT tokenizer, so we never exceed the model's 512 context.
+        """
+        MAX_TOKENS = 510  # 512 - 2 special tokens ([CLS] + [SEP])
+        CURRENT_BUDGET = int(MAX_TOKENS * 0.50)   # 255
+        HISTORY_BUDGET = int(MAX_TOKENS * 0.35)   # 178
+        TASK_BUDGET    = MAX_TOKENS - CURRENT_BUDGET - HISTORY_BUDGET  # 77
+
+        # 1. Current user message (highest priority)
+        current = truncate_to_tokens(user_input, CURRENT_BUDGET)
+
+        # 2. Task prompt (context anchor)
+        task_text = ""
+        if self.task and self.task.participant_prompt:
+            task_text = truncate_to_tokens(self.task.participant_prompt, TASK_BUDGET)
+
+        # 3. Recent history — last N user messages before current turn
+        #    Split budget evenly among last 2-3 messages
+        prev_user_msgs = [
+            m["content"] for m in self.messages if m["role"] == "user"
+        ][:-1]  # exclude current (already appended before this call)
+        recent = prev_user_msgs[-3:]  # last 3 for richer context
+        history_parts: List[str] = []
+        if recent:
+            per_msg = HISTORY_BUDGET // len(recent)
+            for msg in recent:
+                history_parts.append(truncate_to_tokens(msg, per_msg))
+
+        # Assemble: task | history | current
+        parts: List[str] = []
+        if task_text:
+            parts.append(task_text)
+        for hp in history_parts:
+            parts.append(hp)
+        parts.append(current)
+
+        return classify_intent(" ".join(parts))
 
     # ── System Prompt ─────────────────────────────────────────
 
@@ -292,7 +355,11 @@ class ConversationManager:
             self.conversation_id,
         )
 
-        # 10 — record per-turn metrics for offline analysis
+        # 10 — classify current-turn intent (ThradBERT)
+        turn_intent = self._classify_turn_intent(user_input)
+        self.intent_history.append(turn_intent)
+
+        # 11 — record per-turn metrics for offline analysis
         metrics = TurnMetrics(
             turn=current_turn,
             user_msg_len=len(user_input),
@@ -303,6 +370,7 @@ class ConversationManager:
             ad_relevance_score=ad.relevance_score if (inject_ad and ad) else None,
             attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
+            intent_label=turn_intent,
         )
         self.turn_metrics.append(metrics)
 
