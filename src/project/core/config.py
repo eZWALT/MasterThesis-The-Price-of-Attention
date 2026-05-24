@@ -189,7 +189,7 @@ MAX_TURNS_PER_TRIAL: int   = 20
 # 1-indexed user turns at which ads are automatically injected.
 AD_INJECTION_TURNS: list[int] = [3, 6]
 
-BASELINE_DURATION_SECONDS: int = 120
+BASELINE_DURATION_SECONDS: int = 60
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
@@ -385,7 +385,10 @@ SPINNER_ROTATE_MAX_SEC: float = 3.0   # max seconds before switching phrase
 # │  10. LOGGING                                                            │
 # └─────────────────────────────────────────────────────────────────────────┘
 
-DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"
+LOG_DIR: str              = os.getenv("LOG_DIR", "logs")          # base dir for JSONL logs
+LOG_FLUSH_EVERY_N: int    = 25                                    # flush buffer every N events
+LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer timer (seconds)
+DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
