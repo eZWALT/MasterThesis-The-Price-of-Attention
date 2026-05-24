@@ -149,12 +149,15 @@ class AdCatalog:
     @staticmethod
     def _load_catalog(path: str, adapter: DatasetAdapter):
         """
-        Iterate over `path` via the adapter and build the item dict + id_map.
+        Load all JSONL catalog files from CATALOG_DIR into a unified pool.
 
-        Also loads any additional JSONL files found in CATALOG_DIR (multi-source
-        ad pools — e.g. synthetic travel ads, hobby ads, etc.).  Each file in
-        that directory uses the same schema; items are merged into one unified
-        catalog.  Duplicates (by item_id) are skipped with a warning.
+        Every *.jsonl file in CATALOG_DIR is treated as an equal data source
+        (amazon.jsonl, travel.jsonl, hobby.jsonl, etc.).  Items are merged
+        into a single dict + id_map.  Duplicates (by item_id) are skipped.
+
+        The `path` parameter is kept for backward compatibility but is ignored
+        if CATALOG_DIR exists and contains files.  If CATALOG_DIR is missing,
+        falls back to loading `path` directly.
 
         The adapter handles schema differences (Amazon, generic, custom);
         this method is schema-agnostic.
@@ -183,20 +186,22 @@ class AdCatalog:
                 count += 1
             return count
 
-        # 1. Primary catalog file (e.g. data/catalog.jsonl — the Amazon dataset)
-        n_primary = _ingest(adapter.iter_catalog(path), path)
-        logger.info("Catalog loaded: {} items from {}", n_primary, path)
-
-        # 2. Additional catalogs from CATALOG_DIR (synthetic ad pools)
         catalog_dir = Path(CATALOG_DIR)
-        if catalog_dir.is_dir():
-            for extra_file in sorted(catalog_dir.glob("*.jsonl")):
-                n_extra = _ingest(adapter.iter_catalog(str(extra_file)), extra_file.name)
-                if n_extra:
-                    logger.info("  + {} items from {}", n_extra, extra_file.name)
+        sources_loaded = 0
 
-        logger.info("Total catalog size: {} items ({} sources)", len(items),
-                    1 + len(list(catalog_dir.glob("*.jsonl"))) if catalog_dir.is_dir() else 1)
+        if catalog_dir.is_dir() and list(catalog_dir.glob("*.jsonl")):
+            # Load all JSONL files from the catalogs directory
+            for catalog_file in sorted(catalog_dir.glob("*.jsonl")):
+                n = _ingest(adapter.iter_catalog(str(catalog_file)), catalog_file.name)
+                logger.info("Catalog loaded: {} items from {}", n, catalog_file.name)
+                sources_loaded += 1
+        else:
+            # Fallback: single-file mode (backward compat)
+            n = _ingest(adapter.iter_catalog(path), path)
+            logger.info("Catalog loaded: {} items from {}", n, path)
+            sources_loaded = 1
+
+        logger.info("Total catalog size: {} items ({} sources)", len(items), sources_loaded)
         return items, id_map
 
     @staticmethod
