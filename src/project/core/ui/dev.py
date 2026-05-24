@@ -5,6 +5,7 @@ Developer UI: sidebar controls and free-form chat mode (?dev=true).
 from __future__ import annotations
 
 import streamlit as st
+from loguru import logger as log
 
 from core.config import (
     AD_MODES,
@@ -197,4 +198,8 @@ def run_dev_mode():
         else:
             _sync_dev_overrides(mgr)
             _call_llm_with_spinner(mgr, user_input.strip())
+            log.info(
+                "Dev turn {} | ad_mode={} | exp={}",
+                mgr.turn_count, ad_mode, st.session_state.logger.experiment_id,
+            )
             st.rerun()

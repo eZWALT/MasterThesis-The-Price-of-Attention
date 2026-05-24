@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import uuid
 import streamlit as st
+from loguru import logger as log
 
 from core.config import (
     DEFAULT_MODEL,
@@ -72,6 +73,13 @@ def init_session_state(params):
         )
         ctrl.build_trial_plan()
         st.session_state.controller = ctrl
+        log.info(
+            "Session init | pid={} | exp={} | run={} | trials={}",
+            pid,
+            st.session_state.logger.experiment_id,
+            st.session_state.logger.run_id,
+            ctrl.n_trials,
+        )
 
     if "practice_manager" not in st.session_state:
         st.session_state.practice_manager = None
@@ -363,6 +371,12 @@ def run_participant_mode(params):
         if trial_cfg:
             task: TaskDefinition = trial_cfg["task"]
             if render_trial_intro(ctrl.trial_number, ctrl.n_trials, task.participant_prompt):
+                log.info(
+                    "Trial {}/{} starting | pid={} | task={} | ad_mode={} | exp={}",
+                    ctrl.trial_number, ctrl.n_trials,
+                    ctrl.participant_id, task.id, trial_cfg["ad_mode"],
+                    st.session_state.logger.experiment_id,
+                )
                 st.session_state.trial_manager = None
                 ctrl.advance()
                 st.rerun()
@@ -396,6 +410,11 @@ def run_participant_mode(params):
                     "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
                     "messages": list(mgr.messages),
                 })
+                log.info(
+                    "Trial {}/{} complete | pid={} | turns={} | ads_injected={}",
+                    ctrl.trial_number, ctrl.n_trials,
+                    ctrl.participant_id, mgr.turn_count, len(mgr.ad_turns_actual),
+                )
                 st.session_state.trial_manager = None
                 ctrl.advance()
                 st.rerun()
@@ -412,6 +431,12 @@ def run_participant_mode(params):
         if result is not None:
             ctrl.final_survey = result
             export_session_data(ctrl)
+            log.info(
+                "Session complete | pid={} | exp={} | trials_completed={}",
+                ctrl.participant_id,
+                st.session_state.logger.experiment_id,
+                len(ctrl.trial_results),
+            )
             ctrl.advance()
             st.rerun()
 
