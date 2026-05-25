@@ -6,7 +6,13 @@ from __future__ import annotations
 
 import pytest
 
-from core.ad_injection.models import Ad, AdRetrievalResult, format_products_block
+from core.ad_injection.models import (
+    Ad,
+    AdRetrievalResult,
+    compact_display_payload,
+    format_products_block,
+    format_sponsored_chat_content,
+)
 from core.ad_injection.injectors import (
     InlinePersuasiveInjector,
     SponsoredConversationalInjector,
@@ -30,7 +36,13 @@ class TestFormatProductsBlock:
         block = format_products_block(_sample_ads(2).ads)
         assert "1. **Product 1**" in block
         assert "2. **Product 2**" in block
-        assert "Description for product 1" in block
+        assert "Description" not in block
+
+    def test_includes_cta_when_present(self):
+        ads = [Ad(title="Gadget", text="long body", cta="Shop Now")]
+        block = format_products_block(ads)
+        assert "Shop Now" in block
+        assert "long body" not in block
 
     def test_empty_list_returns_empty_string(self):
         assert format_products_block([]) == ""
@@ -65,6 +77,13 @@ class TestOtherInjectorsUsePrimaryOnly:
         injector = ExplicitAdBlockInjector()
         result = injector.inject(_sample_ads(3), [])
         assert result.display_payload["title"] == "Product 1"
+        assert "text" not in result.display_payload
+
+    def test_sponsored_conversational_includes_display_payload(self):
+        injector = SponsoredConversationalInjector()
+        result = injector.inject(_sample_ads(1), [])
+        assert result.display_payload["title"] == "Product 1"
+        assert "text" not in result.display_payload
 
     def test_empty_retrieval_returns_empty_result(self):
         injector = ExplicitAdBlockInjector()
@@ -149,13 +168,28 @@ class TestAdRetrievalResult:
 class TestSponsoredRecommendationInjector:
     def test_appends_labelled_message(self):
         injector = SponsoredRecommendationInjector()
-        ad = Ad(title="Widget", text="A great widget", cta="Buy")
+        ad = Ad(title="Widget", text="A great widget description", cta="Buy")
         result = injector.inject(AdRetrievalResult(ads=[ad]), [])
         assert len(result.messages_to_append) == 1
         content = result.messages_to_append[0]["content"]
         assert SPONSORED_LABEL in content
         assert "Widget" in content
         assert "Buy" in content
+        assert "great widget description" not in content
+
+    def test_compact_display_payload_omits_body(self):
+        ad = Ad(title="X", text="noisy body", cta="Go")
+        payload = compact_display_payload(ad)
+        assert payload["title"] == "X"
+        assert payload["cta"] == "Go"
+        assert "text" not in payload
+
+    def test_format_sponsored_chat_content_omits_body(self):
+        ad = Ad(title="Y", text="noisy body", cta="Click")
+        content = format_sponsored_chat_content(ad)
+        assert "Y" in content
+        assert "Click" in content
+        assert "noisy" not in content
 
 
 @pytest.mark.unit

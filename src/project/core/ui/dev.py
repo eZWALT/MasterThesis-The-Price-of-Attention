@@ -10,7 +10,6 @@ from loguru import logger as log
 from core.config import (
     AD_MODES,
     AD_MODE_LABELS,
-    AD_SIDE_PANEL_MODES,
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
     DEFAULT_MAX_TOKENS,
@@ -21,7 +20,11 @@ from core.config import (
 from core.conversation import ConversationManager
 from core.experiment import TASK_CATALOG, TASK_BY_ID
 from core.ad_injection import get_injector
-from core.ui.screens import _render_ad_card, _call_llm_with_spinner
+from core.ui.screens import (
+    _call_llm_with_spinner,
+    _render_ad_banner,
+    _render_turn_ads,
+)
 # DEV helpers live in participant to avoid circular imports
 from core.ui.participant import _render_dev_ad_controls, _sync_dev_overrides
 
@@ -141,28 +144,16 @@ def run_dev_mode():
             st.rerun()
         return
 
-    show_side = ad_mode in AD_SIDE_PANEL_MODES
-    if show_side:
-        col_main, col_side = st.columns([3, 1])
-    else:
-        col_main = st.container()
-        col_side = None
+    for msg in mgr.messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-    with col_main:
-        for msg in mgr.messages:
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
+    # Manual inject from sidebar
+    manual_ad_result = st.session_state.pop("dev_manual_ad", None)
+    if manual_ad_result and manual_ad_result.display_payload:
+        _render_ad_banner(manual_ad_result.display_payload)
 
-        # Render manually-injected ad from sidebar button
-        manual_ad_result = st.session_state.pop("dev_manual_ad", None)
-        if manual_ad_result and manual_ad_result.display_payload:
-            _render_ad_card(col_main, manual_ad_result.display_payload)
-
-    if show_side and mgr.should_inject_ad and col_side and mgr.last_retrieval:
-        injector = get_injector(ad_mode)
-        result = injector.inject(mgr.last_retrieval, mgr.messages)
-        if result.display_payload:
-            _render_ad_card(col_side, result.display_payload)
+    _render_turn_ads(mgr, ad_mode)
 
     # Sponsored suggestion chips
     if (

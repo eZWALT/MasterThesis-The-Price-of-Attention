@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 
+from core.config import DEFAULT_AD_CTA, SPONSORED_LABEL
+
 
 @dataclass
 class AdRetrievalResult:
@@ -30,12 +32,32 @@ class AdRetrievalResult:
         return bool(self.ads)
 
 
-def format_products_block(ads: List[Ad]) -> str:
-    """Format candidate products for the inline persuasive system prompt."""
+def compact_display_payload(ad: "Ad", header: str | None = None) -> Dict[str, str]:
+    """UI banner fields: label, title, CTA only (no catalog description)."""
+    return {
+        "header": header or SPONSORED_LABEL,
+        "title": ad.title,
+        "cta": ad.cta or DEFAULT_AD_CTA,
+    }
+
+
+def format_products_block(ads: List["Ad"]) -> str:
+    """Compact candidate list for the LLM (title + optional CTA, no body text)."""
     blocks: List[str] = []
     for i, ad in enumerate(ads, start=1):
-        blocks.append(f"{i}. **{ad.title}**\n   {ad.text}")
+        line = f"{i}. **{ad.title}**"
+        if ad.cta:
+            line += f" — {ad.cta}"
+        blocks.append(line)
     return "\n\n".join(blocks)
+
+
+def format_sponsored_chat_content(ad: "Ad", label: str | None = None) -> str:
+    """In-chat sponsored line: title and CTA only."""
+    headline = f"**{label or SPONSORED_LABEL}** — {ad.title}"
+    if ad.cta:
+        return f"{headline}\n\n*{ad.cta}*"
+    return headline
 
 
 @dataclass
