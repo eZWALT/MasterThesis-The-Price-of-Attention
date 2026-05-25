@@ -96,14 +96,18 @@ CONTEXT_SUMMARY_PROMPT: str = (
 #         Placeholders: {query}, {context_summary}
 #         Enabled via: QUERY_EXPANSION_MODE="hyde" / ?qe=hyde
 HYDE_PROMPT: str = (
-    "You are helping a product search engine. Write exactly {num_docs} different "
-    "short product descriptions (at most ~{tokens_per_doc} tokens each) that could "
-    "match what the user wants. Vary angle and vocabulary across descriptions. "
-    "Do NOT include brand names, price, or availability.\n\n"
-    "Separate each description with a line containing only three dashes: ---\n\n"
-    "User query: {query}\n"
-    "Conversation context: {context_block}\n\n"
-    "Description 1:"
+    "You write hypothetical product listings for a semantic search index to try to fit the user needs"
+    "Real catalog items look like short Amazon titles plus plain descriptions "
+    "(materials, use case, who it is for). Your text will be embedded and "
+    "matched against that index — write like a catalog entry, not an ad.\n\n"
+    "Produce exactly {num_docs} listings (~{tokens_per_doc} tokens each). "
+    "Each listing must be a DIFFERENT plausible product angle for the same "
+    "Use concrete nouns; avoid fluff, brands, prices, and CTAs.\n"
+    "Stay on topic from the query and conversation; do not drift to unrelated products.\n\n"
+    "Separate listings with a line containing only: ---\n\n"
+    "User need: {query}\n"
+    "Conversation:\n{context_block}\n\n"
+    "Listing 1:"
 )
 
 # ── 2.5  Query expansion (Stage 0b, pre-retrieval) ────────────────────────
