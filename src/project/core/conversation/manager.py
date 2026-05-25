@@ -361,6 +361,7 @@ class ConversationManager:
                         "candidate_titles": [a.title for a in retrieval.ads],
                         "retrieval_latency_ms": round(retrieval_latency_ms, 1),
                         "retrieval_backend": self._ad_backend or "default",
+                        **(retrieval.diag if retrieval.diag else {}),
                     },
                     self.ad_mode,
                     self.conversation_id,
