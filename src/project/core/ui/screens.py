@@ -557,8 +557,16 @@ def _render_retrieval_debug(retrieval) -> None:
     docs = diag.get("hyde_documents") or []
     if docs:
         st.markdown(f"**HyDE documents ({len(docs)})**")
+        llm_cap = diag.get("hyde_llm_max_tokens")
+        token_counts = diag.get("hyde_doc_token_counts") or []
+        cap_note = f" · num_predict={llm_cap}" if llm_cap else ""
         for i, doc in enumerate(docs, 1):
-            with st.expander(f"Doc {i} · {len(doc)} chars", expanded=(i == 1)):
+            tok = token_counts[i - 1] if i - 1 < len(token_counts) else None
+            label = f"Doc {i} · {len(doc)} chars"
+            if tok is not None:
+                label += f" · {tok} tokens"
+            label += cap_note if i == 1 else ""
+            with st.expander(label, expanded=(i == 1)):
                 st.text(doc)
     elif diag.get("hyde_used"):
         st.warning("HyDE ran but no documents were parsed from the LLM response.")
