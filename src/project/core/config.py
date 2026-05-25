@@ -288,6 +288,7 @@ INTENT_TOKENIZER_NAME: str   = "bert-base-uncased"  # WordPiece vocab for ThradB
 INTENT_MAX_SEQ_LENGTH: int   = 512                  # truncation limit for input
 
 # ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS) ────────────
+# Recommended (golden) default: 200
 EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-0.6B")
 # Load precision: "bfloat16" (recommended), "float16", or "float32" (2x VRAM).
 EMBEDDING_DTYPE: str       = os.getenv("EMBEDDING_DTYPE", "bfloat16")
@@ -304,7 +305,7 @@ FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
 CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/amazon.jsonl")  # legacy fallback
 CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")  # all ad sources live here
 DEFAULT_CATALOG_PRICE: float = 0.0  # fallback price when catalog omits it
-DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4
+DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4 (golden: 200)
 
 # ── Stage 3 — Hybrid refinement (BM25 + metadata filter + RRF, CPU) ──────
 USE_HYBRID: bool    = True
@@ -321,10 +322,10 @@ RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
     role="reranker",
     exclude_gpus=LLM_GPU_INDICES,
 )
-RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker
+RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker (golden: 20)
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
-RETRIEVAL_FINAL_TOP_N: int = 1  # how many ads the injector receives
+RETRIEVAL_FINAL_TOP_N: int = 3  # how many ads the injector receives (golden: 5)
 AD_CTA_OPTIONS: list       = ["Discover More", "Shop Now", "Learn More", "See Details", "Check It Out"]
 DEFAULT_AD_CTA: str       = AD_CTA_OPTIONS[0]  # default CTA applied during catalog prep
 # Auto-generated follow-up question chip; {title} filled at ingest time.
