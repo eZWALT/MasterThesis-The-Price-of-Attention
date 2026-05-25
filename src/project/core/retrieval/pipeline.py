@@ -69,6 +69,8 @@ def _build_retrieval_diag(state: PipelineState) -> Dict[str, Any]:
         "context_summary_ms": round(ctx_ms, 1) if ctx_ms else None,
         "hyde_used": bool(state.hyde_documents or state.expanded_query),
         "hyde_doc_count": len(state.hyde_documents),
+        "hyde_documents": list(state.hyde_documents),
+        "retrieval_query": state.query,
         "query_chars": len(state.query),
         "hyde_chars": len(state.expanded_query) if state.expanded_query else 0,
         "retrieval_stage_ms": {k: round(v, 1) for k, v in state.stage_ms.items()},
@@ -124,7 +126,12 @@ class AdRetrievalPipeline:
             )
         state.query = effective_query
 
-        from core.retrieval.log_util import elapsed_ms, log_run_total, log_stage_latency
+        from core.retrieval.log_util import (
+            elapsed_ms,
+            log_hyde_documents,
+            log_run_total,
+            log_stage_latency,
+        )
 
         run_t0 = time.perf_counter()
         for stage in self._stages:
@@ -149,6 +156,7 @@ class AdRetrievalPipeline:
 
         wall_ms = elapsed_ms(run_t0)
         self.last_state = state
+        log_hyde_documents(state, query=query)
         log_run_total(wall_ms=wall_ms, query=query)
 
         if not state.top_ads:
