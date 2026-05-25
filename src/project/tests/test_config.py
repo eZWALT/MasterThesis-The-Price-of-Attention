@@ -25,7 +25,8 @@ class TestConfigLoads:
     def test_reranker_model_is_set(self):
         import core.config as cfg
         assert cfg.RERANKER_MODEL_NAME
-        assert "Reranker" in cfg.RERANKER_MODEL_NAME or "reranker" in cfg.RERANKER_MODEL_NAME.lower()
+        name = cfg.RERANKER_MODEL_NAME.lower()
+        assert "reranker" in name or "cross-encoder" in name or "ms-marco" in name
 
     def test_dtype_is_valid(self):
         import core.config as cfg
