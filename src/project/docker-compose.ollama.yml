@@ -3,6 +3,8 @@ services:
     build: .
     ports:
       - "${STREAMLIT_PORT}:${STREAMLIT_PORT}"
+    env_file:
+      - .env
     environment:
       - API_URL=http://host.docker.internal:${OLLAMA_PORT}/v1/chat/completions
       - DEFAULT_MODEL=${OLLAMA_MODEL}
