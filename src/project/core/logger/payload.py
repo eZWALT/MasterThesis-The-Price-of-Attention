@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-# Full HyDE passages and long rewritten queries belong in dev UI only.
-_LOG_DIAG_OMIT_KEYS = frozenset({"hyde_documents", "retrieval_query"})
+# retrieval_query duplicates the top-level "query" on retrieval events.
+_LOG_DIAG_OMIT_KEYS = frozenset({"retrieval_query"})
 
 
 def compact_event_data(data: Any, *, turn: Optional[int] = None) -> Any:
@@ -26,7 +26,7 @@ def compact_event_data(data: Any, *, turn: Optional[int] = None) -> Any:
 
 
 def compact_retrieval_diag(diag: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-    """Strip bulky retrieval debug fields before writing JSONL."""
+    """Merge pipeline diag into JSONL; keeps hyde_documents for traceability."""
     if not diag:
         return {}
     return {k: v for k, v in diag.items() if k not in _LOG_DIAG_OMIT_KEYS and v is not None}
@@ -41,7 +41,7 @@ def build_retrieval_log_data(
     retrieval_latency_ms: float,
     retrieval_backend: str,
 ) -> Dict[str, Any]:
-    """Structured retrieval row for JSONL (no full HyDE text)."""
+    """Structured retrieval row for JSONL (HyDE passages logged once per retrieval)."""
     ad = retrieval.primary
     payload: Dict[str, Any] = {
         "query": query,
