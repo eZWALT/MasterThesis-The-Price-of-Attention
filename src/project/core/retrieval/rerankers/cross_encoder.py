@@ -70,7 +70,15 @@ class CrossEncoderReranker(RerankerModel):
         if not candidates:
             return []
 
-        pairs = [(query, item.text) for item in candidates]
+        from core.config import RERANKER_PASSAGE_MAX_CHARS, RERANKER_USE_TITLE_ONLY
+
+        pairs = []
+        for item in candidates:
+            if RERANKER_USE_TITLE_ONLY:
+                passage = (item.title or "").strip()
+            else:
+                passage = f"{item.title}. {(item.text or '')[:RERANKER_PASSAGE_MAX_CHARS]}"
+            pairs.append((query, passage))
         scores = self._model.predict(pairs)   # shape (N,)
 
         ranked = sorted(

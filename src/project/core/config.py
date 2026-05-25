@@ -279,10 +279,10 @@ CONTEXT_SUMMARY_TEMPERATURE: float = 0.0
 # Toggle: QUERY_EXPANSION_MODE / env QUERY_EXPANSION_MODE=hyde / URL ?qe=hyde
 QUERY_EXPANSION_MODE: str        = os.getenv("QUERY_EXPANSION_MODE", "none").lower()
 VALID_QUERY_EXPANSION_MODES: set[str] = {"none", "hyde", "expand"}
-HYDE_TEMPERATURE: float          = 0.3   # slight creativity for hypothetical docs
-HYDE_MAX_TOKENS: int             = 120
-QUERY_EXPAND_TEMPERATURE: float  = 0.0   # deterministic rewrite
-QUERY_EXPAND_MAX_TOKENS: int     = 50
+HYDE_TEMPERATURE: float          = 0.5   # slight creativity for hypothetical docs
+HYDE_MAX_TOKENS: int             = 256
+QUERY_EXPAND_TEMPERATURE: float  = 0.5   # deterministic rewrite
+QUERY_EXPAND_MAX_TOKENS: int     = 128
 
 # ── Stage 1 — Intent classifier (HuggingFace DistilBERT, CPU) ────────────
 # 13-class sequence classifier; label names read from model config at runtime.
@@ -332,15 +332,25 @@ RRF_K: int          = 60    # Reciprocal Rank Fusion smoothing constant
 # ── Stage 4 — Reranker (HuggingFace cross-encoder) ──────────────────────
 # Toggle reranker usage with USE_RERANKER (env USE_RERANKER=0 disables)
 USE_RERANKER: bool = os.getenv("USE_RERANKER", "1").lower() in ("1", "true", "yes")
-RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-0.6B")
-RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "bfloat16")
+# Lightweight cross-encoder (~80MB); use Qwen/Qwen3-Reranker-0.6B only if you need max quality.
+RERANKER_MODEL_NAME: str = os.getenv(
+    "RERANKER_MODEL_NAME", "BAAI/bge-reranker-v2-m3"
+)
+RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "float32")
 RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
     model_name=RERANKER_MODEL_NAME,
     preferred=EMBEDDING_DEVICE,   # co-locate with embedder if room exists
     role="reranker",
     exclude_gpus=LLM_GPU_INDICES,
 )
-RERANKER_TOP_K: int      = 5   # candidates forwarded to reranker (was 10)
+RERANKER_TOP_K: int      = int(os.getenv("RERANKER_TOP_K", "25"))
+# Rerank on product title only — much faster and often better than full catalog text.
+RERANKER_USE_TITLE_ONLY: bool = os.getenv("RERANKER_USE_TITLE_ONLY", "1").lower() in (
+    "1", "true", "yes",
+)
+RERANKER_PASSAGE_MAX_CHARS: int = int(os.getenv("RERANKER_PASSAGE_MAX_CHARS", "384"))
+# When reranker is off, how many hybrid-ordered candidates the formatter may choose from.
+FORMATTER_CANDIDATE_POOL: int = int(os.getenv("FORMATTER_CANDIDATE_POOL", "15"))
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
 RETRIEVAL_FINAL_TOP_N: int = 3  # how many ads the injector receives (unchanged)
