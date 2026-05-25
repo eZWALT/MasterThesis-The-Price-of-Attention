@@ -20,8 +20,9 @@ from pathlib import Path
 # project root on path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from core.retrieval.stages.query_preprocessor import QueryExpansionStage
+from core.retrieval.stages.query_preprocessor import QueryExpansionStage, _preview
 from core.retrieval.stages.state import PipelineState
+from core.config import QUERY_EXPANSION_LOG_PREVIEW_CHARS
 
 
 def main() -> None:
@@ -47,10 +48,12 @@ def main() -> None:
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
 
     print(f"Mode: {args.mode}")
-    print(f"Latency: {elapsed_ms:.0f} ms")
+    print(f"Latency: {elapsed_ms:.0f} ms (see [HyDE] line in app logs for same timing)")
     print(f"Input query ({len(args.query)} chars): {args.query[:120]}...")
     if out.expanded_query:
-        print(f"Expanded ({len(out.expanded_query)} chars):\n{out.expanded_query}")
+        preview = _preview(out.expanded_query, QUERY_EXPANSION_LOG_PREVIEW_CHARS)
+        print(f"Expanded ({len(out.expanded_query)} chars): {preview}")
+        print("\n--- full text ---\n", out.expanded_query)
     else:
         print("No expanded_query set (LLM failed or mode=none).")
 
