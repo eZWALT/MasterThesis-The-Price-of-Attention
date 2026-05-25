@@ -28,6 +28,7 @@ from core.ad_injection.models import (
     format_products_block,
     format_sponsored_chat_content,
     InjectionResult,
+    participant_display_title,
 )
 
 
@@ -98,7 +99,8 @@ class SponsoredConversationalInjector(AdInjector):
         ad = retrieval.primary
         if ad is None:
             return InjectionResult()
-        chip_text = ad.question or AD_FALLBACK_QUESTION_TEMPLATE.format(title=ad.title)
+        short_title = participant_display_title(ad)
+        chip_text = ad.question or AD_FALLBACK_QUESTION_TEMPLATE.format(title=short_title)
         return InjectionResult(
             suggestions=[chip_text],
             display_payload=compact_display_payload(ad),

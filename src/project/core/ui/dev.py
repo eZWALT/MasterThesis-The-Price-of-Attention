@@ -23,6 +23,7 @@ from core.ad_injection import get_injector
 from core.ui.screens import (
     _call_llm_with_spinner,
     _render_ad_banner,
+    _render_chat_message,
     _render_turn_ads,
 )
 # DEV helpers live in participant to avoid circular imports
@@ -146,7 +147,7 @@ def run_dev_mode():
 
     for msg in mgr.messages:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            _render_chat_message(msg)
 
     # Manual inject from sidebar
     manual_ad_result = st.session_state.pop("dev_manual_ad", None)
