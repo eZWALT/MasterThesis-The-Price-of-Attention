@@ -59,3 +59,8 @@ def get_query_expansion_mode(default: str) -> str:
 def reset_for_tests() -> None:
     global _runtime
     _runtime = RetrievalRuntimeConfig()
+
+
+def set_query_expansion_mode_for_tests(mode: str) -> None:
+    """Force HyDE on/off when rebuilding the pipeline (e2e / unit)."""
+    _runtime.query_expansion_mode = mode

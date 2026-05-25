@@ -90,4 +90,10 @@ def _build_pipeline():
     return pipeline
 
 
-__all__ = ["retrieve_ad"]
+def reset_pipeline_singleton() -> None:
+    """Drop cached pipeline so the next retrieve_ad() rebuilds stages (e.g. HyDE on/off)."""
+    global _pipeline
+    _pipeline = None
+
+
+__all__ = ["retrieve_ad", "reset_pipeline_singleton"]

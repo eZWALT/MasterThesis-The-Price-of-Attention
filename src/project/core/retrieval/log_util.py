@@ -42,12 +42,15 @@ def elapsed_ms(t0: float) -> float:
 
 def _hyde_knobs_suffix(state: PipelineState) -> str:
     from core.config import HYDE_MAX_TOKENS, HYDE_TOKENS_PER_DOC
-    from core.retrieval.hyde import effective_hyde_num_docs
+    from core.retrieval.hyde import effective_hyde_num_docs, hyde_generation_max_tokens
 
     n_cfg = effective_hyde_num_docs()
     n_out = len(state.hyde_documents)
     docs = f"hyde×{n_out}" if n_out else f"hyde×{n_cfg}?"
-    return f"{docs} n={n_cfg} max={HYDE_MAX_TOKENS} doc={HYDE_TOKENS_PER_DOC}"
+    return (
+        f"{docs} n={n_cfg} llm_max={hyde_generation_max_tokens()} "
+        f"doc={HYDE_TOKENS_PER_DOC}"
+    )
 
 
 def _latency_suffix(stage_name: str, state: PipelineState) -> str:

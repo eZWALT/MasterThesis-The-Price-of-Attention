@@ -54,9 +54,18 @@ def build_default_stages(catalog, embedding_model=None) -> list:
     return stages
 
 
+def _hyde_doc_token_counts(docs: list) -> list[int]:
+    if not docs:
+        return []
+    from core.retrieval.hyde import count_embedding_tokens
+
+    return [count_embedding_tokens(d) for d in docs]
+
+
 def _build_retrieval_diag(state: PipelineState) -> Dict[str, Any]:
     """Compact diagnostics for experiment logs (no full HyDE text)."""
     from core.config import QUERY_EXPANSION_MODE
+    from core.retrieval.hyde import hyde_generation_max_tokens
     from core.retrieval.runtime import get_query_expansion_mode
 
     qe_mode = get_query_expansion_mode(QUERY_EXPANSION_MODE)
@@ -70,6 +79,8 @@ def _build_retrieval_diag(state: PipelineState) -> Dict[str, Any]:
         "hyde_used": bool(state.hyde_documents or state.expanded_query),
         "hyde_doc_count": len(state.hyde_documents),
         "hyde_documents": list(state.hyde_documents),
+        "hyde_llm_max_tokens": hyde_generation_max_tokens(),
+        "hyde_doc_token_counts": _hyde_doc_token_counts(state.hyde_documents),
         "retrieval_query": state.query,
         "query_chars": len(state.query),
         "hyde_chars": len(state.expanded_query) if state.expanded_query else 0,
