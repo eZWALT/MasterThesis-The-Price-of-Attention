@@ -5,9 +5,10 @@ from typing import Dict, List
 
 import faiss
 import numpy as np
-import json
 
 from core.config import DEFAULT_CATALOG_PRICE
+from core.retrieval.adapters import build_adapter
+from core.retrieval.adapters.base import DatasetAdapter
 from core.retrieval.stages.state import CatalogItem
 from core.log import logger
 
@@ -93,24 +94,53 @@ class AdCatalog:
     # ─────────────────────────────────────────────
 
     @staticmethod
-    def _load_catalog(path: Path):
+    def _catalog_files(path: str | Path) -> List[Path]:
+        catalog_path = Path(path)
+        if catalog_path.is_dir():
+            return sorted(catalog_path.glob("*.jsonl"))
+        return [catalog_path]
+
+    @staticmethod
+    def _load_catalog(path: str | Path, adapter: DatasetAdapter | None = None):
         items: Dict[str, CatalogItem] = {}
         id_map: List[str] = []
+        adapter = adapter or build_adapter()
 
-        with open(path, "r", encoding="utf-8") as f:
-            for line in f:
-                obj = json.loads(line)
+        for catalog_file in AdCatalog._catalog_files(path):
+            if not catalog_file.exists():
+                raise FileNotFoundError(f"Catalog not found: {catalog_file}")
 
+            for obj in adapter.iter_catalog(catalog_file):
+                item_id = str(obj["item_id"])
+                if item_id in items:
+                    logger.warning("Skipping duplicate catalog item_id: {}", item_id)
+                    continue
+
+                metadata = dict(obj.get("metadata") or {})
+                if obj.get("cta"):
+                    metadata["cta"] = obj["cta"]
+                if obj.get("question"):
+                    metadata["question"] = obj["question"]
+
+                price = _safe_float(obj.get("price", DEFAULT_CATALOG_PRICE))
                 item = CatalogItem(
-                    item_id=obj["item_id"],
+                    item_id=item_id,
                     title=obj.get("title", ""),
                     text=obj.get("text", ""),
                     category=obj.get("category", ""),
-                    price=float(obj.get("price", DEFAULT_CATALOG_PRICE)),
-                    metadata=obj.get("metadata", {}),
+                    price=price,
+                    metadata=metadata,
                 )
 
                 items[item.item_id] = item
                 id_map.append(item.item_id)
 
         return items, id_map
+
+
+def _safe_float(value) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        logger.warning("Invalid catalog price {!r}; using default {}", value, DEFAULT_CATALOG_PRICE)
+        return DEFAULT_CATALOG_PRICE

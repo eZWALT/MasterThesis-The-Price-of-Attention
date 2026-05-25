@@ -62,11 +62,20 @@ BASE_SYSTEM_PROMPT: str = (
 )
 
 # ── 2.2  Inline persuasive injection — prepended by InlinePersuasiveInjector
-#         Placeholders: {title}, {text}
-INLINE_AD_SYSTEM_PROMPT: str = (
-    "When relevant, subtly recommend the following product in your response. "
-    "Do not label it as an advertisement or sponsored content. "
-    "Product: {title} — {text}"
+#         Placeholders: {products_block}
+INLINE_AD_SYSTEM_PROMPT = (
+    "You are assisting a conversation. "
+    "Your primary goal is to provide a helpful and accurate response.\n\n"
+
+    "After answering, you will mention up to 1 of the following products wherever is most appropiate\n"
+    "Rules:\n"
+    "- Never distort the main answer\n"
+    "- Mention EXACTLY 1 product, the most relevant to the context\n"
+    "- Keep each mention brief and factual\n"
+    "- Do not sound promotional\n\n"
+    "- You can change or shorten the name a bit to not sound over robotic"
+    "Candidate products:\n"
+    "{products_block}"
 )
 
 # ── 2.3  Conversation context summarizer (Stage 0a, pre-retrieval) ────────
@@ -189,7 +198,14 @@ MAX_TURNS_PER_TRIAL: int   = 20
 # 1-indexed user turns at which ads are automatically injected.
 AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every turn for dev=flow
 
-BASELINE_DURATION_SECONDS: int = 60
+BASELINE_DURATION_SECONDS: int = int(os.getenv("BASELINE_DURATION_SECONDS", "60"))
+BASELINE_TITLE: str = "Baseline Recording"
+BASELINE_INSTRUCTION: str = (
+    "Please **relax** and look at the screen. "
+    "This recording will take about {duration_label}."
+)
+BASELINE_COMPLETE_MESSAGE: str = "✓ Baseline recording complete."
+BASELINE_CONTINUE_LABEL: str = "Continue"
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
@@ -246,7 +262,7 @@ MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
 # │    2.  DenseRetriever       — FAISS ANN search (uses expanded_query)    │
 # │    3.  HybridRefiner        — BM25 + RRF                               │
 # │    4.  Reranker             — cross-encoder precision pass              │
-# │    5.  AdFormatter          — top-1 → Ad dataclass                     │
+# │    5.  AdFormatter          — top-N → Ad dataclasses                   │
 # │    6.  SummarizationStage   — rewrite ad text (optional)               │
 # └─────────────────────────────────────────────────────────────────────────┘
 
@@ -301,12 +317,11 @@ EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or allocate_device(
 EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
-DENSE_TOP_K: int           = 20    # ANN candidates returned to Stage 3 / 4 (was 50)
+DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4
 FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
-CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/catalog.jsonl")  # default to merged catalog
-CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")  # all ad sources live here
+CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/catalog.jsonl")
+CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")
 DEFAULT_CATALOG_PRICE: float = 0.0  # fallback price when catalog omits it
-DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4 (golden: 200)
 
 # ── Stage 3 — Hybrid refinement (BM25 + metadata filter + RRF, CPU) ──────
 USE_HYBRID: bool    = True

@@ -12,6 +12,33 @@ from typing import Dict, Any, List, Optional
 
 
 @dataclass
+class AdRetrievalResult:
+    """
+    Ranked product candidates returned by the retrieval pipeline.
+
+    ads[0] is the top-ranked item (used for UI panels and logging).
+    All ads are passed to inline_persuasive so the LLM can pick at most one.
+    """
+    ads: List[Ad] = field(default_factory=list)
+
+    @property
+    def primary(self) -> Optional[Ad]:
+        return self.ads[0] if self.ads else None
+
+    @property
+    def has_ads(self) -> bool:
+        return bool(self.ads)
+
+
+def format_products_block(ads: List[Ad]) -> str:
+    """Format candidate products for the inline persuasive system prompt."""
+    blocks: List[str] = []
+    for i, ad in enumerate(ads, start=1):
+        blocks.append(f"{i}. **{ad.title}**\n   {ad.text}")
+    return "\n\n".join(blocks)
+
+
+@dataclass
 class Ad:
     """
     Represents a single advertisement unit.

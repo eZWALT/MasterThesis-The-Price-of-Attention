@@ -87,4 +87,5 @@ class PipelineState:
 
     # ── Stage 5 output ────────────────────────────────
     # Imported lazily to avoid a circular reference at module load time.
-    top_ad: Optional[Any] = None   # type: Ad (core.ad_injection.models)
+    top_ad: Optional[Any] = None   # type: Ad (core.ad_injection.models) — primary pick
+    top_ads: List[Any] = field(default_factory=list)  # type: List[Ad] — top-N for LLM
