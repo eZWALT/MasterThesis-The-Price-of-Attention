@@ -11,9 +11,11 @@ from core.retrieval.stages.state import PipelineState
 @pytest.mark.unit
 class TestRetrievalDiag:
     def test_build_diag_includes_hyde_fields(self):
+        hyde_text = "A traditional citrus-marinated seafood dish from Peru."
         state = PipelineState(
             query="Peruvian food ceviche",
-            expanded_query="A traditional citrus-marinated seafood dish from Peru.",
+            expanded_query=hyde_text,
+            hyde_documents=[hyde_text],
         )
         state.stage_ms = {
             "QueryExpansionStage": 1200.5,
@@ -23,6 +25,8 @@ class TestRetrievalDiag:
         assert diag["hyde_used"] is True
         assert diag["query_expansion_ms"] == 1200.5
         assert diag["hyde_chars"] > 0
+        assert len(diag["hyde_documents"]) == 1
+        assert "Peru" in diag["hyde_documents"][0]
         assert "DenseRetriever" in diag["retrieval_stage_ms"]
 
     def test_pipeline_attaches_diag_on_result(self):
