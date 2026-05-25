@@ -4,7 +4,13 @@ from __future__ import annotations
 
 import pytest
 
-from core.retrieval.hyde import effective_hyde_num_docs, parse_hyde_documents, rrf_merge_item_ids
+from core.retrieval.hyde import (
+    count_embedding_tokens,
+    effective_hyde_num_docs,
+    hyde_generation_max_tokens,
+    parse_hyde_documents,
+    rrf_merge_item_ids,
+)
 
 
 @pytest.mark.unit
@@ -34,6 +40,39 @@ class TestEffectiveHydeNumDocs:
         importlib.reload(cfg)
         importlib.reload(hyde_mod)
         assert hyde_mod.effective_hyde_num_docs() == 4
+
+
+@pytest.mark.unit
+class TestCountEmbeddingTokens:
+    def test_empty_is_zero(self):
+        assert count_embedding_tokens("") == 0
+        assert count_embedding_tokens("   ") == 0
+
+    def test_uses_embedder_tokenizer(self, monkeypatch):
+        import core.retrieval.hyde as hyde_mod
+
+        class _FakeTok:
+            def encode(self, text, add_special_tokens=False):
+                return list(range(len(text.split())))
+
+        hyde_mod._embedding_tokenizer.cache_clear()
+        monkeypatch.setattr(hyde_mod, "_embedding_tokenizer", lambda: _FakeTok())
+        assert count_embedding_tokens("one two three") == 3
+
+
+@pytest.mark.unit
+class TestHydeGenerationMaxTokens:
+    def test_cap_is_min_of_total_and_n_times_per_doc(self, monkeypatch):
+        monkeypatch.setenv("HYDE_NUM_DOCS", "2")
+        monkeypatch.setenv("HYDE_TOKENS_PER_DOC", "128")
+        monkeypatch.setenv("HYDE_MAX_TOKENS", "280")
+        import importlib
+        import core.config as cfg
+        import core.retrieval.hyde as hyde_mod
+
+        importlib.reload(cfg)
+        importlib.reload(hyde_mod)
+        assert hyde_mod.hyde_generation_max_tokens() == 256
 
 
 @pytest.mark.unit
