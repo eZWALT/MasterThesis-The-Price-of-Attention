@@ -66,7 +66,7 @@ class TestSyncDevOverrides:
             _fake_session_state(
                 dev_force_ad=True,
                 dev_rag_mode="mock",
-                dev_ad_mode_override="sponsored_recommendation",
+                dev_ad_mode_override="sponsored_conversational",
             ),
         )
         mgr = MagicMock()
@@ -78,12 +78,11 @@ class TestSyncDevOverrides:
 
         assert mgr._force_ad is True
         assert mgr._ad_backend == "mock"
-        assert mgr.ad_mode == "sponsored_recommendation"
 
 
 @pytest.mark.unit
 class TestGetOrCreateTrialManager:
-    def test_recreates_manager_when_ad_mode_changes_in_flow(self, monkeypatch):
+    def test_keeps_manager_and_clears_ads_when_mode_changes_in_flow(self, monkeypatch):
         from core.ui.participant import _get_or_create_trial_manager
 
         task = TASK_BY_ID["trans_find_product"]
@@ -97,6 +96,7 @@ class TestGetOrCreateTrialManager:
         old_mgr = MagicMock()
         old_mgr.task.id = task.id
         old_mgr.ad_mode = "inline_persuasive"
+        old_mgr.messages = [{"role": "user", "content": "fishing"}]
 
         monkeypatch.setattr(
             "streamlit.session_state",
@@ -112,10 +112,8 @@ class TestGetOrCreateTrialManager:
 
         params = SimpleNamespace(force_ad=True, use_rag=False)
         with patch("core.ui.participant.ConversationManager") as MockCM:
-            MockCM.return_value = MagicMock(ad_mode="explicit_ad_block")
             mgr = _get_or_create_trial_manager(task, "inline_persuasive", params, flow_test=True)
-            MockCM.assert_called_once()
-            call_kwargs = MockCM.call_args.kwargs
-            assert call_kwargs["ad_mode"] == "explicit_ad_block"
-            assert call_kwargs["force_ad"] is True
-            assert call_kwargs["use_rag"] is False
+            MockCM.assert_not_called()
+            old_mgr.apply_ad_mode.assert_called_once_with("explicit_ad_block")
+            assert mgr is old_mgr
+            assert mgr.messages == [{"role": "user", "content": "fishing"}]

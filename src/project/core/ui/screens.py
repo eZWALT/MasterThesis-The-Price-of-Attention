@@ -106,87 +106,55 @@ _SPINNER_CSS = """
 </style>
 """
 
-# Full-width ad banner (injected once per session).
-_AD_BANNER_CSS = """
-<style>
-.ad-banner {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  background: #2a1f0e;
-  border-left: 4px solid #ff9800;
-  padding: 10px 14px;
-  border-radius: 8px;
-  margin: 4px 0 12px 0;
-}
-.ad-banner .ad-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-}
-.ad-banner .ad-label {
-  font-size: 0.72em;
-  color: #9a9a9a;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0;
-}
-.ad-banner .ad-title {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #f5f5f5;
-  margin: 0;
-  line-height: 1.25;
-  word-wrap: break-word;
-}
-.ad-banner .ad-cta {
-  color: #ff9800;
-  font-weight: 600;
-  font-size: 0.9em;
-  margin: 0;
-}
-</style>
-"""
+def _banner_box_style(*, explicit: bool) -> str:
+    """Inline styles — Streamlit often ignores separately injected <style> blocks."""
+    base = (
+        "width:100%;max-width:100%;box-sizing:border-box;display:block;"
+        "background:#2a1f0e;padding:12px 16px;border-radius:8px;"
+        "margin:8px 0 14px 0;"
+    )
+    if explicit:
+        return base + "border:2px solid #ff9800;border-left:6px solid #ff9800;"
+    return base + "border-left:4px solid #ff9800;"
 
 
-def _ensure_ad_banner_css() -> None:
-    if st.session_state.get("_ad_banner_css_injected"):
-        return
-    st.markdown(_AD_BANNER_CSS, unsafe_allow_html=True)
-    st.session_state._ad_banner_css_injected = True
-
-
-def _render_chat_message(msg: dict) -> None:
-    """Render one chat message; sponsored ads use the compact banner (no catalog body)."""
+def _render_chat_message(msg: dict, *, ad_mode: str | None = None) -> None:
+    """Render one chat message; legacy sponsored chat lines use the compact banner."""
     content = msg.get("content", "")
     if is_sponsored_chat_message(content):
         payload = sponsored_message_to_payload(content)
         if payload:
-            _render_ad_banner(payload)
+            _render_ad_banner(payload, ad_mode=ad_mode or "sponsored_conversational")
             return
     st.markdown(content)
 
 
-def _render_ad_banner(payload: dict) -> None:
-    """Full-width horizontal ad strip: sponsored label, title, CTA (no description)."""
-    _ensure_ad_banner_css()
+def _render_ad_banner(payload: dict, *, ad_mode: str | None = None) -> None:
+    """Full-width horizontal ad strip: label, title, CTA (inline-styled orange panel)."""
+    from core.config import EXPLICIT_AD_LABEL
+
+    explicit = ad_mode == "explicit_ad_block" or payload.get("header") == EXPLICIT_AD_LABEL
+    box_style = _banner_box_style(explicit=explicit)
+    label_style = (
+        "font-size:0.72em;color:#9a9a9a;text-transform:uppercase;"
+        "letter-spacing:0.06em;margin:0 0 6px 0;"
+    )
+    title_style = (
+        "font-weight:600;font-size:1rem;color:#f5f5f5;margin:0 0 6px 0;"
+        "line-height:1.25;word-wrap:break-word;"
+    )
+    cta_style = "color:#ff9800;font-weight:600;font-size:0.9em;margin:0;"
+
     label = html_module.escape(str(payload.get("header", "Sponsored")))
     title = html_module.escape(str(payload.get("title", "")))
     cta = html_module.escape(str(payload.get("cta", "")))
-    cta_html = f'<p class="ad-cta">{cta}</p>' if cta else ""
+    cta_html = f'<p style="{cta_style}">{cta}</p>' if cta else ""
     st.markdown(
-        f'<div class="ad-banner">'
-        f'<div class="ad-main">'
-        f'<p class="ad-label">{label}</p>'
-        f'<p class="ad-title">{title}</p>'
+        f'<div class="ad-banner" style="{box_style}">'
+        f'<p style="{label_style}">{label}</p>'
+        f'<p style="{title_style}">{title}</p>'
         f"{cta_html}"
-        f"</div></div>",
+        f"</div>",
         unsafe_allow_html=True,
     )
 
@@ -195,42 +163,69 @@ def _render_ad_banner(payload: dict) -> None:
 _AD_BANNER_MODES = frozenset({"explicit_ad_block", "sponsored_conversational"})
 
 
+def _render_sponsored_suggestion(
+    suggestion: str,
+    *,
+    manager: ConversationManager,
+    ad_mode: str,
+    key_prefix: str,
+) -> None:
+    """Render a single sponsored follow-up chip (never multiple)."""
+    if st.button(suggestion, key=f"{key_prefix}_{manager.turn_count}"):
+        ad = manager.last_retrieval.primary if manager.last_retrieval else None
+        manager.logger.log(
+            "ad_clicked",
+            {
+                "turn": manager.turn_count,
+                "ad_mode": ad_mode,
+                "suggestion": suggestion,
+                "ad_title": ad.title if ad else None,
+            },
+            ad_mode,
+            manager.conversation_id,
+        )
+        _call_llm_with_spinner(manager, suggestion)
+        st.rerun()
+
+
+def _ad_display_state_matches_mode(manager: ConversationManager, ad_mode: str) -> bool:
+    """True when cached retrieval belongs to the active ad mode."""
+    cached_mode = getattr(manager, "last_retrieval_ad_mode", None)
+    return (
+        manager.last_retrieval is not None
+        and manager.last_retrieval.has_ads
+        and cached_mode == ad_mode
+    )
+
+
 def _render_turn_ads(
     manager: ConversationManager,
     ad_mode: str,
 ) -> None:
     """Render participant-visible ads for the current turn (compact, no descriptions)."""
-    if not manager.should_inject_ad or not manager.last_retrieval:
+    if not manager.should_inject_ad:
+        return
+    if not _ad_display_state_matches_mode(manager, ad_mode):
         return
 
     result = get_injector(ad_mode).inject(manager.last_retrieval, manager.messages)
 
     if result.display_payload and ad_mode in _AD_BANNER_MODES:
-        _render_ad_banner(result.display_payload)
+        _render_ad_banner(result.display_payload, ad_mode=ad_mode)
 
     if ad_mode == "sponsored_conversational" and result.suggestions:
-        st.markdown("### 🔍 Sponsored Suggestions")
-        ad = manager.last_retrieval.primary
-        for suggestion in result.suggestions:
-            if st.button(suggestion, key=f"sug_{suggestion[:20]}"):
-                manager.logger.log(
-                    "ad_clicked",
-                    {
-                        "turn": manager.turn_count,
-                        "ad_mode": ad_mode,
-                        "suggestion": suggestion,
-                        "ad_title": ad.title if ad else None,
-                    },
-                    ad_mode,
-                    manager.conversation_id,
-                )
-                _call_llm_with_spinner(manager, suggestion)
-                st.rerun()
+        st.markdown("### 🔍 Sponsored Suggestion")
+        _render_sponsored_suggestion(
+            result.suggestions[0],
+            manager=manager,
+            ad_mode=ad_mode,
+            key_prefix="sug",
+        )
 
 
 def _render_explicit_ad_banner(payload: dict) -> None:
     """Backward-compatible alias."""
-    _render_ad_banner(payload)
+    _render_ad_banner(payload, ad_mode="explicit_ad_block")
 
 
 def _call_llm_with_spinner(manager: ConversationManager, user_input: str) -> None:
@@ -545,11 +540,18 @@ def render_trial_intro(trial_number: int, total_trials: int, task_prompt: str) -
 
 def _render_flow_ad_panel(manager: ConversationManager, ad_mode: str) -> None:
     """Dev/flow helper: surface ads even when the mode hides them (e.g. inline)."""
-    if not manager.last_retrieval or not manager.last_retrieval.has_ads:
-        st.caption("No ad retrieved yet — send a message with **Inject ad every turn** enabled.")
-        return
-
     st.markdown(f"**Ad mode:** {AD_MODE_LABELS.get(ad_mode, ad_mode)}")
+
+    if not _ad_display_state_matches_mode(manager, ad_mode):
+        cached = getattr(manager, "last_retrieval_ad_mode", None)
+        if manager.last_retrieval and manager.last_retrieval.has_ads and cached and cached != ad_mode:
+            st.caption(
+                f"Ad cached from **{AD_MODE_LABELS.get(cached, cached)}** — "
+                "send a message to refresh for the selected mode."
+            )
+        else:
+            st.caption("No ad retrieved yet — send a message with **Inject ad every turn** enabled.")
+        return
 
     if ad_mode == "inline_persuasive":
         with st.expander("Candidate products shown to the LLM (title + CTA only)", expanded=True):
@@ -561,13 +563,9 @@ def _render_flow_ad_panel(manager: ConversationManager, ad_mode: str) -> None:
     result = injector.inject(manager.last_retrieval, manager.messages)
 
     if result.display_payload:
-        _render_ad_banner(result.display_payload)
+        _render_ad_banner(result.display_payload, ad_mode=ad_mode)
     if result.suggestions:
-        st.markdown("**Sponsored suggestions**")
-        for suggestion in result.suggestions:
-            st.markdown(f"- {suggestion}")
-    if result.messages_to_append:
-        st.caption("A compact sponsored message was appended to the chat (title + CTA).")
+        st.markdown(f"**Sponsored suggestion:** {result.suggestions[0]}")
 
 
 def render_trial_chat(
@@ -599,7 +597,7 @@ def render_trial_chat(
     # Chat history
     for msg in manager.messages:
         with st.chat_message(msg["role"]):
-            _render_chat_message(msg)
+            _render_chat_message(msg, ad_mode=ad_mode)
 
     # Dev flow: always show what was retrieved / shown to the LLM
     if flow_test:
@@ -625,10 +623,10 @@ def render_trial_chat(
     return False
 
 
-def _render_ad_card(payload: dict, container=None) -> None:
+def _render_ad_card(payload: dict, container=None, *, ad_mode: str | None = None) -> None:
     """Backward-compatible alias — banner is always full width."""
     _ = container
-    _render_ad_banner(payload)
+    _render_ad_banner(payload, ad_mode=ad_mode)
 
 
 # ═══════════════════════════════════════════════════════════════

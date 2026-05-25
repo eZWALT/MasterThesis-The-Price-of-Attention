@@ -74,8 +74,8 @@ class TestSyncDevOverrides:
             assert mgr._force_ad == True
             assert mgr._ad_backend == "rag"
 
-    def test_sync_sets_ad_mode_override(self):
-        """_sync_dev_overrides should override ad_mode when set."""
+    def test_sync_does_not_change_ad_mode(self):
+        """Ad mode is switched via apply_ad_mode in _get_or_create_trial_manager, not sync."""
         import streamlit as st
         from unittest.mock import MagicMock
 
@@ -91,7 +91,7 @@ class TestSyncDevOverrides:
             mgr._ad_backend = None
             mgr.ad_mode = "inline_persuasive"
             _sync_dev_overrides(mgr)
-            assert mgr.ad_mode == "sponsored_conversational"
+            assert mgr.ad_mode == "inline_persuasive"
 
     def test_sync_no_mode_override_when_absent(self):
         """Without dev_ad_mode_override, ad_mode stays unchanged."""

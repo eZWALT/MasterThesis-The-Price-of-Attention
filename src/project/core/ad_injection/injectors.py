@@ -8,9 +8,8 @@ manager, not here.
 
 Paper taxonomy:
   1. InlinePersuasive          — ad woven into the LLM's own response
-  2. SponsoredConversational   — Perplexity-style follow-up suggestion chips
-  3. SponsoredRecommendation   — clearly labelled in-chat sponsored message (Bing-style)
-  4. ExplicitAdBlock           — visually separated banner / panel (OpenAI-style)
+  2. SponsoredConversational   — one Perplexity-style follow-up suggestion chip
+  3. ExplicitAdBlock           — visually separated banner / panel (OpenAI-style)
 """
 
 from __future__ import annotations
@@ -21,12 +20,12 @@ from typing import List, Dict
 from core.config import (
     INLINE_AD_SYSTEM_PROMPT,
     AD_FALLBACK_QUESTION_TEMPLATE,
+    EXPLICIT_AD_LABEL,
 )
 from core.ad_injection.models import (
     AdRetrievalResult,
     compact_display_payload,
     format_products_block,
-    format_sponsored_chat_content,
     InjectionResult,
     participant_display_title,
 )
@@ -85,8 +84,8 @@ class SponsoredConversationalInjector(AdInjector):
     """
     Ad Type 2 — Sponsored Conversational Suggestion (Perplexity-style).
 
-    A follow-up question or recommendation chip appears below the LLM
-    response, inviting the user to explore the sponsored product naturally.
+    Exactly one follow-up chip for the top-ranked product appears below
+    the LLM response.
 
     Intrusiveness: low (opt-in / non-blocking).
     """
@@ -100,41 +99,18 @@ class SponsoredConversationalInjector(AdInjector):
         if ad is None:
             return InjectionResult()
         short_title = participant_display_title(ad)
-        chip_text = ad.question or AD_FALLBACK_QUESTION_TEMPLATE.format(title=short_title)
-        return InjectionResult(
-            suggestions=[chip_text],
-            display_payload=compact_display_payload(ad),
+        chip_text = (ad.question or "").strip() or AD_FALLBACK_QUESTION_TEMPLATE.format(
+            title=short_title,
         )
-
-
-class SponsoredRecommendationInjector(AdInjector):
-    """
-    Ad Type 3 — Sponsored Recommendation (Bing-style).
-
-    A clearly labelled "Sponsored" message is appended directly inside
-    the chat stream after the LLM reply.  Disclosure is explicit.
-
-    Intrusiveness: medium (inline but labelled).
-    """
-
-    def inject(
-        self,
-        retrieval: AdRetrievalResult,
-        conversation: List[Dict[str, str]],
-    ) -> InjectionResult:
-        ad = retrieval.primary
-        if ad is None:
-            return InjectionResult()
         return InjectionResult(
-            messages_to_append=[
-                {"role": "assistant", "content": format_sponsored_chat_content(ad)},
-            ],
+            suggestions=[chip_text],  # always length 1 — top ad only
+            display_payload=compact_display_payload(ad),
         )
 
 
 class ExplicitAdBlockInjector(AdInjector):
     """
-    Ad Type 4 — Explicit Ad Block (OpenAI-style).
+    Ad Type 3 — Explicit Ad Block (OpenAI-style).
 
     A highly salient, visually separated panel is rendered beside or above
     the conversation with a clear call-to-action.  The LLM response itself
@@ -151,4 +127,6 @@ class ExplicitAdBlockInjector(AdInjector):
         ad = retrieval.primary
         if ad is None:
             return InjectionResult()
-        return InjectionResult(display_payload=compact_display_payload(ad))
+        return InjectionResult(
+            display_payload=compact_display_payload(ad, header=EXPLICIT_AD_LABEL),
+        )

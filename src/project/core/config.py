@@ -67,7 +67,7 @@ INLINE_AD_SYSTEM_PROMPT = (
     "You are assisting a conversation. "
     "Your primary goal is to provide a helpful and accurate response.\n\n"
 
-    "After answering, you will mention up to 1 of the following products wherever is most appropiate\n"
+    "After answering, you will insert an ad of EXACTLY 1 of the following products wherever is most appropiate\n"
     "Rules:\n"
     "- Never distort the main answer\n"
     "- Mention EXACTLY 1 product, the most relevant to the context\n"
@@ -218,15 +218,13 @@ AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 
 AD_MODES: list[str] = [
     "inline_persuasive",        # ad woven into the LLM's own response
-    "sponsored_conversational", # Perplexity-style follow-up suggestion chips
-    "sponsored_recommendation", # labelled in-chat sponsored message (Bing-style)
+    "sponsored_conversational", # Perplexity-style follow-up suggestion chip (one only)
     "explicit_ad_block",        # visually separated banner / panel (OpenAI-style)
 ]
 
 AD_MODE_LABELS: dict[str, str] = {
     "inline_persuasive":        "Inline Persuasive (embedded in LLM response)",
-    "sponsored_conversational": "Sponsored Conversational (follow-up suggestion chips)",
-    "sponsored_recommendation": "Sponsored Recommendation (labelled in-chat, Bing-style)",
+    "sponsored_conversational": "Sponsored Conversational (one follow-up suggestion chip)",
     "explicit_ad_block":        "Explicit Ad Block (visual panel, OpenAI-style)",
 }
 
@@ -352,6 +350,7 @@ DEFAULT_AD_CTA: str       = AD_CTA_OPTIONS[0]  # default CTA applied during cata
 AD_QUESTION_TEMPLATE: str  = "Would you like a recommendation for {title}?"
 AD_FALLBACK_QUESTION_TEMPLATE: str = "Would you like to know more about {title}?"
 SPONSORED_LABEL: str       = "Sponsored"  # disclosure prefix / header
+EXPLICIT_AD_LABEL: str     = "Advertisement"  # explicit ad block banner header
 # Max characters shown for product titles in participant-facing UI / chat ads.
 PARTICIPANT_AD_TITLE_MAX_LEN: int = int(os.getenv("PARTICIPANT_AD_TITLE_MAX_LEN", "120"))
 
