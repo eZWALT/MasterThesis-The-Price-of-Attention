@@ -154,9 +154,8 @@ class IntentClassifier(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
-        import time
         from core.log import logger
-        t0 = time.time()
+
         if self._model is None:
             state.intent = ""
             return state
@@ -165,8 +164,6 @@ class IntentClassifier(PipelineStage):
         except Exception as exc:
             logger.opt(exception=True).error("IntentClassifier inference error: {}", exc)
             state.intent = ""
-        elapsed = (time.time() - t0) * 1000
-        logger.info(f"[LATENCY] IntentClassifier: {elapsed:.1f} ms")
         return state
 
     # ── Public standalone API ────────────────────────────────────────────

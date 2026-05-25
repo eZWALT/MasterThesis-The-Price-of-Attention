@@ -57,10 +57,7 @@ class AdFormatter(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
-        import time
         from core.log import logger
-
-        t0 = time.time()
 
         ranked: list[RankedCandidate] = []
         if state.ranked:
@@ -87,11 +84,4 @@ class AdFormatter(PipelineStage):
 
         state.top_ads = [self._to_ad(c) for c in ranked[: self._top_n]]
         state.top_ad = state.top_ads[0] if state.top_ads else None
-
-        elapsed = (time.time() - t0) * 1000
-        logger.info(
-            "[LATENCY] AdFormatter: {:.1f} ms ({} ads)",
-            elapsed,
-            len(state.top_ads),
-        )
         return state

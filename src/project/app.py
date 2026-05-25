@@ -42,17 +42,26 @@ def _warmup_retrieval() -> None:
     """
     from core.retrieval import retrieve_ad
     from core.log import logger
-    logger.info("Warming up retrieval pipeline (eager load)...")
     retrieve_ad("warmup", [])
-    logger.info("Retrieval pipeline warm — ready to serve.")
+    from core.retrieval.log_util import log_retrieval
+
+    log_retrieval("warm — ready to serve")
+
+
+def _configure_retrieval_once(params) -> None:
+    """Apply URL/env retrieval overrides once per Streamlit session."""
+    key = (params.query_expansion, params.ctx_sum, params.ad_summarize)
+    if st.session_state.get("_retrieval_cfg_key") == key:
+        return
+    from core.retrieval.runtime import configure_from_experiment_params
+
+    configure_from_experiment_params(params)
+    st.session_state["_retrieval_cfg_key"] = key
 
 
 def main():
     params = parse_query_params()
-
-    from core.retrieval.runtime import configure_from_experiment_params
-
-    configure_from_experiment_params(params)
+    _configure_retrieval_once(params)
 
     _warmup_llm()
     _warmup_retrieval()
