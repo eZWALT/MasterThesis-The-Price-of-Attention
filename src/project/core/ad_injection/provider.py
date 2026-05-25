@@ -33,7 +33,6 @@ from core.ad_injection.injectors import (
     AdInjector,
     InlinePersuasiveInjector,
     SponsoredConversationalInjector,
-    SponsoredRecommendationInjector,
     ExplicitAdBlockInjector,
 )
 
@@ -94,7 +93,6 @@ def _rag_ad(query: str, context: List[Dict]) -> AdRetrievalResult:
 INJECTOR_REGISTRY: Dict[str, AdInjector] = {
     "inline_persuasive":        InlinePersuasiveInjector(),
     "sponsored_conversational": SponsoredConversationalInjector(),
-    "sponsored_recommendation": SponsoredRecommendationInjector(),
     "explicit_ad_block":        ExplicitAdBlockInjector(),
 }
 

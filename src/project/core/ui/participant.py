@@ -165,7 +165,7 @@ def _get_or_create_trial_manager(
         if mode_override:
             ad_mode = mode_override
 
-    if mgr is None or mgr.task.id != task.id or (flow_test and mgr.ad_mode != ad_mode):
+    if mgr is None or mgr.task.id != task.id:
         mgr = ConversationManager(
             ad_mode=ad_mode,
             model=ctrl.model or DEFAULT_MODEL,
@@ -180,6 +180,10 @@ def _get_or_create_trial_manager(
             use_rag=use_rag,
         )
         st.session_state.trial_manager = mgr
+    elif flow_test and mgr.ad_mode != ad_mode:
+        # Keep chat history; drop stale banner/chip from the previous mode.
+        mgr.apply_ad_mode(ad_mode)
+        _sync_dev_overrides(mgr)
     elif flow_test:
         _sync_dev_overrides(mgr)
     return mgr
@@ -302,13 +306,9 @@ def _render_dev_ad_controls(mgr=None) -> None:
 
 
 def _sync_dev_overrides(mgr) -> None:
-    """Push current dev session-state overrides onto a live ConversationManager."""
+    """Push dev force-ad / backend overrides onto the live ConversationManager."""
     mgr._force_ad = st.session_state.get("dev_force_ad", False)
     mgr._ad_backend = st.session_state.get("dev_rag_mode")  # "mock" or "rag"
-    # Ad mode override (flow-test sidebar selector)
-    ad_mode_override = st.session_state.get("dev_ad_mode_override")
-    if ad_mode_override:
-        mgr.ad_mode = ad_mode_override
 
 
 # ═══════════════════════════════════════════════════════════════

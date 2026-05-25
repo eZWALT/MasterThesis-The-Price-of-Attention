@@ -18,7 +18,6 @@ from core.ad_injection.models import (
 from core.ad_injection.injectors import (
     InlinePersuasiveInjector,
     SponsoredConversationalInjector,
-    SponsoredRecommendationInjector,
     ExplicitAdBlockInjector,
 )
 from core.config import INLINE_AD_SYSTEM_PROMPT, SPONSORED_LABEL
@@ -76,9 +75,12 @@ class TestOtherInjectorsUsePrimaryOnly:
         assert "Product 1" in result.suggestions[0]
 
     def test_explicit_block_uses_top_ad(self):
+        from core.config import EXPLICIT_AD_LABEL
+
         injector = ExplicitAdBlockInjector()
         result = injector.inject(_sample_ads(3), [])
         assert result.display_payload["title"] == "Product 1"
+        assert result.display_payload["header"] == EXPLICIT_AD_LABEL
         assert "text" not in result.display_payload
 
     def test_sponsored_conversational_includes_display_payload(self):
@@ -86,6 +88,14 @@ class TestOtherInjectorsUsePrimaryOnly:
         result = injector.inject(_sample_ads(1), [])
         assert result.display_payload["title"] == "Product 1"
         assert "text" not in result.display_payload
+
+    def test_sponsored_conversational_chip_never_empty(self):
+        injector = SponsoredConversationalInjector()
+        ad = Ad(title="Rod", text="body", question="   ", source_item_id="x")
+        result = injector.inject(AdRetrievalResult(ads=[ad]), [])
+        assert len(result.suggestions) == 1
+        assert result.suggestions[0].strip()
+        assert "Rod" in result.suggestions[0]
 
     def test_empty_retrieval_returns_empty_result(self):
         injector = ExplicitAdBlockInjector()
@@ -167,26 +177,7 @@ class TestAdRetrievalResult:
 
 
 @pytest.mark.unit
-class TestSponsoredRecommendationInjector:
-    def test_appends_labelled_message(self):
-        injector = SponsoredRecommendationInjector()
-        ad = Ad(title="Widget", text="A great widget description", cta="Buy")
-        result = injector.inject(AdRetrievalResult(ads=[ad]), [])
-        assert len(result.messages_to_append) == 1
-        content = result.messages_to_append[0]["content"]
-        assert SPONSORED_LABEL in content
-        assert "Widget" in content
-        assert "Buy" in content
-        assert "great widget description" not in content
-
-    def test_never_includes_catalog_text_field(self):
-        injector = SponsoredRecommendationInjector()
-        body = "NOISY " * 500
-        ad = Ad(title="Gadget", text=body, cta="Buy")
-        content = injector.inject(AdRetrievalResult(ads=[ad]), []).messages_to_append[0]["content"]
-        assert body not in content
-        assert "NOISY" not in content
-
+class TestCompactAdDisplayHelpers:
     def test_compact_display_payload_omits_body(self):
         ad = Ad(title="X", text="noisy body", cta="Go")
         payload = compact_display_payload(ad)

@@ -83,21 +83,20 @@ class TestProcessUserMessage:
     @patch("core.conversation.manager.compute_attention_shift")
     @patch("core.conversation.manager.get_ad")
     @patch.object(ConversationManager, "_classify_turn_intent", return_value="info")
-    def test_sponsored_recommendation_appends_chat_message(
+    def test_sponsored_conversational_exposes_one_suggestion(
         self, _intent, mock_get_ad, mock_shift, sample_ad_retrieval
     ):
         mock_get_ad.return_value = sample_ad_retrieval
         mock_shift.return_value = MagicMock(divergence=0.0, method="jsd")
-        mgr = _make_manager(ad_mode="sponsored_recommendation", force_ad=True, use_rag=False)
+        mgr = _make_manager(ad_mode="sponsored_conversational", force_ad=True, use_rag=False)
         mgr.llm = MagicMock()
         mgr.llm.chat.return_value = "Main reply"
 
         mgr.process_user_message("buy shoes")
 
-        roles = [m["role"] for m in mgr.messages]
-        assert roles.count("assistant") >= 2
-        sponsored = [m for m in mgr.messages if m["role"] == "assistant" and "Sponsored" in m["content"]]
-        assert len(sponsored) == 1
+        assert len(mgr.last_injection.suggestions) == 1
+        assert mgr.last_injection.display_payload is not None
+        assert not mgr.last_injection.messages_to_append
 
     @patch("core.conversation.manager.compute_attention_shift")
     @patch("core.conversation.manager.get_ad")
@@ -113,6 +112,17 @@ class TestProcessUserMessage:
         mock_get_ad.assert_not_called()
         assert mgr.last_retrieval is None
         assert mgr.last_injection == InjectionResult()
+
+    def test_apply_ad_mode_clears_stale_retrieval(self, sample_ad_retrieval):
+        mgr = _make_manager(ad_mode="sponsored_conversational")
+        mgr.last_retrieval = sample_ad_retrieval
+        mgr.last_retrieval_ad_mode = "sponsored_conversational"
+
+        mgr.apply_ad_mode("explicit_ad_block")
+
+        assert mgr.ad_mode == "explicit_ad_block"
+        assert mgr.last_retrieval is None
+        assert mgr.last_retrieval_ad_mode is None
 
     def test_reset_clears_retrieval_state(self, sample_ad_retrieval):
         with patch.object(ConversationManager, "_classify_initial_intent", return_value=""):

@@ -19,7 +19,6 @@ from core.config import (
 )
 from core.conversation import ConversationManager
 from core.experiment import TASK_CATALOG, TASK_BY_ID
-from core.ad_injection import get_injector
 from core.ui.screens import (
     _call_llm_with_spinner,
     _render_ad_banner,
@@ -147,30 +146,14 @@ def run_dev_mode():
 
     for msg in mgr.messages:
         with st.chat_message(msg["role"]):
-            _render_chat_message(msg)
+            _render_chat_message(msg, ad_mode=ad_mode)
 
     # Manual inject from sidebar
     manual_ad_result = st.session_state.pop("dev_manual_ad", None)
     if manual_ad_result and manual_ad_result.display_payload:
-        _render_ad_banner(manual_ad_result.display_payload)
+        _render_ad_banner(manual_ad_result.display_payload, ad_mode=ad_mode)
 
     _render_turn_ads(mgr, ad_mode)
-
-    # Sponsored suggestion chips
-    if (
-        ad_mode == "sponsored_conversational"
-        and mgr.should_inject_ad
-        and mgr.last_retrieval
-    ):
-        injector = get_injector(ad_mode)
-        result = injector.inject(mgr.last_retrieval, mgr.messages)
-        if result.suggestions:
-            st.markdown("### 🔍 Sponsored Suggestions")
-            for suggestion in result.suggestions:
-                if st.button(suggestion, key=f"dev_sug_{suggestion[:20]}"):
-                    _sync_dev_overrides(mgr)
-                    _call_llm_with_spinner(mgr, suggestion)
-                    st.rerun()
 
     if mgr.must_end:
         st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")

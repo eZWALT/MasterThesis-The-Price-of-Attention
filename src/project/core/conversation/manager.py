@@ -152,6 +152,8 @@ class ConversationManager:
         self._modality_hooks: List[Callable[[int, bool, Any], None]] = []
         self.last_retrieval: Optional[AdRetrievalResult] = None
         self.last_injection: InjectionResult = InjectionResult()
+        # Ad mode active when last_retrieval was produced (guards UI after dev mode switches).
+        self.last_retrieval_ad_mode: Optional[str] = None
 
     @property
     def ad_backend(self) -> str | None:
@@ -339,6 +341,7 @@ class ConversationManager:
             retrieval_t0 = time.perf_counter()
             retrieval = get_ad(query=user_input, context=self.messages, backend=self._ad_backend)
             self.last_retrieval = retrieval
+            self.last_retrieval_ad_mode = self.ad_mode if retrieval and retrieval.has_ads else None
             retrieval_latency_ms = (time.perf_counter() - retrieval_t0) * 1000.0
             ad = retrieval.primary
 
@@ -476,12 +479,23 @@ class ConversationManager:
             attention_shift=shift,
         )
 
+    def clear_ad_display_state(self) -> None:
+        """Drop cached retrieval/injection without clearing chat history."""
+        self.last_retrieval = None
+        self.last_injection = InjectionResult()
+        self.last_retrieval_ad_mode = None
+
+    def apply_ad_mode(self, ad_mode: str) -> None:
+        """Switch injection style (dev flow); clears stale ads if the mode changed."""
+        if ad_mode != self.ad_mode:
+            self.ad_mode = ad_mode
+            self.clear_ad_display_state()
+
     def reset(self):
         """Clear conversation for a new trial."""
         self.messages = []
         self.conversation_id = str(uuid.uuid4())
-        self.last_retrieval = None
-        self.last_injection = InjectionResult()
+        self.clear_ad_display_state()
         self.logger.log("session_reset", {}, self.ad_mode, self.conversation_id)
 
     # ── Private ───────────────────────────────────────────────
