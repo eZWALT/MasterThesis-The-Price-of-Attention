@@ -2,11 +2,11 @@
 Stage 5 — Ad Formatter.
 
 Reads  : state.ranked, state.intent
-Writes : state.top_ad  (Ad dataclass)
+Writes : state.top_ads, state.top_ad  (Ad dataclasses)
 
 This is the only stage that knows about the Ad model.
-It converts the top-ranked CatalogItem into the Ad dataclass consumed
-by the injectors, preserving the retrieval score for logging.
+It converts the top-ranked CatalogItems into Ad dataclasses consumed
+by the injectors, preserving retrieval scores for logging.
 
 No model inference happens here — pure data transformation.
 """
@@ -15,12 +15,12 @@ from __future__ import annotations
 
 from core.config import RETRIEVAL_FINAL_TOP_N, DEFAULT_AD_CTA
 from core.retrieval.stages.base import PipelineStage
-from core.retrieval.stages.state import PipelineState
+from core.retrieval.stages.state import PipelineState, RankedCandidate
 
 
 class AdFormatter(PipelineStage):
     """
-    Converts the top-ranked CatalogItem into an Ad dataclass.
+    Converts the top-N ranked CatalogItems into Ad dataclasses.
 
     Config keys (core.config)
     -------------------------
@@ -28,44 +28,64 @@ class AdFormatter(PipelineStage):
 
     Output
     ------
-    state.top_ad : Ad instance ready for injection, or None if
-                   state.ranked is empty (pipeline will fall back to mock).
+    state.top_ads : up to RETRIEVAL_FINAL_TOP_N ads for LLM selection.
+    state.top_ad  : primary ad (top_ads[0]) for UI and logging.
     """
 
     def __init__(self) -> None:
         self._top_n = RETRIEVAL_FINAL_TOP_N
+
+    def _to_ad(self, candidate: RankedCandidate):
+        from core.ad_injection.models import Ad
+
+        item = candidate.item
+        return Ad(
+            title=item.title,
+            text=item.text,
+            cta=item.metadata.get("cta", DEFAULT_AD_CTA),
+            question=item.metadata.get("question", ""),
+            source_item_id=item.item_id,
+            relevance_score=candidate.score,
+            metadata=item.metadata,
+        )
 
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
         import time
         from core.log import logger
+
         t0 = time.time()
-        from core.ad_injection.models import Ad
-        # Prefer ranked, fallback to candidates, else None
-        best = None
-        if state.ranked and len(state.ranked) > 0:
-            best = state.ranked[0]
-            logger.debug(f"AdFormatter: Using top ranked candidate: {best.item.title}")
-        elif state.candidates and len(state.candidates) > 0:
-            # Fallback: wrap candidate as RankedCandidate with score 0.0
-            from core.retrieval.stages.state import RankedCandidate
-            best = RankedCandidate(item=state.candidates[0], score=0.0)
-            logger.debug(f"AdFormatter: Using fallback candidate: {best.item.title}")
+
+        ranked: list[RankedCandidate] = []
+        if state.ranked:
+            ranked = state.ranked
+            logger.debug(
+                "AdFormatter: Using {} ranked candidates",
+                len(ranked),
+            )
+        elif state.candidates:
+            ranked = [
+                RankedCandidate(item=item, score=0.0)
+                for item in state.candidates[: self._top_n]
+            ]
+            logger.debug(
+                "AdFormatter: Using {} fallback candidates",
+                len(ranked),
+            )
         else:
             logger.warning("AdFormatter: No candidates or ranked ads available.")
             state.top_ad = None
+            state.top_ads = []
             return state
 
-        state.top_ad = Ad(
-            title=best.item.title,
-            text=best.item.text,
-            cta=best.item.metadata.get("cta", DEFAULT_AD_CTA),
-            question=best.item.metadata.get("question", ""),
-            source_item_id=best.item.item_id,
-            relevance_score=best.score,
-            metadata=best.item.metadata,
-        )
+        state.top_ads = [self._to_ad(c) for c in ranked[: self._top_n]]
+        state.top_ad = state.top_ads[0] if state.top_ads else None
+
         elapsed = (time.time() - t0) * 1000
-        logger.info(f"[LATENCY] AdFormatter: {elapsed:.1f} ms")
+        logger.info(
+            "[LATENCY] AdFormatter: {:.1f} ms ({} ads)",
+            elapsed,
+            len(state.top_ads),
+        )
         return state

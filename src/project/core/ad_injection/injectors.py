@@ -24,7 +24,7 @@ from core.config import (
     DEFAULT_AD_CTA,
     SPONSORED_LABEL,
 )
-from core.ad_injection.models import Ad, InjectionResult
+from core.ad_injection.models import AdRetrievalResult, format_products_block, InjectionResult
 
 
 # ── Base ──────────────────────────────────────────────────────
@@ -33,13 +33,17 @@ class AdInjector(ABC):
     """
     Contract for all ad injection strategies.
 
-    inject() receives the selected Ad and the current conversation history,
-    and returns an InjectionResult that tells the conversation manager and
-    UI layer what to do — without knowing anything about either.
+    inject() receives ranked retrieval results and the current conversation
+    history, and returns an InjectionResult that tells the conversation
+    manager and UI layer what to do — without knowing anything about either.
     """
 
     @abstractmethod
-    def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
+    def inject(
+        self,
+        retrieval: AdRetrievalResult,
+        conversation: List[Dict[str, str]],
+    ) -> InjectionResult:
         ...
 
 
@@ -53,12 +57,19 @@ class InlinePersuasiveInjector(AdInjector):
     via a system-prompt override.  The ad is never visually labelled;
     the LLM references it organically.
 
+    All retrieved candidates are shown to the LLM; it may mention at most one.
+
     Intrusiveness: lowest (fully implicit).
     """
 
-    def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
+    def inject(
+        self,
+        retrieval: AdRetrievalResult,
+        conversation: List[Dict[str, str]],
+    ) -> InjectionResult:
+        products_block = format_products_block(retrieval.ads)
         system_instruction = INLINE_AD_SYSTEM_PROMPT.format(
-            title=ad.title, text=ad.text
+            products_block=products_block,
         )
         return InjectionResult(
             system_overrides=[{"role": "system", "content": system_instruction}]
@@ -75,7 +86,14 @@ class SponsoredConversationalInjector(AdInjector):
     Intrusiveness: low (opt-in / non-blocking).
     """
 
-    def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
+    def inject(
+        self,
+        retrieval: AdRetrievalResult,
+        conversation: List[Dict[str, str]],
+    ) -> InjectionResult:
+        ad = retrieval.primary
+        if ad is None:
+            return InjectionResult()
         chip_text = ad.question or AD_FALLBACK_QUESTION_TEMPLATE.format(title=ad.title)
         return InjectionResult(suggestions=[chip_text])
 
@@ -90,7 +108,14 @@ class SponsoredRecommendationInjector(AdInjector):
     Intrusiveness: medium (inline but labelled).
     """
 
-    def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
+    def inject(
+        self,
+        retrieval: AdRetrievalResult,
+        conversation: List[Dict[str, str]],
+    ) -> InjectionResult:
+        ad = retrieval.primary
+        if ad is None:
+            return InjectionResult()
         content = f"**{SPONSORED_LABEL}** — {ad.title}\n\n{ad.text}"
         if ad.cta:
             content += f"\n\n*{ad.cta}*"
@@ -110,7 +135,14 @@ class ExplicitAdBlockInjector(AdInjector):
     Intrusiveness: highest (fully disclosed, unavoidable).
     """
 
-    def inject(self, ad: Ad, conversation: List[Dict[str, str]]) -> InjectionResult:
+    def inject(
+        self,
+        retrieval: AdRetrievalResult,
+        conversation: List[Dict[str, str]],
+    ) -> InjectionResult:
+        ad = retrieval.primary
+        if ad is None:
+            return InjectionResult()
         return InjectionResult(
             display_payload={
                 "header": SPONSORED_LABEL,

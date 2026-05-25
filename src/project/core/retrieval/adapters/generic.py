@@ -44,7 +44,7 @@ class GenericAdapter(DatasetAdapter):
             "title":    str(raw["title"]),
             "text":     str(raw["text"]),
             "category": str(raw.get("category", "")),
-            "price":    float(raw.get("price", 0.0)),
+            "price":    raw.get("price", 0.0),
             "cta":      str(raw.get("cta", "")),
             "question": str(raw.get("question", "")),
             "metadata": metadata,

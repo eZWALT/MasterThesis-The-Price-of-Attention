@@ -31,7 +31,7 @@ from core.retrieval.stages.dense import DenseRetriever
 from core.retrieval.stages.hybrid import HybridRefiner
 from core.retrieval.stages.reranker import Reranker
 from core.retrieval.stages.formatter import AdFormatter
-from core.ad_injection.models import Ad
+from core.ad_injection.models import AdRetrievalResult
 
 
 class AdRetrievalPipeline:
@@ -46,7 +46,7 @@ class AdRetrievalPipeline:
     2.  DenseRetriever       — ANN search over FAISS index (GPU 1)
     3.  HybridRefiner        — BM25 + metadata filter + RRF (CPU, optional)
     4.  Reranker             — cross-encoder precision pass (GPU 1)
-    5.  AdFormatter          — top-1 candidate → Ad dataclass
+    5.  AdFormatter          — top-N candidates → Ad dataclasses
     6.  SummarizationStage   — optional; rewrite ad text → concise sentence
 
     All configuration is read from core.config unless overridden via
@@ -82,10 +82,11 @@ class AdRetrievalPipeline:
                 stages.append(Reranker())
             stages.append(AdFormatter())
             self._stages = stages
+        self.last_state: Optional[PipelineState] = None
 
-    def run(self, query: str, context: List[Dict[str, str]]) -> Ad | None:
+    def run(self, query: str, context: List[Dict[str, str]]) -> AdRetrievalResult | None:
         """
-        Execute all stages in order and return the selected Ad.
+        Execute all stages in order and return ranked ads.
 
         Returns None if the pipeline produces no candidates
         (caller should fall back to mock ad).
@@ -94,13 +95,21 @@ class AdRetrievalPipeline:
         state = PipelineState(query=query, context=context)
 
         for stage in self._stages:
-            prev_candidates = getattr(state, 'candidates', None)
-            prev_ranked = getattr(state, 'ranked', None)
             state = stage.run(state)
-            # Debug: log candidate flow after each stage
-            if hasattr(state, 'candidates') and state.candidates is not None:
-                logger.info(f"[DEBUG] After {stage.__class__.__name__}: candidates = {[getattr(c, 'title', None) for c in state.candidates]}")
-            if hasattr(state, 'ranked') and state.ranked is not None:
-                logger.info(f"[DEBUG] After {stage.__class__.__name__}: ranked = {[getattr(r, 'item', None) and getattr(r.item, 'title', None) for r in state.ranked]}")
+            if state.candidates:
+                logger.debug(
+                    "After {}: {} candidates",
+                    stage.__class__.__name__,
+                    len(state.candidates),
+                )
+            if state.ranked:
+                logger.debug(
+                    "After {}: {} ranked",
+                    stage.__class__.__name__,
+                    len(state.ranked),
+                )
 
-        return state.top_ad
+        self.last_state = state
+        if not state.top_ads:
+            return None
+        return AdRetrievalResult(ads=list(state.top_ads))

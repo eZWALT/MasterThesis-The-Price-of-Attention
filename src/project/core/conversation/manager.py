@@ -23,16 +23,16 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor, Future
 from datetime import datetime
 from typing import List, Dict, Optional, Callable, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from core.config import (
     BASE_SYSTEM_PROMPT,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     AD_INJECTION_TURNS,
-    INTENT_MAX_SEQ_LENGTH,
 )
-from core.ad_injection import Ad, InjectionResult, get_ad, get_injector
+from core.ad_injection import get_ad, get_injector
+from core.ad_injection.models import Ad, AdRetrievalResult, InjectionResult
 from core.attention_shift import (
     compute_attention_shift,
     AttentionShiftResult,
@@ -88,7 +88,7 @@ class ConversationManager:
 
     Parameters
     ----------
-    ad_mode : advertising paradigm key (e.g. ``"2_in_chat"``).
+    ad_mode : advertising paradigm key (e.g. ``"inline_persuasive"``).
     model : HuggingFace model id served by vLLM.
     temperature : sampling temperature.
     max_tokens : max new tokens per response.
@@ -150,6 +150,13 @@ class ConversationManager:
         # Each hook is called with (turn: int, ad_injected: bool, ad: Ad|None)
         # in the thread pool after LLM reply — non-blocking.
         self._modality_hooks: List[Callable[[int, bool, Any], None]] = []
+        self.last_retrieval: Optional[AdRetrievalResult] = None
+        self.last_injection: InjectionResult = InjectionResult()
+
+    @property
+    def ad_backend(self) -> str | None:
+        """Active ad backend override (mock/rag), or None for config default."""
+        return self._ad_backend
 
     # ── Modality Registration ─────────────────────────────────
 
@@ -327,39 +334,44 @@ class ConversationManager:
 
         # 4 — ad injection decision (timed for logging)
         inject_ad = self.should_inject_ad
-        ad = None
+        retrieval: Optional[AdRetrievalResult] = None
         if inject_ad:
             retrieval_t0 = time.perf_counter()
-            ad = get_ad(query=user_input, context=self.messages, backend=self._ad_backend)
+            retrieval = get_ad(query=user_input, context=self.messages, backend=self._ad_backend)
+            self.last_retrieval = retrieval
             retrieval_latency_ms = (time.perf_counter() - retrieval_t0) * 1000.0
+            ad = retrieval.primary
 
-            # Log retrieval event with full ad metadata
-            self.logger.log(
-                "retrieval",
-                {
-                    "query": user_input,
-                    "turn": current_turn,
-                    "ad_title": ad.title,
-                    "ad_item_id": ad.source_item_id,
-                    "ad_source": ad.metadata.get("source", "amazon"),
-                    "ad_category": ad.metadata.get("category", ""),
-                    "ad_relevance_score": ad.relevance_score,
-                    "ad_cta": ad.cta,
-                    "retrieval_latency_ms": round(retrieval_latency_ms, 1),
-                    "retrieval_backend": self._ad_backend or "default",
-                },
-                self.ad_mode,
-                self.conversation_id,
-                source="retrieval",
-                turn=current_turn,
-            )
+            if ad is not None:
+                self.logger.log(
+                    "retrieval",
+                    {
+                        "query": user_input,
+                        "turn": current_turn,
+                        "ad_title": ad.title,
+                        "ad_item_id": ad.source_item_id,
+                        "ad_source": ad.metadata.get("source", "amazon"),
+                        "ad_category": ad.metadata.get("category", ""),
+                        "ad_relevance_score": ad.relevance_score,
+                        "ad_cta": ad.cta,
+                        "candidate_count": len(retrieval.ads),
+                        "candidate_titles": [a.title for a in retrieval.ads],
+                        "retrieval_latency_ms": round(retrieval_latency_ms, 1),
+                        "retrieval_backend": self._ad_backend or "default",
+                    },
+                    self.ad_mode,
+                    self.conversation_id,
+                    source="retrieval",
+                    turn=current_turn,
+                )
 
         injector = get_injector(self.ad_mode) if inject_ad else None
         injection = (
-            injector.inject(ad, self.messages)
-            if injector and ad
+            injector.inject(retrieval, self.messages)
+            if injector and retrieval and retrieval.has_ads
             else InjectionResult()
         )
+        self.last_injection = injection
 
         # 5 — LLM call (timed)
         llm_t0 = time.perf_counter()
@@ -381,7 +393,8 @@ class ConversationManager:
         )
 
         # 7 — post-response injection
-        if inject_ad:
+        if inject_ad and retrieval and retrieval.primary:
+            ad = retrieval.primary
             self.ad_turns_actual.append(current_turn)
             for msg in injection.messages_to_append:
                 self.messages.append(msg)
@@ -391,10 +404,10 @@ class ConversationManager:
                         "content": msg["content"],
                         "turn": current_turn,
                         "ad_mode": self.ad_mode,
-                        "ad_title": ad.title if ad else None,
-                        "ad_item_id": ad.source_item_id if ad else None,
-                        "ad_source": ad.metadata.get("source", "amazon") if ad else None,
-                        "ad_relevance_score": ad.relevance_score if ad else None,
+                        "ad_title": ad.title,
+                        "ad_item_id": ad.source_item_id,
+                        "ad_source": ad.metadata.get("source", "amazon"),
+                        "ad_relevance_score": ad.relevance_score,
                     },
                     self.ad_mode,
                     self.conversation_id,
@@ -418,7 +431,7 @@ class ConversationManager:
 
         # Fire modality hooks in parallel (non-blocking, best-effort)
         for hook in self._modality_hooks:
-            _CPU_POOL.submit(hook, current_turn, inject_ad, ad)
+            _CPU_POOL.submit(hook, current_turn, inject_ad, retrieval.primary if retrieval else None)
 
         # Collect parallel results
         shift = shift_future.result()
@@ -445,9 +458,9 @@ class ConversationManager:
             user_msg_len=len(user_input),
             assistant_msg_len=len(assistant_reply),
             llm_latency_ms=round(llm_latency_ms, 1),
-            ad_injected=inject_ad,
-            ad_title=ad.title if (inject_ad and ad) else None,
-            ad_relevance_score=ad.relevance_score if (inject_ad and ad) else None,
+            ad_injected=inject_ad and bool(retrieval and retrieval.has_ads),
+            ad_title=retrieval.primary.title if (inject_ad and retrieval and retrieval.primary) else None,
+            ad_relevance_score=retrieval.primary.relevance_score if (inject_ad and retrieval and retrieval.primary) else None,
             attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
             intent_label=turn_intent,
@@ -467,6 +480,8 @@ class ConversationManager:
         """Clear conversation for a new trial."""
         self.messages = []
         self.conversation_id = str(uuid.uuid4())
+        self.last_retrieval = None
+        self.last_injection = InjectionResult()
         self.logger.log("session_reset", {}, self.ad_mode, self.conversation_id)
 
     # ── Private ───────────────────────────────────────────────

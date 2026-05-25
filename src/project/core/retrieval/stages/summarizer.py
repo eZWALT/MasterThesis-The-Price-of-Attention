@@ -93,6 +93,8 @@ class SummarizationStage(PipelineStage):
                 relevance_score=ad.relevance_score,
                 metadata=ad.metadata,
             )
+            if state.top_ads:
+                state.top_ads[0] = state.top_ad
             logger.debug("SummarizationStage: rewrote ad text to: {}", summary[:80])
         except Exception as exc:
             logger.opt(exception=True).warning(

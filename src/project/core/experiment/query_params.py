@@ -419,8 +419,11 @@ def parse_query_params() -> ExperimentParams:
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:
         # ?force_ad=1  — inject an ad on every turn regardless of ad_turns schedule
-        if p.get("force_ad", "").strip() in ("1", "true", "yes"):
+        force_raw = p.get("force_ad", "").strip().lower()
+        if force_raw in ("1", "true", "yes"):
             params.force_ad = True
+        elif force_raw in ("0", "false", "no"):
+            params.force_ad = False
 
         # ?rag=0  — force mock backend (skip retrieval pipeline, instant response)
         # ?rag=1  — force RAG backend regardless of AD_BACKEND env var
