@@ -51,3 +51,35 @@ def reset_reservations():
     core.device._gpu_reservations.clear()
     yield
     core.device._gpu_reservations.clear()
+
+
+@pytest.fixture
+def fake_streamlit_session():
+    """Reusable Streamlit session_state stand-in for UI unit tests."""
+
+    class SessionState(dict):
+        def __getattr__(self, key):
+            try:
+                return self[key]
+            except KeyError as exc:
+                raise AttributeError(key) from exc
+
+        def __setattr__(self, key, value):
+            self[key] = value
+
+        def pop(self, key, default=None):
+            return super().pop(key, default)
+
+    return SessionState()
+
+
+@pytest.fixture
+def sample_ad_retrieval():
+    from core.ad_injection.models import Ad, AdRetrievalResult
+
+    return AdRetrievalResult(
+        ads=[
+            Ad(title="Alpha", text="First", source_item_id="a", relevance_score=0.9),
+            Ad(title="Beta", text="Second", source_item_id="b", relevance_score=0.8),
+        ]
+    )
