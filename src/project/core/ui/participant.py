@@ -34,6 +34,7 @@ from core.ui.screens import (
     render_demographics,
     render_ocean,
     render_baseline,
+    clear_baseline_session_state,
     render_practice,
     render_trial_intro,
     render_trial_chat,
@@ -94,12 +95,7 @@ def init_session_state(params):
 
     # Dev ad-control overrides (survive reruns; initialised from URL params)
     if "dev_force_ad" not in st.session_state:
-        # Always default to True in dev/flow mode unless explicitly set to False
-        force_ad = getattr(params, "force_ad", None)
-        if force_ad is False:
-            st.session_state.dev_force_ad = False
-        else:
-            st.session_state.dev_force_ad = True
+        st.session_state.dev_force_ad = params.force_ad
     if "dev_rag_mode" not in st.session_state:
         # Always default to 'rag' in dev/flow mode unless explicitly set to 'mock' in URL
         use_rag = getattr(params, "use_rag", None)
@@ -139,15 +135,37 @@ def _get_or_create_practice_manager() -> ConversationManager:
     return mgr
 
 
+def _resolve_dev_ad_settings(params) -> tuple[bool, bool | None, str]:
+    """Map dev/flow session overrides to ConversationManager constructor args."""
+    force_ad = st.session_state.get("dev_force_ad", params.force_ad)
+    rag_mode = st.session_state.get("dev_rag_mode")
+    if rag_mode == "rag":
+        use_rag: bool | None = True
+    elif rag_mode == "mock":
+        use_rag = False
+    else:
+        use_rag = params.use_rag
+    effective_mode = st.session_state.get("dev_ad_mode_override") or ""
+    return force_ad, use_rag, effective_mode
+
+
 def _get_or_create_trial_manager(
     task: TaskDefinition,
     ad_mode: str,
-    force_ad: bool = False,
-    use_rag: bool | None = None,
+    params,
+    flow_test: bool = False,
 ) -> ConversationManager:
     mgr = st.session_state.trial_manager
     ctrl: ExperimentController = st.session_state.controller
-    if mgr is None or mgr.task.id != task.id:
+
+    force_ad = params.force_ad
+    use_rag = params.use_rag
+    if flow_test:
+        force_ad, use_rag, mode_override = _resolve_dev_ad_settings(params)
+        if mode_override:
+            ad_mode = mode_override
+
+    if mgr is None or mgr.task.id != task.id or (flow_test and mgr.ad_mode != ad_mode):
         mgr = ConversationManager(
             ad_mode=ad_mode,
             model=ctrl.model or DEFAULT_MODEL,
@@ -162,6 +180,8 @@ def _get_or_create_trial_manager(
             use_rag=use_rag,
         )
         st.session_state.trial_manager = mgr
+    elif flow_test:
+        _sync_dev_overrides(mgr)
     return mgr
 
 
@@ -277,7 +297,8 @@ def _render_dev_ad_controls(mgr=None) -> None:
         result = injector.inject(ad, mgr.messages)
         # Store result in session state so run_dev_mode can render it in the main area
         st.session_state["dev_manual_ad"] = result
-        st.caption(f"📦 {ad.title}")
+        primary = ad.primary
+        st.caption(f"📦 {primary.title if primary else 'No ad'}")
 
 
 def _sync_dev_overrides(mgr) -> None:
@@ -353,6 +374,8 @@ def run_participant_mode(params):
 
     # Handle skip logic for screens
     if scr in params.skip_screens:
+        if scr == SCREEN_BASELINE:
+            clear_baseline_session_state()
         dev_inject_stub_data(ctrl, bfi_version=params.bfi_version)
         ctrl.advance()
         st.rerun()
@@ -429,14 +452,12 @@ def run_participant_mode(params):
             task = trial_cfg["task"]
             ad_mode = trial_cfg["ad_mode"]
             mgr = _get_or_create_trial_manager(
-                task, ad_mode,
-                force_ad=params.force_ad,
-                use_rag=params.use_rag,
+                task,
+                ad_mode,
+                params,
+                flow_test=params.flow_test,
             )
-            # Apply any live sidebar tweaks before the next turn
-            if params.flow_test:
-                _sync_dev_overrides(mgr)
-            if render_trial_chat(mgr, ad_mode):
+            if render_trial_chat(mgr, mgr.ad_mode, flow_test=params.flow_test):
                 from dataclasses import asdict
                 ctrl.trial_results.append({
                     "trial": ctrl.trial_number,

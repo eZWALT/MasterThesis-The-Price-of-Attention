@@ -20,7 +20,7 @@ from core.config import (
 )
 from core.conversation import ConversationManager
 from core.experiment import TASK_CATALOG, TASK_BY_ID
-from core.ad_injection import get_ad, get_injector
+from core.ad_injection import get_injector
 from core.ui.screens import _render_ad_card, _call_llm_with_spinner
 # DEV helpers live in participant to avoid circular imports
 from core.ui.participant import _render_dev_ad_controls, _sync_dev_overrides
@@ -158,26 +158,20 @@ def run_dev_mode():
         if manual_ad_result and manual_ad_result.display_payload:
             _render_ad_card(col_main, manual_ad_result.display_payload)
 
-    if show_side and mgr.should_inject_ad and col_side:
-        last_user = next(
-            (m["content"] for m in reversed(mgr.messages) if m["role"] == "user"),
-            "",
-        )
-        ad = get_ad(query=last_user, context=mgr.messages)
+    if show_side and mgr.should_inject_ad and col_side and mgr.last_retrieval:
         injector = get_injector(ad_mode)
-        result = injector.inject(ad, mgr.messages)
+        result = injector.inject(mgr.last_retrieval, mgr.messages)
         if result.display_payload:
             _render_ad_card(col_side, result.display_payload)
 
     # Sponsored suggestion chips
-    if ad_mode == "sponsored_conversational" and mgr.should_inject_ad:
-        last_user = next(
-            (m["content"] for m in reversed(mgr.messages) if m["role"] == "user"),
-            "",
-        )
-        ad = get_ad(query=last_user, context=mgr.messages)
+    if (
+        ad_mode == "sponsored_conversational"
+        and mgr.should_inject_ad
+        and mgr.last_retrieval
+    ):
         injector = get_injector(ad_mode)
-        result = injector.inject(ad, mgr.messages)
+        result = injector.inject(mgr.last_retrieval, mgr.messages)
         if result.suggestions:
             st.markdown("### 🔍 Sponsored Suggestions")
             for suggestion in result.suggestions:

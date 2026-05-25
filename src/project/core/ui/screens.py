@@ -29,6 +29,11 @@ from core.config import (
     CONSENT_TEXT,
     # Baseline
     BASELINE_DURATION_SECONDS,
+    BASELINE_TITLE,
+    BASELINE_INSTRUCTION,
+    BASELINE_COMPLETE_MESSAGE,
+    BASELINE_CONTINUE_LABEL,
+    AD_MODE_LABELS,
     # Practice
     PRACTICE_TASK_PROMPT,
     # Trials
@@ -52,7 +57,8 @@ from core.experiment.surveys import (
     FINAL_SURVEY_ITEMS,
     FINAL_OPEN_ENDED_PROMPT,
 )
-from core.ad_injection import get_ad, get_injector
+from core.ad_injection import get_injector
+from core.ad_injection.models import format_products_block
 from core.conversation import ConversationManager
 from core.conversation.ollama_stats import estimate_eta, record_timing
 
@@ -274,40 +280,79 @@ def render_ocean(bfi_version: str = "10") -> Optional[list[int]]:
 # SCREEN 4 — BASELINE
 # ═══════════════════════════════════════════════════════════════
 
+_BASELINE_SESSION_KEYS = (
+    "baseline_start",
+    "_baseline_screen_active",
+    "_baseline_user_confirmed",
+)
+
+
+def _format_duration_label(seconds: int) -> str:
+    """Human-readable duration for baseline instructions."""
+    if seconds < 60:
+        return f"{seconds} second{'s' if seconds != 1 else ''}"
+    mins, secs = divmod(seconds, 60)
+    if secs:
+        return (
+            f"{mins} minute{'s' if mins != 1 else ''} "
+            f"and {secs} second{'s' if secs != 1 else ''}"
+        )
+    return f"{mins} minute{'s' if mins != 1 else ''}"
+
+
+def clear_baseline_session_state() -> None:
+    """Drop baseline timer keys when leaving or skipping the screen."""
+    for key in _BASELINE_SESSION_KEYS:
+        st.session_state.pop(key, None)
+
+
+def _reset_baseline_timer() -> None:
+    st.session_state.baseline_start = time.time()
+
+
 def render_baseline() -> bool:
     """
     Relaxation baseline screen with countdown.
-    Returns True when time is up and user clicks Continue.
+
+    Uses a Streamlit fragment so only the timer refreshes — not the whole app.
+    That avoids re-rendering prior screens (e.g. OCEAN widgets) on each tick.
+    Returns True when time is up and the user clicks Continue.
     """
-    st.header("Baseline Recording")
+    if st.session_state.pop("_baseline_user_confirmed", False):
+        return True
+
+    if not st.session_state.get("_baseline_screen_active"):
+        st.session_state._baseline_screen_active = True
+        _reset_baseline_timer()
+
+    st.header(BASELINE_TITLE)
     st.markdown(
-        "Please **relax** and look at the screen. "
-        "This will take about 2 minutes."
+        BASELINE_INSTRUCTION.format(
+            duration_label=_format_duration_label(BASELINE_DURATION_SECONDS),
+        )
     )
 
-    # Use session state to track start time
-    if "baseline_start" not in st.session_state:
-        st.session_state.baseline_start = time.time()
+    @st.fragment(run_every=1)
+    def _baseline_countdown() -> None:
+        elapsed = time.time() - st.session_state.baseline_start
+        remaining = max(0, int(BASELINE_DURATION_SECONDS - elapsed))
+        if remaining > 0:
+            mins, secs = divmod(remaining, 60)
+            st.markdown(
+                f"<div style='text-align:center; font-size:3em; padding:60px 0;'>"
+                f"⏳ {mins:02d}:{secs:02d}"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+            return
 
-    elapsed = time.time() - st.session_state.baseline_start
-    remaining = max(0, BASELINE_DURATION_SECONDS - elapsed)
+        st.success(BASELINE_COMPLETE_MESSAGE)
+        if st.button(BASELINE_CONTINUE_LABEL, type="primary", key="baseline_continue"):
+            clear_baseline_session_state()
+            st.session_state._baseline_user_confirmed = True
+            st.rerun()
 
-    if remaining > 0:
-        mins, secs = divmod(int(remaining), 60)
-        st.markdown(
-            f"<div style='text-align:center; font-size:3em; padding:60px 0;'>"
-            f"⏳ {mins:02d}:{secs:02d}"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-        # Auto-refresh every 1 second
-        time.sleep(1)
-        st.rerun()
-    else:
-        st.success("✓ Baseline recording complete.")
-        if st.button("Continue", type="primary"):
-            del st.session_state.baseline_start
-            return True
+    _baseline_countdown()
     return False
 
 
@@ -367,7 +412,38 @@ def render_trial_intro(trial_number: int, total_trials: int, task_prompt: str) -
 # SCREEN 7 — TRIAL CHAT (core screen)
 # ═══════════════════════════════════════════════════════════════
 
-def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
+def _render_flow_ad_panel(manager: ConversationManager, ad_mode: str) -> None:
+    """Dev/flow helper: surface ads even when the mode hides them (e.g. inline)."""
+    if not manager.last_retrieval or not manager.last_retrieval.has_ads:
+        st.caption("No ad retrieved yet — send a message with **Inject ad every turn** enabled.")
+        return
+
+    st.markdown(f"**Ad mode:** {AD_MODE_LABELS.get(ad_mode, ad_mode)}")
+
+    if ad_mode == "inline_persuasive":
+        with st.expander("Candidate products shown to the LLM", expanded=True):
+            st.markdown(format_products_block(manager.last_retrieval.ads))
+        st.caption("Inline mode weaves the ad into the assistant reply; nothing is shown as a separate card.")
+        return
+
+    injector = get_injector(ad_mode)
+    result = injector.inject(manager.last_retrieval, manager.messages)
+
+    if result.display_payload:
+        _render_ad_card(st, result.display_payload)
+    if result.suggestions:
+        st.markdown("**Sponsored suggestions**")
+        for suggestion in result.suggestions:
+            st.markdown(f"- {suggestion}")
+    if result.messages_to_append:
+        st.caption("A labelled sponsored message was appended to the chat history.")
+
+
+def render_trial_chat(
+    manager: ConversationManager,
+    ad_mode: str,
+    flow_test: bool = False,
+) -> bool:
     """
     Main chat interface. Returns True when the trial ends
     (user ends after min turns, or max turns reached).
@@ -389,66 +465,33 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
             if st.button("✅ End Conversation"):
                 return True
 
-    # Chat layout — side panel ads float next to the latest message
+    # Chat history
+    for msg in manager.messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    # Side-panel ads — render beside chat when the last turn injected one
     show_side = ad_mode in AD_SIDE_PANEL_MODES
-
-    if show_side:
-        # Render all messages except the last assistant turn flat,
-        # then render the last assistant message + ad card side-by-side
-        msgs = manager.messages
-        # All but last assistant message render normally
-        cutoff = len(msgs)
-        for i, msg in enumerate(msgs):
-            # Find last assistant message to pair with ad
-            if i == cutoff - 1 and msg["role"] == "assistant" and manager.should_inject_ad:
-                col_msg, col_ad = st.columns([3, 1])
-                with col_msg:
-                    with st.chat_message(msg["role"]):
-                        st.markdown(msg["content"])
-                # ad rendered outside loop below
-            else:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
-    else:
-        col_ad = None
-        for msg in manager.messages:
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
-
-    # Side-panel ads — rendered next to the latest assistant message
-    if show_side and manager.should_inject_ad:
-        last_user = next(
-            (m["content"] for m in reversed(manager.messages) if m["role"] == "user"),
-            "",
-        )
-        # Use RAG as default backend unless explicitly overridden
-        backend = getattr(manager, 'ad_backend', None)
-        if backend is None:
-            backend = "rag"
-        ad = get_ad(query=last_user, context=manager.messages, backend=backend)
+    if show_side and manager.should_inject_ad and manager.last_retrieval:
         injector = get_injector(ad_mode)
-        result = injector.inject(ad, manager.messages)
+        result = injector.inject(manager.last_retrieval, manager.messages)
         if result.display_payload:
-            # col_ad was set in the loop above when last msg was assistant
-            try:
-                _render_ad_card(col_ad, result.display_payload)
-            except Exception:
-                _render_ad_card(st, result.display_payload)
+            side_col, _ = st.columns([1, 3])
+            _render_ad_card(side_col, result.display_payload)
 
-    # Suggestion ads
-    if ad_mode == "sponsored_conversational" and manager.should_inject_ad:
-        last_user = next(
-            (m["content"] for m in reversed(manager.messages) if m["role"] == "user"),
-            "",
-        )
-        ad = get_ad(query=last_user, context=manager.messages)
+    # Suggestion chips (participant-visible)
+    if (
+        ad_mode == "sponsored_conversational"
+        and manager.should_inject_ad
+        and manager.last_retrieval
+    ):
         injector = get_injector(ad_mode)
-        result = injector.inject(ad, manager.messages)
+        result = injector.inject(manager.last_retrieval, manager.messages)
         if result.suggestions:
             st.markdown("### 🔍 Sponsored Suggestions")
+            ad = manager.last_retrieval.primary
             for suggestion in result.suggestions:
                 if st.button(suggestion, key=f"sug_{suggestion[:20]}"):
-                    # Log ad click / conversion
                     manager.logger.log(
                         "ad_clicked",
                         {
@@ -462,6 +505,11 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
                     )
                     _call_llm_with_spinner(manager, suggestion)
                     st.rerun()
+
+    # Dev flow: always show what was retrieved / shown to the LLM
+    if flow_test:
+        with st.expander("🎯 Ad debug (dev=flow)", expanded=True):
+            _render_flow_ad_panel(manager, ad_mode)
 
     # Max turns reached → auto-end
     if manager.must_end:
