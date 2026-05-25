@@ -241,7 +241,7 @@ def build_faiss_index(catalog_path: str, index_path: str) -> None:
     AdCatalog.load(
         catalog_path=catalog_path,
         index_path=index_path,
-        embedding_model=embed,
+        embed=embed,
         force_rebuild=True,
     )
 
@@ -268,7 +268,6 @@ def parse_args():
     p.add_argument("--build-index", action="store_true")
     p.add_argument("--index-path", default="data/faiss.index")
 
-    # 🔥 NEW: force re-ingestion control
     p.add_argument("--force-ingest", action="store_true")
 
     return p.parse_args()

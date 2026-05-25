@@ -69,9 +69,7 @@ def _build_pipeline():
     adapter = build_adapter()  # reads CATALOG_ADAPTER env var / config
     catalog = AdCatalog.load(
         catalog_path=CATALOG_PATH,
-        index_path=FAISS_INDEX_PATH,
-        embedding_model=embed,
-        adapter=adapter,
+        index_path=FAISS_INDEX_PATH
     )
     # Pass the already-loaded model so DenseRetriever reuses it (no double load).
     pipeline = AdRetrievalPipeline(catalog=catalog, embedding_model=embed)

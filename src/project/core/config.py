@@ -187,7 +187,7 @@ MIN_TURNS_PER_TRIAL: int   = 3
 MAX_TURNS_PER_TRIAL: int   = 20
 
 # 1-indexed user turns at which ads are automatically injected.
-AD_INJECTION_TURNS: list[int] = [3, 6]
+AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every turn for dev=flow
 
 BASELINE_DURATION_SECONDS: int = 60
 
@@ -198,7 +198,7 @@ BASELINE_DURATION_SECONDS: int = 60
 # └─────────────────────────────────────────────────────────────────────────┘
 
 # Ad retrieval backend: "mock" (placeholder, no GPU) or "rag" (full pipeline)
-AD_BACKEND: str = os.getenv("AD_BACKEND", "mock")
+AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 
 AD_MODES: list[str] = [
     "inline_persuasive",        # ad woven into the LLM's own response
@@ -302,7 +302,7 @@ EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
 FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
-CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/amazon.jsonl")  # legacy fallback
+CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/catalog.jsonl")  # default to merged catalog
 CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")  # all ad sources live here
 DEFAULT_CATALOG_PRICE: float = 0.0  # fallback price when catalog omits it
 DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4 (golden: 200)
