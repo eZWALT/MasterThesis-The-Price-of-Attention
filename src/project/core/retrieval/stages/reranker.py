@@ -48,11 +48,6 @@ class Reranker(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
-        import time
-        from core.log import logger
-        t0 = time.time()
         candidates = state.candidates[: self._top_k]
         state.ranked = self._reranker.rerank(state.query, candidates)
-        elapsed = (time.time() - t0) * 1000
-        logger.info(f"[LATENCY] Reranker: {elapsed:.1f} ms")
         return state

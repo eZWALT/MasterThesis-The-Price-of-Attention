@@ -40,8 +40,11 @@ def retrieve_ad(query: str, context: List[Dict[str, str]]) -> Optional[AdRetriev
         _pipeline = _build_pipeline()
 
     result = _pipeline.run(query, context)
+    from core.retrieval.log_util import is_warmup_query
+
     if result is None or not result.has_ads:
-        logger.warning("No ad retrieved for query: {}", query)
+        if not is_warmup_query(query):
+            logger.warning("retrieval no ads query={!r}", query[:80])
         return None
 
     logger.debug(
@@ -65,7 +68,9 @@ def _build_pipeline():
     from core.retrieval.embeddings import build_embedding_model
     from core.retrieval.adapters import build_adapter
 
-    logger.info("Building retrieval pipeline (first call)...")
+    from core.retrieval.log_util import log_pipeline_building, log_pipeline_ready
+
+    log_pipeline_building()
 
     embed = build_embedding_model(
         model_name=EMBEDDING_MODEL_NAME,
@@ -80,12 +85,8 @@ def _build_pipeline():
 
     stage_names = [s.__class__.__name__ for s in build_default_stages(catalog, embed)]
     pipeline = AdRetrievalPipeline(catalog=catalog, embedding_model=embed)
-    logger.info(
-        "Retrieval pipeline ready — catalog: {} items, adapter: {}, stages: {}",
-        len(catalog),
-        adapter.__class__.__name__,
-        " → ".join(stage_names),
-    )
+    log_pipeline_ready(n_items=len(catalog), stage_names=stage_names)
+    logger.debug("retrieval adapter={}", adapter.__class__.__name__)
     return pipeline
 
 
