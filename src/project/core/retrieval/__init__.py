@@ -76,11 +76,15 @@ def _build_pipeline():
         catalog_path=CATALOG_PATH,
         index_path=FAISS_INDEX_PATH
     )
+    from core.retrieval.pipeline import build_default_stages
+
+    stage_names = [s.__class__.__name__ for s in build_default_stages(catalog, embed)]
     pipeline = AdRetrievalPipeline(catalog=catalog, embedding_model=embed)
     logger.info(
-        "Retrieval pipeline ready — catalog: {} items, adapter: {}",
+        "Retrieval pipeline ready — catalog: {} items, adapter: {}, stages: {}",
         len(catalog),
         adapter.__class__.__name__,
+        " → ".join(stage_names),
     )
     return pipeline
 
