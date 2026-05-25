@@ -70,7 +70,7 @@ Adding both stages to the pipeline
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from core.config import (
     CONTEXT_SUMMARY_PROMPT,
@@ -80,18 +80,41 @@ from core.config import (
     HYDE_PROMPT,
     HYDE_MAX_TOKENS,
     HYDE_TEMPERATURE,
+    HYDE_TOKENS_PER_DOC,
     QUERY_EXPANSION_PROMPT,
     QUERY_EXPANSION_MODE,
+    QUERY_EXPANSION_LOG_PREVIEW_CHARS,
     QUERY_EXPAND_MAX_TOKENS,
     QUERY_EXPAND_TEMPERATURE,
     USE_CONTEXT_SUMMARY,
-    API_URL,
-    DEFAULT_MODEL,
-    LLM_TIMEOUT_SECONDS,
 )
+from core.retrieval.hyde import effective_hyde_num_docs, parse_hyde_documents
 from core.log import logger
 from core.retrieval.stages.base import PipelineStage
+from core.retrieval.stages.preprocess_llm import preprocess_llm_chat
 from core.retrieval.stages.state import PipelineState
+
+
+def _preview(text: str, max_chars: int) -> str:
+    one_line = " ".join((text or "").split())
+    if max_chars <= 0 or len(one_line) <= max_chars:
+        return one_line
+    return one_line[: max_chars - 1] + "…"
+
+
+def _context_block_for_hyde(state: PipelineState) -> str:
+    """Conversation text for HyDE — one LLM call, no separate summary pass."""
+    if state.context_summary:
+        return state.context_summary
+    if not state.context:
+        return "(none)"
+    lines = []
+    for msg in state.context[-6:]:
+        role = msg.get("role", "user").capitalize()
+        content = (msg.get("content") or "").strip()
+        if content:
+            lines.append(f"{role}: {content}")
+    return "\n".join(lines) if lines else "(none)"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -139,13 +162,12 @@ class ContextSummaryStage(PipelineStage):
         prompt = CONTEXT_SUMMARY_PROMPT.format(history=history)
 
         try:
-            summary = self._call_llm(prompt)
-            state.context_summary = summary
-            logger.debug(
-                "ContextSummaryStage: summarised {} turns → \"{}\"",
-                len(state.context),
-                summary[:120],
+            summary = preprocess_llm_chat(
+                prompt,
+                temperature=CONTEXT_SUMMARY_TEMPERATURE,
+                max_tokens=CONTEXT_SUMMARY_MAX_TOKENS,
             )
+            state.context_summary = summary
         except Exception as exc:
             logger.opt(exception=True).warning(
                 "ContextSummaryStage: LLM call failed, context_summary left empty — {}",
@@ -165,19 +187,6 @@ class ContextSummaryStage(PipelineStage):
             content = msg.get("content", "").strip()
             lines.append(f"{role}: {content}")
         return "\n".join(lines)
-
-    def _call_llm(self, user_message: str) -> str:
-        import httpx
-
-        payload: Dict[str, Any] = {
-            "model": DEFAULT_MODEL,
-            "messages": [{"role": "user", "content": user_message}],
-            "max_tokens": CONTEXT_SUMMARY_MAX_TOKENS,
-            "temperature": CONTEXT_SUMMARY_TEMPERATURE,
-        }
-        resp = httpx.post(API_URL, json=payload, timeout=LLM_TIMEOUT_SECONDS)
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"].strip()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -229,50 +238,47 @@ class QueryExpansionStage(PipelineStage):
         if self._mode == "none":
             return state
 
-        context_summary = state.context_summary or ""
+        context_block = _context_block_for_hyde(state)
 
         if self._mode == "hyde":
+            num_docs = effective_hyde_num_docs()
             prompt = HYDE_PROMPT.format(
+                num_docs=num_docs,
+                tokens_per_doc=HYDE_TOKENS_PER_DOC,
                 query=state.query,
-                context_summary=context_summary,
+                context_block=context_block,
             )
         else:  # expand
             prompt = QUERY_EXPANSION_PROMPT.format(
                 query=state.query,
-                context_summary=context_summary,
+                context_summary=context_block,
             )
-
-        try:
-            expanded = self._call_llm(prompt)
-            state.expanded_query = expanded
-            logger.debug(
-                "QueryExpansionStage [{}]: \"{}\" → \"{}\"",
-                self._mode,
-                state.query[:60],
-                expanded[:120],
-            )
-        except Exception as exc:
-            logger.opt(exception=True).warning(
-                "QueryExpansionStage: LLM call failed, falling back to raw query — {}",
-                exc,
-            )
-
-        return state
-
-    # ── private ──────────────────────────────────────────────────────────
-
-    def _call_llm(self, user_message: str) -> str:
-        import httpx
 
         temperature = HYDE_TEMPERATURE if self._mode == "hyde" else QUERY_EXPAND_TEMPERATURE
         max_tokens = HYDE_MAX_TOKENS if self._mode == "hyde" else QUERY_EXPAND_MAX_TOKENS
 
-        payload: Dict[str, Any] = {
-            "model": DEFAULT_MODEL,
-            "messages": [{"role": "user", "content": user_message}],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-        resp = httpx.post(API_URL, json=payload, timeout=LLM_TIMEOUT_SECONDS)
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"].strip()
+        try:
+            expanded = preprocess_llm_chat(
+                prompt,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            if self._mode == "hyde":
+                docs = parse_hyde_documents(expanded)
+                state.hyde_documents = docs
+                state.expanded_query = docs[0] if docs else ""
+            else:
+                state.expanded_query = expanded
+                state.hyde_documents = []
+            if state.expanded_query and QUERY_EXPANSION_LOG_PREVIEW_CHARS > 0:
+                logger.debug(
+                    "[LATENCY] QueryExpansionStage preview={!r}",
+                    _preview(state.expanded_query, QUERY_EXPANSION_LOG_PREVIEW_CHARS),
+                )
+        except Exception as exc:
+            logger.opt(exception=True).warning(
+                "[LATENCY] QueryExpansionStage: failed — using raw query — {}",
+                exc,
+            )
+
+        return state

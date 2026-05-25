@@ -75,6 +75,11 @@ class PipelineState:
     #                   when empty.
     context_summary: str = ""
     expanded_query: str = ""
+    # HyDE: multiple hypothetical docs from one LLM call (fused in DenseRetriever).
+    hyde_documents: List[str] = field(default_factory=list)
+
+    # Per-stage wall times (ms), filled by AdRetrievalPipeline.run().
+    stage_ms: Dict[str, float] = field(default_factory=dict)
 
     # ── Stage 1 output ────────────────────────────────
     intent: str = ""

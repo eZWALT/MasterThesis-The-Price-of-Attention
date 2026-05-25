@@ -20,6 +20,7 @@ from __future__ import annotations
 import numpy as np
 
 from core.config import EMBEDDING_MODEL_NAME, EMBEDDING_DEVICE, DENSE_TOP_K
+from core.retrieval.hyde import rrf_merge_item_ids
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState, CatalogItem
 
@@ -57,13 +58,24 @@ class DenseRetriever(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
-        import time
-        from core.log import logger
-        t0 = time.time()
-        embed_text = state.expanded_query or state.query
-        query_vec: np.ndarray = self._embed.encode([embed_text])    # (1, D)
-        item_ids = self._catalog.search(query_vec, top_k=self._top_k)
+        if state.hyde_documents:
+            embed_texts = state.hyde_documents
+            embed_src = f"hyde×{len(embed_texts)}"
+        elif state.expanded_query:
+            embed_texts = [state.expanded_query]
+        else:
+            embed_texts = [state.query]
+
+        if len(embed_texts) == 1:
+            query_vec: np.ndarray = self._embed.encode(embed_texts)
+            item_ids = self._catalog.search(query_vec, top_k=self._top_k)
+        else:
+            query_vecs: np.ndarray = self._embed.encode(embed_texts)
+            hit_lists = [
+                self._catalog.search(query_vecs[i : i + 1], top_k=self._top_k)
+                for i in range(len(embed_texts))
+            ]
+            item_ids = rrf_merge_item_ids(hit_lists)[: self._top_k]
+
         state.candidates = [self._catalog.get(item_id) for item_id in item_ids]
-        elapsed = (time.time() - t0) * 1000
-        logger.info(f"[LATENCY] DenseRetriever: {elapsed:.1f} ms")
         return state

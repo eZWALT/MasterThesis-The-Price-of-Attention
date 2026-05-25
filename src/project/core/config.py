@@ -96,12 +96,14 @@ CONTEXT_SUMMARY_PROMPT: str = (
 #         Placeholders: {query}, {context_summary}
 #         Enabled via: QUERY_EXPANSION_MODE="hyde" / ?qe=hyde
 HYDE_PROMPT: str = (
-    "Write a short product description (2-3 sentences) that would perfectly "
-    "match what the user is looking for. Be specific about features and "
-    "use-cases. Do NOT include brand, price, or availability.\n\n"
+    "You are helping a product search engine. Write exactly {num_docs} different "
+    "short product descriptions (at most ~{tokens_per_doc} tokens each) that could "
+    "match what the user wants. Vary angle and vocabulary across descriptions. "
+    "Do NOT include brand names, price, or availability.\n\n"
+    "Separate each description with a line containing only three dashes: ---\n\n"
     "User query: {query}\n"
-    "Conversation context: {context_summary}\n\n"
-    "Hypothetical product description:"
+    "Conversation context: {context_block}\n\n"
+    "Description 1:"
 )
 
 # ── 2.5  Query expansion (Stage 0b, pre-retrieval) ────────────────────────
@@ -275,14 +277,19 @@ CONTEXT_SUMMARY_MAX_TOKENS: int = 80    # LLM generation limit for summary
 CONTEXT_SUMMARY_TEMPERATURE: float = 0.0
 
 # ── Stage 0b — Query Expansion ────────────────────────────────────────────
-# Modes: none (default) | hyde | expand
-# Toggle: QUERY_EXPANSION_MODE / env QUERY_EXPANSION_MODE=hyde / URL ?qe=hyde
-QUERY_EXPANSION_MODE: str        = os.getenv("QUERY_EXPANSION_MODE", "none").lower()
+# Modes: hyde (default for pilot) | none | expand
+# Override per session: URL ?qe=none|hyde|expand (see query_params.py)
+QUERY_EXPANSION_MODE: str        = os.getenv("QUERY_EXPANSION_MODE", "hyde").lower()
 VALID_QUERY_EXPANSION_MODES: set[str] = {"none", "hyde", "expand"}
 HYDE_TEMPERATURE: float          = 0.5   # slight creativity for hypothetical docs
-HYDE_MAX_TOKENS: int             = 256
+# One LLM call → multiple HyDE passages (see core.retrieval.hyde).
+HYDE_NUM_DOCS: int               = int(os.getenv("HYDE_NUM_DOCS", "4"))
+HYDE_MAX_TOKENS: int             = int(os.getenv("HYDE_MAX_TOKENS", "512"))
+HYDE_TOKENS_PER_DOC: int         = int(os.getenv("HYDE_TOKENS_PER_DOC", "100"))
 QUERY_EXPAND_TEMPERATURE: float  = 0.5   # deterministic rewrite
 QUERY_EXPAND_MAX_TOKENS: int     = 128
+# Truncated HyDE/expand text in INFO logs (0 = latency/counts only).
+QUERY_EXPANSION_LOG_PREVIEW_CHARS: int = 80
 
 # ── Stage 1 — Intent classifier (HuggingFace DistilBERT, CPU) ────────────
 # 13-class sequence classifier; label names read from model config at runtime.
