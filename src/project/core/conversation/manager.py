@@ -38,6 +38,7 @@ from core.attention_shift import (
     AttentionShiftResult,
     AttentionEstimator,
 )
+from core.logger.payload import build_retrieval_log_data, compact_event_data
 from core.logger import ExperimentLogger
 from core.experiment.tasks import TaskDefinition
 from core.conversation.llm_client import LLMClient
@@ -148,7 +149,6 @@ class ConversationManager:
         self.logger.log(
             "conversation_started",
             {
-                "conversation_id": self.conversation_id,
                 "initial_intent": self.initial_intent,
                 "task_id": self.task.id if self.task else None,
             },
@@ -334,9 +334,14 @@ class ConversationManager:
         current_turn = self.turn_count
         self.logger.log(
             "user_message",
-            {"content": user_input, "turn": current_turn,
-             "msg_len": len(user_input),
-             "time_to_reply_ms": time_to_reply_ms},
+            compact_event_data(
+                {
+                    "content": user_input,
+                    "msg_len": len(user_input),
+                    "time_to_reply_ms": time_to_reply_ms,
+                },
+                turn=current_turn,
+            ),
             self.ad_mode,
             self.conversation_id,
             source="user",
@@ -351,11 +356,7 @@ class ConversationManager:
         self.intent_history.append(turn_intent)
         self.logger.log(
             "intent_classified",
-            {
-                "turn": current_turn,
-                "intent_label": turn_intent,
-                "initial_intent": self.initial_intent,
-            },
+            compact_event_data({"intent_label": turn_intent}, turn=current_turn),
             self.ad_mode,
             self.conversation_id,
             source="system",
@@ -376,22 +377,14 @@ class ConversationManager:
             if ad is not None:
                 self.logger.log(
                     "retrieval",
-                    {
-                        "query": user_input,
-                        "turn": current_turn,
-                        "ad_title": ad.title,
-                        "ad_item_id": ad.source_item_id,
-                        "ad_source": ad.metadata.get("source", "amazon"),
-                        "ad_category": ad.metadata.get("category", ""),
-                        "ad_relevance_score": ad.relevance_score,
-                        "ad_cta": ad.cta,
-                        "candidate_count": len(retrieval.ads),
-                        "candidate_titles": [a.title for a in retrieval.ads],
-                        "retrieval_latency_ms": round(retrieval_latency_ms, 1),
-                        "retrieval_backend": self._ad_backend or "default",
-                        "intent_label": turn_intent,
-                        **(retrieval.diag if retrieval.diag else {}),
-                    },
+                    build_retrieval_log_data(
+                        query=user_input,
+                        turn=current_turn,
+                        retrieval=retrieval,
+                        intent_label=turn_intent,
+                        retrieval_latency_ms=retrieval_latency_ms,
+                        retrieval_backend=self._ad_backend or "default",
+                    ),
                     self.ad_mode,
                     self.conversation_id,
                     source="retrieval",
@@ -416,9 +409,14 @@ class ConversationManager:
         self._last_assistant_ts = time.perf_counter()
         self.logger.log(
             "assistant_reply",
-            {"content": assistant_reply, "turn": current_turn,
-             "msg_len": len(assistant_reply),
-             "llm_latency_ms": round(llm_latency_ms, 1)},
+            compact_event_data(
+                {
+                    "content": assistant_reply,
+                    "msg_len": len(assistant_reply),
+                    "llm_latency_ms": round(llm_latency_ms, 1),
+                },
+                turn=current_turn,
+            ),
             self.ad_mode,
             self.conversation_id,
             source="model",
@@ -432,10 +430,7 @@ class ConversationManager:
         # 8 — post-ad snapshot
         C_post = list(self.messages)
 
-        # 9+10 — PARALLEL: attention shift + intent classification
-        # These are CPU-bound (numpy divergence + BERT forward pass) and
-        # independent of each other. Run in thread pool to avoid blocking
-        # the main thread (Streamlit / UI / future modality streams).
+        # 9 — PARALLEL: attention shift (CPU-bound; non-blocking for Streamlit)
         shift_future: Future = _CPU_POOL.submit(
             compute_attention_shift, C_pre, C_post, self.attention_estimator
         )
@@ -449,11 +444,10 @@ class ConversationManager:
         # Log attention shift (after result is ready)
         self.logger.log(
             "attention_shift",
-            {
-                "divergence": shift.divergence,
-                "method": shift.method,
-                "turn": current_turn,
-            },
+            compact_event_data(
+                {"divergence": shift.divergence, "method": shift.method},
+                turn=current_turn,
+            ),
             self.ad_mode,
             self.conversation_id,
             source="system",
