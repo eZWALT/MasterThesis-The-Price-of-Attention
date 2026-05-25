@@ -37,6 +37,8 @@ services:
     build: .
     ports:
       - "${STREAMLIT_PORT}:${STREAMLIT_PORT}"
+    env_file:
+      - .env
     environment:
       - API_URL=http://vllm:${VLLM_PORT}/v1/chat/completions
       - DEFAULT_MODEL=${VLLM_MODEL}
