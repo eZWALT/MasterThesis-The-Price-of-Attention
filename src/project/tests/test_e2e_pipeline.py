@@ -53,16 +53,22 @@ class TestPipelineE2E:
     ])
     def test_query_returns_real_ad(self, query):
         """Various queries return real ads (not fallback)."""
-        ad = self.retrieve_ad(query, [])
+        result = self.retrieve_ad(query, [])
+        assert result is not None
+        ad = result.primary
+        assert ad is not None
         assert ad.title
         assert ad.text
         assert ad.source_item_id != "fallback"
         assert isinstance(ad.relevance_score, float)
+        assert len(result.ads) >= 1
 
     def test_different_queries_get_different_results(self):
         """Semantically different queries should return different ads."""
-        ad1 = self.retrieve_ad("running shoes for marathon training", [])
-        ad2 = self.retrieve_ad("kitchen blender for smoothies", [])
+        r1 = self.retrieve_ad("running shoes for marathon training", [])
+        r2 = self.retrieve_ad("kitchen blender for smoothies", [])
+        ad1, ad2 = r1.primary, r2.primary
+        assert ad1 and ad2
         assert ad1.source_item_id != ad2.source_item_id or ad1.title != ad2.title
 
     @pytest.mark.parametrize("query", [
@@ -73,14 +79,16 @@ class TestPipelineE2E:
     ], ids=["empty", "whitespace", "single_char", "special_chars"])
     def test_edge_case_queries_do_not_crash(self, query):
         """Degenerate inputs should return something without raising."""
-        ad = self.retrieve_ad(query, [])
-        assert ad.title  # Even fallback has a title
+        result = self.retrieve_ad(query, [])
+        assert result is not None and result.primary is not None
+        assert result.primary.title
 
     def test_long_query_does_not_crash(self):
         """Very long input should be truncated gracefully."""
         long_query = "I want " * 500 + "a nice pair of shoes"
-        ad = self.retrieve_ad(long_query, [])
-        assert ad.title
+        result = self.retrieve_ad(long_query, [])
+        assert result is not None and result.primary is not None
+        assert result.primary.title
 
     @pytest.mark.parametrize("query", [
         "bluetooth speaker",
@@ -105,19 +113,21 @@ class TestPipelineE2E:
     ], ids=["no_context", "single_turn", "multi_turn"])
     def test_context_variations(self, context):
         """Pipeline handles various context lengths."""
-        ad = self.retrieve_ad("something good for commuting", context)
-        assert ad.title
+        result = self.retrieve_ad("something good for commuting", context)
+        assert result is not None and result.primary is not None
+        assert result.primary.title
 
     def test_multiple_sequential_queries_no_state_leak(self):
         """Pipeline handles multiple queries without state leaking."""
         queries = ["gaming mouse", "yoga mat", "sci-fi novel", "espresso machine", "birthday card"]
         results = [self.retrieve_ad(q, []) for q in queries]
 
-        for q, ad in zip(queries, results):
-            assert ad.title, f"Empty title for query: {q}"
+        for q, result in zip(queries, results):
+            ad = result.primary if result else None
+            assert ad and ad.title, f"Empty title for query: {q}"
             assert ad.text, f"Empty text for query: {q}"
 
-        unique_ids = {r.source_item_id for r in results}
+        unique_ids = {r.primary.source_item_id for r in results if r and r.primary}
         assert len(unique_ids) >= 2, "All queries returned the same item"
 
 

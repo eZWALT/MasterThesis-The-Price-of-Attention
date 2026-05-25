@@ -20,11 +20,10 @@ class TestADBackendConfig:
         from core.config import AD_BACKEND
         assert AD_BACKEND in ("mock", "rag")
 
-    def test_ad_backend_default_is_mock(self):
-        """Without env var, defaults to mock."""
-        # AD_BACKEND reads at import time; it should be "mock" in test env
+    def test_ad_backend_default_is_rag(self):
+        """Without env var, defaults to rag (full pipeline)."""
         from core.config import AD_BACKEND
-        assert AD_BACKEND == os.getenv("AD_BACKEND", "mock")
+        assert AD_BACKEND == os.getenv("AD_BACKEND", "rag")
 
     def test_ad_backend_importable_from_provider(self):
         from core.ad_injection.provider import AD_BACKEND

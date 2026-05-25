@@ -11,8 +11,7 @@ from __future__ import annotations
 import json
 import time
 import threading
-from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -180,8 +179,7 @@ class TestMultiSourceCatalog:
         from core.retrieval.adapters.generic import GenericAdapter
 
         adapter = GenericAdapter()
-        with patch("core.retrieval.catalog.CATALOG_DIR", str(catalog_dir)):
-            items, id_map = AdCatalog._load_catalog("ignored", adapter)
+        items, id_map = AdCatalog._load_catalog(catalog_dir, adapter)
 
         assert len(items) == 5
         assert len(id_map) == 5
@@ -198,8 +196,7 @@ class TestMultiSourceCatalog:
             f.write(json.dumps({"item_id": "a1", "title": "DUPE", "text": "dupe"}) + "\n")
 
         adapter = GenericAdapter()
-        with patch("core.retrieval.catalog.CATALOG_DIR", str(catalog_dir)):
-            items, id_map = AdCatalog._load_catalog("ignored", adapter)
+        items, id_map = AdCatalog._load_catalog(catalog_dir, adapter)
 
         # Still 5 (a1 from source_a wins, duplicate from source_b skipped)
         assert len(items) == 5
@@ -211,14 +208,51 @@ class TestMultiSourceCatalog:
         from core.retrieval.adapters.generic import GenericAdapter
 
         adapter = GenericAdapter()
-        with patch("core.retrieval.catalog.CATALOG_DIR", str(catalog_dir)):
-            items, _ = AdCatalog._load_catalog("ignored", adapter)
+        items, _ = AdCatalog._load_catalog(catalog_dir, adapter)
 
         assert items["b1"].metadata == {"source": "synthetic"}
         assert items["a1"].metadata == {}  # no metadata field → empty dict
 
+    def test_promotional_fields_are_available_to_formatter(self, tmp_path):
+        """Top-level cta/question fields are preserved in metadata for AdFormatter."""
+        from core.retrieval.catalog import AdCatalog
+        from core.retrieval.adapters.generic import GenericAdapter
+
+        catalog_file = tmp_path / "ads.jsonl"
+        with open(catalog_file, "w") as f:
+            f.write(json.dumps({
+                "item_id": "p1",
+                "title": "Product",
+                "text": "Description",
+                "cta": "Shop now",
+                "question": "Need this product?",
+            }) + "\n")
+
+        items, _ = AdCatalog._load_catalog(catalog_file, GenericAdapter())
+
+        assert items["p1"].metadata["cta"] == "Shop now"
+        assert items["p1"].metadata["question"] == "Need this product?"
+
+    def test_invalid_price_falls_back_to_zero(self, tmp_path):
+        """Malformed price values do not drop otherwise valid catalog rows."""
+        from core.retrieval.catalog import AdCatalog
+        from core.retrieval.adapters.generic import GenericAdapter
+
+        catalog_file = tmp_path / "ads.jsonl"
+        with open(catalog_file, "w") as f:
+            f.write(json.dumps({
+                "item_id": "p1",
+                "title": "Product",
+                "text": "Description",
+                "price": "not-a-number",
+            }) + "\n")
+
+        items, _ = AdCatalog._load_catalog(catalog_file, GenericAdapter())
+
+        assert items["p1"].price == 0.0
+
     def test_fallback_single_file(self, tmp_path):
-        """Falls back to single-file mode if CATALOG_DIR doesn't exist."""
+        """Loads a single JSONL file when a file path is passed."""
         from core.retrieval.catalog import AdCatalog
         from core.retrieval.adapters.generic import GenericAdapter
 
@@ -227,27 +261,21 @@ class TestMultiSourceCatalog:
             f.write(json.dumps({"item_id": "x1", "title": "X", "text": "x"}) + "\n")
 
         adapter = GenericAdapter()
-        with patch("core.retrieval.catalog.CATALOG_DIR", str(tmp_path / "nonexistent")):
-            items, id_map = AdCatalog._load_catalog(str(single_file), adapter)
+        items, id_map = AdCatalog._load_catalog(single_file, adapter)
 
         assert len(items) == 1
         assert "x1" in items
 
-    def test_empty_dir_falls_back(self, tmp_path):
-        """Empty catalog dir falls back to path parameter."""
+    def test_empty_dir_returns_no_items(self, tmp_path):
+        """Empty catalog directories are explicit and do not silently load another file."""
         from core.retrieval.catalog import AdCatalog
         from core.retrieval.adapters.generic import GenericAdapter
 
         empty_dir = tmp_path / "empty_catalogs"
         empty_dir.mkdir()
 
-        single_file = tmp_path / "fallback.jsonl"
-        with open(single_file, "w") as f:
-            f.write(json.dumps({"item_id": "f1", "title": "Fallback", "text": "fb"}) + "\n")
-
         adapter = GenericAdapter()
-        with patch("core.retrieval.catalog.CATALOG_DIR", str(empty_dir)):
-            items, _ = AdCatalog._load_catalog(str(single_file), adapter)
+        items, id_map = AdCatalog._load_catalog(empty_dir, adapter)
 
-        assert len(items) == 1
-        assert "f1" in items
+        assert items == {}
+        assert id_map == []

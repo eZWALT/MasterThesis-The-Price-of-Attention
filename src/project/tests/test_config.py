@@ -93,3 +93,12 @@ class TestConfigConstants:
     def test_temperature_range(self):
         import core.config as cfg
         assert 0.0 <= cfg.DEFAULT_TEMPERATURE <= 1.0
+
+    def test_retrieval_final_top_n_positive(self):
+        import core.config as cfg
+        assert cfg.RETRIEVAL_FINAL_TOP_N >= 1
+
+    def test_baseline_duration_positive(self):
+        import core.config as cfg
+        assert cfg.BASELINE_DURATION_SECONDS > 0
+        assert "{duration_label}" in cfg.BASELINE_INSTRUCTION

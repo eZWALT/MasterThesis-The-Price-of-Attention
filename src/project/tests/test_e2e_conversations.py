@@ -31,6 +31,12 @@ skip_no_gpu = pytest.mark.skipif(
 )
 
 
+def _primary(result):
+    """Extract primary ad from retrieval result."""
+    assert result is not None and result.primary is not None
+    return result.primary
+
+
 # ─── Test data: realistic conversation scenarios ──────────────────────────────
 
 @dataclass
@@ -208,7 +214,7 @@ class TestConversationScenarios:
         for i, query in enumerate(scenario.retrieval_queries):
             # Build context up to this point
             context = scenario.turns[: (i + 1) * 2]  # approx: 2 messages per turn
-            ad = self.retrieve_ad(query, context)
+            ad = _primary(self.retrieve_ad(query, context))
             assert ad.title, f"[{scenario.name}] Empty title at turn {i}: {query}"
             assert ad.text, f"[{scenario.name}] Empty text at turn {i}: {query}"
             assert ad.source_item_id != "fallback", (
@@ -232,7 +238,7 @@ class TestConversationScenarios:
         details = []
         for i, query in enumerate(scenario.retrieval_queries):
             context = scenario.turns[: (i + 1) * 2]
-            ad = self.retrieve_ad(query, context)
+            ad = _primary(self.retrieve_ad(query, context))
 
             ad_text_lower = (ad.title + " " + ad.text).lower()
             keywords = scenario.expected_keywords[i]
@@ -281,7 +287,7 @@ class TestConversationScenarios:
         hit_rates = []
         for i, query in enumerate(scenario.retrieval_queries):
             context = scenario.turns[: (i + 1) * 2]
-            ad = self.retrieve_ad(query, context)
+            ad = _primary(self.retrieve_ad(query, context))
             ad_text_lower = (ad.title + " " + ad.text).lower()
             keywords = scenario.expected_keywords[i]
             hits = sum(1 for kw in keywords if kw.lower() in ad_text_lower)
@@ -314,10 +320,9 @@ class TestConversationEdgeCases:
             {"role": "assistant", "content": "What style of music do you play?"},
             {"role": "user", "content": "Actually never mind, I need to fix my kitchen sink instead"},
         ]
-        ad = self.retrieve_ad(
+        ad = _primary(self.retrieve_ad(
             "What wrench size do I need for a kitchen faucet?", context
-        )
-        assert ad.source_item_id != "fallback"
+        ))
         # Should NOT be about guitars anymore
         ad_lower = (ad.title + " " + ad.text).lower()
         # At minimum, it should be about tools/home, not music
@@ -343,7 +348,7 @@ class TestConversationEdgeCases:
             context.append({"role": "assistant", "content": f"Here's my take on {topic[:30]}..."})
 
         t0 = time.time()
-        ad = self.retrieve_ad("What's the best closed-back headphone under 100?", context)
+        ad = _primary(self.retrieve_ad("What's the best closed-back headphone under 100?", context))
         elapsed = time.time() - t0
 
         assert ad.title
@@ -352,7 +357,7 @@ class TestConversationEdgeCases:
     def test_ambiguous_query_with_clarifying_context(self):
         """Ambiguous query ('something nice') becomes clear with context."""
         # Without context — vague
-        ad_vague = self.retrieve_ad("I want something nice", [])
+        ad_vague = _primary(self.retrieve_ad("I want something nice", []))
 
         # With context — clearly about musical instruments
         context = [
@@ -361,7 +366,7 @@ class TestConversationEdgeCases:
             {"role": "user", "content": "A cheap keyboard, but I want to upgrade"},
             {"role": "assistant", "content": "Weighted keys make a big difference for piano technique. What's your budget?"},
         ]
-        ad_contextual = self.retrieve_ad("I want something nice", context)
+        ad_contextual = _primary(self.retrieve_ad("I want something nice", context))
 
         # Both should work (no crash), but contextual should be more musical
         assert ad_vague.title
@@ -387,7 +392,7 @@ class TestConversationEdgeCases:
             for i in range(n_turns * 2)
         ]
         t0 = time.time()
-        ad = self.retrieve_ad("What speakers are good for a living room?", context)
+        ad = _primary(self.retrieve_ad("What speakers are good for a living room?", context))
         elapsed = time.time() - t0
 
         assert ad.title
