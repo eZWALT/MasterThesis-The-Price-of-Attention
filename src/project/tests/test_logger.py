@@ -209,15 +209,15 @@ class TestPayloadCompaction:
     def test_compact_event_data_drops_duplicate_turn(self):
         assert compact_event_data({"turn": 3, "x": 1}, turn=3) == {"x": 1}
 
-    def test_compact_retrieval_diag_strips_hyde_documents(self):
+    def test_compact_retrieval_diag_keeps_hyde_documents(self):
         diag = {
             "hyde_doc_count": 2,
-            "hyde_documents": ["long passage"] * 2,
+            "hyde_documents": ["doc one", "doc two"],
             "retrieval_query": "rewritten query text",
             "retrieval_total_ms": 120.0,
         }
         slim = compact_retrieval_diag(diag)
-        assert "hyde_documents" not in slim
+        assert slim["hyde_documents"] == ["doc one", "doc two"]
         assert "retrieval_query" not in slim
         assert slim["hyde_doc_count"] == 2
 
