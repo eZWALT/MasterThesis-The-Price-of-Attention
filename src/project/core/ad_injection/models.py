@@ -22,6 +22,8 @@ class AdRetrievalResult:
     All ads are passed to inline_persuasive so the LLM can pick at most one.
     """
     ads: List[Ad] = field(default_factory=list)
+    # Optional timing / HyDE diagnostics from the retrieval pipeline (for logs & export).
+    diag: Dict[str, Any] = field(default_factory=dict)
 
     @property
     def primary(self) -> Optional[Ad]:

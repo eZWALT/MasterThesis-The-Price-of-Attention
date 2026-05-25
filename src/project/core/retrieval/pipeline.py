@@ -11,7 +11,8 @@ across all ad injection events.
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+import time
+from typing import Any, Dict, List, Optional
 
 from core.retrieval.catalog import AdCatalog
 from core.retrieval.stages.base import PipelineStage
@@ -51,6 +52,28 @@ def build_default_stages(catalog, embedding_model=None) -> list:
         stages.append(Reranker())
     stages.append(AdFormatter())
     return stages
+
+
+def _build_retrieval_diag(state: PipelineState) -> Dict[str, Any]:
+    """Compact diagnostics for experiment logs (no full HyDE text)."""
+    from core.config import QUERY_EXPANSION_MODE
+    from core.retrieval.runtime import get_query_expansion_mode
+
+    qe_mode = get_query_expansion_mode(QUERY_EXPANSION_MODE)
+    hyde_ms = state.stage_ms.get("QueryExpansionStage", 0.0)
+    ctx_ms = state.stage_ms.get("ContextSummaryStage", 0.0)
+    total_ms = sum(state.stage_ms.values())
+    return {
+        "query_expansion_mode": qe_mode,
+        "query_expansion_ms": round(hyde_ms, 1) if hyde_ms else None,
+        "context_summary_ms": round(ctx_ms, 1) if ctx_ms else None,
+        "hyde_used": bool(state.hyde_documents or state.expanded_query),
+        "hyde_doc_count": len(state.hyde_documents),
+        "query_chars": len(state.query),
+        "hyde_chars": len(state.expanded_query) if state.expanded_query else 0,
+        "retrieval_stage_ms": {k: round(v, 1) for k, v in state.stage_ms.items()},
+        "retrieval_total_ms": round(total_ms, 1),
+    }
 
 
 class AdRetrievalPipeline:
@@ -101,22 +124,36 @@ class AdRetrievalPipeline:
             )
         state.query = effective_query
 
+        from core.retrieval.log_util import elapsed_ms, log_run_total, log_stage_latency
+
+        run_t0 = time.perf_counter()
         for stage in self._stages:
+            name = stage.__class__.__name__
+            t0 = time.perf_counter()
             state = stage.run(state)
+            ms = elapsed_ms(t0)
+            state.stage_ms[name] = ms
+            log_stage_latency(name, ms, state, query=query)
             if state.candidates:
                 logger.debug(
                     "After {}: {} candidates",
-                    stage.__class__.__name__,
+                    name,
                     len(state.candidates),
                 )
             if state.ranked:
                 logger.debug(
                     "After {}: {} ranked",
-                    stage.__class__.__name__,
+                    name,
                     len(state.ranked),
                 )
 
+        wall_ms = elapsed_ms(run_t0)
         self.last_state = state
+        log_run_total(wall_ms=wall_ms, query=query)
+
         if not state.top_ads:
             return None
-        return AdRetrievalResult(ads=list(state.top_ads))
+        return AdRetrievalResult(
+            ads=list(state.top_ads),
+            diag=_build_retrieval_diag(state),
+        )
