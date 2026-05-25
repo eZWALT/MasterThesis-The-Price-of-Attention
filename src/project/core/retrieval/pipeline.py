@@ -72,13 +72,16 @@ class AdRetrievalPipeline:
         if stages is not None:
             self._stages = stages
         else:
-            self._stages = [
+            from core.config import USE_RERANKER
+            stages = [
                 IntentClassifier(),
                 DenseRetriever(catalog, embedding_model=embedding_model),
                 HybridRefiner(),
-                Reranker(),
-                AdFormatter(),
             ]
+            if USE_RERANKER:
+                stages.append(Reranker())
+            stages.append(AdFormatter())
+            self._stages = stages
 
     def run(self, query: str, context: List[Dict[str, str]]) -> Ad | None:
         """
