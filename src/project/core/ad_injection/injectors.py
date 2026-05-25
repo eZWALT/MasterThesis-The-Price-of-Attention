@@ -21,10 +21,14 @@ from typing import List, Dict
 from core.config import (
     INLINE_AD_SYSTEM_PROMPT,
     AD_FALLBACK_QUESTION_TEMPLATE,
-    DEFAULT_AD_CTA,
-    SPONSORED_LABEL,
 )
-from core.ad_injection.models import AdRetrievalResult, format_products_block, InjectionResult
+from core.ad_injection.models import (
+    AdRetrievalResult,
+    compact_display_payload,
+    format_products_block,
+    format_sponsored_chat_content,
+    InjectionResult,
+)
 
 
 # ── Base ──────────────────────────────────────────────────────
@@ -95,7 +99,10 @@ class SponsoredConversationalInjector(AdInjector):
         if ad is None:
             return InjectionResult()
         chip_text = ad.question or AD_FALLBACK_QUESTION_TEMPLATE.format(title=ad.title)
-        return InjectionResult(suggestions=[chip_text])
+        return InjectionResult(
+            suggestions=[chip_text],
+            display_payload=compact_display_payload(ad),
+        )
 
 
 class SponsoredRecommendationInjector(AdInjector):
@@ -116,11 +123,10 @@ class SponsoredRecommendationInjector(AdInjector):
         ad = retrieval.primary
         if ad is None:
             return InjectionResult()
-        content = f"**{SPONSORED_LABEL}** — {ad.title}\n\n{ad.text}"
-        if ad.cta:
-            content += f"\n\n*{ad.cta}*"
         return InjectionResult(
-            messages_to_append=[{"role": "assistant", "content": content}]
+            messages_to_append=[
+                {"role": "assistant", "content": format_sponsored_chat_content(ad)},
+            ],
         )
 
 
@@ -143,11 +149,4 @@ class ExplicitAdBlockInjector(AdInjector):
         ad = retrieval.primary
         if ad is None:
             return InjectionResult()
-        return InjectionResult(
-            display_payload={
-                "header": SPONSORED_LABEL,
-                "title": ad.title,
-                "text": ad.text,
-                "cta": ad.cta or DEFAULT_AD_CTA,
-            }
-        )
+        return InjectionResult(display_payload=compact_display_payload(ad))

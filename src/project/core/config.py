@@ -230,8 +230,9 @@ AD_MODE_LABELS: dict[str, str] = {
     "explicit_ad_block":        "Explicit Ad Block (visual panel, OpenAI-style)",
 }
 
-# Modes that render as a side panel / banner beside the chat (not inline).
-AD_SIDE_PANEL_MODES: set[str] = {"explicit_ad_block"}
+# Modes that render as a narrow side column beside chat (none by default).
+# explicit_ad_block uses a full-width banner above the chat input instead.
+AD_SIDE_PANEL_MODES: set[str] = set()
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
