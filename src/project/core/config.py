@@ -288,7 +288,7 @@ INTENT_TOKENIZER_NAME: str   = "bert-base-uncased"  # WordPiece vocab for ThradB
 INTENT_MAX_SEQ_LENGTH: int   = 512                  # truncation limit for input
 
 # ── Stage 2 — Dense retrieval (HuggingFace embedding + FAISS) ────────────
-EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-4B")
+EMBEDDING_MODEL_NAME: str  = os.getenv("EMBEDDING_MODEL_NAME", "Qwen/Qwen3-Embedding-0.6B")
 # Load precision: "bfloat16" (recommended), "float16", or "float32" (2x VRAM).
 EMBEDDING_DTYPE: str       = os.getenv("EMBEDDING_DTYPE", "bfloat16")
 EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or allocate_device(
@@ -304,16 +304,16 @@ FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
 CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/amazon.jsonl")  # legacy fallback
 CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")  # all ad sources live here
 DEFAULT_CATALOG_PRICE: float = 0.0  # fallback price when catalog omits it
-DENSE_TOP_K: int           = 100    # ANN candidates returned to Stage 3 / 4
+DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4
 
 # ── Stage 3 — Hybrid refinement (BM25 + metadata filter + RRF, CPU) ──────
 USE_HYBRID: bool    = True
-BM25_WEIGHT: float  = 0.3   # must sum to 1.0 with DENSE_WEIGHT
-DENSE_WEIGHT: float = 0.7
+BM25_WEIGHT: float  = 0.2   # must sum to 1.0 with DENSE_WEIGHT
+DENSE_WEIGHT: float = 0.8
 RRF_K: int          = 60    # Reciprocal Rank Fusion smoothing constant
 
 # ── Stage 4 — Reranker (HuggingFace cross-encoder) ──────────────────────
-RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-4B")
+RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-0.6B")
 RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "bfloat16")
 RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
     model_name=RERANKER_MODEL_NAME,

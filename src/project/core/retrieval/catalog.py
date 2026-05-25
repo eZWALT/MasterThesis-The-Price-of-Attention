@@ -226,9 +226,39 @@ class AdCatalog:
         total = len(id_map)
         log_interval = batch_size * FAISS_INDEX_LOG_INTERVAL
 
+
+        def build_structured_text(item):
+            # Compose structured text: title + brand + category + key attributes + short description
+            parts = []
+            if getattr(item, 'title', None):
+                parts.append(item.title)
+            # Try to get brand from metadata if present
+            brand = item.metadata.get('brand') if hasattr(item, 'metadata') else None
+            if brand:
+                parts.append(str(brand))
+            if getattr(item, 'category', None):
+                parts.append(item.category)
+            # Key attributes: features, details, etc. from metadata
+            features = item.metadata.get('features') if hasattr(item, 'metadata') else None
+            if features:
+                if isinstance(features, list):
+                    parts.extend([str(f) for f in features[:5]])
+                else:
+                    parts.append(str(features))
+            details = item.metadata.get('details') if hasattr(item, 'metadata') else None
+            if details:
+                if isinstance(details, list):
+                    parts.extend([str(d) for d in details[:3]])
+                else:
+                    parts.append(str(details))
+            # Short description (text field)
+            if getattr(item, 'text', None):
+                parts.append(item.text)
+            return ' '.join([str(p) for p in parts if p]).strip()
+
         for start in range(0, total, batch_size):
             batch_ids = id_map[start : start + batch_size]
-            texts = [items[iid].text for iid in batch_ids]
+            texts = [build_structured_text(items[iid]) for iid in batch_ids]
             vectors = embedding_model.encode(texts)   # (B, D)
 
             if index is None:

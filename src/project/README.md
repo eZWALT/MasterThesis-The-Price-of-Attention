@@ -23,17 +23,6 @@ in LLM-powered recommender systems. Built in collaboration with Telefonica Resea
 The platform provides a ChatGPT-like interface with configurable advertising modes
 to study how different ad placements affect user interaction in conversational AI systems.
 
-**Features:**
-- 4 advertising modes (inline_persuasive, sponsored_conversational,
-  sponsored_recommendation, explicit_ad_block)
-- Task-based experimental trials with turn tracking (min 6, max 10 turns)
-- Attention Shift metric — measures how ads alter conversational semantic trajectory
-- Dual UI mode: participant-facing (minimal) and developer mode (`?dev=true`)
-- Modular 5-stage RAG retrieval pipeline — swappable at every layer
-- Structured logging via **loguru** (level + optional file sink via env vars)
-- Dataset adapters for generic JSONL and Amazon Reviews 2023 catalogs
-- Session logging with JSON export for offline analysis
-
 ## Prerequisites
 
 - **Docker & Docker Compose v2** (`docker compose`, not `docker-compose`)
@@ -46,6 +35,7 @@ to study how different ad placements affect user interaction in conversational A
 ```bash
 cd src/project
 cp .env.example .env      # edit to match your setup
+python scripts/prepare_amazon_catalog.py --build-index          
 ./launch.sh
 ```
 
@@ -98,51 +88,7 @@ Additional catalogs (travel, hobby, etc.) are already provided in
 See [`scripts/README.md`](scripts/README.md) for the full reference (streaming,
 append, HF Hub upload, env var overrides).
 
----
 
-## Environment Variables
-
-### Core / LLM
-
-| Variable | Default | Description |
-|---|---|---|
-| `API_URL` | `http://localhost:9999/v1/chat/completions` | OpenAI-compatible chat endpoint |
-| `DEFAULT_MODEL` | `qwen3.6:35b` | Conversational LLM model id |
-| `STREAMLIT_PORT` | `7777` | Port exposed by Docker / Streamlit |
-| `OLLAMA_PORT` | `9999` | Ollama server port |
-| `OLLAMA_BIN` | *(path)* | Path to the `ollama` binary |
-| `OLLAMA_MODEL` | `qwen3.6:35b` | Model to pull and serve in Ollama |
-| `VLLM_PORT` | `8888` | vLLM server port |
-| `VLLM_MODEL` | `Qwen/Qwen3.5-9B` | Model for vLLM |
-| `VLLM_TENSOR_PARALLEL_SIZE` | `2` | Tensor parallel size (GPUs) |
-
-### RAG / Retrieval pipeline
-
-| Variable | Default | Description |
-|---|---|---|
-| `AD_BACKEND` | `mock` | `mock` — static placeholder ad; `rag` — full retrieval |
-| `INTENT_MODEL_NAME` | `Thrad/thrad-bert-conversation-classifier` | Intent classifier checkpoint (HF) |
-| `INTENT_DEVICE` | `cpu` | Device for the intent model |
-| `EMBEDDING_MODEL_NAME` | `Qwen/Qwen3-Embedding-4B` | Embedding model (BF16, sentence-transformers) |
-| `EMBEDDING_DEVICE` | `cuda:1` | Device for the embedding model (auto-detected) |
-| `RERANKER_MODEL_NAME` | `Qwen/Qwen3-Reranker-4B` | Cross-encoder reranker (BF16, sentence-transformers) |
-| `RERANKER_DEVICE` | `cuda:1` | Device for the reranker (auto-detected) |
-| `CATALOG_DIR` | `data/catalogs/` | Directory with JSONL ad sources (merged at load) |
-| `FAISS_INDEX_PATH` | `data/faiss.index` | Path to the FAISS index (rebuilt if missing) |
-| `CATALOG_ADAPTER` | `generic` | Dataset adapter: `generic` or `amazon` |
-| `FORCE_CPU` | `0` | Force all retrieval models to CPU |
-
-### Logging & Experiment
-
-| Variable | Default | Description |
-|---|---|---|
-| `LOG_LEVEL` | `INFO` | Loguru verbosity: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
-| `LOG_FILE` | *(unset)* | If set, write rotating logs to this path (e.g. `logs/experiment.log`) |
-| `LOG_DIR` | `logs/` | Experiment JSONL output directory |
-| `LOG_FLUSH_EVERY_N` | `25` | Flush after N queued events |
-| `LOG_FLUSH_EVERY_S` | `60.0` | Flush at least every N seconds |
-
----
 
 ## Running with Docker Compose
 
@@ -167,34 +113,6 @@ docker compose -f docker-compose.vllm.yml up --build
 ./launch.sh --vllm --rebuild # force Docker rebuild
 ```
 
----
-
-## Running Locally (no Docker)
-
-```bash
-cd src/project
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-**With full RAG pipeline (GPU required):**
-
-```bash
-cd src/project
-PYTHONPATH=$(pwd) \
-  AD_BACKEND=rag \
-  CATALOG_ADAPTER=generic \
-  EMBEDDING_DEVICE=cuda:1 \
-  RERANKER_DEVICE=cuda:1 \
-  LOG_LEVEL=DEBUG \
-  streamlit run app.py
-```
-
-**With Amazon adapter:**
-
-```bash
-CATALOG_ADAPTER=amazon streamlit run app.py
-```
 
 **Headless pipeline test (no UI):**
 
@@ -235,12 +153,6 @@ query ──▶ 1. IntentClassifier ──▶ 2. DenseRetriever ──▶ 3. Hyb
 | 4 | `Reranker` | `Qwen/Qwen3-Reranker-4B` (BF16) | GPU 1 |
 | 5 | `AdFormatter` | Pure transform — no inference | — |
 
-### Smart Device Allocation
-
-Models are placed automatically by `core/device.py`:
-- Probes VRAM on all GPUs, excludes LLM GPU(s)
-- Falls back to CPU if no GPU has enough free memory
-- Override with env vars: `EMBEDDING_DEVICE`, `RERANKER_DEVICE`, `FORCE_CPU=1`
 
 ### Multi-Source Ad Catalogs
 
