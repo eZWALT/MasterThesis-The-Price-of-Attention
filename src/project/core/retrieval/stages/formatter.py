@@ -38,6 +38,9 @@ class AdFormatter(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
+        import time
+        from core.log import logger
+        t0 = time.time()
         if not state.ranked:
             state.top_ad = None
             return state
@@ -54,4 +57,6 @@ class AdFormatter(PipelineStage):
             relevance_score=best.score,
             metadata=best.item.metadata,
         )
+        elapsed = (time.time() - t0) * 1000
+        logger.info(f"[LATENCY] AdFormatter: {elapsed:.1f} ms")
         return state

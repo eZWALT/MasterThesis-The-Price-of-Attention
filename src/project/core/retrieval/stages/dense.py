@@ -57,9 +57,13 @@ class DenseRetriever(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
-        # Prefer the expanded / HyDE query when available; fall back to raw query.
+        import time
+        from core.log import logger
+        t0 = time.time()
         embed_text = state.expanded_query or state.query
         query_vec: np.ndarray = self._embed.encode([embed_text])    # (1, D)
         item_ids = self._catalog.search(query_vec, top_k=self._top_k)
         state.candidates = [self._catalog.get(item_id) for item_id in item_ids]
+        elapsed = (time.time() - t0) * 1000
+        logger.info(f"[LATENCY] DenseRetriever: {elapsed:.1f} ms")
         return state

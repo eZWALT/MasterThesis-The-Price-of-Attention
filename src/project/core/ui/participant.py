@@ -94,13 +94,19 @@ def init_session_state(params):
 
     # Dev ad-control overrides (survive reruns; initialised from URL params)
     if "dev_force_ad" not in st.session_state:
-        st.session_state.dev_force_ad = getattr(params, "force_ad", False)
+        # Always default to True in dev/flow mode unless explicitly set to False
+        force_ad = getattr(params, "force_ad", None)
+        if force_ad is False:
+            st.session_state.dev_force_ad = False
+        else:
+            st.session_state.dev_force_ad = True
     if "dev_rag_mode" not in st.session_state:
-        # use_rag: True→"rag"  False→"mock"  None→"default"
+        # Always default to 'rag' in dev/flow mode unless explicitly set to 'mock' in URL
         use_rag = getattr(params, "use_rag", None)
-        st.session_state.dev_rag_mode = (
-            "rag" if use_rag is True else "mock" if use_rag is False else "default"
-        )
+        if use_rag is False:
+            st.session_state.dev_rag_mode = "mock"
+        else:
+            st.session_state.dev_rag_mode = "rag"
 
 
 # ═══════════════════════════════════════════════════════════════

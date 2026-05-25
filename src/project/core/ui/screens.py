@@ -200,7 +200,7 @@ def render_demographics() -> Optional[dict]:
     st.header("About You")
     st.caption("All fields are optional.")
 
-    age = st.number_input("Age", min_value=0, max_value=120, value=0, step=1)
+    age = st.number_input("Age", min_value=0, max_value=120, value=25, step=1)
     gender = st.selectbox("Gender", ["Prefer not to say", "Female", "Male", "Non-binary", "Other"])
     ai_experience = st.slider(
         "How experienced are you with AI assistants? (1 = never used, 5 = daily user)",
