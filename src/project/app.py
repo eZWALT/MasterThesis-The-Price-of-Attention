@@ -48,9 +48,14 @@ def _warmup_retrieval() -> None:
 
 
 def main():
+    params = parse_query_params()
+
+    from core.retrieval.runtime import configure_from_experiment_params
+
+    configure_from_experiment_params(params)
+
     _warmup_llm()
     _warmup_retrieval()
-    params = parse_query_params()
 
     st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout="wide")
     init_session_state(params)
