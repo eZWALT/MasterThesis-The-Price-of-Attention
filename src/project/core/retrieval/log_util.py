@@ -139,6 +139,19 @@ def reset_config_log_for_tests() -> None:
     _config_logged = None
 
 
+def log_hyde_documents(state: PipelineState, *, query: str) -> None:
+    """Full HyDE passages at DEBUG (visible with LOG_LEVEL=DEBUG)."""
+    if is_warmup_query(query) or not state.hyde_documents:
+        return
+    logger.debug(
+        "retrieval | hyde documents ({}): query={!r}",
+        len(state.hyde_documents),
+        state.query[:120],
+    )
+    for i, doc in enumerate(state.hyde_documents, 1):
+        logger.debug("retrieval | hyde doc {} ({} ch): {}", i, len(doc), doc)
+
+
 def log_run_total(*, wall_ms: float, query: str) -> None:
     if is_warmup_query(query):
         logger.debug("retrieval | warmup {:.1f} ms", wall_ms)
