@@ -301,6 +301,7 @@ EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or allocate_device(
 EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
+DENSE_TOP_K: int           = 20    # ANN candidates returned to Stage 3 / 4 (was 50)
 FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
 CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/catalog.jsonl")  # default to merged catalog
 CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")  # all ad sources live here
@@ -322,10 +323,10 @@ RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
     role="reranker",
     exclude_gpus=LLM_GPU_INDICES,
 )
-RERANKER_TOP_K: int      = 10   # candidates forwarded to reranker (golden: 20)
+RERANKER_TOP_K: int      = 5   # candidates forwarded to reranker (was 10)
 
 # ── Stage 5 — Formatter ───────────────────────────────────────────────────
-RETRIEVAL_FINAL_TOP_N: int = 3  # how many ads the injector receives (golden: 5)
+RETRIEVAL_FINAL_TOP_N: int = 3  # how many ads the injector receives (unchanged)
 AD_CTA_OPTIONS: list       = ["Discover More", "Shop Now", "Learn More", "See Details", "Check It Out"]
 DEFAULT_AD_CTA: str       = AD_CTA_OPTIONS[0]  # default CTA applied during catalog prep
 # Auto-generated follow-up question chip; {title} filled at ingest time.

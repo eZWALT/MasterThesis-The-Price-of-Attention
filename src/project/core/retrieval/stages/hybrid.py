@@ -97,10 +97,15 @@ class HybridRefiner(PipelineStage):
     # ── PipelineStage interface ──────────────────────────────────────────
 
     def run(self, state: PipelineState) -> PipelineState:
+        import time
+        from core.log import logger
+        t0 = time.time()
         if not self._enabled or not state.candidates:
             return state
 
         state.candidates = self._apply_metadata_filters(state.candidates)
         if state.candidates:
             state.candidates = self._bm25_rescore(state.query, state.candidates)
+        elapsed = (time.time() - t0) * 1000
+        logger.info(f"[LATENCY] HybridRefiner: {elapsed:.1f} ms")
         return state
