@@ -173,16 +173,20 @@ def _render_sponsored_suggestion(
     """Render a single sponsored follow-up chip (never multiple)."""
     if st.button(suggestion, key=f"{key_prefix}_{manager.turn_count}"):
         ad = manager.last_retrieval.primary if manager.last_retrieval else None
+        from core.logger.payload import compact_event_data
+
         manager.logger.log(
             "ad_clicked",
-            {
-                "turn": manager.turn_count,
-                "ad_mode": ad_mode,
-                "suggestion": suggestion,
-                "ad_title": ad.title if ad else None,
-            },
+            compact_event_data(
+                {
+                    "suggestion": suggestion,
+                    "ad_title": ad.title if ad else None,
+                },
+                turn=manager.turn_count,
+            ),
             ad_mode,
             manager.conversation_id,
+            turn=manager.turn_count,
         )
         _call_llm_with_spinner(manager, suggestion)
         st.rerun()

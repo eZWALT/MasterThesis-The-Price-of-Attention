@@ -61,7 +61,7 @@ def _hyde_doc_token_counts(docs: list) -> list[int]:
 
 
 def _build_retrieval_diag(state: PipelineState) -> Dict[str, Any]:
-    """Compact diagnostics for experiment logs (no full HyDE text)."""
+    """Diagnostics for UI/debug and AdRetrievalResult.diag (includes full HyDE text)."""
     from core.config import QUERY_EXPANSION_MODE
     from core.retrieval.hyde import hyde_generation_max_tokens
     from core.retrieval.runtime import get_query_expansion_mode

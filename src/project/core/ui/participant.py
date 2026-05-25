@@ -166,6 +166,7 @@ def _get_or_create_trial_manager(
             ad_mode = mode_override
 
     if mgr is None or mgr.task.id != task.id:
+        st.session_state.logger.set_trial_index(ctrl.current_trial_index)
         mgr = ConversationManager(
             ad_mode=ad_mode,
             model=ctrl.model or DEFAULT_MODEL,
@@ -193,8 +194,27 @@ def _get_or_create_trial_manager(
 # DATA EXPORT
 # ═══════════════════════════════════════════════════════════════
 
+def _trial_summary_for_log(trial_result: dict) -> dict:
+    """Metadata only — per-turn detail lives in JSONL events."""
+    return {
+        k: trial_result[k]
+        for k in (
+            "trial",
+            "task_id",
+            "ad_mode",
+            "conversation_id",
+            "initial_intent",
+            "turns",
+            "ad_turns_actual",
+            "trial_start_ts",
+            "trial_end_ts",
+        )
+        if k in trial_result
+    }
+
+
 def export_session_data(ctrl: ExperimentController):
-    """Persist all collected data via the experiment logger."""
+    """Persist session-level aggregates; turn-level data is already in JSONL."""
     logger: ExperimentLogger = st.session_state.logger
     logger.log(
         "session_complete",
@@ -203,10 +223,7 @@ def export_session_data(ctrl: ExperimentController):
             "demographics": ctrl.demographics,
             "ocean_raw": ctrl.ocean_raw,
             "ocean_scores": ctrl.ocean_scores,
-            "trial_results": [
-                {k: v for k, v in tr.items() if k != "messages"}
-                for tr in ctrl.trial_results
-            ],
+            "trial_summaries": [_trial_summary_for_log(tr) for tr in ctrl.trial_results],
             "post_trial_surveys": ctrl.post_trial_surveys,
             "final_survey": ctrl.final_survey,
         },
@@ -461,7 +478,10 @@ def run_participant_mode(params):
             )
             if render_trial_chat(mgr, mgr.ad_mode, flow_test=params.flow_test):
                 from dataclasses import asdict
-                ctrl.trial_results.append({
+                from datetime import datetime
+
+                trial_end_ts = datetime.now().isoformat()
+                trial_record = {
                     "trial": ctrl.trial_number,
                     "task_id": task.id,
                     "ad_mode": ad_mode,
@@ -471,10 +491,19 @@ def run_participant_mode(params):
                     "turns": mgr.turn_count,
                     "ad_turns_actual": list(mgr.ad_turns_actual),
                     "trial_start_ts": mgr.trial_start_ts,
-                    "trial_end_ts": __import__("datetime").datetime.now().isoformat(),
+                    "trial_end_ts": trial_end_ts,
                     "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
                     "messages": list(mgr.messages),
-                })
+                }
+                ctrl.trial_results.append(trial_record)
+                st.session_state.logger.log(
+                    "trial_complete",
+                    _trial_summary_for_log(trial_record),
+                    ad_mode=ad_mode,
+                    conversation_id=mgr.conversation_id,
+                    source="system",
+                    turn=mgr.turn_count,
+                )
                 log.info(
                     "Trial {}/{} complete | pid={} | turns={} | ads_injected={}",
                     ctrl.trial_number, ctrl.n_trials,

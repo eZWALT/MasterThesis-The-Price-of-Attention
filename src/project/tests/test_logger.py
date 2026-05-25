@@ -14,6 +14,7 @@ import pytest
 
 from core.logger import ExperimentLogger, make_experiment_id, make_run_id
 from core.logger.identity import make_experiment_id as _make_exp_id
+from core.logger.payload import compact_event_data, compact_retrieval_diag
 
 
 @pytest.fixture
@@ -201,6 +202,24 @@ class TestExport:
 
 
 # ── Non-blocking performance ──────────────────────────────────────────────
+
+
+@pytest.mark.unit
+class TestPayloadCompaction:
+    def test_compact_event_data_drops_duplicate_turn(self):
+        assert compact_event_data({"turn": 3, "x": 1}, turn=3) == {"x": 1}
+
+    def test_compact_retrieval_diag_strips_hyde_documents(self):
+        diag = {
+            "hyde_doc_count": 2,
+            "hyde_documents": ["long passage"] * 2,
+            "retrieval_query": "rewritten query text",
+            "retrieval_total_ms": 120.0,
+        }
+        slim = compact_retrieval_diag(diag)
+        assert "hyde_documents" not in slim
+        assert "retrieval_query" not in slim
+        assert slim["hyde_doc_count"] == 2
 
 
 @pytest.mark.unit
