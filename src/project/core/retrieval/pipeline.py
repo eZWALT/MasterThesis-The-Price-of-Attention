@@ -7,16 +7,6 @@ Composes the 5 stages in sequence.  This file reads like pseudocode:
 Callers never instantiate stages directly; they use the pipeline.
 The pipeline is built once (at module load or on first call) and reused
 across all ad injection events.
-
-Extensibility
--------------
-Pass a custom ``stages`` list to swap / add / remove any stage without
-touching this file::
-
-    pipeline = AdRetrievalPipeline(
-        catalog=catalog,
-        stages=[IntentClassifier(), DenseRetriever(catalog, embed), AdFormatter()],
-    )
 """
 
 from __future__ import annotations
@@ -34,9 +24,38 @@ from core.retrieval.stages.formatter import AdFormatter
 from core.ad_injection.models import AdRetrievalResult
 
 
+def build_default_stages(catalog, embedding_model=None) -> list:
+    """Compose pipeline stages from config + per-session runtime overrides."""
+    from core.config import QUERY_EXPANSION_MODE, USE_CONTEXT_SUMMARY, USE_RERANKER
+    from core.retrieval.runtime import get_query_expansion_mode, get_use_context_summary
+    from core.retrieval.stages.query_preprocessor import (
+        ContextSummaryStage,
+        QueryExpansionStage,
+    )
+
+    stages: list = []
+
+    if get_use_context_summary(USE_CONTEXT_SUMMARY):
+        stages.append(ContextSummaryStage())
+
+    qe_mode = get_query_expansion_mode(QUERY_EXPANSION_MODE)
+    if qe_mode != "none":
+        stages.append(QueryExpansionStage(mode=qe_mode))
+
+    stages.extend([
+        IntentClassifier(),
+        DenseRetriever(catalog, embedding_model=embedding_model),
+        HybridRefiner(),
+    ])
+    if USE_RERANKER:
+        stages.append(Reranker())
+    stages.append(AdFormatter())
+    return stages
+
+
 class AdRetrievalPipeline:
     """
-    5-stage ad retrieval pipeline.
+    Ad retrieval pipeline.
 
     Stages (default)
     ----------------
@@ -48,19 +67,6 @@ class AdRetrievalPipeline:
     4.  Reranker             — cross-encoder precision pass (GPU 1)
     5.  AdFormatter          — top-N candidates → Ad dataclasses
     6.  SummarizationStage   — optional; rewrite ad text → concise sentence
-
-    All configuration is read from core.config unless overridden via
-    constructor arguments.
-
-    Parameters
-    ----------
-    catalog         : pre-built AdCatalog (shared across requests).
-    embedding_model : optional pre-built EmbeddingModel passed through
-                      to DenseRetriever so the model is not loaded twice
-                      (the same instance is used for catalog indexing).
-    stages          : optional list of PipelineStage instances that
-                      replaces the default 5-stage sequence.  Useful for
-                      testing, ablations, or adding custom stages.
     """
 
     def __init__(
@@ -72,16 +78,7 @@ class AdRetrievalPipeline:
         if stages is not None:
             self._stages = stages
         else:
-            from core.config import USE_RERANKER
-            stages = [
-                IntentClassifier(),
-                DenseRetriever(catalog, embedding_model=embedding_model),
-                HybridRefiner(),
-            ]
-            if USE_RERANKER:
-                stages.append(Reranker())
-            stages.append(AdFormatter())
-            self._stages = stages
+            self._stages = build_default_stages(catalog, embedding_model)
         self.last_state: Optional[PipelineState] = None
 
     def run(self, query: str, context: List[Dict[str, str]]) -> AdRetrievalResult | None:
@@ -92,7 +89,17 @@ class AdRetrievalPipeline:
         (caller should fall back to mock ad).
         """
         from core.log import logger
+        from core.retrieval.query_text import build_retrieval_query
+
         state = PipelineState(query=query, context=context)
+        effective_query = build_retrieval_query(query, context)
+        if effective_query != query:
+            logger.debug(
+                "Retrieval query expanded from {} chars → {} chars (context-aware)",
+                len(query),
+                len(effective_query),
+            )
+        state.query = effective_query
 
         for stage in self._stages:
             state = stage.run(state)
