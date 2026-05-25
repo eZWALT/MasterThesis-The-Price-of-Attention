@@ -88,7 +88,11 @@ from core.config import (
     QUERY_EXPAND_TEMPERATURE,
     USE_CONTEXT_SUMMARY,
 )
-from core.retrieval.hyde import effective_hyde_num_docs, parse_hyde_documents
+from core.retrieval.hyde import (
+    effective_hyde_num_docs,
+    hyde_generation_max_tokens,
+    parse_hyde_documents,
+)
 from core.log import logger
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.preprocess_llm import preprocess_llm_chat
@@ -238,13 +242,20 @@ class QueryExpansionStage(PipelineStage):
         if self._mode == "none":
             return state
 
+        from core.retrieval.log_util import is_warmup_query
+
+        if is_warmup_query(state.query):
+            return state
+
         context_block = _context_block_for_hyde(state)
 
         if self._mode == "hyde":
             num_docs = effective_hyde_num_docs()
+            llm_max = hyde_generation_max_tokens()
             prompt = HYDE_PROMPT.format(
                 num_docs=num_docs,
                 tokens_per_doc=HYDE_TOKENS_PER_DOC,
+                llm_max_tokens=llm_max,
                 query=state.query,
                 context_block=context_block,
             )
@@ -255,7 +266,10 @@ class QueryExpansionStage(PipelineStage):
             )
 
         temperature = HYDE_TEMPERATURE if self._mode == "hyde" else QUERY_EXPAND_TEMPERATURE
-        max_tokens = HYDE_MAX_TOKENS if self._mode == "hyde" else QUERY_EXPAND_MAX_TOKENS
+        if self._mode == "hyde":
+            max_tokens = hyde_generation_max_tokens()
+        else:
+            max_tokens = QUERY_EXPAND_MAX_TOKENS
 
         try:
             expanded = preprocess_llm_chat(

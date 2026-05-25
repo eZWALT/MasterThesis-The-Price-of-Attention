@@ -96,14 +96,15 @@ CONTEXT_SUMMARY_PROMPT: str = (
 #         Placeholders: {query}, {context_summary}
 #         Enabled via: QUERY_EXPANSION_MODE="hyde" / ?qe=hyde
 HYDE_PROMPT: str = (
-    "You write hypothetical product listings for a semantic search index to try to fit the user needs"
-    "Real catalog items look like short Amazon titles plus plain descriptions "
-    "(materials, use case, who it is for). Your text will be embedded and "
-    "matched against that index — write like a catalog entry, not an ad.\n\n"
-    "Produce exactly {num_docs} listings (~{tokens_per_doc} tokens each). "
-    "Each listing must be a DIFFERENT plausible product angle for the same "
-    "Use concrete nouns; avoid fluff, brands, prices, and CTAs.\n"
-    "Stay on topic from the query and conversation; do not drift to unrelated products.\n\n"
+    "You write hypothetical product listings for semantic search. "
+    "Catalog items are short titles plus plain descriptions (materials, use case). "
+    "Your text is embedded and matched against that index — write like a catalog entry, not an ad.\n\n"
+    "Produce exactly {num_docs} listings. Keep each listing SHORT (well under "
+    "{tokens_per_doc} tokens). The model output is hard-capped at {llm_max_tokens} "
+    "tokens total — leave room for all listings and --- separators.\n"
+    "Each listing must be a DIFFERENT plausible product angle for the same need. "
+    "Use concrete nouns; avoid fluff, brands, prices, and CTAs. "
+    "Stay on topic from the query and conversation.\n\n"
     "Separate listings with a line containing only: ---\n\n"
     "User need: {query}\n"
     "Conversation:\n{context_block}\n\n"
@@ -289,6 +290,7 @@ HYDE_TEMPERATURE: float          = 0.5   # slight creativity for hypothetical do
 # One LLM call → multiple HyDE passages (see core.retrieval.hyde).
 HYDE_NUM_DOCS: int               = int(os.getenv("HYDE_NUM_DOCS", "4"))
 HYDE_MAX_TOKENS: int             = int(os.getenv("HYDE_MAX_TOKENS", "512"))
+# Per-doc target; LLM num_predict = min(HYDE_MAX_TOKENS, HYDE_NUM_DOCS * HYDE_TOKENS_PER_DOC).
 HYDE_TOKENS_PER_DOC: int         = int(os.getenv("HYDE_TOKENS_PER_DOC", "100"))
 QUERY_EXPAND_TEMPERATURE: float  = 0.5   # deterministic rewrite
 QUERY_EXPAND_MAX_TOKENS: int     = 128

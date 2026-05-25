@@ -10,9 +10,16 @@ never averaged.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from typing import List
 
-from core.config import HYDE_MAX_TOKENS, HYDE_NUM_DOCS, HYDE_TOKENS_PER_DOC, RRF_K
+from core.config import (
+    EMBEDDING_MODEL_NAME,
+    HYDE_MAX_TOKENS,
+    HYDE_NUM_DOCS,
+    HYDE_TOKENS_PER_DOC,
+    RRF_K,
+)
 
 
 _SEPARATOR_RE = re.compile(r"\n\s*---\s*\n", re.MULTILINE)
@@ -23,6 +30,31 @@ def effective_hyde_num_docs() -> int:
     per_doc = max(1, HYDE_TOKENS_PER_DOC)
     cap = max(1, HYDE_MAX_TOKENS // per_doc)
     return max(1, min(HYDE_NUM_DOCS, cap))
+
+
+def hyde_generation_max_tokens() -> int:
+    """
+    Exact Ollama/OpenAI ``num_predict`` / ``max_tokens`` for the single HyDE call.
+
+    Hard ceiling on total generated tokens (all listings in one response).
+    """
+    n = effective_hyde_num_docs()
+    return min(HYDE_MAX_TOKENS, max(1, n * HYDE_TOKENS_PER_DOC))
+
+
+@lru_cache(maxsize=1)
+def _embedding_tokenizer():
+    """Same vocabulary as the retrieval embedder — for exact token counts in debug."""
+    from transformers import AutoTokenizer
+
+    return AutoTokenizer.from_pretrained(EMBEDDING_MODEL_NAME)
+
+
+def count_embedding_tokens(text: str) -> int:
+    """Exact token count (display/diag only — generation limit is ``hyde_generation_max_tokens``)."""
+    if not (text or "").strip():
+        return 0
+    return len(_embedding_tokenizer().encode(text, add_special_tokens=False))
 
 
 def parse_hyde_documents(text: str, *, max_docs: int | None = None) -> List[str]:
