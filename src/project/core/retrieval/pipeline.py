@@ -17,7 +17,6 @@ from typing import Any, Dict, List, Optional
 from core.retrieval.catalog import AdCatalog
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState
-from core.retrieval.stages.intent import IntentClassifier
 from core.retrieval.stages.dense import DenseRetriever
 from core.retrieval.stages.hybrid import HybridRefiner
 from core.retrieval.stages.reranker import Reranker
@@ -44,7 +43,6 @@ def build_default_stages(catalog, embedding_model=None) -> list:
         stages.append(QueryExpansionStage(mode=qe_mode))
 
     stages.extend([
-        IntentClassifier(),
         DenseRetriever(catalog, embedding_model=embedding_model),
         HybridRefiner(),
     ])
@@ -97,11 +95,10 @@ class AdRetrievalPipeline:
     ----------------
     0a. ContextSummaryStage  — optional; compress history → context_summary
     0b. QueryExpansionStage  — optional; HyDE / expand query → expanded_query
-    1.  IntentClassifier     — infers conversational intent (CPU, BERT)
-    2.  DenseRetriever       — ANN search over FAISS index (GPU 1)
-    3.  HybridRefiner        — BM25 + metadata filter + RRF (CPU, optional)
-    4.  Reranker             — cross-encoder precision pass (GPU 1)
-    5.  AdFormatter          — top-N candidates → Ad dataclasses
+    1.  DenseRetriever       — ANN search over FAISS index (GPU 1)
+    2.  HybridRefiner        — BM25 + metadata filter + RRF (CPU, optional)
+    3.  Reranker             — cross-encoder precision pass (GPU 1)
+    4.  AdFormatter          — top-N candidates → Ad dataclasses
     6.  SummarizationStage   — optional; rewrite ad text → concise sentence
     """
 

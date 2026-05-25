@@ -96,7 +96,6 @@ class TestProcessUserMessage:
 
         assert len(mgr.last_injection.suggestions) == 1
         assert mgr.last_injection.display_payload is not None
-        assert not mgr.last_injection.messages_to_append
 
     @patch("core.conversation.manager.compute_attention_shift")
     @patch("core.conversation.manager.get_ad")

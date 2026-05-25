@@ -11,7 +11,6 @@ from core.ad_injection.models import (
     AdRetrievalResult,
     compact_display_payload,
     format_products_block,
-    format_sponsored_chat_content,
     participant_display_title,
     sponsored_message_to_payload,
 )
@@ -184,13 +183,6 @@ class TestCompactAdDisplayHelpers:
         assert payload["title"] == "X"
         assert payload["cta"] == "Go"
         assert "text" not in payload
-
-    def test_format_sponsored_chat_content_omits_body(self):
-        ad = Ad(title="Y", text="noisy body", cta="Click")
-        content = format_sponsored_chat_content(ad)
-        assert "Y" in content
-        assert "Click" in content
-        assert "noisy" not in content
 
     def test_participant_display_title_truncates(self):
         long_title = "A" * 200

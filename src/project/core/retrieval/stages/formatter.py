@@ -1,7 +1,7 @@
 """
 Stage 5 — Ad Formatter.
 
-Reads  : state.ranked, state.intent
+Reads  : state.ranked
 Writes : state.top_ads, state.top_ad  (Ad dataclasses)
 
 This is the only stage that knows about the Ad model.

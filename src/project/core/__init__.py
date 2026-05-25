@@ -7,7 +7,6 @@ Subpackages mirror the five system components from the paper (§6):
   conversation/       → 1. Conversation Engine (UI + LLM)
   ad_injection/       → 2. Advertisement Injection Engine
   experiment/         → 3. Experiment Controller
-  participant/        → 4. Participant State Manager
   logger/             → 5. Multimodal Logging System
   attention_shift/    → Cross-cutting metric module (Δ_attn)
 """
@@ -43,10 +42,7 @@ from core.ad_injection import Ad, InjectionResult, get_ad, get_injector
 # ── 3. Experiment Controller ──────────────────────────────────
 from core.experiment import TaskDefinition, TASK_CATALOG, TASK_BY_ID, ExperimentController
 
-# ── 4. Participant State Manager ──────────────────────────────
-from core.participant import ParticipantState
-
-# ── 5. Multimodal Logging System ──────────────────────────────
+# ── 4. Multimodal Logging System ──────────────────────────────
 from core.logger import ExperimentLogger, LogEntry
 
 # ── Attention Shift (metric) ──────────────────────────────────

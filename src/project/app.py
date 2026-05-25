@@ -10,7 +10,7 @@ Quick reference:
   ?dev=flow                                  participant flow + skip buttons
   ?dev=flow&skip=consent,baseline            skip boring screens in testing
   ?n=1&modes=5_implicit&skip=consent,baseline,demographics,ocean  single-trial debug
-  ?pid=p01&tasks=trans_plan_trip&modes=2_in_chat&store=file       specific assignment
+  ?pid=p01&tasks=trans_plan_trip&modes=2_in_chat                  specific assignment
 """
 
 import streamlit as st
