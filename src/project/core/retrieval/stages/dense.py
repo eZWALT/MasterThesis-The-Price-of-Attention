@@ -66,6 +66,7 @@ class DenseRetriever(PipelineStage):
         else:
             embed_texts = [state.query]
 
+        # Multi-HyDE: one FAISS search per doc, fuse with RRF (not vector averaging).
         if len(embed_texts) == 1:
             query_vec: np.ndarray = self._embed.encode(embed_texts)
             item_ids = self._catalog.search(query_vec, top_k=self._top_k)

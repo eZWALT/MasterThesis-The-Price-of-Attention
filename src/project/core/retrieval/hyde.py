@@ -1,5 +1,10 @@
 """
 HyDE helpers — parse multi-document LLM output and fuse dense search lists.
+
+Fusion (not averaging): each hypothetical doc is embedded separately, FAISS
+returns top-k per doc, then reciprocal rank fusion (RRF) merges the lists.
+Items that rank well under multiple HyDE angles score higher; vectors are
+never averaged.
 """
 
 from __future__ import annotations
@@ -21,14 +26,9 @@ def effective_hyde_num_docs() -> int:
 
 
 def parse_hyde_documents(text: str, *, max_docs: int | None = None) -> List[str]:
+    """Split one LLM response into up to ``max_docs`` passages (--- separated)."""
     if max_docs is None:
         max_docs = effective_hyde_num_docs()
-    """
-    Split one LLM response into up to ``max_docs`` hypothetical product passages.
-
-    Expected format (prompt-enforced): passages separated by a line containing only ---.
-    Falls back to a single passage if the model did not use separators.
-    """
     raw = (text or "").strip()
     if not raw:
         return []
