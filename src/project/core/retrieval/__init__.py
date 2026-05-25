@@ -39,10 +39,25 @@ def retrieve_ad(query: str, context: List[Dict[str, str]]) -> Ad:
     if _pipeline is None:
         _pipeline = _build_pipeline()
 
+
     result: Optional[Ad] = _pipeline.run(query, context)
 
     if result is None:
-        return _fallback_ad()
+        from core.log import logger
+        logger.warning(f"[DEBUG] No ad retrieved for query: {query}")
+        return None
+
+    # Log candidate titles if possible (after result assignment)
+    try:
+        state = getattr(_pipeline, 'last_state', None)
+        if state and hasattr(state, 'candidates'):
+            from core.log import logger
+            titles = [getattr(c, 'title', None) for c in state.candidates]
+            logger.info(f"[DEBUG] Retrieved candidate titles: {titles}")
+    except Exception as e:
+        from core.log import logger
+        logger.warning(f"[DEBUG] Could not log candidate titles: {e}")
+
     return result
 
 

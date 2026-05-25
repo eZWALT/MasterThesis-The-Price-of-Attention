@@ -41,13 +41,22 @@ class AdFormatter(PipelineStage):
         import time
         from core.log import logger
         t0 = time.time()
-        if not state.ranked:
+        from core.ad_injection.models import Ad
+        # Prefer ranked, fallback to candidates, else None
+        best = None
+        if state.ranked and len(state.ranked) > 0:
+            best = state.ranked[0]
+            logger.debug(f"AdFormatter: Using top ranked candidate: {best.item.title}")
+        elif state.candidates and len(state.candidates) > 0:
+            # Fallback: wrap candidate as RankedCandidate with score 0.0
+            from core.retrieval.stages.state import RankedCandidate
+            best = RankedCandidate(item=state.candidates[0], score=0.0)
+            logger.debug(f"AdFormatter: Using fallback candidate: {best.item.title}")
+        else:
+            logger.warning("AdFormatter: No candidates or ranked ads available.")
             state.top_ad = None
             return state
 
-        best = state.ranked[0]  # highest reranking score
-
-        from core.ad_injection.models import Ad
         state.top_ad = Ad(
             title=best.item.title,
             text=best.item.text,
