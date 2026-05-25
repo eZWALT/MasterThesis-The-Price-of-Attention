@@ -50,7 +50,7 @@ class LogEntry:
 
     # Event
     timestamp: str           # ISO-8601 UTC
-    event: str               # user_message | assistant_reply | retrieval | ad_injected | ...
+    event: str               # user_message | assistant_reply | intent_classified | retrieval | ...
     source: str              # "user" | "model" | "system" | "retrieval"
     step_index: int          # global monotonic counter within this run
 

@@ -65,15 +65,6 @@ def format_products_block(ads: List["Ad"]) -> str:
     return "\n\n".join(blocks)
 
 
-def format_sponsored_chat_content(ad: "Ad", label: str | None = None) -> str:
-    """In-chat sponsored line: title and CTA only (never ad.text)."""
-    headline = f"**{label or SPONSORED_LABEL}** — {participant_display_title(ad)}"
-    cta = (ad.cta or DEFAULT_AD_CTA).strip()
-    if cta:
-        return f"{headline}\n\n*{cta}*"
-    return headline
-
-
 def is_sponsored_chat_message(content: str) -> bool:
     """True if message content is a labelled sponsored ad (any format generation)."""
     return content.strip().startswith(f"**{SPONSORED_LABEL}**")
@@ -141,12 +132,10 @@ class InjectionResult:
 
     Fields
     ------
-    messages_to_append : chat messages inserted after the LLM reply.
     system_overrides   : system messages prepended before the LLM call.
     display_payload    : consumed by the UI to render ad panels / banners.
     suggestions        : follow-up prompt buttons shown to the participant.
     """
-    messages_to_append: List[Dict[str, str]] = field(default_factory=list)
     system_overrides: List[Dict[str, str]] = field(default_factory=list)
     display_payload: Optional[Dict[str, Any]] = None
     suggestions: List[str] = field(default_factory=list)

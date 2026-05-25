@@ -69,8 +69,8 @@ bfi         BFI version used for the OCEAN personality screen
             Default: 10
 
 study       Study protocol type — sets smart defaults for the session.
-            Values : lab   → BFI-10, file store, 3 trials, baseline, full consent
-                     crowd → BFI-10, null store, 3 trials, skip baseline
+            Values : lab   → BFI-10, 3 trials, baseline, full consent
+                     crowd → BFI-10, 3 trials, skip baseline
             Default: lab (or env var STUDY_TYPE)
             Note: any other param explicitly in the URL overrides the
                   corresponding study default.
@@ -114,8 +114,8 @@ rag         ⚠ DEV MODE ONLY (requires dev=true or dev=flow)
 EXAMPLE URLS
 ───────────────────────────────────────────────────────────────────────────────
 
-Lab session — full protocol, specific task/mode assignment, file persistence:
-  http://localhost:7777?study=lab&pid=p01&tasks=trans_plan_trip,social_new_hobby&modes=inline_persuasive,explicit_ad_block&store=file
+Lab session — full protocol, specific task/mode assignment:
+  http://localhost:7777?study=lab&pid=p01&tasks=trans_plan_trip,social_new_hobby&modes=inline_persuasive,explicit_ad_block
 
 Crowdsourcing session — lightweight, 2 trials, BFI-10, skip baseline:
   http://localhost:7777?study=crowd&pid=p42
@@ -221,9 +221,6 @@ class ExperimentParams:
 
     # ── BFI version for OCEAN screen ─────────────────
     bfi_version: str = "10"                 # "10" | "44"
-
-    # ── Persistence ──────────────────────────────────
-    store_backend: str = "null"             # null | file
 
     # ── RAG pipeline overrides (per-session via URL) ─
     # None = "use whatever config.py / env var says"
@@ -339,12 +336,6 @@ def parse_query_params() -> ExperimentParams:
     if bfi_raw in ("10", "44"):
         params.bfi_version = bfi_raw
         explicitly_set.add("bfi_version")
-
-    # ── Persistence backend ───────────────────────────────────
-    store_raw = p.get("store", "").lower()
-    if store_raw in ("null", "file"):
-        params.store_backend = store_raw
-        explicitly_set.add("store_backend")
 
     # ── Seed ─────────────────────────────────────────────────
     try:

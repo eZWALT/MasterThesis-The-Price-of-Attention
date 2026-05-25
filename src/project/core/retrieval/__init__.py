@@ -66,8 +66,6 @@ def _build_pipeline():
     from core.retrieval.catalog import AdCatalog
     from core.retrieval.pipeline import AdRetrievalPipeline
     from core.retrieval.embeddings import build_embedding_model
-    from core.retrieval.adapters import build_adapter
-
     from core.retrieval.log_util import log_pipeline_building, log_pipeline_ready
 
     log_pipeline_building()
@@ -76,7 +74,6 @@ def _build_pipeline():
         model_name=EMBEDDING_MODEL_NAME,
         device=EMBEDDING_DEVICE,
     )
-    adapter = build_adapter()
     catalog = AdCatalog.load(
         catalog_path=CATALOG_PATH,
         index_path=FAISS_INDEX_PATH
@@ -86,7 +83,6 @@ def _build_pipeline():
     stage_names = [s.__class__.__name__ for s in build_default_stages(catalog, embed)]
     pipeline = AdRetrievalPipeline(catalog=catalog, embedding_model=embed)
     log_pipeline_ready(n_items=len(catalog), stage_names=stage_names)
-    logger.debug("retrieval adapter={}", adapter.__class__.__name__)
     return pipeline
 
 

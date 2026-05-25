@@ -69,24 +69,16 @@ Valid screen names: `consent`, `demographics`, `ocean`, `baseline`, `practice`, 
 |-------|---------|---------|-------------|
 | `model` | `qwen2.5:32b-instruct-q4_K_M` | `DEFAULT_MODEL` | Override LLM model for this session |
 
-### Persistence
-
-| Param | Values | Default | Description |
-|-------|--------|---------|-------------|
-| `store` | `null` \| `file` | `null` | Session data persistence backend |
-
----
-
 ## Example URLs
 
-**Standard production session — assigned group, file persistence**
+**Standard production session — assigned group**
 ```
-http://localhost:7777?pid=p01&cb=0&seed=7&store=file
+http://localhost:7777?pid=p01&cb=0&seed=7
 ```
 
 **Specific task and mode assignment**
 ```
-http://localhost:7777?pid=p02&tasks=trans_plan_trip,social_new_hobby&modes=2_in_chat,4_adjacent&store=file
+http://localhost:7777?pid=p02&tasks=trans_plan_trip,social_new_hobby&modes=2_in_chat,4_adjacent
 ```
 
 **Reduced turns and early ad injection (pilot)**

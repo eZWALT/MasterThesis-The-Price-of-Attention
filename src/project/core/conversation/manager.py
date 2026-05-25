@@ -145,6 +145,18 @@ class ConversationManager:
         # per-turn intent: classified each turn from compact context
         self.initial_intent: str = self._classify_initial_intent()
         self.intent_history: List[str] = []           # one label per user turn
+        self.logger.log(
+            "conversation_started",
+            {
+                "conversation_id": self.conversation_id,
+                "initial_intent": self.initial_intent,
+                "task_id": self.task.id if self.task else None,
+            },
+            self.ad_mode,
+            self.conversation_id,
+            source="system",
+            turn=0,
+        )
 
         # ── Modality hooks (EEG, eye-tracking, etc.) ──────────
         # Each hook is called with (turn: int, ad_injected: bool, ad: Ad|None)
@@ -334,6 +346,22 @@ class ConversationManager:
         # 3 — pre-ad snapshot
         C_pre = list(self.messages)
 
+        # 3b — intent (ThradBERT) before retrieval so JSONL retrieval rows carry intent_label
+        turn_intent = self._classify_turn_intent(user_input)
+        self.intent_history.append(turn_intent)
+        self.logger.log(
+            "intent_classified",
+            {
+                "turn": current_turn,
+                "intent_label": turn_intent,
+                "initial_intent": self.initial_intent,
+            },
+            self.ad_mode,
+            self.conversation_id,
+            source="system",
+            turn=current_turn,
+        )
+
         # 4 — ad injection decision (timed for logging)
         inject_ad = self.should_inject_ad
         retrieval: Optional[AdRetrievalResult] = None
@@ -361,6 +389,7 @@ class ConversationManager:
                         "candidate_titles": [a.title for a in retrieval.ads],
                         "retrieval_latency_ms": round(retrieval_latency_ms, 1),
                         "retrieval_backend": self._ad_backend or "default",
+                        "intent_label": turn_intent,
                         **(retrieval.diag if retrieval.diag else {}),
                     },
                     self.ad_mode,
@@ -396,28 +425,9 @@ class ConversationManager:
             turn=current_turn,
         )
 
-        # 7 — post-response injection
+        # 7 — record ad injection turn (display handled via InjectionResult, not chat append)
         if inject_ad and retrieval and retrieval.primary:
-            ad = retrieval.primary
             self.ad_turns_actual.append(current_turn)
-            for msg in injection.messages_to_append:
-                self.messages.append(msg)
-                self.logger.log(
-                    "ad_injected",
-                    {
-                        "content": msg["content"],
-                        "turn": current_turn,
-                        "ad_mode": self.ad_mode,
-                        "ad_title": ad.title,
-                        "ad_item_id": ad.source_item_id,
-                        "ad_source": ad.metadata.get("source", "amazon"),
-                        "ad_relevance_score": ad.relevance_score,
-                    },
-                    self.ad_mode,
-                    self.conversation_id,
-                    source="system",
-                    turn=current_turn,
-                )
 
         # 8 — post-ad snapshot
         C_post = list(self.messages)
@@ -429,18 +439,12 @@ class ConversationManager:
         shift_future: Future = _CPU_POOL.submit(
             compute_attention_shift, C_pre, C_post, self.attention_estimator
         )
-        intent_future: Future = _CPU_POOL.submit(
-            self._classify_turn_intent, user_input
-        )
-
         # Fire modality hooks in parallel (non-blocking, best-effort)
         for hook in self._modality_hooks:
             _CPU_POOL.submit(hook, current_turn, inject_ad, retrieval.primary if retrieval else None)
 
         # Collect parallel results
         shift = shift_future.result()
-        turn_intent = intent_future.result()
-        self.intent_history.append(turn_intent)
 
         # Log attention shift (after result is ready)
         self.logger.log(

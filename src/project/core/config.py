@@ -158,9 +158,9 @@ PRACTICE_SYSTEM_PROMPT_EXT: str = (
 # │  Set via URL: ?study=lab  or  ?study=crowd                              │
 # │  or env var:  STUDY_TYPE=lab | crowd                                    │
 # │                                                                         │
-# │  lab   — in-person lab session: EEG + eye-tracking, BFI-10, file        │
-# │           store, long baseline, full consent + debrief, 3 trials.       │
-# │  crowd — remote crowdsourcing: no physiology, BFI-10, null store,       │
+# │  lab   — in-person lab session: EEG + eye-tracking, BFI-10, long        │
+# │           baseline, full consent + debrief, 3 trials.                 │
+# │  crowd — remote crowdsourcing: no physiology, BFI-10,                   │
 # │           skip baseline, 3 trials, lighter protocol.                    │
 # └─────────────────────────────────────────────────────────────────────────┘
 
@@ -177,7 +177,6 @@ STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_LAB: {
         "n_trials":       3,
         "bfi_version":    "10",
-        "store_backend":  "file",
         "turns_min":      5,
         "turns_max":      20,
         "skip_screens":   set(),
@@ -186,7 +185,6 @@ STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_CROWD: {
         "n_trials":       3,
         "bfi_version":    "10",
-        "store_backend":  "null",
         "turns_min":      3,
         "turns_max":      20,
         "skip_screens":   {"baseline"},
@@ -265,10 +263,9 @@ MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
 # │  Pipeline stages (in execution order):                                  │
 # │    0a. ContextSummaryStage  — compress history → context_summary        │
 # │    0b. QueryExpansionStage  — HyDE / expand    → expanded_query         │
-# │    1.  IntentClassifier     — intent label                              │
-# │    2.  DenseRetriever       — FAISS ANN search (uses expanded_query)    │
-# │    3.  HybridRefiner        — BM25 + RRF                               │
-# │    4.  Reranker             — cross-encoder precision pass              │
+# │    1.  DenseRetriever       — FAISS ANN search (uses expanded_query)    │
+# │    2.  HybridRefiner        — BM25 + RRF                               │
+# │    3.  Reranker             — cross-encoder precision pass              │
 # │    5.  AdFormatter          — top-N → Ad dataclasses                   │
 # │    6.  SummarizationStage   — rewrite ad text (optional)               │
 # └─────────────────────────────────────────────────────────────────────────┘
