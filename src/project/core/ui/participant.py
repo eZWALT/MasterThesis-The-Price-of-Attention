@@ -183,7 +183,7 @@ def export_session_data(ctrl: ExperimentController):
         ad_mode="session",
         conversation_id=ctrl.participant_id,
     )
-    logger.export_json()
+    logger.export_jsonl()
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -354,6 +354,10 @@ def run_participant_mode(params):
 
     if scr == SCREEN_CONSENT:
         if render_consent():
+            st.session_state.logger.log(
+                "consent_granted", {},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
             ctrl.advance()
             st.rerun()
 
@@ -361,6 +365,10 @@ def run_participant_mode(params):
         result = render_demographics()
         if result is not None:
             ctrl.demographics = result
+            st.session_state.logger.log(
+                "demographics_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
             ctrl.advance()
             st.rerun()
 
@@ -370,11 +378,20 @@ def run_participant_mode(params):
             ctrl.ocean_raw = result
             items = get_ocean_items(params.bfi_version)
             ctrl.ocean_scores = score_ocean(result, items=items)
+            st.session_state.logger.log(
+                "ocean_submitted",
+                {"bfi_version": params.bfi_version, "raw": result, "scores": ctrl.ocean_scores},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
             ctrl.advance()
             st.rerun()
 
     elif scr == SCREEN_BASELINE:
         if render_baseline():
+            st.session_state.logger.log(
+                "baseline_complete", {},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="system",
+            )
             ctrl.advance()
             st.rerun()
 
@@ -442,6 +459,11 @@ def run_participant_mode(params):
         result = render_post_trial_survey(ctrl.trial_number)
         if result is not None:
             ctrl.post_trial_surveys.append(result)
+            st.session_state.logger.log(
+                "post_trial_survey_submitted",
+                {"trial": ctrl.trial_number, "responses": result},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
             ctrl.advance()
             st.rerun()
 
