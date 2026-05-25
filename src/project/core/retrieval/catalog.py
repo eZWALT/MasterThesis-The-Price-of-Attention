@@ -1,55 +1,23 @@
-"""
-Ad Catalog — product corpus loader and FAISS index wrapper.
-
-Responsibilities
-----------------
-1. Load the product catalog from disk (JSONL, one item per line).
-2. Build or load a FAISS index of item embeddings.
-3. Expose search(query_vec, top_k) → list[item_id].
-4. Expose get(item_id) → CatalogItem.
-
-This is the only place that touches FAISS directly.
-All other retrieval code works with CatalogItem objects.
-
-JSONL schema (one JSON object per line):
-  {
-    "item_id": "prod_001",
-    "title":   "Ergonomic Standing Desk",
-    "text":    "Adjustable sit-stand desk with memory presets...",
-    "category": "furniture",
-    "price":   349.99,
-    "cta":     "Shop now",           // optional, forwarded to Ad
-    "question": "Want desk advice?"  // optional, forwarded to Ad
-  }
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import faiss
 import numpy as np
+import json
 
-from core.config import DEFAULT_CATALOG_PRICE, FAISS_INDEX_BATCH_SIZE, FAISS_INDEX_LOG_INTERVAL, CATALOG_DIR
+from core.config import DEFAULT_CATALOG_PRICE
 from core.retrieval.stages.state import CatalogItem
-from core.retrieval.adapters.base import DatasetAdapter
 from core.log import logger
 
 
 class AdCatalog:
     """
-    Loads the product corpus and manages the FAISS index.
-
-    Usage
-    -----
-    catalog = AdCatalog.load(
-        catalog_path="data/catalog.jsonl",
-        index_path="data/faiss.index",
-        embedding_model=embed,        # EmbeddingModel instance
-    )
-    ids = catalog.search(query_vec, top_k=100)
-    item = catalog.get(ids[0])
+    FAST PATH ONLY:
+    - loads prebuilt FAISS index
+    - loads JSONL catalog once
+    - no rebuilding, no embedding, no validation
     """
 
     def __init__(
@@ -58,219 +26,91 @@ class AdCatalog:
         index: faiss.Index,
         id_map: List[str],
     ) -> None:
-        self._items = items        # item_id → CatalogItem
-        self._index = index        # FAISS index
-        self._id_map = id_map      # position → item_id  (aligns with FAISS vectors)
+        self._items = items
+        self._index = index
+        self._id_map = id_map
 
-    # ── factory ─────────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
+    # LOAD (FAST ONLY)
+    # ─────────────────────────────────────────────
 
     @classmethod
     def load(
         cls,
         catalog_path: str,
         index_path: str,
-        embedding_model,                    # EmbeddingModel — avoids circular import
-        adapter: Optional[DatasetAdapter] = None,
-        force_rebuild: bool = False,
     ) -> "AdCatalog":
         """
-        Load catalog from JSONL and build or restore the FAISS index.
-
-        Parameters
-        ----------
-        catalog_path    : path to JSONL file.
-        index_path      : path to FAISS index file (loaded or built).
-        embedding_model : EmbeddingModel instance.
-        adapter         : DatasetAdapter that maps raw records to the
-                          normalised schema.  Defaults to GenericAdapter.
-        force_rebuild   : ignore an existing index and rebuild from scratch.
-
-        If index_path exists and force_rebuild=False, the index is loaded
-        from disk (fast startup).  Otherwise, all items are re-embedded
-        and a new index is built and saved.
+        Assumes BOTH files already exist:
+        - catalog.jsonl
+        - faiss.index
+        Ensures catalog and index are consistent.
         """
-        if adapter is None:
-            from core.retrieval.adapters import build_adapter
-            adapter = build_adapter()   # reads CATALOG_ADAPTER from config
-        items, id_map = cls._load_catalog(catalog_path, adapter)
 
         index_file = Path(index_path)
-        index = None
-        if index_file.exists() and not force_rebuild:
-            index = faiss.read_index(str(index_file))
-            # Sanity checks — rebuild if the index is stale or from a different model.
-            expected_dim = embedding_model.encode(["test"]).shape[1]
-            if index.d != expected_dim:
-                logger.warning(
-                    "FAISS index dim {} ≠ embedding dim {} — rebuilding.",
-                    index.d, expected_dim,
-                )
-                index = None
-            elif index.ntotal != len(id_map):
-                logger.warning(
-                    "FAISS index has {} vectors but catalog has {} items — rebuilding.",
-                    index.ntotal, len(id_map),
-                )
-                index = None
+        catalog_file = Path(catalog_path)
 
-        if index is None:
-            index = cls._build_index(items, id_map, embedding_model, index_file)
+        if not index_file.exists():
+            raise FileNotFoundError(f"FAISS index not found: {index_path}")
+        if not catalog_file.exists():
+            raise FileNotFoundError(f"Catalog not found: {catalog_path}")
+
+        logger.info("Loading FAISS index (FAST PATH)")
+        index = faiss.read_index(str(index_file))
+
+        logger.info("Loading catalog JSONL")
+        items, id_map = cls._load_catalog(catalog_file)
+
+        logger.info("Catalog loaded: {} items", len(items))
+        logger.info("FAISS vectors: {}", index.ntotal)
+
+        if len(id_map) != index.ntotal:
+            raise RuntimeError(
+                f"Catalog and FAISS index size mismatch: "
+                f"catalog has {len(id_map)} items, index has {index.ntotal} vectors.\n"
+                f"You must rebuild the FAISS index after updating the catalog."
+            )
 
         return cls(items=items, index=index, id_map=id_map)
 
-    # ── public API ──────────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
+    # SEARCH API (UNCHANGED)
+    # ─────────────────────────────────────────────
 
     def search(self, query_vec: np.ndarray, top_k: int) -> List[str]:
-        """
-        ANN search over the FAISS index.
-
-        Parameters
-        ----------
-        query_vec : np.ndarray shape (1, D), L2-normalised float32.
-        top_k     : number of nearest neighbours to return.
-
-        Returns
-        -------
-        List of item_id strings, ordered by similarity (highest first).
-        """
         k = min(top_k, len(self._id_map))
         _, indices = self._index.search(query_vec, k)
         return [self._id_map[i] for i in indices[0] if i != -1]
 
     def get(self, item_id: str) -> CatalogItem:
-        """Return the CatalogItem for a given item_id."""
         return self._items[item_id]
 
     def __len__(self) -> int:
         return len(self._items)
 
-    # ── private helpers ─────────────────────────────────────────────────
+    # ─────────────────────────────────────────────
+    # SIMPLE LOADER
+    # ─────────────────────────────────────────────
 
     @staticmethod
-    def _load_catalog(path: str, adapter: DatasetAdapter):
-        """
-        Load all JSONL catalog files from CATALOG_DIR into a unified pool.
-
-        Every *.jsonl file in CATALOG_DIR is treated as an equal data source
-        (amazon.jsonl, travel.jsonl, hobby.jsonl, etc.).  Items are merged
-        into a single dict + id_map.  Duplicates (by item_id) are skipped.
-
-        The `path` parameter is kept for backward compatibility but is ignored
-        if CATALOG_DIR exists and contains files.  If CATALOG_DIR is missing,
-        falls back to loading `path` directly.
-
-        The adapter handles schema differences (Amazon, generic, custom);
-        this method is schema-agnostic.
-        """
+    def _load_catalog(path: Path):
         items: Dict[str, CatalogItem] = {}
         id_map: List[str] = []
 
-        def _ingest(source_iter, source_label: str):
-            """Add items from an iterator, deduplicating by item_id."""
-            count = 0
-            for norm in source_iter:
-                iid = norm["item_id"]
-                if iid in items:
-                    logger.warning("Duplicate item_id '{}' from {} — skipping", iid, source_label)
-                    continue
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                obj = json.loads(line)
+
                 item = CatalogItem(
-                    item_id=iid,
-                    title=norm["title"],
-                    text=norm["text"],
-                    category=norm.get("category", ""),
-                    price=float(norm.get("price", DEFAULT_CATALOG_PRICE)),
-                    metadata=norm.get("metadata", {}),
+                    item_id=obj["item_id"],
+                    title=obj.get("title", ""),
+                    text=obj.get("text", ""),
+                    category=obj.get("category", ""),
+                    price=float(obj.get("price", DEFAULT_CATALOG_PRICE)),
+                    metadata=obj.get("metadata", {}),
                 )
+
                 items[item.item_id] = item
                 id_map.append(item.item_id)
-                count += 1
-            return count
 
-        catalog_dir = Path(CATALOG_DIR)
-        sources_loaded = 0
-
-        if catalog_dir.is_dir() and list(catalog_dir.glob("*.jsonl")):
-            # Load all JSONL files from the catalogs directory
-            for catalog_file in sorted(catalog_dir.glob("*.jsonl")):
-                n = _ingest(adapter.iter_catalog(str(catalog_file)), catalog_file.name)
-                logger.info("Catalog loaded: {} items from {}", n, catalog_file.name)
-                sources_loaded += 1
-        else:
-            # Fallback: single-file mode (backward compat)
-            n = _ingest(adapter.iter_catalog(path), path)
-            logger.info("Catalog loaded: {} items from {}", n, path)
-            sources_loaded = 1
-
-        logger.info("Total catalog size: {} items ({} sources)", len(items), sources_loaded)
         return items, id_map
-
-    @staticmethod
-    def _build_index(
-        items: Dict[str, CatalogItem],
-        id_map: List[str],
-        embedding_model,
-        save_path: Path,
-        batch_size: int = FAISS_INDEX_BATCH_SIZE,
-    ) -> faiss.Index:
-        """Encode items in batches and add to FAISS incrementally.
-
-        Encoding the full corpus in one shot allocates a single (N, D) float32
-        array, which can OOM for large catalogs.  Batching keeps peak memory
-        bounded to ``batch_size * D * 4`` bytes for the vector slice, at the
-        cost of slightly more Python loop overhead.
-        """
-        if not id_map:
-            raise ValueError("id_map is empty — nothing to index.")
-
-        index: faiss.Index | None = None
-        total = len(id_map)
-        log_interval = batch_size * FAISS_INDEX_LOG_INTERVAL
-
-
-        def build_structured_text(item):
-            # Compose structured text: title + brand + category + key attributes + short description
-            parts = []
-            if getattr(item, 'title', None):
-                parts.append(item.title)
-            # Try to get brand from metadata if present
-            brand = item.metadata.get('brand') if hasattr(item, 'metadata') else None
-            if brand:
-                parts.append(str(brand))
-            if getattr(item, 'category', None):
-                parts.append(item.category)
-            # Key attributes: features, details, etc. from metadata
-            features = item.metadata.get('features') if hasattr(item, 'metadata') else None
-            if features:
-                if isinstance(features, list):
-                    parts.extend([str(f) for f in features[:5]])
-                else:
-                    parts.append(str(features))
-            details = item.metadata.get('details') if hasattr(item, 'metadata') else None
-            if details:
-                if isinstance(details, list):
-                    parts.extend([str(d) for d in details[:3]])
-                else:
-                    parts.append(str(details))
-            # Short description (text field)
-            if getattr(item, 'text', None):
-                parts.append(item.text)
-            return ' '.join([str(p) for p in parts if p]).strip()
-
-        for start in range(0, total, batch_size):
-            batch_ids = id_map[start : start + batch_size]
-            texts = [build_structured_text(items[iid]) for iid in batch_ids]
-            vectors = embedding_model.encode(texts)   # (B, D)
-
-            if index is None:
-                dim = vectors.shape[1]
-                index = faiss.IndexFlatIP(dim)  # cosine via inner product on normalised vecs
-
-            index.add(vectors)
-
-            indexed_count = min(start + batch_size, total)
-            if indexed_count % log_interval < batch_size or indexed_count == total:
-                logger.info("  indexed {}/{} items", indexed_count, total)
-
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        faiss.write_index(index, str(save_path))
-        return index
