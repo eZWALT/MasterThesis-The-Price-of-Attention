@@ -13,7 +13,12 @@ No model inference happens here — pure data transformation.
 
 from __future__ import annotations
 
-from core.config import RETRIEVAL_FINAL_TOP_N, DEFAULT_AD_CTA
+from core.config import (
+    RETRIEVAL_FINAL_TOP_N,
+    DEFAULT_AD_CTA,
+    FORMATTER_CANDIDATE_POOL,
+    USE_RERANKER,
+)
 from core.retrieval.stages.base import PipelineStage
 from core.retrieval.stages.state import PipelineState, RankedCandidate
 
@@ -65,9 +70,10 @@ class AdFormatter(PipelineStage):
                 len(ranked),
             )
         elif state.candidates:
+            pool = FORMATTER_CANDIDATE_POOL if not USE_RERANKER else self._top_n
             ranked = [
                 RankedCandidate(item=item, score=0.0)
-                for item in state.candidates[: self._top_n]
+                for item in state.candidates[: max(pool, self._top_n)]
             ]
             logger.debug(
                 "AdFormatter: Using {} fallback candidates",
