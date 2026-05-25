@@ -90,9 +90,17 @@ class AdRetrievalPipeline:
         Returns None if the pipeline produces no candidates
         (caller should fall back to mock ad).
         """
+        from core.log import logger
         state = PipelineState(query=query, context=context)
 
         for stage in self._stages:
+            prev_candidates = getattr(state, 'candidates', None)
+            prev_ranked = getattr(state, 'ranked', None)
             state = stage.run(state)
+            # Debug: log candidate flow after each stage
+            if hasattr(state, 'candidates') and state.candidates is not None:
+                logger.info(f"[DEBUG] After {stage.__class__.__name__}: candidates = {[getattr(c, 'title', None) for c in state.candidates]}")
+            if hasattr(state, 'ranked') and state.ranked is not None:
+                logger.info(f"[DEBUG] After {stage.__class__.__name__}: ranked = {[getattr(r, 'item', None) and getattr(r.item, 'title', None) for r in state.ranked]}")
 
         return state.top_ad

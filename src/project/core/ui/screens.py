@@ -421,7 +421,11 @@ def render_trial_chat(manager: ConversationManager, ad_mode: str) -> bool:
             (m["content"] for m in reversed(manager.messages) if m["role"] == "user"),
             "",
         )
-        ad = get_ad(query=last_user, context=manager.messages)
+        # Use RAG as default backend unless explicitly overridden
+        backend = getattr(manager, 'ad_backend', None)
+        if backend is None:
+            backend = "rag"
+        ad = get_ad(query=last_user, context=manager.messages, backend=backend)
         injector = get_injector(ad_mode)
         result = injector.inject(ad, manager.messages)
         if result.display_payload:

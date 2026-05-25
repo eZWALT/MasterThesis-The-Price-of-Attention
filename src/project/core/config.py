@@ -317,7 +317,7 @@ RRF_K: int          = 60    # Reciprocal Rank Fusion smoothing constant
 
 # ── Stage 4 — Reranker (HuggingFace cross-encoder) ──────────────────────
 # Toggle reranker usage with USE_RERANKER (env USE_RERANKER=0 disables)
-USE_RERANKER: bool = os.getenv("USE_RERANKER", "0").lower() in ("0", "false", "no")
+USE_RERANKER: bool = os.getenv("USE_RERANKER", "1").lower() in ("1", "true", "yes")
 RERANKER_MODEL_NAME: str = os.getenv("RERANKER_MODEL_NAME", "Qwen/Qwen3-Reranker-0.6B")
 RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "bfloat16")
 RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
