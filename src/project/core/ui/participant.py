@@ -297,6 +297,8 @@ def _render_dev_ad_controls(mgr=None) -> None:
             "",
         )
         ad = get_ad(query=last_user, context=mgr.messages, backend=backend)
+        mgr.last_retrieval = ad
+        mgr.last_retrieval_ad_mode = mgr.ad_mode if ad and ad.has_ads else None
         injector = get_injector(mgr.ad_mode)
         result = injector.inject(ad, mgr.messages)
         # Store result in session state so run_dev_mode can render it in the main area

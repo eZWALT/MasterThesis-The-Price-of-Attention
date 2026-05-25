@@ -538,9 +538,49 @@ def render_trial_intro(trial_number: int, total_trials: int, task_prompt: str) -
 # SCREEN 7 — TRIAL CHAT (core screen)
 # ═══════════════════════════════════════════════════════════════
 
+def _render_retrieval_debug(retrieval) -> None:
+    """Show HyDE passages and retrieval metrics (dev=flow and dev mode)."""
+    from core.ad_injection.models import AdRetrievalResult
+
+    if retrieval is None:
+        st.caption("No retrieval yet — send a message with ad injection enabled.")
+        return
+    if not isinstance(retrieval, AdRetrievalResult):
+        return
+
+    diag = retrieval.diag or {}
+    st.caption(f"Retrieval query ({diag.get('query_chars', '?')} chars)")
+    rq = diag.get("retrieval_query")
+    if rq:
+        st.text(rq)
+
+    docs = diag.get("hyde_documents") or []
+    if docs:
+        st.markdown(f"**HyDE documents ({len(docs)})**")
+        for i, doc in enumerate(docs, 1):
+            with st.expander(f"Doc {i} · {len(doc)} chars", expanded=(i == 1)):
+                st.text(doc)
+    elif diag.get("hyde_used"):
+        st.warning("HyDE ran but no documents were parsed from the LLM response.")
+
+    if retrieval.has_ads:
+        st.markdown("**Catalog matches (top ads)**")
+        for j, ad in enumerate(retrieval.ads, 1):
+            score = ad.relevance_score
+            st.markdown(f"{j}. **{ad.title}** — score {score:.3f}" if score else f"{j}. **{ad.title}**")
+    else:
+        st.caption("No ads returned from the pipeline.")
+
+    metrics = {k: v for k, v in diag.items() if k not in ("hyde_documents", "retrieval_query")}
+    if metrics:
+        with st.expander("Timing & config", expanded=False):
+            st.json(metrics)
+
+
 def _render_flow_ad_panel(manager: ConversationManager, ad_mode: str) -> None:
     """Dev/flow helper: surface ads even when the mode hides them (e.g. inline)."""
     st.markdown(f"**Ad mode:** {AD_MODE_LABELS.get(ad_mode, ad_mode)}")
+    _render_retrieval_debug(manager.last_retrieval)
 
     if not _ad_display_state_matches_mode(manager, ad_mode):
         cached = getattr(manager, "last_retrieval_ad_mode", None)

@@ -23,6 +23,7 @@ from core.ui.screens import (
     _call_llm_with_spinner,
     _render_ad_banner,
     _render_chat_message,
+    _render_retrieval_debug,
     _render_turn_ads,
 )
 # DEV helpers live in participant to avoid circular imports
@@ -154,6 +155,9 @@ def run_dev_mode():
         _render_ad_banner(manual_ad_result.display_payload, ad_mode=ad_mode)
 
     _render_turn_ads(mgr, ad_mode)
+
+    with st.expander("🔬 HyDE / retrieval debug", expanded=False):
+        _render_retrieval_debug(mgr.last_retrieval)
 
     if mgr.must_end:
         st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
