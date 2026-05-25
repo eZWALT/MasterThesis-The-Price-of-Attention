@@ -12,6 +12,8 @@ from core.ad_injection.models import (
     compact_display_payload,
     format_products_block,
     format_sponsored_chat_content,
+    participant_display_title,
+    sponsored_message_to_payload,
 )
 from core.ad_injection.injectors import (
     InlinePersuasiveInjector,
@@ -177,6 +179,14 @@ class TestSponsoredRecommendationInjector:
         assert "Buy" in content
         assert "great widget description" not in content
 
+    def test_never_includes_catalog_text_field(self):
+        injector = SponsoredRecommendationInjector()
+        body = "NOISY " * 500
+        ad = Ad(title="Gadget", text=body, cta="Buy")
+        content = injector.inject(AdRetrievalResult(ads=[ad]), []).messages_to_append[0]["content"]
+        assert body not in content
+        assert "NOISY" not in content
+
     def test_compact_display_payload_omits_body(self):
         ad = Ad(title="X", text="noisy body", cta="Go")
         payload = compact_display_payload(ad)
@@ -190,6 +200,24 @@ class TestSponsoredRecommendationInjector:
         assert "Y" in content
         assert "Click" in content
         assert "noisy" not in content
+
+    def test_participant_display_title_truncates(self):
+        long_title = "A" * 200
+        ad = Ad(title=long_title, text="ignored")
+        assert len(participant_display_title(ad)) <= 120
+        assert participant_display_title(ad).endswith("…")
+
+    def test_sponsored_message_to_payload_strips_legacy_body(self):
+        legacy = (
+            "**Sponsored** — Widget\n\n"
+            + ("catalog description " * 400)
+            + "\n\n*Buy*"
+        )
+        payload = sponsored_message_to_payload(legacy)
+        assert payload is not None
+        assert payload["title"] == "Widget"
+        assert payload["cta"] == "Buy"
+        assert "catalog description" not in str(payload.values())
 
 
 @pytest.mark.unit

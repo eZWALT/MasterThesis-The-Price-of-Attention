@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 
-from core.config import DEFAULT_AD_CTA, SPONSORED_LABEL
+from core.config import DEFAULT_AD_CTA, PARTICIPANT_AD_TITLE_MAX_LEN, SPONSORED_LABEL
 
 
 @dataclass
@@ -32,11 +32,22 @@ class AdRetrievalResult:
         return bool(self.ads)
 
 
+def participant_display_title(
+    ad: "Ad",
+    max_len: int = PARTICIPANT_AD_TITLE_MAX_LEN,
+) -> str:
+    """Short headline for UI/chat — never uses catalog body text."""
+    title = " ".join((ad.title or "").split())
+    if len(title) <= max_len:
+        return title
+    return title[: max_len - 1].rstrip() + "…"
+
+
 def compact_display_payload(ad: "Ad", header: str | None = None) -> Dict[str, str]:
     """UI banner fields: label, title, CTA only (no catalog description)."""
     return {
         "header": header or SPONSORED_LABEL,
-        "title": ad.title,
+        "title": participant_display_title(ad),
         "cta": ad.cta or DEFAULT_AD_CTA,
     }
 
@@ -45,7 +56,7 @@ def format_products_block(ads: List["Ad"]) -> str:
     """Compact candidate list for the LLM (title + optional CTA, no body text)."""
     blocks: List[str] = []
     for i, ad in enumerate(ads, start=1):
-        line = f"{i}. **{ad.title}**"
+        line = f"{i}. **{participant_display_title(ad)}**"
         if ad.cta:
             line += f" — {ad.cta}"
         blocks.append(line)
@@ -53,11 +64,48 @@ def format_products_block(ads: List["Ad"]) -> str:
 
 
 def format_sponsored_chat_content(ad: "Ad", label: str | None = None) -> str:
-    """In-chat sponsored line: title and CTA only."""
-    headline = f"**{label or SPONSORED_LABEL}** — {ad.title}"
-    if ad.cta:
-        return f"{headline}\n\n*{ad.cta}*"
+    """In-chat sponsored line: title and CTA only (never ad.text)."""
+    headline = f"**{label or SPONSORED_LABEL}** — {participant_display_title(ad)}"
+    cta = (ad.cta or DEFAULT_AD_CTA).strip()
+    if cta:
+        return f"{headline}\n\n*{cta}*"
     return headline
+
+
+def is_sponsored_chat_message(content: str) -> bool:
+    """True if message content is a labelled sponsored ad (any format generation)."""
+    return content.strip().startswith(f"**{SPONSORED_LABEL}**")
+
+
+def sponsored_message_to_payload(content: str) -> Dict[str, str] | None:
+    """
+    Parse a sponsored chat line into a compact banner payload.
+
+    Drops legacy middle paragraphs (old format appended ad.text between title and CTA).
+    """
+    if not is_sponsored_chat_message(content):
+        return None
+
+    headline, *rest = [p.strip() for p in content.split("\n\n") if p.strip()]
+    prefix = f"**{SPONSORED_LABEL}** — "
+    if not headline.startswith(prefix):
+        return None
+
+    title = headline[len(prefix) :].strip()
+    cta = DEFAULT_AD_CTA
+    for part in reversed(rest):
+        if part.startswith("*") and part.endswith("*"):
+            cta = part.strip("*").strip() or cta
+            break
+
+    if len(title) > PARTICIPANT_AD_TITLE_MAX_LEN:
+        title = participant_display_title(Ad(title=title, text=""))
+
+    return {
+        "header": SPONSORED_LABEL,
+        "title": title,
+        "cta": cta,
+    }
 
 
 @dataclass

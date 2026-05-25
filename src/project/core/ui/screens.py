@@ -59,7 +59,11 @@ from core.experiment.surveys import (
     FINAL_OPEN_ENDED_PROMPT,
 )
 from core.ad_injection import get_injector
-from core.ad_injection.models import format_products_block
+from core.ad_injection.models import (
+    format_products_block,
+    is_sponsored_chat_message,
+    sponsored_message_to_payload,
+)
 from core.conversation import ConversationManager
 from core.conversation.ollama_stats import estimate_eta, record_timing
 
@@ -156,6 +160,17 @@ def _ensure_ad_banner_css() -> None:
         return
     st.markdown(_AD_BANNER_CSS, unsafe_allow_html=True)
     st.session_state._ad_banner_css_injected = True
+
+
+def _render_chat_message(msg: dict) -> None:
+    """Render one chat message; sponsored ads use the compact banner (no catalog body)."""
+    content = msg.get("content", "")
+    if is_sponsored_chat_message(content):
+        payload = sponsored_message_to_payload(content)
+        if payload:
+            _render_ad_banner(payload)
+            return
+    st.markdown(content)
 
 
 def _render_ad_banner(payload: dict) -> None:
@@ -487,7 +502,7 @@ def render_practice(manager: ConversationManager) -> bool:
     # Chat history
     for msg in manager.messages:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            _render_chat_message(msg)
 
     # Input
     if user_input := st.chat_input("Send a message..."):
@@ -584,7 +599,7 @@ def render_trial_chat(
     # Chat history
     for msg in manager.messages:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            _render_chat_message(msg)
 
     # Dev flow: always show what was retrieved / shown to the LLM
     if flow_test:

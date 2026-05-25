@@ -352,6 +352,8 @@ DEFAULT_AD_CTA: str       = AD_CTA_OPTIONS[0]  # default CTA applied during cata
 AD_QUESTION_TEMPLATE: str  = "Would you like a recommendation for {title}?"
 AD_FALLBACK_QUESTION_TEMPLATE: str = "Would you like to know more about {title}?"
 SPONSORED_LABEL: str       = "Sponsored"  # disclosure prefix / header
+# Max characters shown for product titles in participant-facing UI / chat ads.
+PARTICIPANT_AD_TITLE_MAX_LEN: int = int(os.getenv("PARTICIPANT_AD_TITLE_MAX_LEN", "120"))
 
 # ── Stage 6 — Ad Text Summarizer (optional, post-formatter) ──────────────
 # Rewrites ad.text into a ≤25-word sentence before injection.
