@@ -66,15 +66,16 @@ BASE_SYSTEM_PROMPT: str = (
 INLINE_AD_SYSTEM_PROMPT = (
     "You are assisting a conversation. "
     "Your primary goal is to provide a helpful and accurate response.\n\n"
-
-    "You will answer the users questions and stay on topic but also you will insert an ad of EXACTLY 1 of the following products\n"
+    "Answer the user first, then weave in EXACTLY ONE product from the candidate list below.\n"
     "Rules:\n"
-    "- Put it in the most natural and convinient part of the message"
-    "- Never distort the main answer\n"
-    "- Mention EXACTLY 1 product, the most relevant to the context\n"
-    "- Keep each mention brief and factual\n"
-    "- Do not sound promotional\n\n"
-    "- You can change or shorten the name a bit to not sound over robotic"
+    "- Integrate the product as a natural sentence inside the main answer (mid-paragraph is fine).\n"
+    "- Never distort or shorten the helpful answer.\n"
+    "- Mention EXACTLY ONE product — the most relevant to the conversation.\n"
+    "- Keep the mention brief and factual; do not sound salesy or promotional.\n"
+    "- Use the product name from the list (minor shortening is OK).\n"
+    "- Do NOT use section headers, horizontal rules, lines of asterisks (***), or labels like "
+    "'Product Mention'.\n"
+    "- Do NOT put the product in a separate block, list item, or appendix at the end.\n\n"
     "Candidate products:\n"
     "{products_block}"
 )
@@ -374,6 +375,13 @@ SPONSORED_LABEL: str       = "Sponsored"  # disclosure prefix / header
 EXPLICIT_AD_LABEL: str     = "Advertisement"  # explicit ad block banner header
 # Max characters shown for product titles in participant-facing UI / chat ads.
 PARTICIPANT_AD_TITLE_MAX_LEN: int = int(os.getenv("PARTICIPANT_AD_TITLE_MAX_LEN", "120"))
+# Fake landing URL for product-name links (clicks logged as ad_clicked).
+AD_CONVERSION_URL_BASE: str = os.getenv(
+    "AD_CONVERSION_URL_BASE", "https://ads.study.local/product"
+)
+# Public Streamlit URL (used for trackable ad links — must be absolute http(s)).
+_STREAMLIT_PORT = os.getenv("STREAMLIT_PORT", "7777")
+APP_PUBLIC_URL: str = os.getenv("APP_PUBLIC_URL", f"http://localhost:{_STREAMLIT_PORT}")
 
 # ── Stage 6 — Ad Text Summarizer (optional, post-formatter) ──────────────
 # Rewrites ad.text into a ≤25-word sentence before injection.

@@ -22,7 +22,7 @@ from core.experiment import TASK_CATALOG, TASK_BY_ID
 from core.ui.screens import (
     _call_llm_with_spinner,
     _render_ad_banner,
-    _render_chat_message,
+    _render_chat_history,
     _render_retrieval_debug,
     _render_turn_ads,
 )
@@ -145,14 +145,19 @@ def run_dev_mode():
             st.rerun()
         return
 
-    for msg in mgr.messages:
-        with st.chat_message(msg["role"]):
-            _render_chat_message(msg, ad_mode=ad_mode)
+    _render_chat_history(mgr, ad_mode)
 
     # Manual inject from sidebar
     manual_ad_result = st.session_state.pop("dev_manual_ad", None)
     if manual_ad_result and manual_ad_result.display_payload:
-        _render_ad_banner(manual_ad_result.display_payload, ad_mode=ad_mode)
+        primary = mgr.last_retrieval.primary if mgr.last_retrieval else None
+        _render_ad_banner(
+            manual_ad_result.display_payload,
+            ad_mode=ad_mode,
+            manager=mgr,
+            turn=mgr.turn_count,
+            ad=primary,
+        )
 
     _render_turn_ads(mgr, ad_mode)
 
