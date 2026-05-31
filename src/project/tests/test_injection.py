@@ -57,7 +57,8 @@ class TestInlinePersuasiveInjector:
         content = result.system_overrides[0]["content"]
         assert "Product 1" in content
         assert "Product 3" in content
-        assert "EXACTLY 1 product" in content
+        assert "EXACTLY ONE product" in content
+        assert "Product Mention" in content
 
     def test_empty_retrieval_yields_empty_block(self):
         injector = InlinePersuasiveInjector()

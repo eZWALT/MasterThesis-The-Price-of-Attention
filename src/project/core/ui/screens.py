@@ -59,7 +59,15 @@ from core.experiment.surveys import (
     FINAL_OPEN_ENDED_PROMPT,
 )
 from core.ad_injection import get_injector
+from core.ad_injection.ad_links import (
+    clean_inline_assistant_display,
+    detect_mentioned_ad,
+    html_product_link,
+    linkify_inline_ad_titles,
+    log_ad_link_shown,
+)
 from core.ad_injection.models import (
+    Ad,
     format_products_block,
     is_sponsored_chat_message,
     sponsored_message_to_payload,
@@ -118,19 +126,78 @@ def _banner_box_style(*, explicit: bool) -> str:
     return base + "border-left:4px solid #ff9800;"
 
 
-def _render_chat_message(msg: dict, *, ad_mode: str | None = None) -> None:
-    """Render one chat message; legacy sponsored chat lines use the compact banner."""
+def _render_chat_history(manager: ConversationManager, ad_mode: str) -> None:
+    """Render full message history with trackable inline/banner ad links."""
+    turn = 0
+    for msg in manager.messages:
+        if msg.get("role") == "user":
+            turn += 1
+        with st.chat_message(msg["role"]):
+            msg_turn = turn if msg.get("role") == "assistant" else None
+            _render_chat_message(
+                msg,
+                ad_mode=ad_mode,
+                manager=manager,
+                turn=msg_turn,
+            )
+
+
+def _render_chat_message(
+    msg: dict,
+    *,
+    ad_mode: str | None = None,
+    manager: ConversationManager | None = None,
+    turn: int | None = None,
+) -> None:
+    """Render one chat message; linkify inline ad product names when applicable."""
     content = msg.get("content", "")
     if is_sponsored_chat_message(content):
         payload = sponsored_message_to_payload(content)
         if payload:
-            _render_ad_banner(payload, ad_mode=ad_mode or "sponsored_conversational")
+            _render_ad_banner(
+                payload,
+                ad_mode=ad_mode or "sponsored_conversational",
+                manager=manager,
+                turn=turn or 0,
+            )
             return
+
+    if (
+        msg.get("role") == "assistant"
+        and ad_mode == "inline_persuasive"
+        and manager is not None
+        and turn is not None
+        and turn in manager.ads_by_turn
+    ):
+        ads = manager.ads_by_turn[turn]
+        mentioned = detect_mentioned_ad(content, ads)
+        link_ads = [mentioned] if mentioned else ads[:1]
+        display = clean_inline_assistant_display(content)
+        html_body = linkify_inline_ad_titles(display, link_ads)
+        st.markdown(html_body, unsafe_allow_html=True)
+        if link_ads and link_ads[0]:
+            log_ad_link_shown(
+                manager.logger,
+                ad=link_ads[0],
+                ad_mode=ad_mode or "inline_persuasive",
+                conversation_id=manager.conversation_id,
+                turn=turn,
+                interaction="inline_text",
+            )
+        return
+
     st.markdown(content)
 
 
-def _render_ad_banner(payload: dict, *, ad_mode: str | None = None) -> None:
-    """Full-width horizontal ad strip: label, title, CTA (inline-styled orange panel)."""
+def _render_ad_banner(
+    payload: dict,
+    *,
+    ad_mode: str | None = None,
+    manager: ConversationManager | None = None,
+    turn: int | None = None,
+    ad: Ad | None = None,
+) -> None:
+    """Full-width ad strip: label, clickable product title, CTA."""
     from core.config import EXPLICIT_AD_LABEL
 
     explicit = ad_mode == "explicit_ad_block" or payload.get("header") == EXPLICIT_AD_LABEL
@@ -146,13 +213,34 @@ def _render_ad_banner(payload: dict, *, ad_mode: str | None = None) -> None:
     cta_style = "color:#ff9800;font-weight:600;font-size:0.9em;margin:0;"
 
     label = html_module.escape(str(payload.get("header", "Sponsored")))
-    title = html_module.escape(str(payload.get("title", "")))
+    title = str(payload.get("title", ""))
     cta = html_module.escape(str(payload.get("cta", "")))
     cta_html = f'<p style="{cta_style}">{cta}</p>' if cta else ""
+
+    if manager is not None and turn is not None and (ad is not None or payload.get("source_item_id")):
+        if ad is None:
+            ad = Ad(
+                title=title,
+                text="",
+                source_item_id=str(payload.get("source_item_id", "unknown")),
+                cta=payload.get("cta", ""),
+            )
+        title_html = html_product_link(ad, label=title)
+        log_ad_link_shown(
+            manager.logger,
+            ad=ad,
+            ad_mode=ad_mode or "explicit_ad_block",
+            conversation_id=manager.conversation_id,
+            turn=turn,
+            interaction="banner_title",
+        )
+    else:
+        title_html = html_module.escape(title)
+
     st.markdown(
         f'<div class="ad-banner" style="{box_style}">'
         f'<p style="{label_style}">{label}</p>'
-        f'<p style="{title_style}">{title}</p>'
+        f'<p style="{title_style}">{title_html}</p>'
         f"{cta_html}"
         f"</div>",
         unsafe_allow_html=True,
@@ -168,28 +256,23 @@ def _render_sponsored_suggestion(
     *,
     manager: ConversationManager,
     ad_mode: str,
-    key_prefix: str,
+    ad: Ad,
+    turn: int,
 ) -> None:
-    """Render a single sponsored follow-up chip (never multiple)."""
-    if st.button(suggestion, key=f"{key_prefix}_{manager.turn_count}"):
-        ad = manager.last_retrieval.primary if manager.last_retrieval else None
-        from core.logger.payload import compact_event_data
-
-        manager.logger.log(
-            "ad_clicked",
-            compact_event_data(
-                {
-                    "suggestion": suggestion,
-                    "ad_title": ad.title if ad else None,
-                },
-                turn=manager.turn_count,
-            ),
-            ad_mode,
-            manager.conversation_id,
-            turn=manager.turn_count,
-        )
-        _call_llm_with_spinner(manager, suggestion)
-        st.rerun()
+    """Follow-up suggestion with the product name as a clickable link."""
+    st.markdown(
+        linkify_inline_ad_titles(suggestion, [ad]),
+        unsafe_allow_html=True,
+    )
+    log_ad_link_shown(
+        manager.logger,
+        ad=ad,
+        ad_mode=ad_mode,
+        conversation_id=manager.conversation_id,
+        turn=turn,
+        interaction="sponsored_suggestion",
+    )
+    st.caption("Click the product name to view details (opens in a new tab).")
 
 
 def _ad_display_state_matches_mode(manager: ConversationManager, ad_mode: str) -> bool:
@@ -213,17 +296,26 @@ def _render_turn_ads(
         return
 
     result = get_injector(ad_mode).inject(manager.last_retrieval, manager.messages)
+    turn = manager.turn_count
+    primary = manager.last_retrieval.primary
 
     if result.display_payload and ad_mode in _AD_BANNER_MODES:
-        _render_ad_banner(result.display_payload, ad_mode=ad_mode)
+        _render_ad_banner(
+            result.display_payload,
+            ad_mode=ad_mode,
+            manager=manager,
+            turn=turn,
+            ad=primary,
+        )
 
-    if ad_mode == "sponsored_conversational" and result.suggestions:
+    if ad_mode == "sponsored_conversational" and result.suggestions and primary:
         st.markdown("### 🔍 Sponsored Suggestion")
         _render_sponsored_suggestion(
             result.suggestions[0],
             manager=manager,
             ad_mode=ad_mode,
-            key_prefix="sug",
+            ad=primary,
+            turn=turn,
         )
 
 
@@ -608,16 +700,34 @@ def _render_flow_ad_panel(manager: ConversationManager, ad_mode: str) -> None:
     if ad_mode == "inline_persuasive":
         with st.expander("Candidate products shown to the LLM (title + CTA only)", expanded=True):
             st.markdown(format_products_block(manager.last_retrieval.ads))
-        st.caption("Inline mode weaves the ad into the assistant reply; nothing is shown as a separate card.")
+        st.caption(
+            "Inline mode weaves the ad into the assistant reply; "
+            "the product name is a clickable link in the text."
+        )
         return
 
     injector = get_injector(ad_mode)
     result = injector.inject(manager.last_retrieval, manager.messages)
+    primary = manager.last_retrieval.primary if manager.last_retrieval else None
 
     if result.display_payload:
-        _render_ad_banner(result.display_payload, ad_mode=ad_mode)
-    if result.suggestions:
-        st.markdown(f"**Sponsored suggestion:** {result.suggestions[0]}")
+        primary = manager.last_retrieval.primary if manager.last_retrieval else None
+        _render_ad_banner(
+            result.display_payload,
+            ad_mode=ad_mode,
+            manager=manager,
+            turn=manager.turn_count,
+            ad=primary,
+        )
+    if ad_mode == "sponsored_conversational" and result.suggestions and primary:
+        st.markdown("### 🔍 Sponsored Suggestion")
+        _render_sponsored_suggestion(
+            result.suggestions[0],
+            manager=manager,
+            ad_mode=ad_mode,
+            ad=primary,
+            turn=manager.turn_count,
+        )
 
 
 def render_trial_chat(
@@ -646,10 +756,7 @@ def render_trial_chat(
             if st.button("✅ End Conversation"):
                 return True
 
-    # Chat history
-    for msg in manager.messages:
-        with st.chat_message(msg["role"]):
-            _render_chat_message(msg, ad_mode=ad_mode)
+    _render_chat_history(manager, ad_mode)
 
     # Dev flow: always show what was retrieved / shown to the LLM
     if flow_test:

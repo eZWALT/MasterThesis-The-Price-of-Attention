@@ -29,6 +29,7 @@ from core.ad_injection.models import (
     InjectionResult,
     participant_display_title,
 )
+from core.ad_injection.ad_links import enrich_display_payload
 
 
 # ── Base ──────────────────────────────────────────────────────
@@ -104,7 +105,7 @@ class SponsoredConversationalInjector(AdInjector):
         )
         return InjectionResult(
             suggestions=[chip_text],  # always length 1 — top ad only
-            display_payload=compact_display_payload(ad),
+            display_payload=enrich_display_payload(ad, compact_display_payload(ad)),
         )
 
 
@@ -128,5 +129,7 @@ class ExplicitAdBlockInjector(AdInjector):
         if ad is None:
             return InjectionResult()
         return InjectionResult(
-            display_payload=compact_display_payload(ad, header=EXPLICIT_AD_LABEL),
+            display_payload=enrich_display_payload(
+                ad, compact_display_payload(ad, header=EXPLICIT_AD_LABEL)
+            ),
         )

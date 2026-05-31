@@ -184,6 +184,11 @@ class ExperimentLogger:
         """Update participant ID (set after consent/demographics)."""
         self.participant_id = participant_id
 
+    @property
+    def trial_index(self) -> int:
+        """Current trial index (0-based)."""
+        return self._trial_index
+
     def set_trial_index(self, index: int) -> None:
         """Update current trial index (called by ExperimentController)."""
         self._trial_index = index

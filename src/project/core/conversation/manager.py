@@ -139,6 +139,7 @@ class ConversationManager:
         # ── Per-turn metrics (paper DVs) ──────────────────────
         self.turn_metrics: List[TurnMetrics] = []
         self.ad_turns_actual: List[int] = []          # turns where ads were actually injected
+        self.ads_by_turn: Dict[int, List[Ad]] = {}    # candidates shown per injection turn
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
         # ── Intent tracking (ThradBERT, paper §RQ3) ──────────
@@ -426,6 +427,7 @@ class ConversationManager:
         # 7 — record ad injection turn (display handled via InjectionResult, not chat append)
         if inject_ad and retrieval and retrieval.primary:
             self.ad_turns_actual.append(current_turn)
+            self.ads_by_turn[current_turn] = list(retrieval.ads)
 
         # 8 — post-ad snapshot
         C_post = list(self.messages)
