@@ -37,6 +37,7 @@ services:
     build: .
     ports:
       - "${STREAMLIT_PORT}:${STREAMLIT_PORT}"
+      - "${AD_CLICK_SERVER_PORT}:${AD_CLICK_SERVER_PORT}"
     env_file:
       - .env
     environment:

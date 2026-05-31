@@ -19,6 +19,11 @@ from core.config import (
 )
 from core.conversation import ConversationManager
 from core.experiment import TASK_CATALOG, TASK_BY_ID
+from core.ad_injection.ad_links import (
+    inject_ad_click_tracker,
+    register_click_state,
+    start_ad_click_server,
+)
 from core.ui.screens import (
     _call_llm_with_spinner,
     _render_ad_banner,
@@ -126,6 +131,10 @@ def run_dev_mode():
 
     # Always sync force_ad / rag_mode onto the live manager
     _sync_dev_overrides(mgr)
+
+    start_ad_click_server()
+    register_click_state(mgr.logger, mgr, ad_mode)
+    inject_ad_click_tracker()
 
     if task:
         with st.expander("📝 Task Prompt", expanded=False):
