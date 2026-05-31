@@ -25,7 +25,7 @@ from urllib.parse import quote
 
 from loguru import logger as log
 
-from core.ad_injection.models import Ad, participant_display_title
+from core.ad_injection.models import Ad, participant_display_title, ad_image_url
 from core.config import AD_CONVERSION_URL_BASE
 from core.logger.payload import compact_event_data
 
@@ -373,4 +373,7 @@ def enrich_display_payload(ad: Ad, payload: Dict[str, Any]) -> Dict[str, Any]:
     out = dict(payload)
     out["source_item_id"] = ad.source_item_id
     out["click_url"] = ad_product_url(ad)
+    image_url = ad_image_url(ad)
+    if image_url:
+        out["image_url"] = image_url
     return out
