@@ -5,13 +5,14 @@ from __future__ import annotations
 import pytest
 
 from core.ad_injection.ad_links import (
+    _AD_CLICK_TRACKER_JS,
     ad_product_url,
     clean_inline_assistant_display,
     detect_mentioned_ad,
     enrich_display_payload,
     html_product_link,
     linkify_inline_ad_titles,
-    log_ad_link_shown,
+    log_ad_clicked,
 )
 from core.ad_injection.models import Ad, compact_display_payload
 from core.logger import ExperimentLogger
@@ -64,10 +65,10 @@ class TestAdLinks:
         assert "See" in result
         assert "/sp-1" in result
 
-    def test_log_ad_link_shown_writes_jsonl(self, tmp_path):
+    def test_log_ad_clicked_writes_jsonl(self, tmp_path):
         ad = Ad(title="Boots", text="", source_item_id="item-42")
         lg = ExperimentLogger(log_dir=str(tmp_path), flush_every_n=1)
-        log_ad_link_shown(
+        log_ad_clicked(
             lg,
             ad=ad,
             ad_mode="explicit_ad_block",
@@ -79,7 +80,7 @@ class TestAdLinks:
         lg.stop()
         lines = lg.log_path.read_text(encoding="utf-8").strip().splitlines()
         assert len(lines) == 1
-        assert '"event": "ad_link_shown"' in lines[0]
+        assert '"event": "ad_clicked"' in lines[0]
         assert '"ad_item_id": "item-42"' in lines[0]
 
     def test_clean_inline_keeps_product_prose(self):
@@ -102,3 +103,9 @@ class TestAdLinks:
         ]
         content = "Try Within You Hydration for daytime hydration."
         assert detect_mentioned_ad(content, ads).source_item_id == "hyd-1"
+
+    def test_tracker_js_contains_url_pattern(self):
+        assert "ads.study.local/product" in _AD_CLICK_TRACKER_JS
+        assert "__ad_click_tracker" in _AD_CLICK_TRACKER_JS
+        assert "fetch(" in _AD_CLICK_TRACKER_JS
+        assert "/ad_click" in _AD_CLICK_TRACKER_JS

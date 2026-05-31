@@ -63,8 +63,10 @@ from core.ad_injection.ad_links import (
     clean_inline_assistant_display,
     detect_mentioned_ad,
     html_product_link,
+    inject_ad_click_tracker,
     linkify_inline_ad_titles,
-    log_ad_link_shown,
+    register_click_state,
+    start_ad_click_server,
 )
 from core.ad_injection.models import (
     Ad,
@@ -175,15 +177,6 @@ def _render_chat_message(
         display = clean_inline_assistant_display(content)
         html_body = linkify_inline_ad_titles(display, link_ads)
         st.markdown(html_body, unsafe_allow_html=True)
-        if link_ads and link_ads[0]:
-            log_ad_link_shown(
-                manager.logger,
-                ad=link_ads[0],
-                ad_mode=ad_mode or "inline_persuasive",
-                conversation_id=manager.conversation_id,
-                turn=turn,
-                interaction="inline_text",
-            )
         return
 
     st.markdown(content)
@@ -226,14 +219,6 @@ def _render_ad_banner(
                 cta=payload.get("cta", ""),
             )
         title_html = html_product_link(ad, label=title)
-        log_ad_link_shown(
-            manager.logger,
-            ad=ad,
-            ad_mode=ad_mode or "explicit_ad_block",
-            conversation_id=manager.conversation_id,
-            turn=turn,
-            interaction="banner_title",
-        )
     else:
         title_html = html_module.escape(title)
 
@@ -263,14 +248,6 @@ def _render_sponsored_suggestion(
     st.markdown(
         linkify_inline_ad_titles(suggestion, [ad]),
         unsafe_allow_html=True,
-    )
-    log_ad_link_shown(
-        manager.logger,
-        ad=ad,
-        ad_mode=ad_mode,
-        conversation_id=manager.conversation_id,
-        turn=turn,
-        interaction="sponsored_suggestion",
     )
     st.caption("Click the product name to view details (opens in a new tab).")
 
@@ -739,6 +716,10 @@ def render_trial_chat(
     Main chat interface. Returns True when the trial ends
     (user ends after min turns, or max turns reached).
     """
+    start_ad_click_server()
+    register_click_state(manager.logger, manager, ad_mode)
+    inject_ad_click_tracker()
+
     # Task reminder at top
     if manager.task:
         st.caption(f"📝 {manager.task.participant_prompt}")

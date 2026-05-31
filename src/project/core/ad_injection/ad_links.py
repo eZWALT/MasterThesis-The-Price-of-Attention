@@ -3,18 +3,27 @@ Trackable product links for ad conversion (behavioral DV).
 
 Product names are rendered as blue ``<a>`` links pointing directly to the
 fake product URL (``AD_CONVERSION_URL_BASE``) with ``target="_blank"``.
-Clicking opens a new browser tab; the chat session is never navigated away.
+Clicking opens a new browser tab.
 
-``ad_link_shown`` is logged to JSONL when a clickable link is rendered so
-that downstream analysis can count ad engagements.
+A tiny threaded HTTP server (``start_ad_click_server``) runs inside the
+Streamlit process on ``AD_CLICK_SERVER_PORT``.  ``st.html`` injects a JS
+click listener that POSTs to this server on every ad-link click.  The
+server logs ``ad_clicked`` immediately — no page reload, no query-param
+hacks.
 """
 
 from __future__ import annotations
 
 import html
+import json
+import os
 import re
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from urllib.parse import quote
+
+from loguru import logger as log
 
 from core.ad_injection.models import Ad, participant_display_title
 from core.config import AD_CONVERSION_URL_BASE
@@ -32,6 +41,10 @@ _PRODUCT_MENTION_RE = re.compile(
     r"\n\s*Product Mention:\s*\n.*",
     flags=re.IGNORECASE | re.DOTALL,
 )
+
+AD_CLICK_SERVER_PORT = int(os.getenv("AD_CLICK_SERVER_PORT", "7780"))
+
+_AD_URL_PATTERN = AD_CONVERSION_URL_BASE.rstrip("/").replace("https://", "").replace("http://", "")
 
 
 # ── URLs ──────────────────────────────────────────────────────────────────
@@ -62,9 +75,163 @@ def html_product_link(
     )
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+#  Threaded HTTP click server
+# ═══════════════════════════════════════════════════════════════════════════
+
+_click_state: Dict[str, Any] = {}
+_server_started = False
+
+
+class _AdClickHandler(BaseHTTPRequestHandler):
+    """Handles POST /ad_click from the browser JS."""
+
+    def do_POST(self):
+        if self.path != "/ad_click":
+            self._reply(404, {"error": "not found"})
+            return
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            body = json.loads(self.rfile.read(length)) if length else {}
+        except Exception:
+            self._reply(400, {"error": "bad json"})
+            return
+
+        item_id = body.get("item_id", "").strip()
+        if not item_id:
+            self._reply(400, {"error": "missing item_id"})
+            return
+
+        logger = _click_state.get("logger")
+        manager = _click_state.get("manager")
+        ad_mode = _click_state.get("ad_mode", "")
+
+        if logger is None:
+            self._reply(503, {"error": "logger not ready"})
+            return
+
+        turn = 0
+        conversation_id = ""
+        if manager is not None:
+            turn = getattr(manager, "turn_count", 0) or 0
+            conversation_id = getattr(manager, "conversation_id", "") or ""
+
+        ad = _find_ad_from_state(item_id)
+        log_ad_clicked(
+            logger,
+            ad=ad,
+            ad_mode=ad_mode,
+            conversation_id=conversation_id,
+            turn=turn,
+            interaction="product_link",
+        )
+        log.info("ad_clicked logged for item_id={} turn={}", item_id, turn)
+        self._reply(200, {"ok": True})
+
+    def do_OPTIONS(self):
+        """CORS preflight."""
+        self.send_response(200)
+        self._cors_headers()
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
+    def _reply(self, code: int, data: dict):
+        body = json.dumps(data).encode()
+        self.send_response(code)
+        self._cors_headers()
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _cors_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+
+    def log_message(self, format, *args):
+        pass
+
+
+def _find_ad_from_state(item_id: str) -> Ad:
+    manager = _click_state.get("manager")
+    if manager is not None:
+        turn = getattr(manager, "turn_count", 0) or 0
+        for ad in manager.ads_by_turn.get(turn, []):
+            if ad.source_item_id == item_id:
+                return ad
+        if manager.last_retrieval and manager.last_retrieval.primary:
+            primary = manager.last_retrieval.primary
+            if primary.source_item_id == item_id:
+                return primary
+    return Ad(title=item_id, text="", source_item_id=item_id)
+
+
+def start_ad_click_server() -> None:
+    """Start the click-logging HTTP server once (idempotent)."""
+    global _server_started
+    if _server_started:
+        return
+    _server_started = True
+    try:
+        server = HTTPServer(("0.0.0.0", AD_CLICK_SERVER_PORT), _AdClickHandler)
+    except OSError as exc:
+        log.warning("Ad click server failed to bind on port {}: {}", AD_CLICK_SERVER_PORT, exc)
+        return
+    t = threading.Thread(target=server.serve_forever, daemon=True)
+    t.start()
+    log.info("Ad click server listening on :{}", AD_CLICK_SERVER_PORT)
+
+
+def register_click_state(
+    logger: "ExperimentLogger",
+    manager: "ConversationManager",
+    ad_mode: str,
+) -> None:
+    """Update the state the click server uses to log events."""
+    _click_state["logger"] = logger
+    _click_state["manager"] = manager
+    _click_state["ad_mode"] = ad_mode
+
+
+# ── JS click tracker (injected into page) ────────────────────────────────
+
+def _build_tracker_js(port: int) -> str:
+    return (
+        '<script>\n'
+        '(function() {\n'
+        '    if (window.__ad_click_tracker) return;\n'
+        '    window.__ad_click_tracker = true;\n'
+        '    document.addEventListener("click", function(e) {\n'
+        '        var link = e.target.closest(\'a[href*="' + _AD_URL_PATTERN + '"]\');\n'
+        '        if (!link) return;\n'
+        '        var m = link.href.match(/\\/product\\/([^\\/?#]+)/);\n'
+        '        if (!m) return;\n'
+        '        var itemId = decodeURIComponent(m[1]);\n'
+        '        fetch("http://" + location.hostname + ":' + str(port) + '/ad_click", {\n'
+        '            method: "POST",\n'
+        '            headers: {"Content-Type": "application/json"},\n'
+        '            body: JSON.stringify({item_id: itemId})\n'
+        '        }).catch(function(){});\n'
+        '    }, true);\n'
+        '})();\n'
+        '</script>'
+    )
+
+
+_AD_CLICK_TRACKER_JS: str = _build_tracker_js(AD_CLICK_SERVER_PORT)
+
+
+def inject_ad_click_tracker() -> None:
+    """Inject a JS click listener that POSTs to the local click server."""
+    import streamlit as st
+
+    st.html(_AD_CLICK_TRACKER_JS, unsafe_allow_javascript=True)
+
+
 # ── JSONL logging ─────────────────────────────────────────────────────────
 
-def log_ad_link_shown(
+def log_ad_clicked(
     logger: "ExperimentLogger",
     *,
     ad: Ad,
@@ -73,9 +240,9 @@ def log_ad_link_shown(
     turn: int,
     interaction: str,
 ) -> None:
-    """Record that a clickable product link was shown (behavioral DV)."""
+    """Record an ad click conversion (behavioral DV)."""
     logger.log(
-        "ad_link_shown",
+        "ad_clicked",
         compact_event_data(
             {
                 "ad_item_id": ad.source_item_id,
@@ -87,7 +254,7 @@ def log_ad_link_shown(
         ),
         ad_mode,
         conversation_id,
-        source="system",
+        source="user",
         turn=turn,
     )
 
