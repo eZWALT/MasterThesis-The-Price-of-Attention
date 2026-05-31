@@ -14,7 +14,7 @@ from core.ad_injection.ad_links import (
     linkify_inline_ad_titles,
     log_ad_clicked,
 )
-from core.ad_injection.models import Ad, compact_display_payload
+from core.ad_injection.models import Ad, ad_image_url, catalog_image_url, compact_display_payload
 from core.logger import ExperimentLogger
 
 
@@ -29,6 +29,31 @@ class TestAdLinks:
         payload = enrich_display_payload(ad, compact_display_payload(ad))
         assert payload["source_item_id"] == "x1"
         assert payload["click_url"].endswith("/x1")
+        assert "image_url" not in payload
+
+    def test_enrich_display_payload_includes_image(self):
+        ad = Ad(
+            title="Boots",
+            text="",
+            source_item_id="x1",
+            metadata={"image": "https://cdn.example/boot.jpg"},
+        )
+        payload = enrich_display_payload(ad, compact_display_payload(ad))
+        assert payload["image_url"] == "https://cdn.example/boot.jpg"
+
+    def test_catalog_image_url_from_amazon_images_list(self):
+        url = catalog_image_url(
+            {
+                "images": [
+                    {"thumb": "https://cdn.example/thumb.jpg", "large": "https://cdn.example/large.jpg"}
+                ]
+            }
+        )
+        assert url == "https://cdn.example/large.jpg"
+
+    def test_ad_image_url_missing_for_synthetic(self):
+        ad = Ad(title="Mock", text="", source_item_id="mock")
+        assert ad_image_url(ad) is None
 
     def test_html_product_link_opens_new_tab(self):
         ad = Ad(title="Boots", text="", source_item_id="shoe-1")

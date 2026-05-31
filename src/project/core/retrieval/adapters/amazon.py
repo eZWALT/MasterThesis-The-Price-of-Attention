@@ -91,8 +91,13 @@ class AmazonAdapter(DatasetAdapter):
             metadata["average_rating"] = raw["average_rating"]
         if raw.get("rating_number") is not None:
             metadata["rating_number"] = raw["rating_number"]
+        if raw.get("rating_number") is not None:
+            metadata["rating_number"] = raw["rating_number"]
         if raw.get("details"):
             metadata["details"] = raw["details"]
+        image_url = self._extract_image_url(raw)
+        if image_url:
+            metadata["image"] = image_url
 
         return {
             "item_id":  item_id,
@@ -137,6 +142,16 @@ class AmazonAdapter(DatasetAdapter):
                 parts.append(reviews)
 
         return " ".join(parts).strip()
+
+    @staticmethod
+    def _extract_image_url(raw: Dict[str, Any]) -> str:
+        """Pick the best image URL from Amazon metadata fields."""
+        from core.ad_injection.models import catalog_image_url
+
+        direct = raw.get("image")
+        if isinstance(direct, str) and direct.strip().startswith(("http://", "https://")):
+            return direct.strip()
+        return catalog_image_url({"images": raw.get("images")}) or ""
 
     @staticmethod
     def _parse_category(raw: Dict[str, Any]) -> str:

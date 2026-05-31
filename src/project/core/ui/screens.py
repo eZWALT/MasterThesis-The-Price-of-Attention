@@ -70,6 +70,7 @@ from core.ad_injection.ad_links import (
 )
 from core.ad_injection.models import (
     Ad,
+    ad_image_url,
     format_products_block,
     is_sponsored_chat_message,
     sponsored_message_to_payload,
@@ -128,6 +129,27 @@ def _banner_box_style(*, explicit: bool) -> str:
     return base + "border-left:4px solid #ff9800;"
 
 
+def _ad_image_html(image_url: str, *, size_px: int = 72) -> str:
+    """Optional product thumbnail — omitted when no image URL exists."""
+    safe_url = html_module.escape(image_url, quote=True)
+    alt = html_module.escape("Product")
+    return (
+        f'<img src="{safe_url}" alt="{alt}" '
+        f'style="width:{size_px}px;height:{size_px}px;object-fit:cover;'
+        f'border-radius:6px;flex-shrink:0;background:#1a1a1a;" />'
+    )
+
+
+def _resolve_payload_image_url(payload: dict, ad: Ad | None) -> str | None:
+    """Image URL from display payload or linked ad metadata."""
+    url = payload.get("image_url")
+    if isinstance(url, str) and url.strip().startswith(("http://", "https://")):
+        return url.strip()
+    if ad is not None:
+        return ad_image_url(ad)
+    return None
+
+
 def _render_chat_history(manager: ConversationManager, ad_mode: str) -> None:
     """Render full message history with trackable inline/banner ad links."""
     turn = 0
@@ -156,11 +178,16 @@ def _render_chat_message(
     if is_sponsored_chat_message(content):
         payload = sponsored_message_to_payload(content)
         if payload:
+            ad = None
+            if manager is not None and turn is not None and turn in manager.ads_by_turn:
+                ads = manager.ads_by_turn[turn]
+                ad = detect_mentioned_ad(payload.get("title", ""), ads) or (ads[0] if ads else None)
             _render_ad_banner(
                 payload,
                 ad_mode=ad_mode or "sponsored_conversational",
                 manager=manager,
                 turn=turn or 0,
+                ad=ad,
             )
             return
 
@@ -222,12 +249,26 @@ def _render_ad_banner(
     else:
         title_html = html_module.escape(title)
 
+    image_url = _resolve_payload_image_url(payload, ad)
+    if image_url:
+        body_html = (
+            f'<div style="display:flex;align-items:flex-start;gap:12px;">'
+            f"{_ad_image_html(image_url, size_px=72)}"
+            f'<div style="flex:1;min-width:0;">'
+            f'<p style="{label_style}">{label}</p>'
+            f'<p style="{title_style}">{title_html}</p>'
+            f"{cta_html}"
+            f"</div></div>"
+        )
+    else:
+        body_html = (
+            f'<p style="{label_style}">{label}</p>'
+            f'<p style="{title_style}">{title_html}</p>'
+            f"{cta_html}"
+        )
+
     st.markdown(
-        f'<div class="ad-banner" style="{box_style}">'
-        f'<p style="{label_style}">{label}</p>'
-        f'<p style="{title_style}">{title_html}</p>'
-        f"{cta_html}"
-        f"</div>",
+        f'<div class="ad-banner" style="{box_style}">{body_html}</div>',
         unsafe_allow_html=True,
     )
 
@@ -245,10 +286,18 @@ def _render_sponsored_suggestion(
     turn: int,
 ) -> None:
     """Follow-up suggestion with the product name as a clickable link."""
-    st.markdown(
-        linkify_inline_ad_titles(suggestion, [ad]),
-        unsafe_allow_html=True,
-    )
+    suggestion_html = linkify_inline_ad_titles(suggestion, [ad])
+    image_url = ad_image_url(ad)
+    if image_url:
+        st.markdown(
+            f'<div style="display:flex;align-items:center;gap:10px;margin:4px 0;">'
+            f"{_ad_image_html(image_url, size_px=48)}"
+            f'<div style="flex:1;min-width:0;">{suggestion_html}</div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(suggestion_html, unsafe_allow_html=True)
     st.caption("Click the product name to view details (opens in a new tab).")
 
 

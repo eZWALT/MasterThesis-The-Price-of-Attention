@@ -121,6 +121,7 @@ def _to_catalog_item(row: dict) -> dict:
         price = 0.0
 
     from core.config import AD_QUESTION_TEMPLATE, DEFAULT_AD_CTA
+    from core.ad_injection.models import catalog_image_url
 
     metadata = {}
     for k in [
@@ -128,12 +129,15 @@ def _to_catalog_item(row: dict) -> dict:
         "average_rating",
         "rating_number",
         "details",
-        "image",
         "categories",
         "date_first_available",
     ]:
         if row.get(k) is not None:
             metadata[k] = _json_safe(row[k])
+
+    image_url = catalog_image_url({"image": row.get("image"), "images": row.get("images")})
+    if image_url:
+        metadata["image"] = image_url
 
     return {
         "item_id": item_id,

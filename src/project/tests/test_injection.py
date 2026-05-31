@@ -83,6 +83,17 @@ class TestOtherInjectorsUsePrimaryOnly:
         assert result.display_payload["header"] == EXPLICIT_AD_LABEL
         assert "text" not in result.display_payload
 
+    def test_explicit_block_includes_image_when_present(self):
+        injector = ExplicitAdBlockInjector()
+        ad = Ad(
+            title="Camera",
+            text="body",
+            source_item_id="cam-1",
+            metadata={"image": "https://cdn.example/cam.jpg"},
+        )
+        result = injector.inject(AdRetrievalResult(ads=[ad]), [])
+        assert result.display_payload["image_url"] == "https://cdn.example/cam.jpg"
+
     def test_sponsored_conversational_includes_display_payload(self):
         injector = SponsoredConversationalInjector()
         result = injector.inject(_sample_ads(1), [])

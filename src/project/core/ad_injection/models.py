@@ -45,6 +45,42 @@ def participant_display_title(
     return title[: max_len - 1].rstrip() + "…"
 
 
+def catalog_image_url(metadata: Dict[str, Any] | None) -> str | None:
+    """
+    Best-effort product image URL from catalog metadata.
+
+    Supports the normalised ``metadata.image`` string (catalog.jsonl) and
+    raw Amazon ``images`` lists (``hi_res`` / ``large`` / ``thumb``).
+    Returns ``None`` for synthetic/mock ads with no image.
+    """
+    if not metadata:
+        return None
+
+    direct = metadata.get("image")
+    if isinstance(direct, str):
+        url = direct.strip()
+        if url.startswith(("http://", "https://")):
+            return url
+
+    images = metadata.get("images")
+    if isinstance(images, list) and images:
+        first = images[0]
+        if isinstance(first, dict):
+            for key in ("hi_res", "large", "thumb", "variant"):
+                candidate = first.get(key)
+                if isinstance(candidate, str) and candidate.strip().startswith(("http://", "https://")):
+                    return candidate.strip()
+        elif isinstance(first, str) and first.strip().startswith(("http://", "https://")):
+            return first.strip()
+
+    return None
+
+
+def ad_image_url(ad: "Ad") -> str | None:
+    """Product image URL for an ad, if the retrieved catalog item has one."""
+    return catalog_image_url(ad.metadata)
+
+
 def compact_display_payload(ad: "Ad", header: str | None = None) -> Dict[str, str]:
     """UI banner fields: label, title, CTA only (no catalog description)."""
     return {
