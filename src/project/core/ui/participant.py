@@ -15,6 +15,7 @@ from core.config import (
     DEFAULT_MAX_TOKENS,
     TRIALS_PER_SESSION,
     PRACTICE_SYSTEM_PROMPT_EXT,
+    STUDY_TYPE_LABELS,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
     SCREEN_OCEAN,
@@ -74,12 +75,29 @@ def init_session_state(params):
         )
         ctrl.build_trial_plan()
         st.session_state.controller = ctrl
+        st.session_state.experiment_params = params
         log.info(
-            "Session init | pid={} | exp={} | run={} | trials={}",
+            "Session init | pid={} | study={} | skip={} | exp={} | run={} | trials={}",
             pid,
+            params.study_type,
+            sorted(params.skip_screens),
             st.session_state.logger.experiment_id,
             st.session_state.logger.run_id,
             ctrl.n_trials,
+        )
+        st.session_state.logger.log(
+            "session_started",
+            {
+                "participant_id": pid,
+                "study_type": params.study_type,
+                "skip_screens": sorted(params.skip_screens),
+                "n_trials": params.n_trials,
+                "turns_min": params.turns_min,
+                "turns_max": params.turns_max,
+            },
+            ad_mode="session",
+            conversation_id=pid,
+            source="system",
         )
 
     if "practice_manager" not in st.session_state:
@@ -334,8 +352,10 @@ def _sync_dev_overrides(mgr) -> None:
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════════
 
-def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False, bfi_version: str = "10"):
+def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False, bfi_version: str = "10", study_type: str | None = None):
     with st.sidebar:
+        if study_type:
+            st.caption(f"Study: {STUDY_TYPE_LABELS.get(study_type, study_type)}")
         if flow_test:
             st.caption(f"pid: `{ctrl.participant_id}`")
             st.divider()
@@ -389,13 +409,25 @@ def run_participant_mode(params):
     ctrl: ExperimentController = st.session_state.controller
     scr = ctrl.current_screen
 
-    render_progress_sidebar(ctrl, flow_test=params.flow_test, bfi_version=params.bfi_version)
+    render_progress_sidebar(
+        ctrl,
+        flow_test=params.flow_test,
+        bfi_version=params.bfi_version,
+        study_type=params.study_type,
+    )
 
     # Handle skip logic for screens
     if scr in params.skip_screens:
         if scr == SCREEN_BASELINE:
             clear_baseline_session_state()
         dev_inject_stub_data(ctrl, bfi_version=params.bfi_version)
+        st.session_state.logger.log(
+            "screen_skipped",
+            {"screen": scr, "study_type": params.study_type},
+            ad_mode="session",
+            conversation_id=ctrl.participant_id,
+            source="system",
+        )
         ctrl.advance()
         st.rerun()
         return
