@@ -170,26 +170,23 @@ STUDY_TYPE_CROWD: str = "crowd"
 STUDY_TYPES: set[str] = {STUDY_TYPE_LAB, STUDY_TYPE_CROWD}
 
 # Default when ?study= is absent from the URL.
-DEFAULT_STUDY_TYPE: str = os.getenv("STUDY_TYPE", STUDY_TYPE_LAB)
+DEFAULT_STUDY_TYPE: str = os.getenv("STUDY_TYPE", STUDY_TYPE_CROWD)
 
 # Smart defaults applied by ExperimentParams.apply_study_defaults().
 # Any param explicitly present in the URL overrides these.
+# Auto-skipped screens are defined separately in STUDY_SKIP_SCREENS (below).
 STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_LAB: {
-        "n_trials":       3,
-        "bfi_version":    "10",
-        "turns_min":      5,
-        "turns_max":      20,
-        "skip_screens":   set(),
-        "baseline":       True,     # EEG / eye-tracking baseline screen shown
+        "n_trials":    3,
+        "bfi_version": "10",
+        "turns_min":   5,
+        "turns_max":   20,
     },
     STUDY_TYPE_CROWD: {
-        "n_trials":       3,
-        "bfi_version":    "10",
-        "turns_min":      3,
-        "turns_max":      20,
-        "skip_screens":   {"baseline"},
-        "baseline":       False,
+        "n_trials":    3,
+        "bfi_version": "10",
+        "turns_min":   3,
+        "turns_max":   20,
     },
 }
 
@@ -460,6 +457,26 @@ SCREEN_POST_TRIAL_SURVEY: str = "post_trial_survey"
 SCREEN_FINAL_SURVEY:      str = "final_survey"
 SCREEN_DEBRIEF:           str = "debrief"
 SCREEN_DONE:              str = "done"
+
+
+# Per-study screens auto-advanced without rendering (extend these frozensets as needed).
+# lab   → full protocol incl. EEG/eye-tracking baseline
+# crowd → remote Prolific-style; no physiology hardware
+STUDY_SKIP_SCREENS: dict[str, frozenset[str]] = {
+    STUDY_TYPE_LAB: frozenset({SCREEN_DEMOGRAPHICS}),
+    STUDY_TYPE_CROWD: frozenset({SCREEN_BASELINE, SCREEN_DEMOGRAPHICS}),
+}
+
+
+def study_skip_screens(study_type: str) -> set[str]:
+    """Mutable copy of protocol screens skipped for *study_type*."""
+    return set(STUDY_SKIP_SCREENS.get(study_type, frozenset()))
+
+
+STUDY_TYPE_LABELS: dict[str, str] = {
+    STUDY_TYPE_LAB: "Lab (EEG / in-person)",
+    STUDY_TYPE_CROWD: "Crowdsourcing (remote)",
+}
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
