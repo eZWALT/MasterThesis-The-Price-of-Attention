@@ -164,6 +164,7 @@ from core.config import (
     SCREEN_PRACTICE,
     SCREEN_TRIAL_INTRO,
     SCREEN_FINAL_SURVEY,
+    study_skip_screens,
 )
 from core.experiment.tasks import TASK_CATALOG, TASK_BY_ID, TaskDefinition
 
@@ -320,11 +321,11 @@ def parse_query_params() -> ExperimentParams:
     while len(params.ad_modes) < params.n_trials:
         params.ad_modes.append(default_modes[len(params.ad_modes) % len(default_modes)])
 
-    # ── Skip screens ─────────────────────────────────────────
+    # ── Skip screens (URL extras merged with study protocol skips) ─
     skip_raw = p.get("skip", "").strip()
+    url_skip_screens: set[str] = set()
     if skip_raw:
-        params.skip_screens = {s for s in skip_raw.split(",") if s in SKIPPABLE_SCREENS}
-        explicitly_set.add("skip_screens")
+        url_skip_screens = {s for s in skip_raw.split(",") if s in SKIPPABLE_SCREENS}
 
     # ── Model override ────────────────────────────────────────
     model_raw = p.get("model", "").strip()
@@ -426,5 +427,8 @@ def parse_query_params() -> ExperimentParams:
 
     # ── Apply study-type smart defaults for unset params ──────
     params.apply_study_defaults(explicitly_set)
+
+    # Protocol skips (e.g. crowd → baseline) plus any ?skip= extras
+    params.skip_screens = study_skip_screens(params.study_type) | url_skip_screens
 
     return params
