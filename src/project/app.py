@@ -5,7 +5,9 @@ All experiment configuration is driven by URL query parameters.
 See core/experiment/query_params.py for the full parameter reference.
 
 Quick reference:
-  /                                          production participant session
+  /                                          production participant session (crowd protocol by default)
+  ?study=crowd&pid=p42                       crowdsourcing — skips EEG baseline automatically
+  ?study=lab&pid=p01                         in-person lab — full protocol incl. baseline
   ?dev=true                                  developer free-chat mode
   ?dev=flow                                  participant flow + skip buttons
   ?dev=flow&skip=consent,baseline            skip boring screens in testing

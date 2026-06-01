@@ -55,11 +55,35 @@ cb=2  →  [C, D, E, A, B]
 | `turns_max` | `8` | `MAX_TURNS_PER_TRIAL` | Turns at which chat is force-closed |
 | `ad_turns` | `2,5` | `AD_INJECTION_TURNS` | 1-indexed turns that trigger ad injection |
 
-### Screen skipping
+### Study protocol (lab vs crowdsourcing)
 
 | Param | Values | Default | Description |
 |-------|--------|---------|-------------|
-| `skip` | comma-separated screen names | — | Silently auto-advance past these screens |
+| `study` | `lab` \| `crowd` | `crowd` (or `STUDY_TYPE` env) | Protocol preset — controls auto-skipped screens and turn defaults |
+
+| Study | Baseline (EEG) | Default `turns_min` | Auto-skipped screens |
+|-------|----------------|---------------------|----------------------|
+| `lab` | shown | 5 | `demographics` |
+| `crowd` | skipped | 3 | `baseline`, `demographics` |
+
+Add more auto-skipped screens per study in `STUDY_SKIP_SCREENS` in `core/config.py`.
+URL `skip=` extras are **merged** with the study protocol (e.g. `?study=crowd&skip=consent` skips baseline + consent).
+
+**Lab session (full protocol)**
+```
+http://localhost:7777?study=lab&pid=p01
+```
+
+**Crowdsourcing session (no EEG baseline)**
+```
+http://localhost:7777?study=crowd&pid=p42
+```
+
+### Screen skipping (dev / extras)
+
+| Param | Values | Default | Description |
+|-------|--------|---------|-------------|
+| `skip` | comma-separated screen names | — | Additional screens to auto-advance (merged with `study` skips) |
 
 Valid screen names: `consent`, `demographics`, `ocean`, `baseline`, `practice`, `trial_intro`, `final_survey`
 

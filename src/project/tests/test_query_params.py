@@ -62,10 +62,25 @@ class TestParseQueryParams:
         assert "consent" in p.skip_screens
         assert "baseline" in p.skip_screens
 
-    def test_study_crowd_applies_defaults(self):
+    def test_study_crowd_skips_baseline(self):
         p = self._parse({"study": "crowd"})
         assert p.study_type == "crowd"
-        assert "baseline" in p.skip_screens or p.skip_screens  # crowd may skip baseline
+        assert "baseline" in p.skip_screens
+        assert "demographics" in p.skip_screens
+        assert p.turns_min == 3
+
+    def test_study_lab_includes_baseline(self):
+        p = self._parse({"study": "lab"})
+        assert p.study_type == "lab"
+        assert "baseline" not in p.skip_screens
+        assert "demographics" in p.skip_screens
+        assert p.turns_min == 5
+
+    def test_study_crowd_merges_url_skip_with_protocol(self):
+        p = self._parse({"study": "crowd", "skip": "consent"})
+        assert "baseline" in p.skip_screens
+        assert "demographics" in p.skip_screens
+        assert "consent" in p.skip_screens
 
 
 @pytest.mark.unit
