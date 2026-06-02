@@ -149,7 +149,8 @@ def _get_or_create_practice_manager() -> ConversationManager:
             min_turns=ctrl.turns_min,
             max_turns=ctrl.turns_max,
             finish_from=ctrl.finish_from,
-            ad_turns=ctrl.ad_turns,
+            ad_turns=[],          # No ads in practice round
+            use_rag=False,        # No RAG pipeline needed for practice
         )
         st.session_state.practice_manager = mgr
     return mgr
