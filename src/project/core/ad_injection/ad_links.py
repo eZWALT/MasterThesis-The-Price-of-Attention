@@ -168,13 +168,22 @@ def _find_ad_from_state(item_id: str) -> Ad:
 
 
 def start_ad_click_server() -> None:
-    """Start the click-logging HTTP server once (idempotent)."""
+    """Start the click-logging HTTP server once (idempotent).
+
+    Uses ``allow_reuse_address = True`` (SO_REUSEADDR) so the port can
+    be rebound immediately after a Streamlit hot-reload or container
+    restart — avoids EADDRINUSE from sockets lingering in TIME_WAIT.
+    """
     global _server_started
     if _server_started:
         return
     _server_started = True
+
+    class _ReusableHTTPServer(HTTPServer):
+        allow_reuse_address = True
+
     try:
-        server = HTTPServer(("0.0.0.0", AD_CLICK_SERVER_PORT), _AdClickHandler)
+        server = _ReusableHTTPServer(("0.0.0.0", AD_CLICK_SERVER_PORT), _AdClickHandler)
     except OSError as exc:
         log.warning("Ad click server failed to bind on port {}: {}", AD_CLICK_SERVER_PORT, exc)
         return
