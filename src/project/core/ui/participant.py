@@ -512,6 +512,10 @@ def run_participant_mode(params):
                 from dataclasses import asdict
                 from datetime import datetime
 
+                # Determine end reason for continuation tracking
+                end_reason = "max_turns" if mgr.must_end else "user_ended"
+                continuation_summary = mgr.finalize_trial(reason=end_reason)
+
                 trial_end_ts = datetime.now().isoformat()
                 trial_record = {
                     "trial": ctrl.trial_number,
@@ -525,6 +529,7 @@ def run_participant_mode(params):
                     "trial_start_ts": mgr.trial_start_ts,
                     "trial_end_ts": trial_end_ts,
                     "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
+                    "continuation": continuation_summary,
                     "messages": list(mgr.messages),
                 }
                 ctrl.trial_results.append(trial_record)
@@ -537,9 +542,10 @@ def run_participant_mode(params):
                     turn=mgr.turn_count,
                 )
                 log.info(
-                    "Trial {}/{} complete | pid={} | turns={} | ads_injected={}",
+                    "Trial {}/{} complete | pid={} | turns={} | ads_injected={} | continued_after_ad={}",
                     ctrl.trial_number, ctrl.n_trials,
                     ctrl.participant_id, mgr.turn_count, len(mgr.ad_turns_actual),
+                    continuation_summary.get("n_continued_after_ad", "?"),
                 )
                 st.session_state.trial_manager = None
                 ctrl.advance()

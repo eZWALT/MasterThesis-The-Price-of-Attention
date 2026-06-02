@@ -60,6 +60,7 @@ class TurnMetrics:
     attention_divergence: Optional[float] = None  # attention shift KL
     time_to_reply_ms: Optional[float] = None  # user delay since last assistant msg (set by UI)
     intent_label: str = ""                   # ThradBERT intent classification for this turn
+    continued: bool = True                   # did the user send another message after this turn?
 
 
 @dataclass
@@ -468,6 +469,7 @@ class ConversationManager:
             attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
             intent_label=turn_intent,
+            continued=True,
         )
         self.turn_metrics.append(metrics)
 
@@ -479,6 +481,68 @@ class ConversationManager:
             must_end=self.must_end,
             attention_shift=shift,
         )
+
+    def finalize_trial(self, reason: str = "user_ended") -> dict:
+        """Mark the last turn as continued=False and return a trial summary dict.
+
+        Call this when the participant ends the conversation (Done button)
+        or when max turns is reached (auto-end).
+
+        Parameters
+        ----------
+        reason : "user_ended" | "max_turns" — why the trial ended.
+
+        Returns
+        -------
+        dict with continuation stats for logging.
+        """
+        # ── Set continued=False on the last turn ──────────────
+        if self.turn_metrics:
+            self.turn_metrics[-1].continued = False
+
+        # ── Compute continuation summary ──────────────────────
+        n_turns = len(self.turn_metrics)
+        n_ad_turns = sum(1 for m in self.turn_metrics if m.ad_injected)
+        n_continued_after_ad = sum(
+            1 for m in self.turn_metrics
+            if m.ad_injected and m.continued
+        )
+        n_continued_total = sum(1 for m in self.turn_metrics if m.continued)
+
+        # ── time_to_reply_ms statistics ───────────────────────
+        reply_times = [
+            m.time_to_reply_ms for m in self.turn_metrics
+            if m.time_to_reply_ms is not None
+        ]
+        avg_reply_ms = sum(reply_times) / len(reply_times) if reply_times else None
+        median_reply_ms = sorted(reply_times)[len(reply_times) // 2] if reply_times else None
+
+        summary = {
+            "reason": reason,
+            "n_turns": n_turns,
+            "n_ad_turns": n_ad_turns,
+            "n_continued_after_ad": n_continued_after_ad,
+            "n_continued_total": n_continued_total,
+            "continuation_rate_after_ad": round(n_continued_after_ad / n_ad_turns, 3) if n_ad_turns else None,
+            "continuation_rate_overall": round(n_continued_total / n_turns, 3) if n_turns else None,
+            "avg_time_to_reply_ms": round(avg_reply_ms, 1) if avg_reply_ms is not None else None,
+            "median_time_to_reply_ms": round(median_reply_ms, 1) if median_reply_ms is not None else None,
+            "per_turn_continued": [
+                {"turn": m.turn, "ad_injected": m.ad_injected, "continued": m.continued}
+                for m in self.turn_metrics
+            ],
+        }
+
+        self.logger.log(
+            "trial_end",
+            compact_event_data(summary, turn=n_turns),
+            self.ad_mode,
+            self.conversation_id,
+            source="system",
+            turn=n_turns,
+        )
+
+        return summary
 
     def clear_ad_display_state(self) -> None:
         """Drop cached retrieval/injection without clearing chat history."""
