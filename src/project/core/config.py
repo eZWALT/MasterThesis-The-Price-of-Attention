@@ -199,6 +199,15 @@ TRIALS_PER_SESSION: int    = 3
 MIN_TURNS_PER_TRIAL: int   = 3
 MAX_TURNS_PER_TRIAL: int   = 20
 
+# Turn at which the "I've finished" button becomes visible in the sidebar.
+# Participants can keep chatting beyond this, but the button gives them
+# an explicit way to signal they're done at any point from this turn on.
+# Must be ≥ 1 and ≤ MAX_TURNS_PER_TRIAL.
+# Defaults to MIN_TURNS_PER_TRIAL so the button appears as soon as the
+# participant has met the minimum turn requirement — researchers can
+# override via ?finish_from=N or the FINISH_BUTTON_VISIBLE_FROM_TURN env var.
+FINISH_BUTTON_VISIBLE_FROM_TURN: int = int(os.getenv("FINISH_BUTTON_VISIBLE_FROM_TURN", str(MIN_TURNS_PER_TRIAL)))
+
 # 1-indexed user turns at which ads are automatically injected.
 AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every turn for dev=flow
 

@@ -38,7 +38,6 @@ from core.config import (
     # Practice
     PRACTICE_TASK_PROMPT,
     # Trials
-    MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     AD_SIDE_PANEL_MODES,
 )
@@ -763,7 +762,7 @@ def render_trial_chat(
 ) -> bool:
     """
     Main chat interface. Returns True when the trial ends
-    (user ends after min turns, or max turns reached).
+    (user clicks "I've finished" or max turns reached).
     """
     start_ad_click_server()
     register_click_state(manager.logger, manager, ad_mode)
@@ -773,17 +772,21 @@ def render_trial_chat(
     if manager.task:
         st.caption(f"📝 {manager.task.participant_prompt}")
 
-    # Turn progress in sidebar
+    # Turn progress + finish button in sidebar
     with st.sidebar:
         progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
         st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
 
-        if manager.can_end:
-            st.success(
-                f"✓ Minimum of {MIN_TURNS_PER_TRIAL} turns reached. "
-                "You can keep chatting or end the conversation."
-            )
-            if st.button("✅ End Conversation"):
+        # "I've finished" button — visible from manager.finish_from onwards
+        if manager.turn_count >= manager.finish_from:
+            if manager.turn_count < manager.min_turns:
+                st.info(
+                    f"💬 Keep chatting — you need at least {manager.min_turns} turns "
+                    "before you can finish."
+                )
+            else:
+                st.success("You can keep chatting or finish when you're ready.")
+            if st.button("🏁 I've finished", type="primary", use_container_width=True):
                 return True
 
     _render_chat_history(manager, ad_mode)

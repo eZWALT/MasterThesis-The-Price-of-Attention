@@ -59,6 +59,10 @@ turns_max   Maximum user turns before the chat is auto-closed
             Example: ?turns_max=8
             Default: MAX_TURNS_PER_TRIAL from config
 
+finish_from Turn from which the "I've finished" button becomes visible
+            Example: ?finish_from=5
+            Default: FINISH_BUTTON_VISIBLE_FROM_TURN from config (= turns_min)
+
 ad_turns    1-indexed user turns at which ads are injected (comma-separated)
             Example: ?ad_turns=2,5
             Default: AD_INJECTION_TURNS from config
@@ -155,6 +159,7 @@ from core.config import (
     TRIALS_PER_SESSION,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
+    FINISH_BUTTON_VISIBLE_FROM_TURN,
     AD_INJECTION_TURNS,
     VALID_QUERY_EXPANSION_MODES,
     SCREEN_CONSENT,
@@ -218,6 +223,7 @@ class ExperimentParams:
     # ── Turn constraints (per trial) ─────────────────
     turns_min: int = MIN_TURNS_PER_TRIAL
     turns_max: int = MAX_TURNS_PER_TRIAL
+    finish_from: Optional[int] = None   # None → FINISH_BUTTON_VISIBLE_FROM_TURN
     ad_turns: List[int] = field(default_factory=lambda: list(AD_INJECTION_TURNS))
 
     # ── BFI version for OCEAN screen ─────────────────
@@ -372,6 +378,14 @@ def parse_query_params() -> ExperimentParams:
     # Ensure turns_min <= turns_max
     if params.turns_min > params.turns_max:
         params.turns_max = params.turns_min
+
+    # ── Finish button visible from turn ────────────────────────
+    try:
+        ff = int(p.get("finish_from", ""))
+        if 1 <= ff <= 30:
+            params.finish_from = ff
+    except (ValueError, TypeError):
+        pass
 
     # ── Ad injection turns ────────────────────────────────────
     ad_turns_raw = p.get("ad_turns", "").strip()
