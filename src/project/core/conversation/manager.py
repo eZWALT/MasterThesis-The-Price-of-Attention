@@ -30,6 +30,7 @@ from core.config import (
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     AD_INJECTION_TURNS,
+    FINISH_BUTTON_VISIBLE_FROM_TURN,
 )
 from core.ad_injection import get_ad, get_injector
 from core.ad_injection.models import Ad, AdRetrievalResult, InjectionResult
@@ -112,6 +113,7 @@ class ConversationManager:
         attention_estimator: AttentionEstimator | None = None,
         min_turns: int = MIN_TURNS_PER_TRIAL,
         max_turns: int = MAX_TURNS_PER_TRIAL,
+        finish_from: int | None = None,
         ad_turns: Optional[List[int]] = None,
         force_ad: bool = False,
         use_rag: Optional[bool] = None,
@@ -126,6 +128,7 @@ class ConversationManager:
         self.attention_estimator = attention_estimator
         self.min_turns = min_turns
         self.max_turns = max_turns
+        self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
         self.ad_turns: List[int] = ad_turns if ad_turns is not None else list(AD_INJECTION_TURNS)
         # Dev overrides — None means "respect module-level defaults"
         self._force_ad: bool = force_ad

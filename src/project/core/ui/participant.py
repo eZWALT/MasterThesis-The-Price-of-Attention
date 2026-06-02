@@ -71,6 +71,7 @@ def init_session_state(params):
             cb_group=params.cb_group,
             turns_min=params.turns_min,
             turns_max=params.turns_max,
+            finish_from=params.finish_from,
             ad_turns=params.ad_turns,
         )
         ctrl.build_trial_plan()
@@ -147,6 +148,7 @@ def _get_or_create_practice_manager() -> ConversationManager:
             logger=st.session_state.logger,
             min_turns=ctrl.turns_min,
             max_turns=ctrl.turns_max,
+            finish_from=ctrl.finish_from,
             ad_turns=ctrl.ad_turns,
         )
         st.session_state.practice_manager = mgr
@@ -194,6 +196,7 @@ def _get_or_create_trial_manager(
             logger=st.session_state.logger,
             min_turns=ctrl.turns_min,
             max_turns=ctrl.turns_max,
+            finish_from=ctrl.finish_from,
             ad_turns=ctrl.ad_turns,
             force_ad=force_ad,
             use_rag=use_rag,

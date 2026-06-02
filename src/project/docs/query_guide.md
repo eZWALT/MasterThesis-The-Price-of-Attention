@@ -51,8 +51,9 @@ cb=2  →  [C, D, E, A, B]
 
 | Param | Example | Default | Description |
 |-------|---------|---------|-------------|
-| `turns_min` | `4` | `MIN_TURNS_PER_TRIAL` | Turns required before "Done" button appears |
+| `turns_min` | `4` | `MIN_TURNS_PER_TRIAL` | Turns required before "I've finished" actually ends the trial |
 | `turns_max` | `8` | `MAX_TURNS_PER_TRIAL` | Turns at which chat is force-closed |
+| `finish_from` | `5` | `FINISH_BUTTON_VISIBLE_FROM_TURN` (= `turns_min`) | Turn from which the "I've finished" button becomes visible |
 | `ad_turns` | `2,5` | `AD_INJECTION_TURNS` | 1-indexed turns that trigger ad injection |
 
 ### Study protocol (lab vs crowdsourcing)
@@ -143,5 +144,6 @@ http://localhost:7777?pid=p01&seed=42&cb=2&tasks=trans_plan_trip&modes=5_implici
 
 - Invalid or out-of-range values are **silently ignored** — the system falls back to config defaults.
 - `turns_min` is clamped to `≤ turns_max` automatically.
+- `finish_from` defaults to `FINISH_BUTTON_VISIBLE_FROM_TURN`, which itself defaults to `MIN_TURNS_PER_TRIAL` (= `turns_min`). The button appears from that turn onward as soft guidance — clicking it always ends the trial regardless of `turns_min`.
 - `tasks` and `modes` lists are padded or trimmed to match `n` if lengths differ.
 - `cb` and `seed` are logged in the session export for reproducibility audits.

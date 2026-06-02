@@ -22,6 +22,7 @@ from core.config import (
     AD_MODES,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
+    FINISH_BUTTON_VISIBLE_FROM_TURN,
     AD_INJECTION_TURNS,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
@@ -80,6 +81,7 @@ class ExperimentController:
         cb_group: Optional[int] = None,
         turns_min: int = MIN_TURNS_PER_TRIAL,
         turns_max: int = MAX_TURNS_PER_TRIAL,
+        finish_from: Optional[int] = None,
         ad_turns: Optional[List[int]] = None,
     ):
         self.participant_id = participant_id
@@ -89,6 +91,7 @@ class ExperimentController:
         self.cb_group = cb_group
         self.turns_min = turns_min
         self.turns_max = turns_max
+        self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
         self.ad_turns: List[int] = ad_turns if ad_turns is not None else list(AD_INJECTION_TURNS)
 
         # Pre-resolved tasks/modes from params (may be None → auto)
