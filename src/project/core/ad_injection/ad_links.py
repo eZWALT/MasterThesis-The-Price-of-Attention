@@ -90,25 +90,94 @@ class _AdClickHandler(BaseHTTPRequestHandler):
         if self.path != "/ad_click":
             self._reply(404, {"error": "not found"})
             return
-        try:
-            length = int(self.headers.get("Content-Length", 0))
-            body = json.loads(self.rfile.read(length)) if length else {}
-        except Exception:
-            self._reply(400, {"error": "bad json"})
-            return
 
-        item_id = body.get("item_id", "").strip()
+        item_id = self._parse_item_id()
         if not item_id:
             self._reply(400, {"error": "missing item_id"})
             return
 
+        ok = self._record_click(item_id)
+        if ok:
+            self._reply(200, {"ok": True})
+        else:
+            self._reply(503, {"error": "logger not ready"})
+
+    def do_GET(self):
+        """Tracking-pixel fallback (Image().src=...)."""
+        from urllib.parse import parse_qs, urlparse
+        parsed = urlparse(self.path)
+        if parsed.path != "/ad_click":
+            self._reply(404, {"error": "not found"})
+            return
+        qs = parse_qs(parsed.query)
+        item_id = qs.get("item_id", [""])[0].strip()
+        if item_id:
+            self._record_click(item_id)
+        # Return a 1×1 transparent GIF (always, even on error)
+        self.send_response(200)
+        self._cors_headers()
+        self.send_header("Content-Type", "image/gif")
+        self.send_header("Content-Length", "43")
+        self.send_header("Connection", "close")
+        self.end_headers()
+        self.wfile.write(
+            b"GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff"
+            b"\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,"
+            b"\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+        )
+
+    def do_OPTIONS(self):
+        """CORS preflight."""
+        self.send_response(200)
+        self._cors_headers()
+        self.send_header("Content-Length", "0")
+        self.send_header("Connection", "close")
+        self.end_headers()
+
+    # ── helpers ────────────────────────────────────────────────────────
+
+    def _parse_item_id(self) -> str:
+        """Extract item_id from either JSON or form-urlencoded POST body."""
+        content_type = self.headers.get("Content-Type", "")
+        length = int(self.headers.get("Content-Length", 0))
+
+        if "application/json" in content_type:
+            try:
+                body = json.loads(self.rfile.read(length)) if length else {}
+            except Exception:
+                return ""
+            return body.get("item_id", "").strip()
+
+        # navigator.sendBeacon sends application/x-www-form-urlencoded
+        if "application/x-www-form-urlencoded" in content_type or "text/plain" in content_type:
+            try:
+                raw = self.rfile.read(length).decode() if length else ""
+            except Exception:
+                return ""
+            from urllib.parse import parse_qs
+            pairs = parse_qs(raw)
+            return pairs.get("item_id", [""])[0].strip()
+
+        # Fallback: try JSON then form-encoded
+        try:
+            raw = self.rfile.read(length).decode() if length else ""
+        except Exception:
+            return ""
+        try:
+            body = json.loads(raw)
+            return body.get("item_id", "").strip()
+        except Exception:
+            pairs = parse_qs(raw)
+            return pairs.get("item_id", [""])[0].strip()
+
+    def _record_click(self, item_id: str) -> bool:
+        """Log the click event. Returns True on success, False if logger not ready."""
         logger = _click_state.get("logger")
         manager = _click_state.get("manager")
         ad_mode = _click_state.get("ad_mode", "")
 
         if logger is None:
-            self._reply(503, {"error": "logger not ready"})
-            return
+            return False
 
         turn = 0
         conversation_id = ""
@@ -126,14 +195,7 @@ class _AdClickHandler(BaseHTTPRequestHandler):
             interaction="product_link",
         )
         log.info("ad_clicked logged for item_id={} turn={}", item_id, turn)
-        self._reply(200, {"ok": True})
-
-    def do_OPTIONS(self):
-        """CORS preflight."""
-        self.send_response(200)
-        self._cors_headers()
-        self.send_header("Content-Length", "0")
-        self.end_headers()
+        return True
 
     def _reply(self, code: int, data: dict):
         body = json.dumps(data).encode()
@@ -141,12 +203,13 @@ class _AdClickHandler(BaseHTTPRequestHandler):
         self._cors_headers()
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
+        self.send_header("Connection", "close")
         self.end_headers()
         self.wfile.write(body)
 
     def _cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
     def log_message(self, format, *args):
@@ -181,6 +244,10 @@ def start_ad_click_server() -> None:
 
     class _ReusableHTTPServer(HTTPServer):
         allow_reuse_address = True
+        # HTTP/1.1 is required for proper CORS preflight handling;
+        # HTTP/1.0 (the BaseHTTPRequestHandler default) causes some
+        # browsers to reject the preflight response.
+        protocol_version = "HTTP/1.1"
 
     try:
         server = _ReusableHTTPServer(("0.0.0.0", AD_CLICK_SERVER_PORT), _AdClickHandler)
@@ -217,11 +284,21 @@ def _build_tracker_js(port: int) -> str:
         '        var m = link.href.match(/\\/product\\/([^\\/?#]+)/);\n'
         '        if (!m) return;\n'
         '        var itemId = decodeURIComponent(m[1]);\n'
-        '        fetch("http://" + location.hostname + ":' + str(port) + '/ad_click", {\n'
-        '            method: "POST",\n'
-        '            headers: {"Content-Type": "application/json"},\n'
-        '            body: JSON.stringify({item_id: itemId})\n'
-        '        }).catch(function(){});\n'
+        '        var url = "http://" + location.hostname + ":' + str(port) + '/ad_click";\n'
+        '        var payload = "item_id=" + encodeURIComponent(itemId);\n'
+        '        try {\n'
+        '            if (navigator.sendBeacon) {\n'
+        '                navigator.sendBeacon(url, payload);\n'
+        '            } else {\n'
+        '                var img = new Image();\n'
+        '                img.src = url + "?" + payload;\n'
+        '            }\n'
+        '        } catch(err) {\n'
+        '            try {\n'
+        '                var img = new Image();\n'
+        '                img.src = url + "?" + payload;\n'
+        '            } catch(_) {}\n'
+        '        }\n'
         '    }, true);\n'
         '})();\n'
         '</script>'
