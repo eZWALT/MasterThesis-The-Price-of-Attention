@@ -243,14 +243,15 @@ class ExperimentController:
 
     def exit_early(self) -> None:
         """
-        Terminate the session early — jump straight to post-trial screens.
+        Terminate the session early — skip remaining trials.
 
         The participant keeps all trial results collected so far and
-        proceeds through OCEAN → final_survey → done as normal.
+        proceeds through post_trial_survey → OCEAN → final_survey → done.
         """
         self.n_trials = self.current_trial_index
         # Truncate the trial plan to the trials actually completed
         self.trial_plan = self.trial_plan[: self.n_trials]
-        # Move to post-trial screens (skip remaining trial_intro/chat/survey)
-        self._trial_sub_index = 0
-        self.current_screen = _POST_TRIAL_SCREENS[0]
+        # Jump to the post-trial survey for the last completed trial,
+        # then the normal advance() will go OCEAN → final_survey → done.
+        self._trial_sub_index = _TRIAL_SCREENS.index(SCREEN_POST_TRIAL_SURVEY)
+        self.current_screen = SCREEN_POST_TRIAL_SURVEY
