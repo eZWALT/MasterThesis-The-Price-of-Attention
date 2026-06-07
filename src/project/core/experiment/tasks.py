@@ -30,8 +30,186 @@ TASK_CATALOG: list[TaskDefinition] = [
     # ── Simulated Work Task Situations ──────────────────────
     # (Borlund 2003; Borlund & Ingwersen 1997 — realistic information-
     # -seeking scenarios designed to trigger natural search behaviour.)
+    #
+    # Order matters: first n_trials tasks are the default picks.
 
-    # ── Informational ────────────────────────────────────────
+    # 1 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_new_hobby_lifestyle",
+        title="Find a new personal activity",
+        genre="Social",
+        participant_prompt=(
+            "You want to start a new hobby to improve your routine, "
+            "wellbeing, or social life. You have limited time and budget, "
+            "and you want something that fits your personality and "
+            "lifestyle. Find information that would help you identify "
+            "suitable hobby options and compare their practical "
+            "requirements."
+        ),
+        system_prompt_extension=(
+            "The user wants to start a new hobby to improve wellbeing, "
+            "routine, or social life with limited time and budget. Help "
+            "them explore options that fit their personality and lifestyle. "
+            "Compare practical requirements like cost, time commitment, "
+            "space, and learning curve. Ask about their current routine, "
+            "interests, and what they want to get out of the hobby."
+        ),
+        description="Social task — finding a hobby that matches personality, time, and budget constraints.",
+    ),
+
+    # 2 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_photography_event",
+        title="Document an important event",
+        genre="Informational",
+        participant_prompt=(
+            "You have been asked to photograph a community event for your "
+            "organisation. You already have access to a basic camera, but "
+            "you are unsure what additional equipment, if any, would help "
+            "you capture the event properly. Find information that would "
+            "help you prepare an appropriate photography kit for this "
+            "situation."
+        ),
+        system_prompt_extension=(
+            "The user is preparing to photograph a community event with a "
+            "basic camera. Help them figure out what additional equipment "
+            "— lenses, lighting, tripods, memory cards, etc. — would "
+            "improve their results. Ask about the venue, lighting "
+            "conditions, type of event, and what kind of shots they need."
+        ),
+        description="Informational task — preparing a photography kit for a community event.",
+    ),
+
+    # 3 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_birthday_surprise",
+        title="Plan a birthday surprise",
+        genre="Social",
+        participant_prompt=(
+            "Your close friend's birthday is in two weeks. You want to "
+            "prepare something thoughtful that reflects their personality, "
+            "interests, and your shared history, but you are unsure what "
+            "kind of surprise would feel personal rather than generic. "
+            "Find information that would help you decide what kinds of "
+            "gifts, experiences, or gestures might suit this friend."
+        ),
+        system_prompt_extension=(
+            "The user is planning a birthday surprise for a close friend. "
+            "Help them think about the friend's personality, shared "
+            "experiences, and what would feel meaningful vs. generic. "
+            "Suggest gift ideas, experience options, and personal "
+            "gestures. Ask about the friend's interests and their "
+            "relationship to narrow things down."
+        ),
+        description="Social task — planning a personalised birthday surprise for a friend.",
+    ),
+
+    # 4 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_study_environment",
+        title="Create a better study environment",
+        genre="Transactional",
+        participant_prompt=(
+            "You are beginning an intensive course that will require "
+            "several months of focused study from home. Your current setup "
+            "is distracting and uncomfortable, and you need to make it "
+            "easier to concentrate without overcomplicating the space. "
+            "Find information that would help you decide what changes to "
+            "your study environment would be most useful."
+        ),
+        system_prompt_extension=(
+            "The user needs to improve their home study environment for "
+            "an intensive multi-month course. Help them identify practical "
+            "changes — desk, chair, lighting, noise management, "
+            "organisation — that reduce distraction without overcomplicating "
+            "the space. Ask about their current setup, main distractions, "
+            "budget, and study schedule."
+        ),
+        description="Transactional task — improving a home study environment for focused work.",
+    ),
+
+    # 5 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_fitness_restart",
+        title="Prepare for a fitness restart",
+        genre="Social",
+        participant_prompt=(
+            "You want to become more active again after a long break. You "
+            "have limited time, some uncertainty about motivation, and no "
+            "clear idea whether home workouts, classes, running, or "
+            "another activity would suit you best. Find information that "
+            "would help you identify realistic fitness options that match "
+            "your schedule, preferences, and constraints."
+        ),
+        system_prompt_extension=(
+            "The user wants to restart fitness after a long break. Help "
+            "them compare realistic options — home workouts, classes, "
+            "running, apps, personal training — that fit their schedule, "
+            "motivation level, and preferences. Ask about their past "
+            "experience with exercise, current fitness level, available "
+            "time, and what has or hasn't worked before."
+        ),
+        description="Social task — finding realistic fitness options after a long break.",
+    ),
+
+    # 6 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_anniversary_surprise",
+        title="Plan a 10-year anniversary surprise",
+        genre="Social",
+        participant_prompt=(
+            "Your 10-year anniversary with your partner is coming up. You "
+            "want to plan something memorable that reflects your "
+            "relationship, shared experiences, and your partner's "
+            "preferences, but you are unsure whether a trip, event, "
+            "keepsake, or experience would feel most meaningful. Find "
+            "information that would help you decide what kinds of "
+            "anniversary surprises or experiences might suit this "
+            "relationship."
+        ),
+        system_prompt_extension=(
+            "The user is planning a 10-year anniversary surprise for their "
+            "partner. Help them think about what would feel most meaningful "
+            "— a trip, event, keepsake, or experience — based on their "
+            "relationship and shared history. Suggest ideas and help them "
+            "weigh the emotional impact of different options. Ask about "
+            "their partner's preferences, shared memories, and what has "
+            "felt special in the past."
+        ),
+        description="Social task — planning a meaningful anniversary surprise that reflects the relationship.",
+    ),
+
+    # 7 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_laptop_budget",
+        title="Choose the best laptop within a budget",
+        genre="Transactional",
+        participant_prompt=(
+            "You need a new laptop for software development and your "
+            "budget is capped at €1,200. You are unsure which "
+            "specifications matter most for writing, compiling, and "
+            "running code, and you want to avoid overspending on features "
+            "you will not use. Find information that would help you "
+            "compare laptop options, understand which specs to prioritise "
+            "for development work, and choose the best fit within your "
+            "budget."
+        ),
+        system_prompt_extension=(
+            "The user needs a laptop under €1,200 for software "
+            "development. Help them compare options and recommend the best "
+            "fit while respecting the budget constraint. Explain which "
+            "specifications matter most for development — CPU, RAM, "
+            "storage type, display — and which are less critical. Compare "
+            "concrete models at different price points and highlight "
+            "trade-offs. Ask about their tech stack, whether they need "
+            "GPU acceleration, portability needs, and which specs they "
+            "are unsure about."
+        ),
+        description="Transactional task — comparing laptops under €1,200 for software development, learning which specs matter most.",
+    ),
+
+    # ── Remaining tasks (order not critical) ────────────────
+
     TaskDefinition(
         id="swt_dev_role_setup",
         title="Prepare for a software development role",
@@ -74,27 +252,6 @@ TASK_CATALOG: list[TaskDefinition] = [
         description="Informational task — finding the right communication gear for remote work.",
     ),
     TaskDefinition(
-        id="swt_photography_event",
-        title="Document an important event",
-        genre="Informational",
-        participant_prompt=(
-            "You have been asked to photograph a community event for your "
-            "organisation. You already have access to a basic camera, but "
-            "you are unsure what additional equipment, if any, would help "
-            "you capture the event properly. Find information that would "
-            "help you prepare an appropriate photography kit for this "
-            "situation."
-        ),
-        system_prompt_extension=(
-            "The user is preparing to photograph a community event with a "
-            "basic camera. Help them figure out what additional equipment "
-            "— lenses, lighting, tripods, memory cards, etc. — would "
-            "improve their results. Ask about the venue, lighting "
-            "conditions, type of event, and what kind of shots they need."
-        ),
-        description="Informational task — preparing a photography kit for a community event.",
-    ),
-    TaskDefinition(
         id="swt_pricing_strategy",
         title="Plan pricing for a small online service",
         genre="Informational",
@@ -115,8 +272,6 @@ TASK_CATALOG: list[TaskDefinition] = [
         ),
         description="Informational task — researching pricing strategies for a small online business.",
     ),
-
-    # ── Transactional ────────────────────────────────────────
     TaskDefinition(
         id="swt_choose_destination",
         title="Choose a destination for a break",
@@ -160,99 +315,6 @@ TASK_CATALOG: list[TaskDefinition] = [
         description="Transactional task — planning a dinner party for guests with diverse preferences.",
     ),
     TaskDefinition(
-        id="swt_study_environment",
-        title="Create a better study environment",
-        genre="Transactional",
-        participant_prompt=(
-            "You are beginning an intensive course that will require "
-            "several months of focused study from home. Your current setup "
-            "is distracting and uncomfortable, and you need to make it "
-            "easier to concentrate without overcomplicating the space. "
-            "Find information that would help you decide what changes to "
-            "your study environment would be most useful."
-        ),
-        system_prompt_extension=(
-            "The user needs to improve their home study environment for "
-            "an intensive multi-month course. Help them identify practical "
-            "changes — desk, chair, lighting, noise management, "
-            "organisation — that reduce distraction without overcomplicating "
-            "the space. Ask about their current setup, main distractions, "
-            "budget, and study schedule."
-        ),
-        description="Transactional task — improving a home study environment for focused work.",
-    ),
-
-    # ── Social / Reflective ──────────────────────────────────
-    TaskDefinition(
-        id="swt_birthday_surprise",
-        title="Plan a birthday surprise",
-        genre="Social",
-        participant_prompt=(
-            "Your close friend's birthday is in two weeks. You want to "
-            "prepare something thoughtful that reflects their personality, "
-            "interests, and your shared history, but you are unsure what "
-            "kind of surprise would feel personal rather than generic. "
-            "Find information that would help you decide what kinds of "
-            "gifts, experiences, or gestures might suit this friend."
-        ),
-        system_prompt_extension=(
-            "The user is planning a birthday surprise for a close friend. "
-            "Help them think about the friend's personality, shared "
-            "experiences, and what would feel meaningful vs. generic. "
-            "Suggest gift ideas, experience options, and personal "
-            "gestures. Ask about the friend's interests and their "
-            "relationship to narrow things down."
-        ),
-        description="Social task — planning a personalised birthday surprise for a friend.",
-    ),
-    TaskDefinition(
-        id="swt_new_hobby_lifestyle",
-        title="Find a new personal activity",
-        genre="Social",
-        participant_prompt=(
-            "You want to start a new hobby to improve your routine, "
-            "wellbeing, or social life. You have limited time and budget, "
-            "and you want something that fits your personality and "
-            "lifestyle. Find information that would help you identify "
-            "suitable hobby options and compare their practical "
-            "requirements."
-        ),
-        system_prompt_extension=(
-            "The user wants to start a new hobby to improve wellbeing, "
-            "routine, or social life with limited time and budget. Help "
-            "them explore options that fit their personality and lifestyle. "
-            "Compare practical requirements like cost, time commitment, "
-            "space, and learning curve. Ask about their current routine, "
-            "interests, and what they want to get out of the hobby."
-        ),
-        description="Social task — finding a hobby that matches personality, time, and budget constraints.",
-    ),
-    TaskDefinition(
-        id="swt_anniversary_surprise",
-        title="Plan a 10-year anniversary surprise",
-        genre="Social",
-        participant_prompt=(
-            "Your 10-year anniversary with your partner is coming up. You "
-            "want to plan something memorable that reflects your "
-            "relationship, shared experiences, and your partner's "
-            "preferences, but you are unsure whether a trip, event, "
-            "keepsake, or experience would feel most meaningful. Find "
-            "information that would help you decide what kinds of "
-            "anniversary surprises or experiences might suit this "
-            "relationship."
-        ),
-        system_prompt_extension=(
-            "The user is planning a 10-year anniversary surprise for their "
-            "partner. Help them think about what would feel most meaningful "
-            "— a trip, event, keepsake, or experience — based on their "
-            "relationship and shared history. Suggest ideas and help them "
-            "weigh the emotional impact of different options. Ask about "
-            "their partner's preferences, shared memories, and what has "
-            "felt special in the past."
-        ),
-        description="Social task — planning a meaningful anniversary surprise that reflects the relationship.",
-    ),
-    TaskDefinition(
         id="swt_friend_new_job",
         title="Help a friend start a new job",
         genre="Social",
@@ -273,28 +335,6 @@ TASK_CATALOG: list[TaskDefinition] = [
             "preparation they are in."
         ),
         description="Social task — finding useful support or gifts for a friend starting a new job.",
-    ),
-    TaskDefinition(
-        id="swt_fitness_restart",
-        title="Prepare for a fitness restart",
-        genre="Social",
-        participant_prompt=(
-            "You want to become more active again after a long break. You "
-            "have limited time, some uncertainty about motivation, and no "
-            "clear idea whether home workouts, classes, running, or "
-            "another activity would suit you best. Find information that "
-            "would help you identify realistic fitness options that match "
-            "your schedule, preferences, and constraints."
-        ),
-        system_prompt_extension=(
-            "The user wants to restart fitness after a long break. Help "
-            "them compare realistic options — home workouts, classes, "
-            "running, apps, personal training — that fit their schedule, "
-            "motivation level, and preferences. Ask about their past "
-            "experience with exercise, current fitness level, available "
-            "time, and what has or hasn't worked before."
-        ),
-        description="Social task — finding realistic fitness options after a long break.",
     ),
     TaskDefinition(
         id="swt_friend_moving_abroad",
