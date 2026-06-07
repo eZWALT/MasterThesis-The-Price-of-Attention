@@ -71,6 +71,7 @@ class DenseRetriever(PipelineStage):
             query_vec: np.ndarray = self._embed.encode(embed_texts)
             item_ids = self._catalog.search(query_vec, top_k=self._top_k)
         else:
+            # Batch encode all HyDE docs in one forward pass, then search each vector.
             query_vecs: np.ndarray = self._embed.encode(embed_texts)
             hit_lists = [
                 self._catalog.search(query_vecs[i : i + 1], top_k=self._top_k)

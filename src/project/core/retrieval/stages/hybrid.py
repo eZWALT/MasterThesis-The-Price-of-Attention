@@ -50,6 +50,9 @@ class HybridRefiner(PipelineStage):
         self._bm25_w = BM25_WEIGHT
         self._dense_w = DENSE_WEIGHT
         self._filters = metadata_filters or {}
+        # Cache tokenised texts by item_id — avoids re-splitting the same
+        # catalog item's text on every retrieval turn.
+        self._token_cache: dict[str, List[str]] = {}
 
     # ── private ─────────────────────────────────────────────────────────
 
@@ -68,13 +71,22 @@ class HybridRefiner(PipelineStage):
             filtered.append(item)
         return filtered
 
+    def _tokenise_item(self, item: CatalogItem) -> List[str]:
+        """Tokenise item text with caching — avoids re-splitting across turns."""
+        tok = self._token_cache.get(item.item_id)
+        if tok is not None:
+            return tok
+        tok = item.text.lower().split()
+        self._token_cache[item.item_id] = tok
+        return tok
+
     def _bm25_rescore(
         self, query: str, items: List[CatalogItem]
     ) -> List[CatalogItem]:
         """Re-rank candidates with BM25 + RRF and return sorted list."""
         from rank_bm25 import BM25Okapi
 
-        tokenised_corpus = [item.text.lower().split() for item in items]
+        tokenised_corpus = [self._tokenise_item(item) for item in items]
         bm25 = BM25Okapi(tokenised_corpus)
         bm25_scores = bm25.get_scores(query.lower().split())
 

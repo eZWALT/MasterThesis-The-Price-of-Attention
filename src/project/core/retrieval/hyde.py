@@ -51,10 +51,18 @@ def _embedding_tokenizer():
 
 
 def count_embedding_tokens(text: str) -> int:
-    """Exact token count (display/diag only — generation limit is ``hyde_generation_max_tokens``)."""
+    """Exact token count (display/diag only — generation limit is ``hyde_generation_max_tokens``).
+
+    Lazily loads the tokenizer on first call.  If the tokenizer fails to
+    load (e.g. offline, no disk space), returns 0 silently so diagnostics
+    never break the pipeline.
+    """
     if not (text or "").strip():
         return 0
-    return len(_embedding_tokenizer().encode(text, add_special_tokens=False))
+    try:
+        return len(_embedding_tokenizer().encode(text, add_special_tokens=False))
+    except Exception:  # noqa: BLE001
+        return 0
 
 
 def parse_hyde_documents(text: str, *, max_docs: int | None = None) -> List[str]:
