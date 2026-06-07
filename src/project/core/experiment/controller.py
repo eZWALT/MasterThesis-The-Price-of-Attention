@@ -19,6 +19,7 @@ import random
 
 from core.config import (
     TRIALS_PER_SESSION,
+    EXIT_N_TRIALS,
     AD_MODES,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
@@ -234,3 +235,22 @@ class ExperimentController:
     @property
     def is_session_complete(self) -> bool:
         return self.current_screen == SCREEN_DONE
+
+    @property
+    def can_exit_early(self) -> bool:
+        """True when the participant has completed ≥ EXIT_N_TRIALS trials."""
+        return self.current_trial_index >= EXIT_N_TRIALS
+
+    def exit_early(self) -> None:
+        """
+        Terminate the session early — jump straight to post-trial screens.
+
+        The participant keeps all trial results collected so far and
+        proceeds through OCEAN → final_survey → done as normal.
+        """
+        self.n_trials = self.current_trial_index
+        # Truncate the trial plan to the trials actually completed
+        self.trial_plan = self.trial_plan[: self.n_trials]
+        # Move to post-trial screens (skip remaining trial_intro/chat/survey)
+        self._trial_sub_index = 0
+        self.current_screen = _POST_TRIAL_SCREENS[0]

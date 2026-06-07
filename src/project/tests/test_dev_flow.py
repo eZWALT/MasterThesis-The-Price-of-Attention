@@ -85,7 +85,7 @@ class TestGetOrCreateTrialManager:
     def test_keeps_manager_and_clears_ads_when_mode_changes_in_flow(self, monkeypatch):
         from core.ui.participant import _get_or_create_trial_manager
 
-        task = TASK_BY_ID["trans_find_product"]
+        task = TASK_BY_ID["swt_dev_role_setup"]
         logger = MagicMock()
         ctrl = MagicMock()
         ctrl.model = "test"

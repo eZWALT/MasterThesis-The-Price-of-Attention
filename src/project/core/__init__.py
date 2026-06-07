@@ -24,6 +24,7 @@ from core.config import (                                   # noqa: F401
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     TRIALS_PER_SESSION,
+    EXIT_N_TRIALS,
     AD_INJECTION_TURNS,
     AD_MODES,
     AD_MODE_LABELS,

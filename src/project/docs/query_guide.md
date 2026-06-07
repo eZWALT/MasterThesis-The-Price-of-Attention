@@ -26,8 +26,8 @@ The full parameter reference lives in `core/experiment/query_params.py`.
 
 | Param | Example | Default | Description |
 |-------|---------|---------|-------------|
-| `n` | `2` | `TRIALS_PER_SESSION` | Number of trials (1–20) |
-| `tasks` | `trans_plan_trip,social_new_hobby` | first N from catalog | Ordered task IDs |
+| `n` | `2` | `TRIALS_PER_SESSION` (=10) | Number of trials (1–20) |
+| `tasks` | `swt_dev_role_setup,swt_birthday_surprise` | first N from catalog | Ordered task IDs |
 | `modes` | `2_in_chat,4_adjacent` | first N from `AD_MODES` | Ordered ad mode keys |
 
 ### Counterbalancing & reproducibility
@@ -103,7 +103,7 @@ http://localhost:7777?pid=p01&cb=0&seed=7
 
 **Specific task and mode assignment**
 ```
-http://localhost:7777?pid=p02&tasks=trans_plan_trip,social_new_hobby&modes=2_in_chat,4_adjacent
+http://localhost:7777?pid=p02&tasks=swt_dev_role_setup,swt_birthday_surprise&modes=2_in_chat,4_adjacent
 ```
 
 **Reduced turns and early ad injection (pilot)**
@@ -123,7 +123,7 @@ http://localhost:7777?dev=flow&n=1&modes=5_implicit&skip=consent,baseline,demogr
 
 **Reproduce exact session from logs**
 ```
-http://localhost:7777?pid=p01&seed=42&cb=2&tasks=trans_plan_trip&modes=5_implicit&turns_min=6&turns_max=10&ad_turns=3,6
+http://localhost:7777?pid=p01&seed=42&cb=2&tasks=swt_dev_role_setup&modes=5_implicit&turns_min=6&turns_max=10&ad_turns=3,6
 ```
 
 ---
