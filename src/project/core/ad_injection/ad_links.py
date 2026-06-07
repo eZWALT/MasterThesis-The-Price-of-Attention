@@ -1,15 +1,15 @@
 """
 Trackable product links for ad conversion (behavioral DV).
 
-Product names are rendered as blue ``<a>`` links pointing directly to the
-fake product URL (``AD_CONVERSION_URL_BASE``) with ``target="_blank"``.
-Clicking opens a new browser tab.
+Product names are rendered as blue ``<a>`` links that point to the
+click-tracking server (``http://<host>:7780/click/<item_id>``) with
+``target="_blank"``.  Clicking opens a new browser tab; the server
+logs ``ad_clicked`` immediately and responds with an HTTP 302 redirect
+to the real product URL.
 
-A tiny threaded HTTP server (``start_ad_click_server``) runs inside the
-Streamlit process on ``AD_CLICK_SERVER_PORT``.  ``st.html`` injects a JS
-click listener that POSTs to this server on every ad-link click.  The
-server logs ``ad_clicked`` immediately — no page reload, no query-param
-hacks.
+No client-side JavaScript is required — the browser follows the
+redirect natively, making the tracking completely reliable regardless
+of CORS, Mixed Content, or Streamlit DOM quirks.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ import re
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
-from urllib.parse import quote
+from urllib.parse import parse_qs, quote, unquote, urlparse
 
 from loguru import logger as log
 
@@ -44,7 +44,10 @@ _PRODUCT_MENTION_RE = re.compile(
 
 AD_CLICK_SERVER_PORT = int(os.getenv("AD_CLICK_SERVER_PORT", "7780"))
 
-_AD_URL_PATTERN = AD_CONVERSION_URL_BASE.rstrip("/").replace("https://", "").replace("http://", "")
+# Hostname used for click-server redirect URLs.
+# When empty (default), the hostname is derived from Streamlit's request
+# context (st.context.url) so it matches whatever the browser used.
+AD_CLICK_SERVER_HOST: str = os.getenv("AD_CLICK_SERVER_HOST", "")
 
 
 # ── URLs ──────────────────────────────────────────────────────────────────
@@ -59,6 +62,27 @@ def ad_product_url_for_id(item_id: str) -> str:
     return f"{AD_CONVERSION_URL_BASE.rstrip('/')}/{quote(item_id.strip(), safe='')}"
 
 
+def _click_server_base_url() -> str:
+    """Return the base URL for the click-tracking server.
+
+    Uses ``AD_CLICK_SERVER_HOST`` if set, otherwise derives the hostname
+    from ``st.context.url`` so that the browser can reach port 7780 on
+    the same host it already uses for the Streamlit app.
+    """
+    host = AD_CLICK_SERVER_HOST
+    if not host:
+        try:
+            import streamlit as st
+            page_url = st.context.url
+            if page_url:
+                host = urlparse(page_url).hostname or "localhost"
+        except Exception:
+            pass
+    if not host:
+        host = "localhost"
+    return f"http://{host}:{AD_CLICK_SERVER_PORT}"
+
+
 # ── HTML link generation ──────────────────────────────────────────────────
 
 def html_product_link(
@@ -66,12 +90,20 @@ def html_product_link(
     *,
     label: str | None = None,
 ) -> str:
-    """Product title as an ``<a>`` that opens the product URL in a new tab."""
+    """Product title as an ``<a>`` that routes through the click server.
+
+    The href points to ``http://<host>:7780/click/<item_id>`` so the
+    click server can log the event before redirecting the browser to
+    the real product page.  No JavaScript is needed.
+    """
     text = html.escape(label or participant_display_title(ad))
-    href = html.escape(ad_product_url(ad), quote=True)
+    item_id = quote((ad.source_item_id or "unknown").strip(), safe="")
+    click_href = f"{_click_server_base_url()}/click/{item_id}"
+    href = html.escape(click_href, quote=True)
     return (
         f'<a href="{href}" target="_blank" rel="noopener noreferrer" '
-        f'title="{href}" style="{_AD_LINK_STYLE}">{text}</a>'
+        f'title="{html.escape(ad_product_url(ad), quote=True)}" '
+        f'style="{_AD_LINK_STYLE}">{text}</a>'
     )
 
 
@@ -84,47 +116,57 @@ _server_started = False
 
 
 class _AdClickHandler(BaseHTTPRequestHandler):
-    """Handles POST /ad_click from the browser JS."""
-
-    def do_POST(self):
-        if self.path != "/ad_click":
-            self._reply(404, {"error": "not found"})
-            return
-
-        item_id = self._parse_item_id()
-        if not item_id:
-            self._reply(400, {"error": "missing item_id"})
-            return
-
-        ok = self._record_click(item_id)
-        if ok:
-            self._reply(200, {"ok": True})
-        else:
-            self._reply(503, {"error": "logger not ready"})
+    """Handles GET /click/<item_id> → log + 302 redirect, and
+    POST /ad_click for legacy JS-based tracking."""
 
     def do_GET(self):
-        """Tracking-pixel fallback (Image().src=...)."""
-        from urllib.parse import parse_qs, urlparse
+        """Redirect-based click tracking.
+
+        Path ``/click/<item_id>`` logs the click and redirects the
+        browser to the real product URL.  This is the primary tracking
+        mechanism — no client-side JavaScript is required.
+        """
+        from urllib.parse import urlparse
         parsed = urlparse(self.path)
-        if parsed.path != "/ad_click":
-            self._reply(404, {"error": "not found"})
+        path = parsed.path.rstrip("/")
+
+        # ── /click/<item_id>  →  log + 302 redirect ──
+        if path.startswith("/click/"):
+            item_id = path[len("/click/"):]
+            # URL-decode in case the item_id contains encoded chars
+            from urllib.parse import unquote
+            item_id = unquote(item_id).strip()
+            if item_id:
+                self._record_click(item_id)
+            # Always redirect to the product page (even if logging failed)
+            target = ad_product_url_for_id(item_id) if item_id else AD_CONVERSION_URL_BASE
+            self.send_response(302)
+            self.send_header("Location", target)
+            self.send_header("Content-Length", "0")
+            self.send_header("Connection", "close")
+            self.end_headers()
             return
-        qs = parse_qs(parsed.query)
-        item_id = qs.get("item_id", [""])[0].strip()
-        if item_id:
-            self._record_click(item_id)
-        # Return a 1×1 transparent GIF (always, even on error)
-        self.send_response(200)
-        self._cors_headers()
-        self.send_header("Content-Type", "image/gif")
-        self.send_header("Content-Length", "43")
-        self.send_header("Connection", "close")
-        self.end_headers()
-        self.wfile.write(
-            b"GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff"
-            b"\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,"
-            b"\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
-        )
+
+        # ── Legacy tracking-pixel fallback ──
+        if parsed.path == "/ad_click":
+            qs = parse_qs(parsed.query)
+            item_id = qs.get("item_id", [""])[0].strip()
+            if item_id:
+                self._record_click(item_id)
+            self.send_response(200)
+            self._cors_headers()
+            self.send_header("Content-Type", "image/gif")
+            self.send_header("Content-Length", "43")
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.wfile.write(
+                b"GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff"
+                b"\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,"
+                b"\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+            )
+            return
+
+        self._reply(404, {"error": "not found"})
 
     def do_OPTIONS(self):
         """CORS preflight."""
@@ -133,6 +175,21 @@ class _AdClickHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", "0")
         self.send_header("Connection", "close")
         self.end_headers()
+
+    def do_POST(self):
+        """Legacy POST /ad_click (sendBeacon) — kept for backward compat."""
+        if self.path != "/ad_click":
+            self._reply(404, {"error": "not found"})
+            return
+        item_id = self._parse_item_id()
+        if not item_id:
+            self._reply(400, {"error": "missing item_id"})
+            return
+        ok = self._record_click(item_id)
+        if ok:
+            self._reply(200, {"ok": True})
+        else:
+            self._reply(503, {"error": "logger not ready"})
 
     # ── helpers ────────────────────────────────────────────────────────
 
@@ -268,51 +325,6 @@ def register_click_state(
     _click_state["logger"] = logger
     _click_state["manager"] = manager
     _click_state["ad_mode"] = ad_mode
-
-
-# ── JS click tracker (injected into page) ────────────────────────────────
-
-def _build_tracker_js(port: int) -> str:
-    return (
-        '<script>\n'
-        '(function() {\n'
-        '    if (window.__ad_click_tracker) return;\n'
-        '    window.__ad_click_tracker = true;\n'
-        '    document.addEventListener("click", function(e) {\n'
-        '        var link = e.target.closest(\'a[href*="' + _AD_URL_PATTERN + '"]\');\n'
-        '        if (!link) return;\n'
-        '        var m = link.href.match(/\\/product\\/([^\\/?#]+)/);\n'
-        '        if (!m) return;\n'
-        '        var itemId = decodeURIComponent(m[1]);\n'
-        '        var url = "http://" + location.hostname + ":' + str(port) + '/ad_click";\n'
-        '        var payload = "item_id=" + encodeURIComponent(itemId);\n'
-        '        try {\n'
-        '            if (navigator.sendBeacon) {\n'
-        '                navigator.sendBeacon(url, payload);\n'
-        '            } else {\n'
-        '                var img = new Image();\n'
-        '                img.src = url + "?" + payload;\n'
-        '            }\n'
-        '        } catch(err) {\n'
-        '            try {\n'
-        '                var img = new Image();\n'
-        '                img.src = url + "?" + payload;\n'
-        '            } catch(_) {}\n'
-        '        }\n'
-        '    }, true);\n'
-        '})();\n'
-        '</script>'
-    )
-
-
-_AD_CLICK_TRACKER_JS: str = _build_tracker_js(AD_CLICK_SERVER_PORT)
-
-
-def inject_ad_click_tracker() -> None:
-    """Inject a JS click listener that POSTs to the local click server."""
-    import streamlit as st
-
-    st.html(_AD_CLICK_TRACKER_JS, unsafe_allow_javascript=True)
 
 
 # ── JSONL logging ─────────────────────────────────────────────────────────
@@ -463,3 +475,22 @@ def enrich_display_payload(ad: Ad, payload: Dict[str, Any]) -> Dict[str, Any]:
     if image_url:
         out["image_url"] = image_url
     return out
+
+
+# ── JS click tracker (LEGACY — no longer required) ────────────────────────
+#
+# The redirect-based approach (ad links point to /click/<item_id> on the
+# click server) makes client-side JavaScript tracking unnecessary.
+# ``inject_ad_click_tracker()`` is kept as a no-op so that existing
+# call-sites (screens.py, dev.py) don't break.
+
+def _build_tracker_js(port: int) -> str:
+    return ""
+
+
+_AD_CLICK_TRACKER_JS: str = ""
+
+
+def inject_ad_click_tracker() -> None:
+    """No-op — redirect-based tracking makes JS injection unnecessary."""
+    pass

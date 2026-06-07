@@ -59,7 +59,7 @@ class TestAdLinks:
         ad = Ad(title="Boots", text="", source_item_id="shoe-1")
         result = html_product_link(ad, label="Boots")
         assert 'target="_blank"' in result
-        assert "/shoe-1" in result
+        assert "/click/shoe-1" in result
         assert "Boots" in result
 
     def test_linkify_wraps_bold_title(self):
@@ -129,8 +129,6 @@ class TestAdLinks:
         content = "Try Within You Hydration for daytime hydration."
         assert detect_mentioned_ad(content, ads).source_item_id == "hyd-1"
 
-    def test_tracker_js_contains_url_pattern(self):
-        assert "ads.study.local/product" in _AD_CLICK_TRACKER_JS
-        assert "__ad_click_tracker" in _AD_CLICK_TRACKER_JS
-        assert "fetch(" in _AD_CLICK_TRACKER_JS
-        assert "/ad_click" in _AD_CLICK_TRACKER_JS
+    def test_tracker_js_is_empty_no_js_needed(self):
+        # JS tracker is no longer needed — redirect-based tracking is used
+        assert _AD_CLICK_TRACKER_JS == ""
