@@ -4,7 +4,8 @@
 #
 # Usage:
 #   ./launch.sh              # defaults to ollama
-#   ./launch.sh --ollama     # explicit ollama mode
+#   ./launch.sh --ollama     # explicit ollama mode (Docker, no GPU)
+#   ./launch.sh --host       # run Streamlit on host with GPU access
 #   ./launch.sh --vllm       # vLLM mode (requires nvidia-container-toolkit)
 # ─────────────────────────────────────────────────────────────────────────────
 set -e
@@ -30,9 +31,10 @@ for arg in "$@"; do
     case $arg in
         --ollama) MODE="ollama" ;;
         --vllm)   MODE="vllm"   ;;
+        --host)   MODE="host"   ;;
         *)
             echo "Unknown argument: $arg"
-            echo "Usage: $0 [--ollama|--vllm]"
+            echo "Usage: $0 [--ollama|--host|--vllm]"
             exit 1
             ;;
     esac
@@ -91,10 +93,52 @@ launch_vllm() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
+# HOST path  —  runs Streamlit directly on the host (full GPU access,
+#               no nvidia-container-toolkit needed)
+# ─────────────────────────────────────────────────────────────────────────────
+launch_host() {
+    export OLLAMA_HOST="0.0.0.0:${OLLAMA_PORT}"
+    export OLLAMA_KEEP_ALIVE="${OLLAMA_KEEP_ALIVE:--1}"
+
+    echo "[1/4] Starting ollama on port ${OLLAMA_PORT}..."
+    "$OLLAMA_BIN" serve &
+    OLLAMA_PID=$!
+
+    trap "echo 'Shutting down...'; kill \$OLLAMA_PID 2>/dev/null" EXIT INT TERM
+
+    echo "[2/4] Waiting for ollama to be ready..."
+    until curl -sf "http://localhost:${OLLAMA_PORT}/api/tags" > /dev/null 2>&1; do
+        sleep 1
+    done
+    echo "      ollama is up."
+
+    if "$OLLAMA_BIN" list | grep -q "^${OLLAMA_MODEL}"; then
+        echo "[3/4] Model ${OLLAMA_MODEL} already present, skipping pull."
+    else
+        echo "[3/4] Pulling ${OLLAMA_MODEL} (this may take a while)..."
+        "$OLLAMA_BIN" pull "$OLLAMA_MODEL"
+    fi
+
+    # Point the app at the local ollama (not Docker host.docker.internal)
+    export API_URL="http://localhost:${OLLAMA_PORT}/v1/chat/completions"
+    export OLLAMA_API_BASE="http://localhost:${OLLAMA_PORT}"
+    export DEFAULT_MODEL="${OLLAMA_MODEL}"
+    export LLM_BACKEND="ollama"
+    export LLM_THINK="${LLM_THINK:-false}"
+
+    echo "[4/4] Starting Streamlit on host (GPU-enabled)..."
+    cd "${SCRIPT_DIR}"
+    streamlit run app.py \
+        --server.port "${STREAMLIT_PORT}" \
+        --server.address 0.0.0.0
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Dispatch
 # ─────────────────────────────────────────────────────────────────────────────
 case $MODE in
     ollama) launch_ollama ;;
+    host)   launch_host   ;;
     vllm)   launch_vllm   ;;
 esac
 
