@@ -412,7 +412,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             st.divider()
             remaining = ctrl.n_trials - ctrl.current_trial_index
             if st.button(
-                f"🚪 Leave study early ({remaining} trial{'s' if remaining != 1 else ''} left)",
+                "🚪 Leave study early",
                 use_container_width=True,
                 help=f"You have completed {ctrl.current_trial_index} of {ctrl.n_trials} trials. "
                      f"You may stop now and your data so far will be saved, or continue with the remaining trials.",
