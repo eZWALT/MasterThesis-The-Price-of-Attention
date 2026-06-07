@@ -208,6 +208,37 @@ TASK_CATALOG: list[TaskDefinition] = [
         description="Transactional task — comparing laptops under €1,200 for software development, learning which specs matter most.",
     ),
 
+    # 8 ──────────────────────────────────────────────────────
+    TaskDefinition(
+        id="swt_plasticfree_living",
+        title="Go plastic-free to protect your health",
+        genre="Informational",
+        participant_prompt=(
+            "You have been reading about the health risks of microplastics "
+            "and want to reduce your exposure by eliminating as much "
+            "plastic from your daily life as possible. You know this is "
+            "an almost impossible task, but you want to find out where "
+            "plastic hides in your food, household products, clothing, "
+            "and personal care items, and what realistic alternatives "
+            "exist. Find information that would help you identify the "
+            "biggest sources of plastic in everyday life and discover "
+            "practical ways to avoid them."
+        ),
+        system_prompt_extension=(
+            "The user wants to reduce microplastic exposure by going "
+            "plastic-free. Help them discover where plastic is hidden in "
+            "daily life — food packaging, kitchen utensils, clothing "
+            "fibres, personal care products, household items — and what "
+            "alternatives exist. Be realistic: acknowledge that complete "
+            "elimination is nearly impossible, but help prioritise the "
+            "changes with the biggest impact. Compare swaps by cost, "
+            "convenience, and effectiveness. Ask about their diet, "
+            "household routines, and which areas of life they most want "
+            "to change."
+        ),
+        description="Informational task — discovering hidden sources of plastic in daily life and finding realistic alternatives to reduce microplastic exposure.",
+    ),
+
     # ── Remaining tasks (order not critical) ────────────────
 
     TaskDefinition(
