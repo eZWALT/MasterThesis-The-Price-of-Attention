@@ -17,7 +17,7 @@ pid         Force a specific participant ID (for re-running or debugging)
             Example: ?pid=abc123
 
 tasks       Ordered comma-separated task IDs for this session
-            Example: ?tasks=info_optimize_routine,trans_plan_trip
+            Example: ?tasks=swt_dev_role_setup,swt_birthday_surprise
             Default: first N tasks from TASK_CATALOG
 
 modes       Ordered comma-separated advertising mode keys
@@ -119,7 +119,7 @@ EXAMPLE URLS
 ───────────────────────────────────────────────────────────────────────────────
 
 Lab session — full protocol, specific task/mode assignment:
-  http://localhost:7777?study=lab&pid=p01&tasks=trans_plan_trip,social_new_hobby&modes=inline_persuasive,explicit_ad_block
+  http://localhost:7777?study=lab&pid=p01&tasks=swt_dev_role_setup,swt_birthday_surprise&modes=inline_persuasive,explicit_ad_block
 
 Crowdsourcing session — lightweight, 2 trials, BFI-10, skip baseline:
   http://localhost:7777?study=crowd&pid=p42

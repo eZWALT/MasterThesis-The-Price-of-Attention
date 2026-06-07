@@ -14,6 +14,7 @@ from core.config import (
     DEFAULT_TEMPERATURE,
     DEFAULT_MAX_TOKENS,
     TRIALS_PER_SESSION,
+    EXIT_N_TRIALS,
     PRACTICE_SYSTEM_PROMPT_EXT,
     STUDY_TYPE_LABELS,
     SCREEN_CONSENT,
@@ -402,6 +403,33 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             SCREEN_DONE: "Done ✓",
         }
         st.caption(f"📍 {labels.get(ctrl.current_screen, ctrl.current_screen)}")
+
+        # ── Early-exit button ────────────────────────────────
+        # Appears once the participant has completed ≥ EXIT_N_TRIALS trials.
+        # They can continue to the full n_trials, or leave with data so far.
+        _trial_screens = {SCREEN_TRIAL_INTRO, SCREEN_TRIAL_CHAT, SCREEN_POST_TRIAL_SURVEY}
+        if ctrl.can_exit_early and ctrl.current_screen in _trial_screens:
+            st.divider()
+            remaining = ctrl.n_trials - ctrl.current_trial_index
+            if st.button(
+                f"🚪 Leave study early ({remaining} trial{'s' if remaining != 1 else ''} left)",
+                use_container_width=True,
+                help=f"You have completed {ctrl.current_trial_index} of {ctrl.n_trials} trials. "
+                     f"You may stop now and your data so far will be saved, or continue with the remaining trials.",
+            ):
+                st.session_state.logger.log(
+                    "early_exit",
+                    {
+                        "trials_completed": ctrl.current_trial_index,
+                        "trials_planned": ctrl.n_trials,
+                        "current_screen": ctrl.current_screen,
+                    },
+                    ad_mode="session",
+                    conversation_id=ctrl.participant_id,
+                    source="user",
+                )
+                ctrl.exit_early()
+                st.rerun()
 
 
 # ═══════════════════════════════════════════════════════════════

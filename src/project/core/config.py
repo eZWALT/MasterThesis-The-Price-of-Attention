@@ -177,13 +177,13 @@ DEFAULT_STUDY_TYPE: str = os.getenv("STUDY_TYPE", STUDY_TYPE_CROWD)
 # Auto-skipped screens are defined separately in STUDY_SKIP_SCREENS (below).
 STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_LAB: {
-        "n_trials":    3,
+        "n_trials":    10,
         "bfi_version": "10",
         "turns_min":   5,
         "turns_max":   20,
     },
     STUDY_TYPE_CROWD: {
-        "n_trials":    3,
+        "n_trials":    10,
         "bfi_version": "10",
         "turns_min":   3,
         "turns_max":   20,
@@ -195,9 +195,16 @@ STUDY_DEFAULTS: dict[str, dict] = {
 # │  4.  EXPERIMENT DESIGN                                                  │
 # └─────────────────────────────────────────────────────────────────────────┘
 
-TRIALS_PER_SESSION: int    = 3
+TRIALS_PER_SESSION: int    = 10
 MIN_TURNS_PER_TRIAL: int   = 3
 MAX_TURNS_PER_TRIAL: int   = 20
+
+# Minimum number of trials a participant must complete before the
+# "Leave study early" button appears in the sidebar.  Participants
+# who complete at least this many trials are considered to have
+# provided sufficient data; they may still continue to the full
+# n_trials if they wish.
+EXIT_N_TRIALS: int         = 5
 
 # Turn at which the "I've finished" button becomes visible in the sidebar.
 # Participants can keep chatting beyond this, but the button gives them
