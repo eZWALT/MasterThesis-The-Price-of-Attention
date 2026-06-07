@@ -293,7 +293,7 @@ QUERY_EXPANSION_MODE: str        = os.getenv("QUERY_EXPANSION_MODE", "hyde").low
 VALID_QUERY_EXPANSION_MODES: set[str] = {"none", "hyde", "expand"}
 HYDE_TEMPERATURE: float          = 0.5   # slight creativity for hypothetical docs
 # One LLM call → multiple HyDE passages (see core.retrieval.hyde).
-HYDE_NUM_DOCS: int               = int(os.getenv("HYDE_NUM_DOCS", "4"))
+HYDE_NUM_DOCS: int               = int(os.getenv("HYDE_NUM_DOCS", "2"))
 HYDE_MAX_TOKENS: int             = int(os.getenv("HYDE_MAX_TOKENS", "512"))
 # Per-doc target; LLM num_predict = min(HYDE_MAX_TOKENS, HYDE_NUM_DOCS * HYDE_TOKENS_PER_DOC).
 HYDE_TOKENS_PER_DOC: int         = int(os.getenv("HYDE_TOKENS_PER_DOC", "100"))
@@ -334,7 +334,7 @@ EMBEDDING_DEVICE: str      = os.getenv("EMBEDDING_DEVICE") or allocate_device(
 EMBEDDING_BATCH_SIZE: int  = 32
 FAISS_INDEX_PATH: str      = os.getenv("FAISS_INDEX_PATH", "data/faiss.index")
 FAISS_INDEX_BATCH_SIZE: int = 256   # items per encode batch when building index
-DENSE_TOP_K: int           = 50    # ANN candidates returned to Stage 3 / 4
+DENSE_TOP_K: int           = 30    # ANN candidates returned to Stage 3 / 4
 FAISS_INDEX_LOG_INTERVAL: int = 4   # log progress every N batches
 CATALOG_PATH: str          = os.getenv("CATALOG_PATH", "data/catalogs/catalog.jsonl")
 CATALOG_DIR: str           = os.getenv("CATALOG_DIR", "data/catalogs")
@@ -354,14 +354,14 @@ USE_RERANKER: bool = os.getenv("USE_RERANKER", "1").lower() in ("1", "true", "ye
 RERANKER_MODEL_NAME: str = os.getenv(
     "RERANKER_MODEL_NAME", "BAAI/bge-reranker-v2-m3"
 )
-RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "float32")
+RERANKER_DTYPE: str      = os.getenv("RERANKER_DTYPE", "bfloat16")
 RERANKER_DEVICE: str     = os.getenv("RERANKER_DEVICE") or allocate_device(
     model_name=RERANKER_MODEL_NAME,
     preferred=EMBEDDING_DEVICE,   # co-locate with embedder if room exists
     role="reranker",
     exclude_gpus=LLM_GPU_INDICES,
 )
-RERANKER_TOP_K: int      = int(os.getenv("RERANKER_TOP_K", "25"))
+RERANKER_TOP_K: int      = int(os.getenv("RERANKER_TOP_K", "10"))
 # Rerank on product title only — much faster and often better than full catalog text.
 RERANKER_USE_TITLE_ONLY: bool = os.getenv("RERANKER_USE_TITLE_ONLY", "1").lower() in (
     "1", "true", "yes",
