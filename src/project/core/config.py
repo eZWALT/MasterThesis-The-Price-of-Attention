@@ -142,9 +142,9 @@ SUMMARIZATION_PROMPT: str = (
 
 # ── 2.7  Practice task prompts ────────────────────────────────────────────
 PRACTICE_TASK_PROMPT: str = (
-    "This is a practice round. Ask the assistant for a movie recommendation "
-    "— tell it what genres you like, what mood you're in, or ask for "
-    "something surprising. This is just to get comfortable with the interface."
+    "This is a practice round to get comfortable with the chat interface. "
+    "Ask the assistant for a movie recommendation — tell it what genres you "
+    "like, what mood you're in, or ask for something surprising."
 )
 PRACTICE_SYSTEM_PROMPT_EXT: str = (
     "The user wants a movie recommendation. Suggest films based on their "
@@ -502,10 +502,18 @@ CONSENT_TEXT: str = (
     "You are being invited to participate in a research study investigating "
     "how people interact with AI conversational assistants.\n\n"
     "**What you will do:** You will chat with an AI assistant across several "
-    "short conversations and answer brief questionnaires in between.\n\n"
+    "short conversations. Each conversation will present you with a different "
+    "task or scenario to explore. Between conversations, you will answer brief "
+    "questionnaires about your experience.\n\n"
+    "**About advertisements:** During the conversations, you may see product "
+    "recommendations or advertisements. If something catches your interest, "
+    "feel free to click on it — this is entirely up to you. However, please "
+    "note that these are part of the study and cannot be dismissed or opted "
+    "out of. For brevity, ad content and links are kept short.\n\n"
     "**Duration:** Approximately 1 hour 30 minutes.\n\n"
-    "**Data collected:** Your chat messages, questionnaire responses, and "
-    "(if applicable) physiological signals (EEG, eye-tracking) will be "
+    "**Data collected:** Your chat messages, questionnaire responses, "
+    "and click interactions will be recorded. "
+    "If applicable, physiological signals (EEG, eye-tracking) will also be "
     "recorded. All data is pseudonymised and stored securely.\n\n"
     "**Voluntary participation:** You may withdraw at any time without "
     "giving a reason and without penalty.\n\n"
