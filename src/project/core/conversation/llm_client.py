@@ -12,8 +12,9 @@ All other model parameters come from config — nothing is hardcoded here.
 
 from __future__ import annotations
 
+import json
 import requests
-from typing import List, Dict
+from typing import List, Dict, Generator
 
 import logging
 
@@ -104,6 +105,26 @@ class LLMClient:
             return self._chat_ollama(messages, model, temperature, max_tokens)
         return self._chat_openai(messages, model, temperature, max_tokens)
 
+    def chat_stream(
+        self,
+        messages: List[Dict[str, str]],
+        model: str,
+        temperature: float,
+        max_tokens: int,
+    ) -> Generator[str, None, None]:
+        """
+        Stream tokens from the LLM. Yields content strings as they arrive.
+
+        Raises
+        ------
+        RuntimeError on any network or API error (emitted as the first
+        yielded token so the UI can display it).
+        """
+        if LLM_BACKEND == "ollama":
+            yield from self._chat_ollama_stream(messages, model, temperature, max_tokens)
+        else:
+            yield from self._chat_openai_stream(messages, model, temperature, max_tokens)
+
     # ── private ──────────────────────────────────────────────────────────
 
     def _chat_ollama(self, messages, model, temperature, max_tokens) -> str:
@@ -140,6 +161,39 @@ class LLMClient:
         except Exception as e:
             raise RuntimeError(f"Ollama request failed: {e}") from e
 
+    def _chat_ollama_stream(self, messages, model, temperature, max_tokens) -> Generator[str, None, None]:
+        """Streaming variant of _chat_ollama."""
+        url = f"{self.ollama_api_base.rstrip('/')}/api/chat"
+        try:
+            keep_alive: int | str = int(OLLAMA_KEEP_ALIVE)
+        except (ValueError, TypeError):
+            keep_alive = OLLAMA_KEEP_ALIVE
+        payload = {
+            "model": model,
+            "messages": messages,
+            "think": LLM_THINK,
+            "stream": True,
+            "keep_alive": keep_alive,
+            "options": {
+                "temperature": temperature,
+                "num_predict": max_tokens,
+                "num_ctx": OLLAMA_NUM_CTX,
+            },
+        }
+        try:
+            response = requests.post(url, json=payload, stream=True, timeout=self.timeout)
+            response.raise_for_status()
+            for line in response.iter_lines(decode_unicode=True):
+                if line:
+                    data = json.loads(line)
+                    content = data.get("message", {}).get("content", "")
+                    if content:
+                        yield content
+                    if data.get("done", False):
+                        break
+        except Exception as e:
+            yield f"⚠️ {e}"
+
     def _chat_openai(self, messages, model, temperature, max_tokens) -> str:
         """
         OpenAI-compatible /v1/chat/completions — used for vLLM and hosted models.
@@ -160,3 +214,31 @@ class LLMClient:
             return content.strip()
         except Exception as e:
             raise RuntimeError(f"OpenAI-compat request failed: {e}") from e
+
+    def _chat_openai_stream(self, messages, model, temperature, max_tokens) -> Generator[str, None, None]:
+        """Streaming variant of _chat_openai."""
+        payload = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "stream": True,
+        }
+        try:
+            response = requests.post(
+                self.api_url, json=payload, stream=True, timeout=self.timeout
+            )
+            response.raise_for_status()
+            for line in response.iter_lines(decode_unicode=True):
+                if line:
+                    if line.startswith("data: "):
+                        data_str = line[6:]
+                        if data_str.strip() == "[DONE]":
+                            break
+                        data = json.loads(data_str)
+                        delta = data.get("choices", [{}])[0].get("delta", {})
+                        content = delta.get("content", "")
+                        if content:
+                            yield content
+        except Exception as e:
+            yield f"⚠️ {e}"

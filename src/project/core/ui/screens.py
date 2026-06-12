@@ -13,18 +13,11 @@ from __future__ import annotations
 
 import html as html_module
 import time
-import random
-import threading
 import streamlit as st
 from typing import Optional
 
 from core.config import (
     DEFAULT_MAX_TOKENS,
-    OLLAMA_API_BASE,
-    # Spinner
-    SPINNER_PHRASES,
-    SPINNER_ROTATE_MIN_SEC,
-    SPINNER_ROTATE_MAX_SEC,
     # Consent
     CONSENT_TITLE,
     CONSENT_TEXT,
@@ -75,46 +68,7 @@ from core.ad_injection.models import (
     sponsored_message_to_payload,
 )
 from core.conversation import ConversationManager
-from core.conversation.ollama_stats import estimate_eta, record_timing
 
-
-# ═══════════════════════════════════════════════════════════════
-# LLM SPINNER HELPER
-# ═══════════════════════════════════════════════════════════════
-
-# CSS-only spinner injected once per Streamlit app lifetime.
-_SPINNER_CSS = """
-<style>
-@keyframes llm-spin {
-    0%   { transform: rotate(0deg);   }
-    100% { transform: rotate(360deg); }
-}
-.llm-spinner {
-    display: inline-block;
-    width: 18px; height: 18px;
-    border: 3px solid rgba(255,255,255,.15);
-    border-top-color: #58a6ff;
-    border-radius: 50%;
-    animation: llm-spin .8s linear infinite;
-    flex-shrink: 0;
-}
-.llm-thinking {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px; border-radius: 10px;
-    background: #1a1d24; color: #e0e0e0;
-    font-size: 0.95em; margin: 8px 0;
-    box-shadow: 0 1px 4px rgba(0,0,0,.3);
-}
-.llm-thinking .phrase {
-    flex: 1;
-}
-.llm-thinking .elapsed {
-    font-variant-numeric: tabular-nums;
-    font-size: 0.8em;
-    opacity: 0.55;
-}
-</style>
-"""
 
 def _banner_box_style(*, explicit: bool) -> str:
     """Inline styles — Streamlit often ignores separately injected <style> blocks."""
@@ -349,84 +303,6 @@ def _render_explicit_ad_banner(payload: dict) -> None:
     _render_ad_banner(payload, ad_mode="explicit_ad_block")
 
 
-def _call_llm_with_spinner(manager: ConversationManager, user_input: str) -> None:
-    """
-    Call manager.process_user_message in a background thread while
-    showing a live spinner with rotating "thinking" phrases and an
-    optional ETA derived from Ollama /api/ps.
-    """
-    model = getattr(manager, "model", None)
-    eta_secs = estimate_eta(
-        max_tokens=DEFAULT_MAX_TOKENS,
-        model=model,
-        base_url=OLLAMA_API_BASE,
-    )
-
-    exc_holder: list = []
-    t0 = time.perf_counter()
-
-    def _run() -> None:
-        try:
-            manager.process_user_message(user_input)
-        except Exception as e:  # noqa: BLE001
-            exc_holder.append(e)
-
-    thread = threading.Thread(target=_run, daemon=True)
-    thread.start()
-
-    # Inject CSS once
-    st.markdown(_SPINNER_CSS, unsafe_allow_html=True)
-
-    placeholder = st.empty()
-    phrases = list(SPINNER_PHRASES)
-    random.shuffle(phrases)
-    phrase_idx = 0
-    next_switch = t0 + random.uniform(SPINNER_ROTATE_MIN_SEC, SPINNER_ROTATE_MAX_SEC)
-
-    while thread.is_alive():
-        now = time.perf_counter()
-        elapsed = now - t0
-
-        # Rotate phrase
-        if now >= next_switch:
-            phrase_idx = (phrase_idx + 1) % len(phrases)
-            next_switch = now + random.uniform(SPINNER_ROTATE_MIN_SEC, SPINNER_ROTATE_MAX_SEC)
-
-        phrase = phrases[phrase_idx]
-
-        # ETA / elapsed label
-        if eta_secs is not None:
-            remaining = max(0.0, eta_secs - elapsed)
-            timer = f"{elapsed:.0f}s / ~{elapsed + remaining:.0f}s"
-        else:
-            timer = f"{elapsed:.0f}s"
-
-        placeholder.markdown(
-            f"""<div class='llm-thinking'>
-                <div class='llm-spinner'></div>
-                <span class='phrase'>{phrase}</span>
-                <span class='elapsed'>{timer}</span>
-            </div>""",
-            unsafe_allow_html=True,
-        )
-        time.sleep(0.15)
-
-    thread.join()
-    elapsed = time.perf_counter() - t0
-    placeholder.empty()
-
-    # Update rolling tokens/s estimate for future ETA predictions
-    if manager.messages:
-        last_reply = next(
-            (m["content"] for m in reversed(manager.messages) if m["role"] == "assistant"),
-            "",
-        )
-        record_timing(elapsed=elapsed, reply=last_reply)
-
-    if exc_holder:
-        raise exc_holder[0]
-
-
 # ═══════════════════════════════════════════════════════════════
 # SCREEN 1 — CONSENT
 # ═══════════════════════════════════════════════════════════════
@@ -625,7 +501,10 @@ def render_practice(manager: ConversationManager) -> bool:
         if not user_input.strip():
             st.warning("Please enter a message before sending.")
         else:
-            _call_llm_with_spinner(manager, user_input.strip())
+            with st.chat_message("user"):
+                st.markdown(user_input.strip())
+            with st.chat_message("assistant"):
+                st.write_stream(manager.process_user_message_stream(user_input.strip()))
             st.rerun()
 
     # Allow ending practice at any time after ≥1 exchange
@@ -809,7 +688,10 @@ def render_trial_chat(
         if not user_input.strip():
             st.warning("Please enter a message before sending.")
         else:
-            _call_llm_with_spinner(manager, user_input.strip())
+            with st.chat_message("user"):
+                st.markdown(user_input.strip())
+            with st.chat_message("assistant"):
+                st.write_stream(manager.process_user_message_stream(user_input.strip()))
             st.rerun()
 
     return False
