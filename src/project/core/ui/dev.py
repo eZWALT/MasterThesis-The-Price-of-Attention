@@ -25,7 +25,6 @@ from core.ad_injection.ad_links import (
     start_ad_click_server,
 )
 from core.ui.screens import (
-    _call_llm_with_spinner,
     _render_ad_banner,
     _render_chat_history,
     _render_retrieval_debug,
@@ -184,7 +183,10 @@ def run_dev_mode():
             st.warning("Please enter a message before sending.")
         else:
             _sync_dev_overrides(mgr)
-            _call_llm_with_spinner(mgr, user_input.strip())
+            with st.chat_message("user"):
+                st.markdown(user_input.strip())
+            with st.chat_message("assistant"):
+                st.write_stream(mgr.process_user_message_stream(user_input.strip()))
             log.info(
                 "Dev turn {} | ad_mode={} | exp={}",
                 mgr.turn_count, ad_mode, st.session_state.logger.experiment_id,
