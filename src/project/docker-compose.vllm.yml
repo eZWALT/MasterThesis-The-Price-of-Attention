@@ -1,7 +1,9 @@
 services:
 
   vllm:
-    image: vllm/vllm-openai:v0.8.5
+    build:
+      dockerfile: Dockerfile.vllm
+      context: .
     deploy:
       resources:
         reservations:
