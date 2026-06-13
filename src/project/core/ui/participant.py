@@ -1,11 +1,12 @@
 """
-Participant flow: session state management, screen dispatcher,
+Participant flow — Workflow A*: session state, screen dispatcher,
 progress sidebar, and dev-flow skip helpers.
 """
 
 from __future__ import annotations
 
 import uuid
+import random
 import streamlit as st
 from loguru import logger as log
 
@@ -13,35 +14,42 @@ from core.config import (
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
     DEFAULT_MAX_TOKENS,
-    TRIALS_PER_SESSION,
     EXIT_N_TRIALS,
     PRACTICE_SYSTEM_PROMPT_EXT,
     STUDY_TYPE_LABELS,
+    CONDITION_AD_MODE,
+    CONDITION_LABELS,
+    CONDITION_TIMING,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
+    SCREEN_INSTRUCTIONS,
+    SCREEN_WARMUP_CHAT,
+    SCREEN_FIRST_IMPRESSION,
+    SCREEN_CONDITION_INTRO,
+    SCREEN_CONDITION_CHAT,
+    SCREEN_POST_CONDITION_SURVEY,
     SCREEN_OCEAN,
-    SCREEN_BASELINE,
-    SCREEN_PRACTICE,
-    SCREEN_TRIAL_INTRO,
-    SCREEN_TRIAL_CHAT,
-    SCREEN_POST_TRIAL_SURVEY,
-    SCREEN_FINAL_SURVEY,
+    SCREEN_VALS,
+    SCREEN_GLOBAL_EVALUATION,
     SCREEN_DONE,
+    WARMUP_TASK_ID,
+    WARMUP_TURNS,
 )
 from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
-from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, score_ocean, get_ocean_items
+from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, TASK_BY_ID, score_ocean, get_ocean_items
 from core.ui.screens import (
     render_consent,
     render_demographics,
     render_ocean,
-    render_baseline,
-    clear_baseline_session_state,
-    render_practice,
-    render_trial_intro,
-    render_trial_chat,
-    render_post_trial_survey,
-    render_final_survey,
+    render_instructions,
+    render_warmup_chat,
+    render_first_impression,
+    render_condition_intro,
+    render_condition_chat,
+    render_post_condition_survey,
+    render_vals,
+    render_global_evaluation,
     render_done,
 )
 
@@ -51,7 +59,7 @@ from core.ui.screens import (
 # ═══════════════════════════════════════════════════════════════
 
 def init_session_state(params):
-    """Ensure every expected key exists in st.session_state, using ExperimentParams for config."""
+    """Ensure every expected key exists in st.session_state."""
     if "logger" not in st.session_state:
         from core.config import LOG_DIR, LOG_DIR_DEV, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
         log_dir = LOG_DIR_DEV if (params.dev_mode or params.flow_test) else LOG_DIR
@@ -65,28 +73,24 @@ def init_session_state(params):
         pid = params.participant_id or str(uuid.uuid4())[:8]
         ctrl = ExperimentController(
             participant_id=pid,
-            n_trials=params.n_trials,
             tasks=params.tasks,
-            ad_modes=params.ad_modes,
             model=params.model or DEFAULT_MODEL,
             seed=params.seed,
             cb_group=params.cb_group,
             turns_min=params.turns_min,
             turns_max=params.turns_max,
             finish_from=params.finish_from,
-            ad_turns=params.ad_turns,
         )
-        ctrl.build_trial_plan()
+        ctrl.build_condition_plan()
         st.session_state.controller = ctrl
         st.session_state.experiment_params = params
         log.info(
-            "Session init | pid={} | study={} | skip={} | exp={} | run={} | trials={}",
+            "Session init (A*) | pid={} | study={} | skip={} | exp={} | run={}",
             pid,
             params.study_type,
             sorted(params.skip_screens),
             st.session_state.logger.experiment_id,
             st.session_state.logger.run_id,
-            ctrl.n_trials,
         )
         st.session_state.logger.log(
             "session_started",
@@ -94,19 +98,18 @@ def init_session_state(params):
                 "participant_id": pid,
                 "study_type": params.study_type,
                 "skip_screens": sorted(params.skip_screens),
-                "n_trials": params.n_trials,
-                "turns_min": params.turns_min,
-                "turns_max": params.turns_max,
+                "protocol": "workflow_a_star",
+                "conditions": ctrl.condition_plan,
             },
             ad_mode="session",
             conversation_id=pid,
             source="system",
         )
 
-    if "practice_manager" not in st.session_state:
-        st.session_state.practice_manager = None
-    if "trial_manager" not in st.session_state:
-        st.session_state.trial_manager = None
+    if "warmup_manager" not in st.session_state:
+        st.session_state.warmup_manager = None
+    if "condition_manager" not in st.session_state:
+        st.session_state.condition_manager = None
 
     # Dev mode state
     if "dev_manager" not in st.session_state:
@@ -114,11 +117,10 @@ def init_session_state(params):
     if "dev_trial_complete" not in st.session_state:
         st.session_state.dev_trial_complete = False
 
-    # Dev ad-control overrides (survive reruns; initialised from URL params)
+    # Dev ad-control overrides
     if "dev_force_ad" not in st.session_state:
         st.session_state.dev_force_ad = params.force_ad
     if "dev_rag_mode" not in st.session_state:
-        # Always default to 'rag' in dev/flow mode unless explicitly set to 'mock' in URL
         use_rag = getattr(params, "use_rag", None)
         if use_rag is False:
             st.session_state.dev_rag_mode = "mock"
@@ -130,31 +132,25 @@ def init_session_state(params):
 # MANAGER FACTORIES
 # ═══════════════════════════════════════════════════════════════
 
-def _get_or_create_practice_manager() -> ConversationManager:
-    mgr = st.session_state.practice_manager
+def _get_or_create_warmup_manager() -> ConversationManager:
+    mgr = st.session_state.warmup_manager
     if mgr is None:
         ctrl: ExperimentController = st.session_state.controller
-        practice_task = TaskDefinition(
-            id="practice",
-            title="Practice",
-            genre="Practice",
-            participant_prompt="Practice chatting with the assistant.",
-            system_prompt_extension=PRACTICE_SYSTEM_PROMPT_EXT,
-        )
+        warmup_task = TASK_BY_ID.get(WARMUP_TASK_ID, TASK_CATALOG[0])
         mgr = ConversationManager(
-            ad_mode="inline_persuasive",
+            ad_mode="",
             model=ctrl.model or DEFAULT_MODEL,
             temperature=DEFAULT_TEMPERATURE,
             max_tokens=DEFAULT_MAX_TOKENS,
-            task=practice_task,
+            task=warmup_task,
             logger=st.session_state.logger,
-            min_turns=ctrl.turns_min,
-            max_turns=ctrl.turns_max,
-            finish_from=ctrl.finish_from,
-            ad_turns=[],          # No ads in practice round
-            use_rag=False,        # No RAG pipeline needed for practice
+            min_turns=1,
+            max_turns=WARMUP_TURNS,
+            finish_from=1,
+            ad_turns=[],
+            use_rag=True,
         )
-        st.session_state.practice_manager = mgr
+        st.session_state.warmup_manager = mgr
     return mgr
 
 
@@ -172,15 +168,19 @@ def _resolve_dev_ad_settings(params) -> tuple[bool, bool | None, str]:
     return force_ad, use_rag, effective_mode
 
 
-def _get_or_create_trial_manager(
+def _get_or_create_condition_manager(
     task: TaskDefinition,
-    ad_mode: str,
+    condition_id: str,
     params,
     flow_test: bool = False,
 ) -> ConversationManager:
-    mgr = st.session_state.trial_manager
+    mgr = st.session_state.condition_manager
     ctrl: ExperimentController = st.session_state.controller
 
+    ad_mode = CONDITION_AD_MODE.get(condition_id, "")
+    window = CONDITION_TIMING.get(condition_id)
+
+    # Determine ad_turns for this condition
     force_ad = params.force_ad
     use_rag = params.use_rag
     if flow_test:
@@ -188,8 +188,18 @@ def _get_or_create_trial_manager(
         if mode_override:
             ad_mode = mode_override
 
+    # Build ad_turns list: exactly 1 random turn within window
+    ad_turns: list[int] = []
+    if condition_id != "no_ads" and window is not None and ad_mode:
+        # Use deterministic seed if set, else random
+        if ctrl.seed is not None:
+            rng = random.Random(ctrl.seed + hash(condition_id) + hash(task.id))
+            ad_turns = [rng.randint(window[0], window[1])]
+        else:
+            ad_turns = [random.randint(window[0], window[1])]
+
     if mgr is None or mgr.task.id != task.id:
-        st.session_state.logger.set_trial_index(ctrl.current_trial_index)
+        st.session_state.logger.set_trial_index(ctrl.current_condition_index)
         mgr = ConversationManager(
             ad_mode=ad_mode,
             model=ctrl.model or DEFAULT_MODEL,
@@ -200,16 +210,14 @@ def _get_or_create_trial_manager(
             min_turns=ctrl.turns_min,
             max_turns=ctrl.turns_max,
             finish_from=ctrl.finish_from,
-            ad_turns=ctrl.ad_turns,
+            ad_turns=ad_turns,
             force_ad=force_ad,
             use_rag=use_rag,
         )
-        st.session_state.trial_manager = mgr
-    elif flow_test and mgr.ad_mode != ad_mode:
-        # Keep chat history; drop stale banner/chip from the previous mode.
-        mgr.apply_ad_mode(ad_mode)
-        _sync_dev_overrides(mgr)
+        st.session_state.condition_manager = mgr
     elif flow_test:
+        if mgr.ad_mode != ad_mode:
+            mgr.apply_ad_mode(ad_mode)
         _sync_dev_overrides(mgr)
     return mgr
 
@@ -218,14 +226,13 @@ def _get_or_create_trial_manager(
 # DATA EXPORT
 # ═══════════════════════════════════════════════════════════════
 
-def _trial_summary_for_log(trial_result: dict) -> dict:
-    """Metadata only — per-turn detail lives in JSONL events."""
+def _condition_summary_for_log(condition_result: dict) -> dict:
     return {
-        k: trial_result[k]
+        k: condition_result[k]
         for k in (
-            "trial",
-            "task_id",
+            "condition_id",
             "ad_mode",
+            "task_id",
             "conversation_id",
             "initial_intent",
             "turns",
@@ -233,23 +240,25 @@ def _trial_summary_for_log(trial_result: dict) -> dict:
             "trial_start_ts",
             "trial_end_ts",
         )
-        if k in trial_result
+        if k in condition_result
     }
 
 
 def export_session_data(ctrl: ExperimentController):
-    """Persist session-level aggregates; turn-level data is already in JSONL."""
+    """Persist session-level aggregates."""
     logger: ExperimentLogger = st.session_state.logger
     logger.log(
         "session_complete",
         {
             "participant_id": ctrl.participant_id,
             "demographics": ctrl.demographics,
+            "first_impression": ctrl.first_impression,
             "ocean_raw": ctrl.ocean_raw,
             "ocean_scores": ctrl.ocean_scores,
-            "trial_summaries": [_trial_summary_for_log(tr) for tr in ctrl.trial_results],
-            "post_trial_surveys": ctrl.post_trial_surveys,
-            "final_survey": ctrl.final_survey,
+            "vals_responses": ctrl.vals_responses,
+            "condition_summaries": [_condition_summary_for_log(cr) for cr in ctrl.condition_results],
+            "condition_surveys": ctrl.condition_surveys,
+            "global_evaluation": ctrl.global_evaluation,
         },
         ad_mode="session",
         conversation_id=ctrl.participant_id,
@@ -266,26 +275,31 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
     scr = ctrl.current_screen
     if scr == SCREEN_DEMOGRAPHICS and not ctrl.demographics:
         ctrl.demographics = {"age": 0, "gender": "skip", "education": "skip"}
+    elif scr == SCREEN_FIRST_IMPRESSION and not ctrl.first_impression:
+        ctrl.first_impression = {"first_impression_text": "skip", "reuse_intent": "Maybe", "sentiment_label": "Neutral"}
     elif scr == SCREEN_OCEAN and not ctrl.ocean_raw:
         items = get_ocean_items(bfi_version)
         ctrl.ocean_raw = [4] * len(items)
         ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
-    elif scr == SCREEN_POST_TRIAL_SURVEY:
-        ctrl.post_trial_surveys.append({"skipped": True})
-    elif scr == SCREEN_FINAL_SURVEY:
-        ctrl.final_survey = {"skipped": True}
+    elif scr == SCREEN_VALS and not ctrl.vals_responses:
+        ctrl.vals_responses = {k: 3 for k in ["innovation", "achievement", "tradition", "excitement", "practicality", "status", "self_reliance", "community"]}
+    elif scr == SCREEN_POST_CONDITION_SURVEY:
+        ctrl.condition_surveys.append({k: 4 for k in ["trust", "usefulness", "satisfaction"]})
+    elif scr == SCREEN_GLOBAL_EVALUATION:
+        ctrl.global_evaluation = {k: 4 for k in ["overall_trust", "overall_usefulness", "ad_awareness", "ad_disruption", "willingness_reuse"]}
+        ctrl.global_evaluation["open_ended"] = "skip"
         export_session_data(ctrl)
-    elif scr == SCREEN_TRIAL_CHAT:
-        ctrl.trial_results.append({
-            "trial": ctrl.trial_number,
-            "task_id": "skip",
+    elif scr == SCREEN_CONDITION_CHAT:
+        ctrl.condition_results.append({
+            "condition_id": "skip",
             "ad_mode": "skip",
+            "task_id": "skip",
             "turns": 0,
             "messages": [],
         })
-        st.session_state.trial_manager = None
-    elif scr == SCREEN_PRACTICE:
-        st.session_state.practice_manager = None
+        st.session_state.condition_manager = None
+    elif scr == SCREEN_WARMUP_CHAT:
+        st.session_state.warmup_manager = None
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -293,24 +307,16 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
 # ═══════════════════════════════════════════════════════════════
 
 def _render_dev_ad_controls(mgr=None) -> None:
-    """
-    Render the dev ad-injection control panel inside the *current* sidebar context.
-
-    Writes to st.session_state.dev_force_ad and st.session_state.dev_rag_mode.
-    Optionally accepts the active ConversationManager so it can be synced live.
-    """
     from core.ad_injection import get_ad, get_injector
 
     st.markdown("**🎯 Ad Controls**")
 
-    # Force-ad toggle
     st.session_state.dev_force_ad = st.toggle(
         "Inject ad every turn",
         value=st.session_state.get("dev_force_ad", False),
         help="Overrides ad_turns schedule — every user turn triggers an injection.",
     )
 
-    # Backend selector
     from core.config import AD_BACKEND
     rag_options = ["mock", "rag"]
     rag_labels  = {"mock": "🧸 Mock (fast, no GPU)", "rag": "🔍 RAG pipeline"}
@@ -325,11 +331,9 @@ def _render_dev_ad_controls(mgr=None) -> None:
     )
     st.session_state.dev_rag_mode = chosen
 
-    # Sync onto the live manager so changes take effect without page reload
     if mgr is not None:
         _sync_dev_overrides(mgr)
 
-    # One-shot manual inject button
     if mgr is not None and st.button("💉 Inject ad NOW", use_container_width=True,
                                       help="Fire one ad immediately, regardless of turn schedule."):
         backend = None if chosen == "default" else chosen
@@ -342,16 +346,14 @@ def _render_dev_ad_controls(mgr=None) -> None:
         mgr.last_retrieval_ad_mode = mgr.ad_mode if ad and ad.has_ads else None
         injector = get_injector(mgr.ad_mode)
         result = injector.inject(ad, mgr.messages)
-        # Store result in session state so run_dev_mode can render it in the main area
         st.session_state["dev_manual_ad"] = result
         primary = ad.primary
         st.caption(f"📦 {primary.title if primary else 'No ad'}")
 
 
 def _sync_dev_overrides(mgr) -> None:
-    """Push dev force-ad / backend overrides onto the live ConversationManager."""
     mgr._force_ad = st.session_state.get("dev_force_ad", False)
-    mgr._ad_backend = st.session_state.get("dev_rag_mode")  # "mock" or "rag"
+    mgr._ad_backend = st.session_state.get("dev_rag_mode")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -371,22 +373,22 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
                 ctrl.advance()
                 st.rerun()
 
-            # Ad mode override — lets dev switch injection style mid-session
-            from core.config import AD_MODES, AD_MODE_LABELS
-            trial_cfg = ctrl.current_trial_config
-            default_mode = trial_cfg["ad_mode"] if trial_cfg else AD_MODES[0]
-            default_idx = AD_MODES.index(default_mode) if default_mode in AD_MODES else 0
-            selected_mode = st.selectbox(
-                "📊 Ad Mode",
-                AD_MODES,
-                index=default_idx,
-                format_func=lambda k: AD_MODE_LABELS.get(k, k),
-                key="dev_flow_ad_mode",
-            )
-            st.session_state.dev_ad_mode_override = selected_mode
+            # Condition override for dev-flow
+            from core.config import CONDITIONS, CONDITION_AD_MODE
+            trial_cfg = ctrl.current_condition_config
+            if trial_cfg:
+                default_condition = trial_cfg["condition"]
+                default_idx = CONDITIONS.index(default_condition) if default_condition in CONDITIONS else 0
+                selected = st.selectbox(
+                    "📊 Condition",
+                    CONDITIONS,
+                    index=default_idx,
+                    format_func=lambda k: CONDITION_LABELS.get(k, k),
+                    key="dev_flow_condition",
+                )
+                st.session_state.dev_ad_mode_override = CONDITION_AD_MODE.get(selected, "")
 
-            # Ad controls — only shown on the chat screen, manager may be None
-            mgr = st.session_state.get("trial_manager")
+            mgr = st.session_state.get("condition_manager")
             with st.expander("🎯 Ad overrides", expanded=bool(st.session_state.get("dev_force_ad"))):
                 _render_dev_ad_controls(mgr=mgr)
             st.divider()
@@ -394,35 +396,35 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
         labels = {
             SCREEN_CONSENT: "Consent",
             SCREEN_DEMOGRAPHICS: "Demographics",
+            SCREEN_INSTRUCTIONS: "Instructions",
+            SCREEN_WARMUP_CHAT: "Warm-Up",
+            SCREEN_FIRST_IMPRESSION: "First Impression",
+            SCREEN_CONDITION_INTRO: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
+            SCREEN_CONDITION_CHAT: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
+            SCREEN_POST_CONDITION_SURVEY: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_OCEAN: "Personality",
-            SCREEN_BASELINE: "Baseline",
-            SCREEN_PRACTICE: "Practice",
-            SCREEN_TRIAL_INTRO: f"Trial {ctrl.trial_number}/{ctrl.n_trials} — Intro",
-            SCREEN_TRIAL_CHAT: f"Trial {ctrl.trial_number}/{ctrl.n_trials} — Chat",
-            SCREEN_POST_TRIAL_SURVEY: f"Trial {ctrl.trial_number}/{ctrl.n_trials} — Survey",
-            SCREEN_FINAL_SURVEY: "Final Survey",
+            SCREEN_VALS: "Lifestyle",
+            SCREEN_GLOBAL_EVALUATION: "Final Evaluation",
             SCREEN_DONE: "Done ✓",
         }
         st.caption(f"📍 {labels.get(ctrl.current_screen, ctrl.current_screen)}")
 
-        # ── Early-exit button ────────────────────────────────
-        # Appears once the participant has completed ≥ EXIT_N_TRIALS trials.
-        # They can continue to the full n_trials, or leave with data so far.
-        _trial_screens = {SCREEN_TRIAL_INTRO, SCREEN_TRIAL_CHAT, SCREEN_POST_TRIAL_SURVEY}
-        if ctrl.can_exit_early and ctrl.current_screen in _trial_screens:
+        # Early-exit button during conditions
+        _condition_screens = {SCREEN_CONDITION_INTRO, SCREEN_CONDITION_CHAT, SCREEN_POST_CONDITION_SURVEY}
+        if ctrl.can_exit_early and ctrl.current_screen in _condition_screens:
             st.divider()
-            remaining = ctrl.n_trials - ctrl.current_trial_index
+            remaining = ctrl.n_conditions - ctrl.current_condition_index
             if st.button(
                 "🚪 Leave study early",
                 use_container_width=True,
-                help=f"You have completed {ctrl.current_trial_index} of {ctrl.n_trials} trials. "
-                     f"You may stop now and your data so far will be saved, or continue with the remaining trials.",
+                help=f"You have completed {ctrl.current_condition_index} of {ctrl.n_conditions} conditions. "
+                     f"You may stop now and your data so far will be saved.",
             ):
                 st.session_state.logger.log(
                     "early_exit",
                     {
-                        "trials_completed": ctrl.current_trial_index,
-                        "trials_planned": ctrl.n_trials,
+                        "conditions_completed": ctrl.current_condition_index,
+                        "conditions_planned": ctrl.n_conditions,
                         "current_screen": ctrl.current_screen,
                     },
                     ad_mode="session",
@@ -434,11 +436,11 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
 
 
 # ═══════════════════════════════════════════════════════════════
-# PARTICIPANT SCREEN DISPATCHER
+# PARTICIPANT SCREEN DISPATCHER (Workflow A*)
 # ═══════════════════════════════════════════════════════════════
 
 def run_participant_mode(params):
-    """Drive the participant through the full experiment protocol, using ExperimentParams for config."""
+    """Drive the participant through Workflow A* protocol."""
     ctrl: ExperimentController = st.session_state.controller
     scr = ctrl.current_screen
 
@@ -449,10 +451,8 @@ def run_participant_mode(params):
         study_type=params.study_type,
     )
 
-    # Handle skip logic for screens
+    # Handle skip logic
     if scr in params.skip_screens:
-        if scr == SCREEN_BASELINE:
-            clear_baseline_session_state()
         dev_inject_stub_data(ctrl, bfi_version=params.bfi_version)
         st.session_state.logger.log(
             "screen_skipped",
@@ -485,6 +485,113 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
+    elif scr == SCREEN_INSTRUCTIONS:
+        if render_instructions():
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_WARMUP_CHAT:
+        mgr = _get_or_create_warmup_manager()
+        if render_warmup_chat(mgr):
+            st.session_state.warmup_manager = None
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_FIRST_IMPRESSION:
+        result = render_first_impression()
+        if result is not None:
+            ctrl.first_impression = result
+            st.session_state.logger.log(
+                "first_impression_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_CONDITION_INTRO:
+        cfg = ctrl.current_condition_config
+        if cfg:
+            task: TaskDefinition = cfg["task"]
+            if render_condition_intro(
+                ctrl.condition_number,
+                ctrl.n_conditions,
+                cfg["condition"],
+                task.participant_prompt,
+            ):
+                log.info(
+                    "Condition {}/{} starting | pid={} | condition={} | task={} | ad_mode={}",
+                    ctrl.condition_number, ctrl.n_conditions,
+                    ctrl.participant_id, cfg["condition"], task.id, cfg["ad_mode"],
+                )
+                st.session_state.condition_manager = None
+                ctrl.advance()
+                st.rerun()
+
+    elif scr == SCREEN_CONDITION_CHAT:
+        cfg = ctrl.current_condition_config
+        if cfg:
+            task = cfg["task"]
+            condition_id = cfg["condition"]
+            mgr = _get_or_create_condition_manager(
+                task,
+                condition_id,
+                params,
+                flow_test=params.flow_test,
+            )
+            if render_condition_chat(mgr, condition_id, flow_test=params.flow_test):
+                from dataclasses import asdict
+                from datetime import datetime
+
+                end_reason = "max_turns" if mgr.must_end else "user_ended"
+                continuation_summary = mgr.finalize_trial(reason=end_reason)
+
+                trial_end_ts = datetime.now().isoformat()
+                condition_record = {
+                    "condition_id": condition_id,
+                    "ad_mode": cfg["ad_mode"],
+                    "ad_turn": cfg["ad_turn"],
+                    "task_id": task.id,
+                    "conversation_id": mgr.conversation_id,
+                    "initial_intent": mgr.initial_intent,
+                    "intent_history": list(mgr.intent_history),
+                    "turns": mgr.turn_count,
+                    "ad_turns_actual": list(mgr.ad_turns_actual),
+                    "trial_start_ts": mgr.trial_start_ts,
+                    "trial_end_ts": trial_end_ts,
+                    "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
+                    "continuation": continuation_summary,
+                    "messages": list(mgr.messages),
+                }
+                ctrl.condition_results.append(condition_record)
+                st.session_state.logger.log(
+                    "condition_complete",
+                    _condition_summary_for_log(condition_record),
+                    ad_mode=cfg["ad_mode"],
+                    conversation_id=mgr.conversation_id,
+                    source="system",
+                    turn=mgr.turn_count,
+                )
+                log.info(
+                    "Condition {} complete | pid={} | condition={} | turns={} | ads={}",
+                    ctrl.condition_number, ctrl.participant_id,
+                    condition_id, mgr.turn_count, mgr.ad_turns_actual,
+                )
+                st.session_state.condition_manager = None
+                ctrl.advance()
+                st.rerun()
+
+    elif scr == SCREEN_POST_CONDITION_SURVEY:
+        result = render_post_condition_survey(ctrl.condition_number)
+        if result is not None:
+            ctrl.condition_surveys.append(result)
+            st.session_state.logger.log(
+                "post_condition_survey_submitted",
+                {"condition": ctrl.condition_number, "responses": result},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
     elif scr == SCREEN_OCEAN:
         result = render_ocean(params.bfi_version)
         if result is not None:
@@ -499,113 +606,27 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_BASELINE:
-        if render_baseline():
-            st.session_state.logger.log(
-                "baseline_complete", {},
-                ad_mode="session", conversation_id=ctrl.participant_id, source="system",
-            )
-            ctrl.advance()
-            st.rerun()
-
-    elif scr == SCREEN_PRACTICE:
-        mgr = _get_or_create_practice_manager()
-        if render_practice(mgr):
-            st.session_state.practice_manager = None
-            ctrl.advance()
-            st.rerun()
-
-    elif scr == SCREEN_TRIAL_INTRO:
-        trial_cfg = ctrl.current_trial_config
-        if trial_cfg:
-            task: TaskDefinition = trial_cfg["task"]
-            if render_trial_intro(ctrl.trial_number, ctrl.n_trials, task.participant_prompt):
-                log.info(
-                    "Trial {}/{} starting | pid={} | task={} | ad_mode={} | exp={}",
-                    ctrl.trial_number, ctrl.n_trials,
-                    ctrl.participant_id, task.id, trial_cfg["ad_mode"],
-                    st.session_state.logger.experiment_id,
-                )
-                st.session_state.trial_manager = None
-                ctrl.advance()
-                st.rerun()
-
-    elif scr == SCREEN_TRIAL_CHAT:
-        trial_cfg = ctrl.current_trial_config
-        if trial_cfg:
-            task = trial_cfg["task"]
-            ad_mode = trial_cfg["ad_mode"]
-            mgr = _get_or_create_trial_manager(
-                task,
-                ad_mode,
-                params,
-                flow_test=params.flow_test,
-            )
-            if render_trial_chat(mgr, mgr.ad_mode, flow_test=params.flow_test):
-                from dataclasses import asdict
-                from datetime import datetime
-
-                # Determine end reason for continuation tracking
-                end_reason = "max_turns" if mgr.must_end else "user_ended"
-                continuation_summary = mgr.finalize_trial(reason=end_reason)
-
-                trial_end_ts = datetime.now().isoformat()
-                trial_record = {
-                    "trial": ctrl.trial_number,
-                    "task_id": task.id,
-                    "ad_mode": ad_mode,
-                    "conversation_id": mgr.conversation_id,
-                    "initial_intent": mgr.initial_intent,
-                    "intent_history": list(mgr.intent_history),
-                    "turns": mgr.turn_count,
-                    "ad_turns_actual": list(mgr.ad_turns_actual),
-                    "trial_start_ts": mgr.trial_start_ts,
-                    "trial_end_ts": trial_end_ts,
-                    "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
-                    "continuation": continuation_summary,
-                    "messages": list(mgr.messages),
-                }
-                ctrl.trial_results.append(trial_record)
-                st.session_state.logger.log(
-                    "trial_complete",
-                    _trial_summary_for_log(trial_record),
-                    ad_mode=ad_mode,
-                    conversation_id=mgr.conversation_id,
-                    source="system",
-                    turn=mgr.turn_count,
-                )
-                log.info(
-                    "Trial {}/{} complete | pid={} | turns={} | ads_injected={} | continued_after_ad={}",
-                    ctrl.trial_number, ctrl.n_trials,
-                    ctrl.participant_id, mgr.turn_count, len(mgr.ad_turns_actual),
-                    continuation_summary.get("n_continued_after_ad", "?"),
-                )
-                st.session_state.trial_manager = None
-                ctrl.advance()
-                st.rerun()
-
-    elif scr == SCREEN_POST_TRIAL_SURVEY:
-        result = render_post_trial_survey(ctrl.trial_number)
+    elif scr == SCREEN_VALS:
+        result = render_vals()
         if result is not None:
-            ctrl.post_trial_surveys.append(result)
+            ctrl.vals_responses = result
             st.session_state.logger.log(
-                "post_trial_survey_submitted",
-                {"trial": ctrl.trial_number, "responses": result},
+                "vals_submitted", result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_FINAL_SURVEY:
-        result = render_final_survey()
+    elif scr == SCREEN_GLOBAL_EVALUATION:
+        result = render_global_evaluation()
         if result is not None:
-            ctrl.final_survey = result
+            ctrl.global_evaluation = result
             export_session_data(ctrl)
             log.info(
-                "Session complete | pid={} | exp={} | trials_completed={}",
+                "Session complete (A*) | pid={} | exp={} | conditions={}",
                 ctrl.participant_id,
                 st.session_state.logger.experiment_id,
-                len(ctrl.trial_results),
+                len(ctrl.condition_results),
             )
             ctrl.advance()
             st.rerun()
