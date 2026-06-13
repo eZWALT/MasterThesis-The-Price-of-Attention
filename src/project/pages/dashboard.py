@@ -24,7 +24,7 @@ st.title("📊 Experiment Dashboard")
 
 # ── Config ────────────────────────────────────────────────────
 
-LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))
+LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))  # search parent to find both production/ and development/
 
 # ── Helpers ───────────────────────────────────────────────────
 

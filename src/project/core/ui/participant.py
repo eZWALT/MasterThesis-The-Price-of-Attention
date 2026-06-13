@@ -53,9 +53,10 @@ from core.ui.screens import (
 def init_session_state(params):
     """Ensure every expected key exists in st.session_state, using ExperimentParams for config."""
     if "logger" not in st.session_state:
-        from core.config import LOG_DIR, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
+        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
+        log_dir = LOG_DIR_DEV if (params.dev_mode or params.flow_test) else LOG_DIR
         st.session_state.logger = ExperimentLogger(
-            log_dir=LOG_DIR,
+            log_dir=log_dir,
             flush_every_n=LOG_FLUSH_EVERY_N,
             flush_every_s=LOG_FLUSH_EVERY_S,
         )

@@ -214,5 +214,4 @@ src/project/.hf_cache/
 
 # Ignore large or generated files
 src/project/data/catalogs/catalog.jsonl
-src/project/logs/
 src/project/data/catalogs/amazon*
