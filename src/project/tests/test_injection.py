@@ -12,14 +12,12 @@ from core.ad_injection.models import (
     compact_display_payload,
     format_products_block,
     participant_display_title,
-    sponsored_message_to_payload,
 )
 from core.ad_injection.injectors import (
     InlinePersuasiveInjector,
-    SponsoredConversationalInjector,
     ExplicitAdBlockInjector,
 )
-from core.config import INLINE_AD_SYSTEM_PROMPT, SPONSORED_LABEL
+from core.config import INLINE_AD_SYSTEM_PROMPT
 
 
 def _sample_ads(n: int = 3) -> AdRetrievalResult:
@@ -68,12 +66,6 @@ class TestInlinePersuasiveInjector:
 
 @pytest.mark.unit
 class TestOtherInjectorsUsePrimaryOnly:
-    def test_sponsored_conversational_uses_top_ad(self):
-        injector = SponsoredConversationalInjector()
-        result = injector.inject(_sample_ads(3), [])
-        assert len(result.suggestions) == 1
-        assert "Product 1" in result.suggestions[0]
-
     def test_explicit_block_uses_top_ad(self):
         from core.config import EXPLICIT_AD_LABEL
 
@@ -93,20 +85,6 @@ class TestOtherInjectorsUsePrimaryOnly:
         )
         result = injector.inject(AdRetrievalResult(ads=[ad]), [])
         assert result.display_payload["image_url"] == "https://cdn.example/cam.jpg"
-
-    def test_sponsored_conversational_includes_display_payload(self):
-        injector = SponsoredConversationalInjector()
-        result = injector.inject(_sample_ads(1), [])
-        assert result.display_payload["title"] == "Product 1"
-        assert "text" not in result.display_payload
-
-    def test_sponsored_conversational_chip_never_empty(self):
-        injector = SponsoredConversationalInjector()
-        ad = Ad(title="Rod", text="body", question="   ", source_item_id="x")
-        result = injector.inject(AdRetrievalResult(ads=[ad]), [])
-        assert len(result.suggestions) == 1
-        assert result.suggestions[0].strip()
-        assert "Rod" in result.suggestions[0]
 
     def test_empty_retrieval_returns_empty_result(self):
         injector = ExplicitAdBlockInjector()
@@ -201,19 +179,6 @@ class TestCompactAdDisplayHelpers:
         ad = Ad(title=long_title, text="ignored")
         assert len(participant_display_title(ad)) <= 120
         assert participant_display_title(ad).endswith("…")
-
-    def test_sponsored_message_to_payload_strips_legacy_body(self):
-        legacy = (
-            "**Sponsored** — Widget\n\n"
-            + ("catalog description " * 400)
-            + "\n\n*Buy*"
-        )
-        payload = sponsored_message_to_payload(legacy)
-        assert payload is not None
-        assert payload["title"] == "Widget"
-        assert payload["cta"] == "Buy"
-        assert "catalog description" not in str(payload.values())
-
 
 @pytest.mark.unit
 class TestInjectorRegistry:

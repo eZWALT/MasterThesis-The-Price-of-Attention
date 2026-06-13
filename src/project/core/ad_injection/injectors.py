@@ -8,8 +8,7 @@ manager, not here.
 
 Paper taxonomy:
   1. InlinePersuasive          — ad woven into the LLM's own response
-  2. SponsoredConversational   — one Perplexity-style follow-up suggestion chip
-  3. ExplicitAdBlock           — visually separated banner / panel (OpenAI-style)
+  2. ExplicitAdBlock           — visually separated banner / panel (OpenAI-style)
 """
 
 from __future__ import annotations
@@ -19,7 +18,6 @@ from typing import List, Dict
 
 from core.config import (
     INLINE_AD_SYSTEM_PROMPT,
-    AD_FALLBACK_QUESTION_TEMPLATE,
     EXPLICIT_AD_LABEL,
 )
 from core.ad_injection.models import (
@@ -27,7 +25,6 @@ from core.ad_injection.models import (
     compact_display_payload,
     format_products_block,
     InjectionResult,
-    participant_display_title,
 )
 from core.ad_injection.ad_links import enrich_display_payload
 
@@ -78,34 +75,6 @@ class InlinePersuasiveInjector(AdInjector):
         )
         return InjectionResult(
             system_overrides=[{"role": "system", "content": system_instruction}]
-        )
-
-
-class SponsoredConversationalInjector(AdInjector):
-    """
-    Ad Type 2 — Sponsored Conversational Suggestion (Perplexity-style).
-
-    Exactly one follow-up chip for the top-ranked product appears below
-    the LLM response.
-
-    Intrusiveness: low (opt-in / non-blocking).
-    """
-
-    def inject(
-        self,
-        retrieval: AdRetrievalResult,
-        conversation: List[Dict[str, str]],
-    ) -> InjectionResult:
-        ad = retrieval.primary
-        if ad is None:
-            return InjectionResult()
-        short_title = participant_display_title(ad)
-        chip_text = (ad.question or "").strip() or AD_FALLBACK_QUESTION_TEMPLATE.format(
-            title=short_title,
-        )
-        return InjectionResult(
-            suggestions=[chip_text],  # always length 1 — top ad only
-            display_payload=enrich_display_payload(ad, compact_display_payload(ad)),
         )
 
 

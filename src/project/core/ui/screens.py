@@ -62,10 +62,7 @@ from core.ad_injection.ad_links import (
 )
 from core.ad_injection.models import (
     Ad,
-    ad_image_url,
     format_products_block,
-    is_sponsored_chat_message,
-    sponsored_message_to_payload,
 )
 from core.conversation import ConversationManager
 
@@ -128,22 +125,6 @@ def _render_chat_message(
 ) -> None:
     """Render one chat message; linkify inline ad product names when applicable."""
     content = msg.get("content", "")
-    if is_sponsored_chat_message(content):
-        payload = sponsored_message_to_payload(content)
-        if payload:
-            ad = None
-            if manager is not None and turn is not None and turn in manager.ads_by_turn:
-                ads = manager.ads_by_turn[turn]
-                ad = detect_mentioned_ad(payload.get("title", ""), ads) or (ads[0] if ads else None)
-            _render_ad_banner(
-                payload,
-                ad_mode=ad_mode or "sponsored_conversational",
-                manager=manager,
-                turn=turn or 0,
-                ad=ad,
-            )
-            return
-
     if (
         msg.get("role") == "assistant"
         and ad_mode == "inline_persuasive"
@@ -227,31 +208,7 @@ def _render_ad_banner(
 
 
 # Modes that show the full-width title+CTA banner above the chat input.
-_AD_BANNER_MODES = frozenset({"explicit_ad_block", "sponsored_conversational"})
-
-
-def _render_sponsored_suggestion(
-    suggestion: str,
-    *,
-    manager: ConversationManager,
-    ad_mode: str,
-    ad: Ad,
-    turn: int,
-) -> None:
-    """Follow-up suggestion with the product name as a clickable link."""
-    suggestion_html = linkify_inline_ad_titles(suggestion, [ad])
-    image_url = ad_image_url(ad)
-    if image_url:
-        st.markdown(
-            f'<div style="display:flex;align-items:center;gap:10px;margin:4px 0;">'
-            f"{_ad_image_html(image_url, size_px=48)}"
-            f'<div style="flex:1;min-width:0;">{suggestion_html}</div>'
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(suggestion_html, unsafe_allow_html=True)
-    st.caption("Click the product name to view details (opens in a new tab).")
+_AD_BANNER_MODES = frozenset({"explicit_ad_block"})
 
 
 def _ad_display_state_matches_mode(manager: ConversationManager, ad_mode: str) -> bool:
@@ -285,16 +242,6 @@ def _render_turn_ads(
             manager=manager,
             turn=turn,
             ad=primary,
-        )
-
-    if ad_mode == "sponsored_conversational" and result.suggestions and primary:
-        st.markdown("### 🔍 Sponsored Suggestion")
-        _render_sponsored_suggestion(
-            result.suggestions[0],
-            manager=manager,
-            ad_mode=ad_mode,
-            ad=primary,
-            turn=turn,
         )
 
 
@@ -623,17 +570,6 @@ def _render_flow_ad_panel(manager: ConversationManager, ad_mode: str) -> None:
             turn=manager.turn_count,
             ad=primary,
         )
-    if ad_mode == "sponsored_conversational" and result.suggestions and primary:
-        st.markdown("### 🔍 Sponsored Suggestion")
-        _render_sponsored_suggestion(
-            result.suggestions[0],
-            manager=manager,
-            ad_mode=ad_mode,
-            ad=primary,
-            turn=manager.turn_count,
-        )
-
-
 def render_trial_chat(
     manager: ConversationManager,
     ad_mode: str,
@@ -675,7 +611,7 @@ def render_trial_chat(
         with st.expander("🎯 Ad debug (dev=flow)", expanded=True):
             _render_flow_ad_panel(manager, ad_mode)
 
-    # Compact ads above chat input (banner + sponsored chips where applicable)
+    # Compact ads above chat input (banner where applicable)
     _render_turn_ads(manager, ad_mode)
 
     # Max turns reached → auto-end

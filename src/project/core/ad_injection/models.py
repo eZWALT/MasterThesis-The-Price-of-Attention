@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 
-from core.config import DEFAULT_AD_CTA, PARTICIPANT_AD_TITLE_MAX_LEN, SPONSORED_LABEL
+from core.config import DEFAULT_AD_CTA, PARTICIPANT_AD_TITLE_MAX_LEN
 
 
 @dataclass
@@ -84,7 +84,7 @@ def ad_image_url(ad: "Ad") -> str | None:
 def compact_display_payload(ad: "Ad", header: str | None = None) -> Dict[str, str]:
     """UI banner fields: label, title, CTA only (no catalog description)."""
     return {
-        "header": header or SPONSORED_LABEL,
+        "header": header or "",
         "title": participant_display_title(ad),
         "cta": ad.cta or DEFAULT_AD_CTA,
     }
@@ -101,42 +101,6 @@ def format_products_block(ads: List["Ad"]) -> str:
     return "\n\n".join(blocks)
 
 
-def is_sponsored_chat_message(content: str) -> bool:
-    """True if message content is a labelled sponsored ad (any format generation)."""
-    return content.strip().startswith(f"**{SPONSORED_LABEL}**")
-
-
-def sponsored_message_to_payload(content: str) -> Dict[str, str] | None:
-    """
-    Parse a sponsored chat line into a compact banner payload.
-
-    Drops legacy middle paragraphs (old format appended ad.text between title and CTA).
-    """
-    if not is_sponsored_chat_message(content):
-        return None
-
-    headline, *rest = [p.strip() for p in content.split("\n\n") if p.strip()]
-    prefix = f"**{SPONSORED_LABEL}** — "
-    if not headline.startswith(prefix):
-        return None
-
-    title = headline[len(prefix) :].strip()
-    cta = DEFAULT_AD_CTA
-    for part in reversed(rest):
-        if part.startswith("*") and part.endswith("*"):
-            cta = part.strip("*").strip() or cta
-            break
-
-    if len(title) > PARTICIPANT_AD_TITLE_MAX_LEN:
-        title = participant_display_title(Ad(title=title, text=""))
-
-    return {
-        "header": SPONSORED_LABEL,
-        "title": title,
-        "cta": cta,
-    }
-
-
 @dataclass
 class Ad:
     """
@@ -147,7 +111,7 @@ class Ad:
     title          : display headline.
     text           : body copy shown to the user or injected into the LLM.
     cta            : call-to-action label (e.g. "Learn more").
-    question       : follow-up suggestion text (used by SponsoredConversational).
+    question       : follow-up suggestion text.
     source_item_id : catalog item id from which this ad was retrieved.
     relevance_score: retrieval / reranking score (0.0 for mock ads).
     metadata       : arbitrary key-value pairs from the catalog item.

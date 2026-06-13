@@ -66,7 +66,7 @@ class TestSyncDevOverrides:
             _fake_session_state(
                 dev_force_ad=True,
                 dev_rag_mode="mock",
-                dev_ad_mode_override="sponsored_conversational",
+                dev_ad_mode_override="inline_persuasive",
             ),
         )
         mgr = MagicMock()

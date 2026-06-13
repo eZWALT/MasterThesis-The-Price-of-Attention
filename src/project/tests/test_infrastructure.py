@@ -82,7 +82,7 @@ class TestSyncDevOverrides:
         mock_state = {
             "dev_force_ad": False,
             "dev_rag_mode": "mock",
-            "dev_ad_mode_override": "sponsored_conversational",
+            "dev_ad_mode_override": "inline_persuasive",
         }
         with patch.object(st, "session_state", mock_state):
             from core.ui.participant import _sync_dev_overrides
