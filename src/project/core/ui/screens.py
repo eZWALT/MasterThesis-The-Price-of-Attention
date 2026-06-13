@@ -44,10 +44,6 @@ from core.experiment.surveys import (
     POST_CONDITION_SCALE_MIN,
     POST_CONDITION_SCALE_MAX,
     POST_CONDITION_ITEMS,
-    VALS_SCALE_MIN,
-    VALS_SCALE_MAX,
-    VALS_SCALE_LABELS,
-    VALS_ITEMS,
     GLOBAL_EVAL_SCALE_MIN,
     GLOBAL_EVAL_SCALE_MAX,
     GLOBAL_EVAL_ITEMS,
@@ -970,43 +966,6 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
         if invalid:
             st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
             return None
-        return responses
-    elif not all_answered:
-        st.info("Please answer all questions to continue.")
-    return None
-
-
-# ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — VALS LIFESTYLE QUESTIONNAIRE
-# ═══════════════════════════════════════════════════════════════
-
-def render_vals() -> Optional[dict]:
-    """
-    Lifestyle segmentation questionnaire (adapted VALS).
-    Returns dict of {item_id: score} on submit, None otherwise.
-    """
-    st.header("Lifestyle Questionnaire")
-    st.info("Please indicate how much you agree with each statement.")
-
-    responses: dict[str, int] = {}
-    all_answered = True
-
-    for item in VALS_ITEMS:
-        value = st.radio(
-            f"**{item['text']}**",
-            options=list(range(VALS_SCALE_MIN, VALS_SCALE_MAX + 1)),
-            format_func=lambda v: f"{v} — {VALS_SCALE_LABELS.get(v, '')}",
-            horizontal=True,
-            index=None,
-            key=f"vals_{item['id']}",
-        )
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
         return responses
     elif not all_answered:
         st.info("Please answer all questions to continue.")

@@ -151,43 +151,6 @@ POST_TRIAL_ITEMS: list[dict[str, str]] = [
     {"id": "helpfulness",   "text": "Overall, the assistant was helpful."},
 ]
 
-# ═══════════════════════════════════════════════════════════════
-# VALS — LIFESTYLE SEGMENTATION  (adapted from VALS framework)
-# 8 items covering Innovator, Thinker, Believer, Achiever,
-# Striver, Experiencer, Maker, Survivor dimensions.
-# ═══════════════════════════════════════════════════════════════
-VALS_SCALE_MIN: int = 1
-VALS_SCALE_MAX: int = 5
-VALS_SCALE_LABELS: dict[int, str] = {
-    1: "Disagree strongly",
-    2: "Disagree a little",
-    3: "Neither agree nor disagree",
-    4: "Agree a little",
-    5: "Agree strongly",
-}
-
-VALS_ITEMS: list[dict[str, str]] = [
-    {"id": "innovation",  "text": "I like to try new and innovative things before others do."},
-    {"id": "achievement", "text": "I set ambitious goals and work hard to achieve them."},
-    {"id": "tradition",   "text": "I value tradition and follow established ways of doing things."},
-    {"id": "excitement",  "text": "I seek excitement and enjoy spontaneous experiences."},
-    {"id": "practicality","text": "I prefer practical, functional products over trendy ones."},
-    {"id": "status",     "text": "I care about the brands I use and what they say about me."},
-    {"id": "self_reliance","text": "I prefer to rely on myself rather than on others."},
-    {"id": "community",  "text": "Being part of a community and helping others is important to me."},
-]
-
-VALS_SEGMENTS: dict[str, str] = {
-    "innovation":  "Innovator",
-    "achievement": "Achiever",
-    "tradition":   "Believer",
-    "excitement":  "Experiencer",
-    "practicality":"Maker",
-    "status":      "Striver",
-    "self_reliance":"Survivor",
-    "community":   "Thinker",
-}
-
 
 # ═══════════════════════════════════════════════════════════════
 # GLOBAL EVALUATION  (end of session — Workflow A*)

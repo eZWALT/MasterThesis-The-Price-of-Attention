@@ -70,7 +70,7 @@ Per-participant JSONL log contains:
 - `condition_complete` — condition_id, ad_mode, ad_turn, turns, metrics
 - `post_condition_survey_submitted` — trust, usefulness, satisfaction
 - `session_complete` — demographics, first_impression, ocean_scores,
-  vals_responses, condition_summaries, condition_surveys, global_evaluation
+  condition_summaries, condition_surveys, global_evaluation
 
 ## Dev Mode
 
