@@ -238,13 +238,11 @@ AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 
 AD_MODES: list[str] = [
     "inline_persuasive",        # ad woven into the LLM's own response
-    "sponsored_conversational", # Perplexity-style follow-up suggestion chip (one only)
     "explicit_ad_block",        # visually separated banner / panel (OpenAI-style)
 ]
 
 AD_MODE_LABELS: dict[str, str] = {
     "inline_persuasive":        "Inline Persuasive (embedded in LLM response)",
-    "sponsored_conversational": "Sponsored Conversational (one follow-up suggestion chip)",
     "explicit_ad_block":        "Explicit Ad Block (visual panel, OpenAI-style)",
 }
 

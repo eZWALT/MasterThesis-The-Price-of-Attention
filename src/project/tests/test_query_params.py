@@ -53,9 +53,9 @@ class TestParseQueryParams:
         p = self._parse({
             "dev": "flow",
             "n": "2",
-            "modes": "explicit_ad_block,invalid_mode,sponsored_conversational",
+            "modes": "explicit_ad_block,invalid_mode,inline_persuasive",
         })
-        assert p.ad_modes == ["explicit_ad_block", "sponsored_conversational"]
+        assert p.ad_modes == ["explicit_ad_block", "inline_persuasive"]
 
     def test_skip_screens_parsed(self):
         p = self._parse({"skip": "consent,baseline,ocean"})

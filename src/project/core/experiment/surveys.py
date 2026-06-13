@@ -145,7 +145,7 @@ POST_TRIAL_ITEMS: list[dict[str, str]] = [
 # ═══════════════════════════════════════════════════════════════
 FINAL_SURVEY_ITEMS: list[dict[str, str]] = [
     {"id": "overall_trust",    "text": "Overall, I trusted the AI assistant across all conversations."},
-    {"id": "ad_awareness",     "text": "I noticed promotional or sponsored content during the conversations."},
+    {"id": "ad_awareness",     "text": "I noticed promotional content during the conversations."},
     {"id": "ad_disruption",    "text": "The promotional content disrupted my experience."},
     {"id": "willingness_reuse","text": "I would use a similar AI assistant again in the future."},
 ]

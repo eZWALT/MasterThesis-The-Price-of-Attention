@@ -83,23 +83,6 @@ class TestProcessUserMessage:
     @patch("core.conversation.manager.compute_attention_shift")
     @patch("core.conversation.manager.get_ad")
     @patch.object(ConversationManager, "_classify_turn_intent", return_value="info")
-    def test_sponsored_conversational_exposes_one_suggestion(
-        self, _intent, mock_get_ad, mock_shift, sample_ad_retrieval
-    ):
-        mock_get_ad.return_value = sample_ad_retrieval
-        mock_shift.return_value = MagicMock(divergence=0.0, method="jsd")
-        mgr = _make_manager(ad_mode="sponsored_conversational", force_ad=True, use_rag=False)
-        mgr.llm = MagicMock()
-        mgr.llm.chat.return_value = "Main reply"
-
-        mgr.process_user_message("buy shoes")
-
-        assert len(mgr.last_injection.suggestions) == 1
-        assert mgr.last_injection.display_payload is not None
-
-    @patch("core.conversation.manager.compute_attention_shift")
-    @patch("core.conversation.manager.get_ad")
-    @patch.object(ConversationManager, "_classify_turn_intent", return_value="info")
     def test_no_injection_when_not_ad_turn(self, _intent, mock_get_ad, mock_shift):
         mock_shift.return_value = MagicMock(divergence=0.0, method="jsd")
         mgr = _make_manager(ad_turns=[99], force_ad=False)
@@ -113,9 +96,9 @@ class TestProcessUserMessage:
         assert mgr.last_injection == InjectionResult()
 
     def test_apply_ad_mode_clears_stale_retrieval(self, sample_ad_retrieval):
-        mgr = _make_manager(ad_mode="sponsored_conversational")
+        mgr = _make_manager(ad_mode="inline_persuasive")
         mgr.last_retrieval = sample_ad_retrieval
-        mgr.last_retrieval_ad_mode = "sponsored_conversational"
+        mgr.last_retrieval_ad_mode = "inline_persuasive"
 
         mgr.apply_ad_mode("explicit_ad_block")
 

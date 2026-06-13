@@ -32,7 +32,6 @@ from core.ad_injection.models import Ad, AdRetrievalResult
 from core.ad_injection.injectors import (
     AdInjector,
     InlinePersuasiveInjector,
-    SponsoredConversationalInjector,
     ExplicitAdBlockInjector,
 )
 
@@ -92,7 +91,6 @@ def _rag_ad(query: str, context: List[Dict]) -> AdRetrievalResult:
 
 INJECTOR_REGISTRY: Dict[str, AdInjector] = {
     "inline_persuasive":        InlinePersuasiveInjector(),
-    "sponsored_conversational": SponsoredConversationalInjector(),
     "explicit_ad_block":        ExplicitAdBlockInjector(),
 }
 
