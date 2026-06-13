@@ -229,11 +229,52 @@ BASELINE_CONTINUE_LABEL: str = "Continue"
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
-# │  5.  ADVERTISING MODES  (paper taxonomy, Section 3.2)                  │
-# │  Ordered by increasing intrusiveness.                                   │
+# │  5.  EXPERIMENT CONDITIONS & ADVERTISING MODES                           │
+# │  Workflow A*: 5-condition within-subject design                         │
+# │  Paper: Section 3.2 — Advertising Modes.                                │
 # └─────────────────────────────────────────────────────────────────────────┘
 
-# Ad retrieval backend: "mock" (placeholder, no GPU) or "rag" (full pipeline)
+# ── 5 experimental conditions ────────────────────────────
+CONDITIONS: list[str] = [
+    "no_ads",
+    "inline_early",
+    "inline_late",
+    "block_early",
+    "block_late",
+]
+
+CONDITION_LABELS: dict[str, str] = {
+    "no_ads":       "No Ads",
+    "inline_early": "Inline Ad (Early)",
+    "inline_late":  "Inline Ad (Late)",
+    "block_early":  "Block Ad (Early)",
+    "block_late":   "Block Ad (Late)",
+}
+
+# Each condition → (injector_key, timing_window)
+# window = (min_turn, max_turn) inclusive; exactly 1 random turn chosen.
+# None = never inject.
+CONDITION_AD_MODE: dict[str, str] = {
+    "no_ads":       "",
+    "inline_early": "inline_persuasive",
+    "inline_late":  "inline_persuasive",
+    "block_early":  "explicit_ad_block",
+    "block_late":   "explicit_ad_block",
+}
+
+CONDITION_TIMING: dict[str, tuple[int, int] | None] = {
+    "no_ads":       None,
+    "inline_early": (1, 2),
+    "inline_late":  (3, 5),
+    "block_early":  (1, 2),
+    "block_late":   (3, 5),
+}
+
+# Warmup task (fixed, no ads, not logged as a condition)
+WARMUP_TASK_ID: str = "swt_new_hobby_lifestyle"
+WARMUP_TURNS: int = 5
+
+# ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 
 AD_MODES: list[str] = [
@@ -246,8 +287,6 @@ AD_MODE_LABELS: dict[str, str] = {
     "explicit_ad_block":        "Explicit Ad Block (visual panel, OpenAI-style)",
 }
 
-# Modes that render as a narrow side column beside chat (none by default).
-# explicit_ad_block uses a full-width banner above the chat input instead.
 AD_SIDE_PANEL_MODES: set[str] = set()
 
 
@@ -466,12 +505,22 @@ SCREEN_DEMOGRAPHICS:      str = "demographics"
 SCREEN_OCEAN:             str = "ocean"
 SCREEN_BASELINE:          str = "baseline"
 SCREEN_PRACTICE:          str = "practice"
-SCREEN_TRIAL_INTRO:       str = "trial_intro"
+SCREEN_TRIAL_INTRO:       str = "trial_intro"       # kept for backward compat; mapped to condition_intro
 SCREEN_TRIAL_CHAT:        str = "trial_chat"
 SCREEN_POST_TRIAL_SURVEY: str = "post_trial_survey"
 SCREEN_FINAL_SURVEY:      str = "final_survey"
 SCREEN_DEBRIEF:           str = "debrief"
 SCREEN_DONE:              str = "done"
+
+# Workflow A* screen names
+SCREEN_INSTRUCTIONS:           str = "instructions"
+SCREEN_WARMUP_CHAT:            str = "warmup_chat"
+SCREEN_FIRST_IMPRESSION:       str = "first_impression"
+SCREEN_CONDITION_INTRO:        str = "condition_intro"
+SCREEN_CONDITION_CHAT:         str = "condition_chat"
+SCREEN_POST_CONDITION_SURVEY:  str = "post_condition_survey"
+SCREEN_VALS:                   str = "vals"
+SCREEN_GLOBAL_EVALUATION:      str = "global_evaluation"
 
 
 # Per-study screens auto-advanced without rendering (extend these frozensets as needed).
