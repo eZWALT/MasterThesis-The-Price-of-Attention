@@ -18,35 +18,40 @@ from typing import Optional
 
 from core.config import (
     DEFAULT_MAX_TOKENS,
-    # Consent
     CONSENT_TITLE,
     CONSENT_TEXT,
-    # Baseline
     BASELINE_DURATION_SECONDS,
     BASELINE_TITLE,
     BASELINE_INSTRUCTION,
     BASELINE_COMPLETE_MESSAGE,
     BASELINE_CONTINUE_LABEL,
     AD_MODE_LABELS,
-    # Practice
+    CONDITION_LABELS,
     PRACTICE_TASK_PROMPT,
-    # Trials
     MAX_TURNS_PER_TRIAL,
     AD_SIDE_PANEL_MODES,
 )
 from core.experiment.surveys import (
-    # OCEAN
     OCEAN_ITEMS,
     OCEAN_SCALE_MIN,
     OCEAN_SCALE_MAX,
     OCEAN_SCALE_LABELS,
     OCEAN_INSTRUCTIONS,
     get_ocean_items,
-    # Post-trial survey
     POST_TRIAL_SCALE_MIN,
     POST_TRIAL_SCALE_MAX,
     POST_TRIAL_ITEMS,
-    # Final survey
+    POST_CONDITION_SCALE_MIN,
+    POST_CONDITION_SCALE_MAX,
+    POST_CONDITION_ITEMS,
+    VALS_SCALE_MIN,
+    VALS_SCALE_MAX,
+    VALS_SCALE_LABELS,
+    VALS_ITEMS,
+    GLOBAL_EVAL_SCALE_MIN,
+    GLOBAL_EVAL_SCALE_MAX,
+    GLOBAL_EVAL_ITEMS,
+    GLOBAL_OPEN_ENDED_PROMPT,
     FINAL_SURVEY_ITEMS,
     FINAL_OPEN_ENDED_PROMPT,
 )
@@ -722,6 +727,329 @@ def render_final_survey() -> Optional[dict]:
         invalid = [
             iid for iid, v in responses.items()
             if isinstance(v, int) and not (POST_TRIAL_SCALE_MIN <= v <= POST_TRIAL_SCALE_MAX)
+        ]
+        if invalid:
+            st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
+            return None
+        return responses
+    elif not all_answered:
+        st.info("Please answer all Likert questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — INSTRUCTIONS
+# ═══════════════════════════════════════════════════════════════
+
+def render_instructions() -> bool:
+    """Brief task explanation before warm-up."""
+    st.header("About This Study")
+    st.markdown(
+        "You will chat with an AI shopping assistant across several "
+        "short conversations. Each conversation will present you with "
+        "a different shopping task.\n\n"
+        "After each conversation, you will answer a few brief questions "
+        "about your experience.\n\n"
+        "Take your time and interact naturally with the assistant."
+    )
+    return st.button("Begin", type="primary")
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — WARM-UP CHAT
+# ═══════════════════════════════════════════════════════════════
+
+def render_warmup_chat(manager: ConversationManager) -> bool:
+    """
+    Warm-up conversation — no ads, no Likert after.
+    Returns True when user clicks 'Done'.
+    """
+    st.header("Warm-Up Conversation")
+    st.info(
+        "This is a practice conversation to get familiar with the interface. "
+        "Chat naturally with the assistant."
+    )
+
+    for msg in manager.messages:
+        with st.chat_message(msg["role"]):
+            _render_chat_message(msg)
+
+    if manager.turn_count >= 1:
+        st.divider()
+        if st.button("Done — continue to study", type="primary"):
+            return True
+
+    if user_input := st.chat_input("Send a message..."):
+        if user_input.strip():
+            with st.chat_message("user"):
+                st.markdown(user_input.strip())
+            with st.chat_message("assistant"):
+                st.write_stream(manager.process_user_message_stream(user_input.strip()))
+            st.rerun()
+
+    return False
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — FIRST IMPRESSION (non-Likert)
+# ═══════════════════════════════════════════════════════════════
+
+def render_first_impression() -> Optional[dict]:
+    """
+    Lightweight baseline — no Likert scales.
+
+    Collects:
+      - first_impression_text (free-text)
+      - reuse_intent (Yes / Maybe / No)
+      - sentiment_label (Negative / Neutral / Positive)
+    """
+    st.header("Your First Impression")
+    st.caption("Please share your initial thoughts about the system.")
+
+    text = st.text_area(
+        "Describe your first impression of the system in one sentence.",
+        key="first_impression_text",
+    )
+
+    reuse = st.radio(
+        "Would you use this assistant again?",
+        ["Yes", "Maybe", "No"],
+        index=None,
+        horizontal=True,
+        key="first_impression_reuse",
+    )
+
+    sentiment = st.radio(
+        "Overall, how would you describe your experience so far?",
+        ["Negative", "Neutral", "Positive"],
+        index=None,
+        horizontal=True,
+        key="first_impression_sentiment",
+    )
+
+    all_filled = bool(text and reuse and sentiment)
+    if all_filled and st.button("Continue", type="primary"):
+        return {
+            "first_impression_text": text,
+            "reuse_intent": reuse,
+            "sentiment_label": sentiment,
+        }
+    elif not all_filled:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — CONDITION INTRO
+# ═══════════════════════════════════════════════════════════════
+
+def render_condition_intro(
+    condition_number: int,
+    total_conditions: int,
+    condition_id: str,
+    task_prompt: str,
+) -> bool:
+    """Show which condition + task is next."""
+    label = CONDITION_LABELS.get(condition_id, condition_id)
+    st.header(f"Conversation {condition_number} of {total_conditions}")
+    st.caption(f"Condition: {label}")
+    st.markdown(
+        f"<div style='text-align:center; font-size:1.2em; padding:40px 20px; "
+        f"background:#1a1d24; border-radius:12px; margin:20px 0;'>"
+        f"{task_prompt}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+    if st.button("Start conversation", type="primary"):
+        return True
+    return False
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — CONDITION CHAT
+# ═══════════════════════════════════════════════════════════════
+
+def render_condition_chat(
+    manager: ConversationManager,
+    condition_id: str,
+    flow_test: bool = False,
+) -> bool:
+    """
+    Condition-aware chat interface.
+
+    Handles no_ads (no ad injection) and ad conditions (single ad at ad_turn).
+    """
+    from core.config import CONDITION_AD_MODE
+
+    ad_mode = CONDITION_AD_MODE.get(condition_id, "")
+    start_ad_click_server()
+    register_click_state(manager.logger, manager, condition_id)
+    inject_ad_click_tracker()
+
+    label = CONDITION_LABELS.get(condition_id, condition_id)
+
+    if manager.task:
+        st.caption(f"📝 {manager.task.participant_prompt}")
+
+    with st.sidebar:
+        progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
+        st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
+        st.caption(f"Condition: {label}")
+
+        if manager.turn_count >= manager.finish_from:
+            if manager.turn_count < manager.min_turns:
+                st.info(
+                    f"💬 Keep chatting — you need at least {manager.min_turns} turns "
+                    "before you can finish."
+                )
+            else:
+                st.success("You can keep chatting or finish when you're ready.")
+            if st.button("🏁 I've finished", type="primary", use_container_width=True):
+                return True
+
+    _render_chat_history(manager, ad_mode)
+
+    if flow_test:
+        with st.expander("🎯 Ad debug (dev=flow)", expanded=True):
+            _render_flow_ad_panel(manager, ad_mode)
+
+    if condition_id != "no_ads":
+        _render_turn_ads(manager, ad_mode)
+
+    if manager.must_end:
+        st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
+        return True
+
+    if user_input := st.chat_input("Send a message..."):
+        if not user_input.strip():
+            st.warning("Please enter a message before sending.")
+        else:
+            with st.chat_message("user"):
+                st.markdown(user_input.strip())
+            with st.chat_message("assistant"):
+                st.write_stream(manager.process_user_message_stream(user_input.strip()))
+            st.rerun()
+
+    return False
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — POST-CONDITION SURVEY
+# ═══════════════════════════════════════════════════════════════
+
+def render_post_condition_survey(condition_number: int) -> Optional[dict]:
+    """
+    3-item Likert survey after each condition (trust, usefulness, satisfaction).
+    """
+    st.header(f"Post-Conversation Survey")
+    st.caption("Please rate the following statements about the conversation you just had.")
+
+    responses: dict[str, int] = {}
+    all_answered = True
+
+    for item in POST_CONDITION_ITEMS:
+        value = st.radio(
+            item["text"],
+            options=list(range(POST_CONDITION_SCALE_MIN, POST_CONDITION_SCALE_MAX + 1)),
+            format_func=lambda v: f"{v}",
+            horizontal=True,
+            index=None,
+            key=f"post_condition_{condition_number}_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        invalid = [
+            iid for iid, v in responses.items()
+            if not (POST_CONDITION_SCALE_MIN <= v <= POST_CONDITION_SCALE_MAX)
+        ]
+        if invalid:
+            st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
+            return None
+        return responses
+    elif not all_answered:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — VALS LIFESTYLE QUESTIONNAIRE
+# ═══════════════════════════════════════════════════════════════
+
+def render_vals() -> Optional[dict]:
+    """
+    Lifestyle segmentation questionnaire (adapted VALS).
+    Returns dict of {item_id: score} on submit, None otherwise.
+    """
+    st.header("Lifestyle Questionnaire")
+    st.info("Please indicate how much you agree with each statement.")
+
+    responses: dict[str, int] = {}
+    all_answered = True
+
+    for item in VALS_ITEMS:
+        value = st.radio(
+            f"**{item['text']}**",
+            options=list(range(VALS_SCALE_MIN, VALS_SCALE_MAX + 1)),
+            format_func=lambda v: f"{v} — {VALS_SCALE_LABELS.get(v, '')}",
+            horizontal=True,
+            index=None,
+            key=f"vals_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        return responses
+    elif not all_answered:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — GLOBAL EVALUATION
+# ═══════════════════════════════════════════════════════════════
+
+def render_global_evaluation() -> Optional[dict]:
+    """
+    End-of-session global evaluation + open-ended debrief.
+    """
+    st.header("Final Evaluation")
+    st.caption("Please reflect on the entire session.")
+
+    responses: dict[str, int | str] = {}
+    all_answered = True
+
+    for item in GLOBAL_EVAL_ITEMS:
+        value = st.radio(
+            item["text"],
+            options=list(range(GLOBAL_EVAL_SCALE_MIN, GLOBAL_EVAL_SCALE_MAX + 1)),
+            format_func=lambda v: f"{v}",
+            horizontal=True,
+            index=None,
+            key=f"global_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    st.subheader("Debrief")
+    open_text = st.text_area(GLOBAL_OPEN_ENDED_PROMPT, key="global_open_ended")
+    responses["open_ended"] = open_text
+
+    if all_answered and st.button("Submit", type="primary"):
+        invalid = [
+            iid for iid, v in responses.items()
+            if isinstance(v, int) and not (GLOBAL_EVAL_SCALE_MIN <= v <= GLOBAL_EVAL_SCALE_MAX)
         ]
         if invalid:
             st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
