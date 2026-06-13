@@ -128,7 +128,18 @@ def get_ocean_items(version: str = "10") -> list[tuple[str, str, bool]]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# POST-TRIAL SURVEY  (after each chat trial)
+# POST-CONDITION SURVEY  (after each condition chat — Workflow A*)
+# ═══════════════════════════════════════════════════════════════
+POST_CONDITION_SCALE_MIN: int = 1
+POST_CONDITION_SCALE_MAX: int = 7
+POST_CONDITION_ITEMS: list[dict[str, str]] = [
+    {"id": "trust",       "text": "I trusted the assistant during this conversation."},
+    {"id": "usefulness",  "text": "The assistant was useful for my shopping task."},
+    {"id": "satisfaction","text": "I am satisfied with the shopping experience."},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# POST-TRIAL SURVEY  (after each chat trial — legacy, kept for compat)
 # ═══════════════════════════════════════════════════════════════
 POST_TRIAL_SCALE_MIN: int = 1
 POST_TRIAL_SCALE_MAX: int = 7
@@ -141,7 +152,63 @@ POST_TRIAL_ITEMS: list[dict[str, str]] = [
 ]
 
 # ═══════════════════════════════════════════════════════════════
-# FINAL SURVEY  (end of session)
+# VALS — LIFESTYLE SEGMENTATION  (adapted from VALS framework)
+# 8 items covering Innovator, Thinker, Believer, Achiever,
+# Striver, Experiencer, Maker, Survivor dimensions.
+# ═══════════════════════════════════════════════════════════════
+VALS_SCALE_MIN: int = 1
+VALS_SCALE_MAX: int = 5
+VALS_SCALE_LABELS: dict[int, str] = {
+    1: "Disagree strongly",
+    2: "Disagree a little",
+    3: "Neither agree nor disagree",
+    4: "Agree a little",
+    5: "Agree strongly",
+}
+
+VALS_ITEMS: list[dict[str, str]] = [
+    {"id": "innovation",  "text": "I like to try new and innovative things before others do."},
+    {"id": "achievement", "text": "I set ambitious goals and work hard to achieve them."},
+    {"id": "tradition",   "text": "I value tradition and follow established ways of doing things."},
+    {"id": "excitement",  "text": "I seek excitement and enjoy spontaneous experiences."},
+    {"id": "practicality","text": "I prefer practical, functional products over trendy ones."},
+    {"id": "status",     "text": "I care about the brands I use and what they say about me."},
+    {"id": "self_reliance","text": "I prefer to rely on myself rather than on others."},
+    {"id": "community",  "text": "Being part of a community and helping others is important to me."},
+]
+
+VALS_SEGMENTS: dict[str, str] = {
+    "innovation":  "Innovator",
+    "achievement": "Achiever",
+    "tradition":   "Believer",
+    "excitement":  "Experiencer",
+    "practicality":"Maker",
+    "status":      "Striver",
+    "self_reliance":"Survivor",
+    "community":   "Thinker",
+}
+
+
+# ═══════════════════════════════════════════════════════════════
+# GLOBAL EVALUATION  (end of session — Workflow A*)
+# ═══════════════════════════════════════════════════════════════
+GLOBAL_EVAL_SCALE_MIN: int = 1
+GLOBAL_EVAL_SCALE_MAX: int = 7
+GLOBAL_EVAL_ITEMS: list[dict[str, str]] = [
+    {"id": "overall_trust",     "text": "Overall, I trusted the AI assistant across all conversations."},
+    {"id": "overall_usefulness","text": "Overall, the assistant was useful for my shopping tasks."},
+    {"id": "ad_awareness",      "text": "I noticed promotional content during the conversations."},
+    {"id": "ad_disruption",     "text": "The promotional content disrupted my experience."},
+    {"id": "willingness_reuse", "text": "I would use a similar AI assistant again in the future."},
+]
+
+GLOBAL_OPEN_ENDED_PROMPT: str = (
+    "Did you notice anything unusual during the conversations? "
+    "Any other comments? (optional)"
+)
+
+# ═══════════════════════════════════════════════════════════════
+# FINAL SURVEY  (end of session — legacy)
 # ═══════════════════════════════════════════════════════════════
 FINAL_SURVEY_ITEMS: list[dict[str, str]] = [
     {"id": "overall_trust",    "text": "Overall, I trusted the AI assistant across all conversations."},
