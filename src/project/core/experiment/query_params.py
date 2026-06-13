@@ -106,6 +106,12 @@ force_ad    ⚠ DEV MODE ONLY (requires dev=true or dev=flow)
             Default: off
             Example: ?dev=flow&force_ad=1
 
+calibration Calibration mode — no upper turn limit, min 5 turns before finish,
+            flag in logs to differentiate from real data.
+            Values : true | 1 | yes → calibration mode
+            Default: false
+            Example: ?calibration=true
+
 rag         ⚠ DEV MODE ONLY (requires dev=true or dev=flow)
             Override the AD_BACKEND for this session.
             Values : 0 → force mock backend (instant, no GPU, placeholder ad)
@@ -228,6 +234,11 @@ class ExperimentParams:
 
     # ── BFI version for OCEAN screen ─────────────────
     bfi_version: str = "10"                 # "10" | "44"
+
+    # ── Calibration mode ──────────────────────────────
+    # ?calibration=true → no turn limit, min 5 turns before finish,
+    # logged so real data can be filtered from calibration runs.
+    calibration: bool = False
 
     # ── RAG pipeline overrides (per-session via URL) ─
     # None = "use whatever config.py / env var says"
@@ -421,6 +432,17 @@ def parse_query_params() -> ExperimentParams:
         params.ad_summarize = True
     elif ad_sum_raw in ("0", "false", "no"):
         params.ad_summarize = False
+
+    # ── Calibration mode ────────────────────────────────────────────────
+    # ?calibration=true — no upper turn limit, min 5 turns before finish,
+    # flag in logs so calibration runs can be filtered from real data.
+    cal_raw = p.get("calibration", "").strip().lower()
+    if cal_raw in ("true", "1", "yes"):
+        params.calibration = True
+        params.turns_min = max(params.turns_min, 5)
+        params.turns_max = 999
+        params.finish_from = 5
+        explicitly_set.update({"turns_min", "turns_max"})
 
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:

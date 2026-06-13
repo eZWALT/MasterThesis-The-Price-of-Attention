@@ -78,6 +78,7 @@ def init_session_state(params):
             turns_min=params.turns_min,
             turns_max=params.turns_max,
             finish_from=params.finish_from,
+            calibration=params.calibration,
         )
         ctrl.build_condition_plan()
         st.session_state.controller = ctrl
@@ -95,6 +96,7 @@ def init_session_state(params):
             {
                 "participant_id": pid,
                 "study_type": params.study_type,
+                "calibration": params.calibration,
                 "skip_screens": sorted(params.skip_screens),
                 "protocol": "workflow_a_star",
                 "conditions": ctrl.condition_plan,
@@ -249,6 +251,7 @@ def export_session_data(ctrl: ExperimentController):
         "session_complete",
         {
             "participant_id": ctrl.participant_id,
+            "calibration": ctrl.calibration,
             "demographics": ctrl.demographics,
             "first_impression": ctrl.first_impression,
             "ocean_raw": ctrl.ocean_raw,
