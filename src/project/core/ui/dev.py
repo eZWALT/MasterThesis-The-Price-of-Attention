@@ -10,6 +10,9 @@ from loguru import logger as log
 from core.config import (
     AD_MODES,
     AD_MODE_LABELS,
+    CONDITIONS,
+    CONDITION_LABELS,
+    CONDITION_AD_MODE,
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
     DEFAULT_MAX_TOKENS,
@@ -53,11 +56,13 @@ def render_dev_sidebar():
             step=8,
         )
         st.divider()
-        ad_mode = st.selectbox(
-            "📊 Advertising Mode",
-            AD_MODES,
-            format_func=lambda k: AD_MODE_LABELS.get(k, k),
+        condition = st.selectbox(
+            "📊 Condition",
+            CONDITIONS,
+            format_func=lambda k: CONDITION_LABELS.get(k, k),
         )
+        ad_mode = CONDITION_AD_MODE.get(condition, "")
+        st.caption(f"Ad mode: {AD_MODE_LABELS.get(ad_mode, 'none')}")
         st.divider()
         task_options = ["(none)"] + [t.id for t in TASK_CATALOG]
         task_choice = st.selectbox(
@@ -96,12 +101,12 @@ def render_dev_sidebar():
         if st.button("💾 Export Logs (JSONL)"):
             path = st.session_state.logger.export_jsonl()
             st.success(f"Exported to {path}")
-    return model, temperature, max_tokens, ad_mode, task
+    return model, temperature, max_tokens, ad_mode, task, condition
 
 
 def run_dev_mode():
     """Free-form chat with full developer controls."""
-    model, temperature, max_tokens, ad_mode, task = render_dev_sidebar()
+    model, temperature, max_tokens, ad_mode, task, condition = render_dev_sidebar()
 
     mgr = st.session_state.dev_manager
     needs_new = (
@@ -124,11 +129,9 @@ def run_dev_mode():
         )
         st.session_state.dev_manager = mgr
     elif mgr.ad_mode != ad_mode:
-        # Switch ad mode in-place — preserves conversation history
         mgr.ad_mode = ad_mode
         st.session_state.dev_manager = mgr
 
-    # Always sync force_ad / rag_mode onto the live manager
     _sync_dev_overrides(mgr)
 
     start_ad_click_server()
@@ -140,9 +143,10 @@ def run_dev_mode():
             st.markdown(f"**{task.title}** ({task.genre})")
             st.write(task.participant_prompt)
 
-    # Active ad mode badge
-    from core.config import AD_MODE_LABELS
-    st.caption(f"**Ad mode:** {AD_MODE_LABELS.get(ad_mode, ad_mode)}")
+    from core.config import CONDITION_LABELS, AD_MODE_LABELS
+    condition_label = CONDITION_LABELS.get(condition, condition)
+    ad_label = AD_MODE_LABELS.get(ad_mode, "none")
+    st.caption(f"**Condition:** {condition_label} | **Ad mode:** {ad_label}")
 
     if st.session_state.dev_trial_complete:
         st.divider()
