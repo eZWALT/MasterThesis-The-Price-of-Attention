@@ -29,7 +29,6 @@ from core.config import (
     SCREEN_CONDITION_CHAT,
     SCREEN_POST_CONDITION_SURVEY,
     SCREEN_OCEAN,
-    SCREEN_VALS,
     SCREEN_GLOBAL_EVALUATION,
     SCREEN_DONE,
     WARMUP_TASK_ID,
@@ -48,7 +47,6 @@ from core.ui.screens import (
     render_condition_intro,
     render_condition_chat,
     render_post_condition_survey,
-    render_vals,
     render_global_evaluation,
     render_done,
 )
@@ -255,7 +253,6 @@ def export_session_data(ctrl: ExperimentController):
             "first_impression": ctrl.first_impression,
             "ocean_raw": ctrl.ocean_raw,
             "ocean_scores": ctrl.ocean_scores,
-            "vals_responses": ctrl.vals_responses,
             "condition_summaries": [_condition_summary_for_log(cr) for cr in ctrl.condition_results],
             "condition_surveys": ctrl.condition_surveys,
             "global_evaluation": ctrl.global_evaluation,
@@ -281,8 +278,6 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         items = get_ocean_items(bfi_version)
         ctrl.ocean_raw = [4] * len(items)
         ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
-    elif scr == SCREEN_VALS and not ctrl.vals_responses:
-        ctrl.vals_responses = {k: 3 for k in ["innovation", "achievement", "tradition", "excitement", "practicality", "status", "self_reliance", "community"]}
     elif scr == SCREEN_POST_CONDITION_SURVEY:
         ctrl.condition_surveys.append({k: 4 for k in ["trust", "usefulness", "satisfaction"]})
     elif scr == SCREEN_GLOBAL_EVALUATION:
@@ -403,7 +398,6 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             SCREEN_CONDITION_CHAT: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_POST_CONDITION_SURVEY: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_OCEAN: "Personality",
-            SCREEN_VALS: "Lifestyle",
             SCREEN_GLOBAL_EVALUATION: "Final Evaluation",
             SCREEN_DONE: "Done ✓",
         }
@@ -601,17 +595,6 @@ def run_participant_mode(params):
             st.session_state.logger.log(
                 "ocean_submitted",
                 {"bfi_version": params.bfi_version, "raw": result, "scores": ctrl.ocean_scores},
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
-    elif scr == SCREEN_VALS:
-        result = render_vals()
-        if result is not None:
-            ctrl.vals_responses = result
-            st.session_state.logger.log(
-                "vals_submitted", result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
             ctrl.advance()

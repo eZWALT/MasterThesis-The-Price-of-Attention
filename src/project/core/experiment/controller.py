@@ -5,7 +5,7 @@ Implements the 5-condition within-subject protocol:
 
   consent → demographics → instructions → warmup_chat → first_impression
   → [condition_intro → condition_chat → post_condition_survey] × 5
-  → ocean (BFI-10) → vals → global_evaluation → done
+  → global_evaluation → ocean (BFI-10) → done
 
 Paper reference: Sections 6.3 — Experiment Controller, Workflow A*.
 """
@@ -32,7 +32,6 @@ from core.config import (
     SCREEN_CONDITION_CHAT,
     SCREEN_POST_CONDITION_SURVEY,
     SCREEN_OCEAN,
-    SCREEN_VALS,
     SCREEN_GLOBAL_EVALUATION,
     SCREEN_DONE,
     WARMUP_TASK_ID,
@@ -57,9 +56,8 @@ _CONDITION_SCREENS: list[str] = [
 ]
 
 _POST_CONDITION_SCREENS: list[str] = [
-    SCREEN_OCEAN,
-    SCREEN_VALS,
     SCREEN_GLOBAL_EVALUATION,
+    SCREEN_OCEAN,
     SCREEN_DONE,
 ]
 
@@ -105,7 +103,6 @@ class ExperimentController:
         self.first_impression: Dict[str, Any] = {}
         self.ocean_raw: List[int] = []
         self.ocean_scores: Dict[str, float] = {}
-        self.vals_responses: Dict[str, int] = {}
         self.condition_results: List[Dict[str, Any]] = []   # one per condition
         self.condition_surveys: List[Dict[str, int]] = []    # post-condition Likert
         self.global_evaluation: Dict[str, Any] = {}

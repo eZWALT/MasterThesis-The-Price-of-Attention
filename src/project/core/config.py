@@ -519,7 +519,6 @@ SCREEN_FIRST_IMPRESSION:       str = "first_impression"
 SCREEN_CONDITION_INTRO:        str = "condition_intro"
 SCREEN_CONDITION_CHAT:         str = "condition_chat"
 SCREEN_POST_CONDITION_SURVEY:  str = "post_condition_survey"
-SCREEN_VALS:                   str = "vals"
 SCREEN_GLOBAL_EVALUATION:      str = "global_evaluation"
 
 
