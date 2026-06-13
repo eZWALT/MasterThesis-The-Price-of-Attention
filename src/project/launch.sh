@@ -7,6 +7,8 @@
 #   ./launch.sh --ollama     # explicit ollama mode (Docker, no GPU)
 #   ./launch.sh --host       # run Streamlit on host with GPU access
 #   ./launch.sh --vllm       # vLLM mode (requires nvidia-container-toolkit)
+#   ./launch.sh --cluster    # multi-GPU Ollama cluster via nginx LB
+#     Optional: ./launch.sh --cluster 4  (use 4 GPUs for Ollama)
 # ─────────────────────────────────────────────────────────────────────────────
 set -e
 
@@ -27,17 +29,20 @@ fi
 MODE="ollama"
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
-for arg in "$@"; do
-    case $arg in
-        --ollama) MODE="ollama" ;;
-        --vllm)   MODE="vllm"   ;;
-        --host)   MODE="host"   ;;
+CLUSTER_GPUS=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --ollama)  MODE="ollama" ;;
+        --vllm)    MODE="vllm"   ;;
+        --host)    MODE="host"   ;;
+        --cluster) MODE="cluster"; shift; CLUSTER_GPUS="${1:-}" ;;
         *)
-            echo "Unknown argument: $arg"
-            echo "Usage: $0 [--ollama|--host|--vllm]"
+            echo "Unknown argument: $1"
+            echo "Usage: $0 [--ollama|--host|--vllm|--cluster [N]]"
             exit 1
             ;;
     esac
+    shift
 done
 
 echo "[launch.sh] mode: $MODE"
@@ -134,12 +139,51 @@ launch_host() {
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
+# CLUSTER path  —  multi-GPU Ollama with nginx round-robin
+# ─────────────────────────────────────────────────────────────────────────────
+launch_cluster() {
+    local cluster_script="${SCRIPT_DIR}/scripts/start_ollama_cluster.sh"
+    if [[ ! -x "${cluster_script}" ]]; then
+        echo "ERROR: ${cluster_script} not found or not executable."
+        exit 1
+    fi
+
+    echo "[launch.sh] Starting Ollama cluster with ${CLUSTER_GPUS:-all} GPU(s)…"
+    "${cluster_script}" ${CLUSTER_GPUS} &
+    CLUSTER_PID=$!
+
+    # Wait for nginx to be ready on the cluster port
+    local cluster_port="${OLLAMA_CLUSTER_PORT:-9999}"
+    echo "[launch.sh] Waiting for nginx on port ${cluster_port}…"
+    until curl -sf "http://localhost:${cluster_port}/api/tags" > /dev/null 2>&1; do
+        sleep 2
+    done
+    echo "      Cluster ready."
+
+    # Point the app at the nginx frontend (no code changes needed)
+    export API_URL="http://localhost:${cluster_port}/v1/chat/completions"
+    export OLLAMA_API_BASE="http://localhost:${cluster_port}"
+    export DEFAULT_MODEL="${OLLAMA_MODEL}"
+    export LLM_BACKEND="ollama"
+    export LLM_THINK="${LLM_THINK:-false}"
+
+    trap "echo 'Shutting down...'; kill ${CLUSTER_PID} 2>/dev/null" EXIT INT TERM
+
+    echo "[launch.sh] Starting Streamlit on host (multi-GPU cluster)…"
+    cd "${SCRIPT_DIR}"
+    streamlit run app.py \
+        --server.port "${STREAMLIT_PORT}" \
+        --server.address 0.0.0.0
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Dispatch
 # ─────────────────────────────────────────────────────────────────────────────
 case $MODE in
-    ollama) launch_ollama ;;
-    host)   launch_host   ;;
-    vllm)   launch_vllm   ;;
+    ollama)  launch_ollama  ;;
+    host)    launch_host    ;;
+    vllm)    launch_vllm    ;;
+    cluster) launch_cluster ;;
 esac
 
 wait
