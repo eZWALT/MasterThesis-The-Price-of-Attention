@@ -1,236 +1,238 @@
 """
-Experiment Controller.
+Experiment Controller — Workflow A*.
 
-Manages the progression of an experimental session as a linear screen
-state machine:
+Implements the 5-condition within-subject protocol:
 
-  consent → demographics → baseline → practice
-  → [trial_intro → trial_chat → post_trial_survey] × N
-  → ocean (BFI-10) → final_survey → done
+  consent → demographics → instructions → warmup_chat → first_impression
+  → [condition_intro → condition_chat → post_condition_survey] × 5
+  → ocean (BFI-10) → vals → global_evaluation → done
 
-Paper reference: Section 6.3 — Experiment Controller.
+Paper reference: Sections 6.3 — Experiment Controller, Workflow A*.
 """
 
 from __future__ import annotations
 
+import random
 from typing import Any, Dict, List, Optional
 
-import random
-
 from core.config import (
-    TRIALS_PER_SESSION,
+    CONDITIONS,
+    CONDITION_AD_MODE,
+    CONDITION_TIMING,
     EXIT_N_TRIALS,
-    AD_MODES,
     MIN_TURNS_PER_TRIAL,
     MAX_TURNS_PER_TRIAL,
     FINISH_BUTTON_VISIBLE_FROM_TURN,
-    AD_INJECTION_TURNS,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
+    SCREEN_INSTRUCTIONS,
+    SCREEN_WARMUP_CHAT,
+    SCREEN_FIRST_IMPRESSION,
+    SCREEN_CONDITION_INTRO,
+    SCREEN_CONDITION_CHAT,
+    SCREEN_POST_CONDITION_SURVEY,
     SCREEN_OCEAN,
-    SCREEN_BASELINE,
-    SCREEN_PRACTICE,
-    SCREEN_TRIAL_INTRO,
-    SCREEN_TRIAL_CHAT,
-    SCREEN_POST_TRIAL_SURVEY,
-    SCREEN_FINAL_SURVEY,
+    SCREEN_VALS,
+    SCREEN_GLOBAL_EVALUATION,
     SCREEN_DONE,
+    WARMUP_TASK_ID,
+    WARMUP_TURNS,
 )
-from core.experiment.tasks import TaskDefinition, TASK_CATALOG
+from core.experiment.tasks import TaskDefinition, TASK_CATALOG, TASK_BY_ID
 
 
-# ── Ordered list of screens (non-trial portion) ──────────────
-_PRE_TRIAL_SCREENS: list[str] = [
+# ── Screen lists ─────────────────────────────────
+_PRE_CONDITION_SCREENS: list[str] = [
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
-    SCREEN_BASELINE,
-    SCREEN_PRACTICE,
+    SCREEN_INSTRUCTIONS,
+    SCREEN_WARMUP_CHAT,
+    SCREEN_FIRST_IMPRESSION,
 ]
 
-_TRIAL_SCREENS: list[str] = [
-    SCREEN_TRIAL_INTRO,
-    SCREEN_TRIAL_CHAT,
-    SCREEN_POST_TRIAL_SURVEY,
+_CONDITION_SCREENS: list[str] = [
+    SCREEN_CONDITION_INTRO,
+    SCREEN_CONDITION_CHAT,
+    SCREEN_POST_CONDITION_SURVEY,
 ]
 
-_POST_TRIAL_SCREENS: list[str] = [
+_POST_CONDITION_SCREENS: list[str] = [
     SCREEN_OCEAN,
-    SCREEN_FINAL_SURVEY,
+    SCREEN_VALS,
+    SCREEN_GLOBAL_EVALUATION,
     SCREEN_DONE,
 ]
 
 
 class ExperimentController:
     """
-    Orchestrates a full experimental session for one participant.
+    Workflow A* state machine.
 
-    The controller is a *pure state machine*: it knows which screen
-    the participant should see, what trial they are on, and stores
-    every datum collected along the way.  It has **no Streamlit
-    dependency** — the UI calls ``advance()`` and reads
-    ``current_screen`` to decide what to render.
+    Pure state — no Streamlit dependency.  UI calls ``advance()``
+    and reads ``current_screen`` to decide what to render.
     """
 
     def __init__(
         self,
         participant_id: str,
-        n_trials: int = TRIALS_PER_SESSION,
         tasks: Optional[List[TaskDefinition]] = None,
-        ad_modes: Optional[List[str]] = None,
         model: Optional[str] = None,
         seed: Optional[int] = None,
         cb_group: Optional[int] = None,
         turns_min: int = MIN_TURNS_PER_TRIAL,
         turns_max: int = MAX_TURNS_PER_TRIAL,
         finish_from: Optional[int] = None,
-        ad_turns: Optional[List[int]] = None,
     ):
         self.participant_id = participant_id
-        self.n_trials = n_trials
         self.model = model
         self.seed = seed
         self.cb_group = cb_group
         self.turns_min = turns_min
         self.turns_max = turns_max
         self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
-        self.ad_turns: List[int] = ad_turns if ad_turns is not None else list(AD_INJECTION_TURNS)
 
-        # Pre-resolved tasks/modes from params (may be None → auto)
-        self._param_tasks = tasks
-        self._param_modes = ad_modes
-
-        # ── Screen state ──────────────────────────────────────
+        # Screen state
         self.current_screen: str = SCREEN_CONSENT
-        self.current_trial_index: int = 0        # 0-based
-        self._trial_sub_index: int = 0           # index within _TRIAL_SCREENS
+        self.current_condition_index: int = 0   # 0-based
+        self._condition_sub_index: int = 0       # index within _CONDITION_SCREENS
 
-        # ── Trial plan ────────────────────────────────────────
-        self.trial_plan: List[dict] = []
+        # ── Trial plan ────────────────────────────────
+        # List of dict: {condition, ad_mode, ad_window, task, ad_turn}
+        self.condition_plan: List[dict] = []
 
-        # ── Collected data ────────────────────────────────────
+        # ── Collected data ────────────────────────────
         self.demographics: Dict[str, Any] = {}
+        self.first_impression: Dict[str, Any] = {}
         self.ocean_raw: List[int] = []
         self.ocean_scores: Dict[str, float] = {}
-        self.trial_results: List[Dict[str, Any]] = []   # one dict per trial
-        self.post_trial_surveys: List[Dict[str, int]] = []
-        self.final_survey: Dict[str, Any] = {}
+        self.vals_responses: Dict[str, int] = {}
+        self.condition_results: List[Dict[str, Any]] = []   # one per condition
+        self.condition_surveys: List[Dict[str, int]] = []    # post-condition Likert
+        self.global_evaluation: Dict[str, Any] = {}
 
-    # ── Counterbalancing ──────────────────────────────────────
+    # ── Counterbalancing ─────────────────────────
 
-    def build_trial_plan(
+    def build_condition_plan(
         self,
         tasks: Optional[List[TaskDefinition]] = None,
-        ad_modes: Optional[List[str]] = None,
     ) -> List[dict]:
         """
-        Generate a counterbalanced assignment of tasks × ad conditions.
+        Build counterbalanced condition plan.
 
-        Counterbalancing strategy
-        ─────────────────────────
-        Latin-square rotation is applied to ad_modes so every participant
-        group sees each ad mode in a different trial position.
-
-        The rotation row is chosen by:
-          1. ``cb_group`` if explicitly set via ?cb=N
-          2. Otherwise derived as ``hash(participant_id) % len(ad_modes)``
-
-        ``seed`` (via ?seed=N) makes the task shuffle reproducible across
-        re-runs — useful for within-participant repeat sessions or debugging.
+        Strategy:
+          1. Pick 5 tasks (first 5 from catalog, or supplied list).
+          2. Shuffle conditions + tasks together if seed is set.
+          3. Apply Latin-square rotation to conditions by cb_group / pid hash.
+          4. Sample exactly 1 ad turn per condition window.
         """
-        tasks    = tasks    or self._param_tasks    or TASK_CATALOG[: self.n_trials]
-        ad_modes = ad_modes or self._param_modes    or AD_MODES[: self.n_trials]
+        conditions = list(CONDITIONS)
+        tasks = (tasks or TASK_CATALOG[:5])[:5]
 
-        # Pad / trim to n_trials
-        while len(tasks)    < self.n_trials:
-            tasks.append(tasks[len(tasks) % len(tasks)])
-        while len(ad_modes) < self.n_trials:
-            ad_modes.append(ad_modes[len(ad_modes) % len(ad_modes)])
-        tasks    = tasks[:    self.n_trials]
-        ad_modes = ad_modes[: self.n_trials]
+        while len(tasks) < 5:
+            tasks.append(TASK_CATALOG[len(tasks) % len(TASK_CATALOG)])
 
-        # ── Optional task shuffle (seed-locked) ───────────────
+        # Zip and optionally shuffle
+        paired = list(zip(conditions, tasks))
         if self.seed is not None:
             rng = random.Random(self.seed)
-            combined = list(zip(tasks, ad_modes))
-            rng.shuffle(combined)
-            tasks, ad_modes = zip(*combined) if combined else (tasks, ad_modes)
-            tasks    = list(tasks)
-            ad_modes = list(ad_modes)
+            rng.shuffle(paired)
+            conditions, tasks = zip(*paired) if paired else (conditions, tasks)
+            conditions = list(conditions)
+            tasks = list(tasks)
 
-        # ── Latin-square rotation of ad_modes ─────────────────
-        n = len(ad_modes)
+        # Latin-square rotation of conditions
+        n = len(conditions)
         if self.cb_group is not None:
             row = self.cb_group % n
         else:
             row = hash(self.participant_id) % n
-        ad_modes = ad_modes[row:] + ad_modes[:row]   # circular rotation
+        conditions = conditions[row:] + conditions[:row]
 
-        self.trial_plan = [
-            {"task": t, "ad_mode": m}
-            for t, m in zip(tasks, ad_modes)
-        ]
-        return self.trial_plan
+        # Build plan with per-condition ad_turn assignment
+        self.condition_plan = []
+        for cond, task in zip(conditions, tasks):
+            ad_mode = CONDITION_AD_MODE.get(cond, "")
+            window = CONDITION_TIMING.get(cond)
+            ad_turn = None
+            if window is not None and ad_mode:
+                if self.seed is not None:
+                    rng_win = random.Random(self.seed + hash(cond) + hash(task.id))
+                    ad_turn = rng_win.randint(window[0], window[1])
+                else:
+                    ad_turn = random.randint(window[0], window[1])
 
-    # ── Navigation ────────────────────────────────────────────
+            self.condition_plan.append({
+                "condition": cond,
+                "ad_mode": ad_mode,
+                "ad_window": window,
+                "ad_turn": ad_turn,
+                "task": task,
+            })
+
+        return self.condition_plan
+
+    def build_condition_plan_backward_compat(
+        self,
+        tasks: Optional[List[TaskDefinition]] = None,
+        ad_modes: Optional[List[str]] = None,
+    ) -> List[dict]:
+        """Legacy stub — delegates to build_condition_plan."""
+        return self.build_condition_plan(tasks=tasks)
+
+    # ── Navigation ───────────────────────────────
+
+    @property
+    def n_conditions(self) -> int:
+        return len(self.condition_plan)
 
     def advance(self) -> str:
-        """
-        Move to the next screen in the protocol.
-
-        Returns the new ``current_screen`` value.
-        """
         scr = self.current_screen
 
-        # Pre-trial sequence
-        if scr in _PRE_TRIAL_SCREENS:
-            idx = _PRE_TRIAL_SCREENS.index(scr)
-            if idx + 1 < len(_PRE_TRIAL_SCREENS):
-                self.current_screen = _PRE_TRIAL_SCREENS[idx + 1]
+        # Pre-condition sequence
+        if scr in _PRE_CONDITION_SCREENS:
+            idx = _PRE_CONDITION_SCREENS.index(scr)
+            if idx + 1 < len(_PRE_CONDITION_SCREENS):
+                self.current_screen = _PRE_CONDITION_SCREENS[idx + 1]
             else:
-                # Finished pre-trial → enter first trial block
-                self.current_trial_index = 0
-                self._trial_sub_index = 0
-                self.current_screen = _TRIAL_SCREENS[0]
+                self.current_condition_index = 0
+                self._condition_sub_index = 0
+                self.current_screen = _CONDITION_SCREENS[0]
             return self.current_screen
 
-        # Trial screens (repeating block)
-        if scr in _TRIAL_SCREENS:
-            self._trial_sub_index += 1
-            if self._trial_sub_index < len(_TRIAL_SCREENS):
-                self.current_screen = _TRIAL_SCREENS[self._trial_sub_index]
+        # Condition screens (repeating block)
+        if scr in _CONDITION_SCREENS:
+            self._condition_sub_index += 1
+            if self._condition_sub_index < len(_CONDITION_SCREENS):
+                self.current_screen = _CONDITION_SCREENS[self._condition_sub_index]
             else:
-                # Finished one trial block → next trial or post-trial
-                self.current_trial_index += 1
-                if self.current_trial_index < self.n_trials:
-                    self._trial_sub_index = 0
-                    self.current_screen = _TRIAL_SCREENS[0]
+                self.current_condition_index += 1
+                if self.current_condition_index < self.n_conditions:
+                    self._condition_sub_index = 0
+                    self.current_screen = _CONDITION_SCREENS[0]
                 else:
-                    self.current_screen = _POST_TRIAL_SCREENS[0]
+                    self.current_screen = _POST_CONDITION_SCREENS[0]
             return self.current_screen
 
-        # Post-trial sequence
-        if scr in _POST_TRIAL_SCREENS:
-            idx = _POST_TRIAL_SCREENS.index(scr)
-            if idx + 1 < len(_POST_TRIAL_SCREENS):
-                self.current_screen = _POST_TRIAL_SCREENS[idx + 1]
-            # Already at DONE → stay
+        # Post-condition sequence
+        if scr in _POST_CONDITION_SCREENS:
+            idx = _POST_CONDITION_SCREENS.index(scr)
+            if idx + 1 < len(_POST_CONDITION_SCREENS):
+                self.current_screen = _POST_CONDITION_SCREENS[idx + 1]
             return self.current_screen
 
         return self.current_screen
 
-    # ── Trial helpers ─────────────────────────────────────────
+    # ── Condition helpers ───────────────────────
 
     @property
-    def current_trial_config(self) -> Optional[dict]:
-        """Return ``{task, ad_mode}`` for the active trial, or None."""
-        if 0 <= self.current_trial_index < len(self.trial_plan):
-            return self.trial_plan[self.current_trial_index]
+    def current_condition_config(self) -> Optional[dict]:
+        if 0 <= self.current_condition_index < len(self.condition_plan):
+            return self.condition_plan[self.current_condition_index]
         return None
 
     @property
-    def trial_number(self) -> int:
-        """1-based trial number for display."""
-        return self.current_trial_index + 1
+    def condition_number(self) -> int:
+        return self.current_condition_index + 1
 
     @property
     def is_session_complete(self) -> bool:
@@ -238,20 +240,13 @@ class ExperimentController:
 
     @property
     def can_exit_early(self) -> bool:
-        """True when the participant has completed ≥ EXIT_N_TRIALS trials."""
-        return self.current_trial_index >= EXIT_N_TRIALS
+        return self.current_condition_index >= EXIT_N_TRIALS
 
     def exit_early(self) -> None:
-        """
-        Terminate the session early — skip remaining trials.
+        self.condition_plan = self.condition_plan[:self.current_condition_index]
+        self._condition_sub_index = _CONDITION_SCREENS.index(SCREEN_POST_CONDITION_SURVEY)
+        self.current_screen = SCREEN_POST_CONDITION_SURVEY
 
-        The participant keeps all trial results collected so far and
-        proceeds through post_trial_survey → OCEAN → final_survey → done.
-        """
-        self.n_trials = self.current_trial_index
-        # Truncate the trial plan to the trials actually completed
-        self.trial_plan = self.trial_plan[: self.n_trials]
-        # Jump to the post-trial survey for the last completed trial,
-        # then the normal advance() will go OCEAN → final_survey → done.
-        self._trial_sub_index = _TRIAL_SCREENS.index(SCREEN_POST_TRIAL_SURVEY)
-        self.current_screen = SCREEN_POST_TRIAL_SURVEY
+    __all__ = [
+        "ExperimentController",
+    ]
