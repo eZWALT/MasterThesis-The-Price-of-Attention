@@ -10,7 +10,8 @@ Paper reference: Section 5.2.2 — Task Design.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,7 @@ class TaskDefinition:
     participant_prompt: str             # What the participant sees
     system_prompt_extension: str        # Appended to BASE_SYSTEM_PROMPT
     description: str = ""               # Internal researcher note
+    gold_items: List[str] = field(default_factory=list)  # ground-truth answers for benchmark metrics
 
 
 # ── Task catalog ──────────────────────────────────────────────
