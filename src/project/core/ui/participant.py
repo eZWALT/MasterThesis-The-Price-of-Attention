@@ -348,7 +348,6 @@ def export_session_data(ctrl: ExperimentController):
             "ocean_scores": ctrl.ocean_scores,
             "condition_summaries": [_condition_summary_for_log(cr) for cr in ctrl.condition_results],
             "condition_surveys": ctrl.condition_surveys,
-            "global_evaluation": ctrl.global_evaluation,
         },
         ad_mode="session",
         conversation_id=ctrl.participant_id,
@@ -456,10 +455,16 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             st.caption(f"pid: `{ctrl.participant_id}`")
             st.divider()
             st.caption("🛠 Dev mode — flow test")
-            if st.button("⏭ Skip screen", use_container_width=True):
-                dev_inject_stub_data(ctrl, bfi_version=bfi_version)
-                ctrl.advance()
-                st.rerun()
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("⏪ Back", use_container_width=True):
+                    ctrl.go_back()
+                    st.rerun()
+            with col2:
+                if st.button("⏭ Skip", use_container_width=True):
+                    dev_inject_stub_data(ctrl, bfi_version=bfi_version)
+                    ctrl.advance()
+                    st.rerun()
 
             # Condition override for dev-flow
             from core.config import CONDITIONS, CONDITION_AD_MODE
@@ -490,8 +495,13 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             SCREEN_CONDITION_INTRO: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_CONDITION_CHAT: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_POST_CONDITION_SURVEY: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
+            SCREEN_ADS_AWARENESS: "Ads Awareness",
+            SCREEN_ADS_RECALL: "Ads Recall",
+            SCREEN_ADS_PERCEPTION: "Ads Perception",
+            SCREEN_LLM_EVALUATION: "LLM Evaluation",
+            SCREEN_GODSPEED: "Overall Experience",
             SCREEN_OCEAN: "Personality",
-            SCREEN_GLOBAL_EVALUATION: "Final Evaluation",
+            SCREEN_DECEPTION_DISCLOSURE: "Debrief",
             SCREEN_DONE: "Done ✓",
         }
         st.caption(f"📍 {labels.get(ctrl.current_screen, ctrl.current_screen)}")
@@ -685,20 +695,6 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_GLOBAL_EVALUATION:
-        result = render_global_evaluation()
-        if result is not None:
-            ctrl.global_evaluation = result
-            export_session_data(ctrl)
-            log.info(
-                "Session complete (A*) | pid={} | exp={} | conditions={}",
-                ctrl.participant_id,
-                st.session_state.logger.experiment_id,
-                len(ctrl.condition_results),
-            )
-            ctrl.advance()
-            st.rerun()
-
     elif scr == SCREEN_ADS_AWARENESS:
         result = render_ads_awareness()
         if result is not None:
@@ -786,6 +782,13 @@ def run_participant_mode(params):
             st.rerun()
 
     elif scr == SCREEN_DONE:
+        export_session_data(ctrl)
+        log.info(
+            "Session complete | pid={} | exp={} | conditions={}",
+            ctrl.participant_id,
+            st.session_state.logger.experiment_id,
+            len(ctrl.condition_results),
+        )
         render_done()
 
     else:
