@@ -5,9 +5,9 @@ Implements the 5-condition within-subject protocol:
 
   consent → instructions → warmup_chat → first_impression
   → [condition_intro → condition_chat → post_condition_survey] × 5
-  → global_evaluation → ads_awareness → ads_recall_interpretation
-  → ads_perception → llm_evaluation → godspeed
-  → ocean (BFI-10) → demographics → deception_disclosure → done
+  → ads_awareness → ads_recall_interpretation → ads_perception
+  → llm_evaluation → godspeed → ocean (BFI-10) → demographics
+  → deception_disclosure → done
 
 Paper reference: Sections 6.3 — Experiment Controller, Workflow A*.
 """
@@ -33,7 +33,6 @@ from core.config import (
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
     SCREEN_POST_CONDITION_SURVEY,
-    SCREEN_GLOBAL_EVALUATION,
     SCREEN_ADS_AWARENESS,
     SCREEN_ADS_RECALL,
     SCREEN_ADS_PERCEPTION,
@@ -63,7 +62,6 @@ _CONDITION_SCREENS: list[str] = [
 ]
 
 _POST_CONDITION_SCREENS: list[str] = [
-    SCREEN_GLOBAL_EVALUATION,
     SCREEN_ADS_AWARENESS,
     SCREEN_ADS_RECALL,
     SCREEN_ADS_PERCEPTION,
@@ -107,6 +105,7 @@ class ExperimentController:
 
         # Screen state
         self.current_screen: str = SCREEN_CONSENT
+        self._previous_screen: str | None = None
         self.current_condition_index: int = 0   # 0-based
         self._condition_sub_index: int = 0       # index within _CONDITION_SCREENS
 
@@ -121,7 +120,6 @@ class ExperimentController:
         self.ocean_scores: Dict[str, float] = {}
         self.condition_results: List[Dict[str, Any]] = []   # one per condition
         self.condition_surveys: List[Dict[str, int]] = []    # post-condition Likert
-        self.global_evaluation: Dict[str, Any] = {}
 
     # ── Counterbalancing ─────────────────────────
 
@@ -198,8 +196,10 @@ class ExperimentController:
     def n_conditions(self) -> int:
         return len(self.condition_plan)
 
-    def advance(self) -> str:
+    def advance(self, _skip_save: bool = False) -> str:
         scr = self.current_screen
+        if not _skip_save:
+            self._previous_screen = scr
 
         # Pre-condition sequence
         if scr in _PRE_CONDITION_SCREENS:
@@ -233,6 +233,14 @@ class ExperimentController:
                 self.current_screen = _POST_CONDITION_SCREENS[idx + 1]
             return self.current_screen
 
+        return self.current_screen
+
+    def go_back(self) -> str:
+        """Go back to the previous screen (dev-flow only)."""
+        if self._previous_screen is not None:
+            prev = self._previous_screen
+            self._previous_screen = self.current_screen
+            self.current_screen = prev
         return self.current_screen
 
     # ── Condition helpers ───────────────────────
