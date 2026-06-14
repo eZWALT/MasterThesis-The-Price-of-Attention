@@ -803,24 +803,24 @@ def render_first_impression() -> Optional[dict]:
     st.caption("Please share your initial thoughts about the system.")
 
     text = st.text_area(
-        "Describe your first impression of the system in one sentence.",
+        "1. Please describe your first impression of the system after your initial interaction in one sentence.",
         key="first_impression_text",
     )
 
-    reuse = st.radio(
-        "Would you use this assistant again?",
-        ["Yes", "Maybe", "No"],
-        index=None,
-        horizontal=True,
-        key="first_impression_reuse",
-    )
-
     sentiment = st.radio(
-        "Overall, how would you describe your experience so far?",
+        "2. Overall, how would you describe your experience so far?",
         ["Negative", "Neutral", "Positive"],
         index=None,
         horizontal=True,
         key="first_impression_sentiment",
+    )
+
+    reuse = st.radio(
+        "3. Based on your initial interaction, would you use this assistant again?",
+        ["Yes", "Maybe", "No"],
+        index=None,
+        horizontal=True,
+        key="first_impression_reuse",
     )
 
     all_filled = bool(text and reuse and sentiment)
