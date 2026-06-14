@@ -133,9 +133,22 @@ def get_ocean_items(version: str = "10") -> list[tuple[str, str, bool]]:
 POST_CONDITION_SCALE_MIN: int = 1
 POST_CONDITION_SCALE_MAX: int = 7
 POST_CONDITION_ITEMS: list[dict[str, str]] = [
-    {"id": "trust",       "text": "I trusted the assistant during this conversation."},
-    {"id": "usefulness",  "text": "The assistant was useful for my shopping task."},
-    {"id": "satisfaction","text": "I am satisfied with the shopping experience."},
+    # ── Perceived Usefulness ──
+    {"id": "usefulness_effective",   "text": "The assistant helped me complete the task effectively."},
+    {"id": "usefulness_decision",    "text": "The assistant improved the quality of my decision making."},
+    {"id": "usefulness_informative", "text": "The assistant provided helpful information for my task."},
+    # ── Trust in the System ──
+    {"id": "trust_reliable",  "text": "I felt confident that the information provided by the assistant was reliable."},
+    {"id": "trust_overall",   "text": "I trusted the assistant during the interaction."},
+    {"id": "trust_rely",      "text": "I would rely on the assistant\u2019s suggestions for making decisions."},
+    # ── Perceived Intrusiveness and Manipulative Influence ──
+    {"id": "intrusiveness_influence",  "text": "I felt the assistant was trying to influence my decisions."},
+    {"id": "intrusiveness_interrupt",  "text": "The assistant interrupted my workflow with content that was not directly relevant to the task."},
+    {"id": "intrusiveness_steer",      "text": "The assistant led and steered the conversation in a direction I did not fully control."},
+    # ── Satisfaction with the Experience ──
+    {"id": "satisfaction_overall",      "text": "I am satisfied with the experience of using this assistant."},
+    {"id": "satisfaction_expectations", "text": "The assistant met my expectations."},
+    {"id": "satisfaction_positive",     "text": "I had a positive experience interacting with this assistant."},
 ]
 
 # ═══════════════════════════════════════════════════════════════

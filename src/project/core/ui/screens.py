@@ -935,10 +935,10 @@ def render_condition_chat(
 
 def render_post_condition_survey(condition_number: int) -> Optional[dict]:
     """
-    3-item Likert survey after each condition (trust, usefulness, satisfaction).
+    12-item Likert survey after each condition (4 constructs × 3 items each).
     """
     st.header(f"Post-Conversation Survey")
-    st.caption("Please rate the following statements about the conversation you just had.")
+    st.caption("Please rate the following statements about the conversation you just had (1 = Strongly disagree, 7 = Strongly agree).")
 
     responses: dict[str, int] = {}
     all_answered = True
