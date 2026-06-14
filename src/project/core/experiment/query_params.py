@@ -248,7 +248,7 @@ class ExperimentParams:
 
     # ── Dev-only overrides ────────────────────────────
     # Available only when dev=true|flow; silently ignored in production.
-    force_ad: bool = True                   # ?force_ad=1 → inject ad on every turn
+    force_ad: bool = False                  # ?force_ad=1 → inject ad on every turn
     use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
 
     def apply_study_defaults(self, explicitly_set: set) -> None:

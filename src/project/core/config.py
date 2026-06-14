@@ -252,7 +252,7 @@ CONDITION_LABELS: dict[str, str] = {
 }
 
 # Each condition → (injector_key, timing_window)
-# window = (min_turn, max_turn) inclusive; exactly 1 random turn chosen.
+# window = (min_turn, max_turn) inclusive; exactly 1 random turn chosen (now fixed values).
 # None = never inject.
 CONDITION_AD_MODE: dict[str, str] = {
     "no_ads":       "",
@@ -264,10 +264,10 @@ CONDITION_AD_MODE: dict[str, str] = {
 
 CONDITION_TIMING: dict[str, tuple[int, int] | None] = {
     "no_ads":       None,
-    "inline_early": (1, 2),
-    "inline_late":  (3, 5),
-    "block_early":  (1, 2),
-    "block_late":   (3, 5),
+    "inline_early": (2, 2),
+    "inline_late":  (4, 4),
+    "block_early":  (2, 2),
+    "block_late":   (4, 4),
 }
 
 # Warmup task (fixed, no ads, not logged as a condition)
