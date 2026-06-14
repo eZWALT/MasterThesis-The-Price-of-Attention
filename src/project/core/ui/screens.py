@@ -889,11 +889,14 @@ def render_condition_chat(
     manager: ConversationManager,
     condition_id: str,
     flow_test: bool = False,
+    calibration: bool = False,
 ) -> bool:
     """
     Condition-aware chat interface.
 
     Handles no_ads (no ad injection) and ad conditions (single ad at ad_turn).
+    In calibration mode, shows an early-exit button (researcher can end anytime
+    after min_turns). In production/dev-flow, participants must complete all turns.
     """
     from core.config import CONDITION_AD_MODE
 
@@ -911,6 +914,17 @@ def render_condition_chat(
         progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
         st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
         st.caption(f"Condition: {label}")
+
+        if calibration and manager.turn_count >= manager.finish_from:
+            if manager.turn_count < manager.min_turns:
+                st.info(
+                    f"💬 Keep chatting — you need at least {manager.min_turns} turns "
+                    "before you can finish."
+                )
+            else:
+                st.success("You can keep chatting or finish when you're ready.")
+            if st.button("🏁 I've finished", type="primary", use_container_width=True):
+                return True
 
     _render_chat_history(manager, ad_mode)
 
