@@ -912,17 +912,6 @@ def render_condition_chat(
         st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
         st.caption(f"Condition: {label}")
 
-        if manager.turn_count >= manager.finish_from:
-            if manager.turn_count < manager.min_turns:
-                st.info(
-                    f"💬 Keep chatting — you need at least {manager.min_turns} turns "
-                    "before you can finish."
-                )
-            else:
-                st.success("You can keep chatting or finish when you're ready.")
-            if st.button("🏁 I've finished", type="primary", use_container_width=True):
-                return True
-
     _render_chat_history(manager, ad_mode)
 
     if flow_test:
