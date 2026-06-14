@@ -614,7 +614,7 @@ def run_participant_mode(params):
                 params,
                 flow_test=params.flow_test,
             )
-            if render_condition_chat(mgr, condition_id, flow_test=params.flow_test):
+            if render_condition_chat(mgr, condition_id, flow_test=params.flow_test, calibration=params.calibration):
                 from dataclasses import asdict
                 from datetime import datetime
 
