@@ -29,8 +29,14 @@ from core.config import (
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
     SCREEN_POST_CONDITION_SURVEY,
-    SCREEN_OCEAN,
     SCREEN_GLOBAL_EVALUATION,
+    SCREEN_ADS_AWARENESS,
+    SCREEN_ADS_RECALL,
+    SCREEN_ADS_PERCEPTION,
+    SCREEN_LLM_EVALUATION,
+    SCREEN_GODSPEED,
+    SCREEN_OCEAN,
+    SCREEN_DECEPTION_DISCLOSURE,
     SCREEN_DONE,
     WARMUP_TASK_ID,
     WARMUP_TURNS,
@@ -63,6 +69,13 @@ from core.ui.screens import (
     render_condition_chat,
     render_post_condition_survey,
     render_global_evaluation,
+    render_ads_awareness,
+    render_ads_recall,
+    render_ads_perception,
+    render_llm_evaluation,
+    render_godspeed,
+    render_demographics_end,
+    render_deception_disclosure,
     render_done,
 )
 
@@ -548,17 +561,6 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_DEMOGRAPHICS:
-        result = render_demographics()
-        if result is not None:
-            ctrl.demographics = result
-            st.session_state.logger.log(
-                "demographics_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
     elif scr == SCREEN_INSTRUCTIONS:
         if render_instructions():
             ctrl.advance()
@@ -683,6 +685,70 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
+    elif scr == SCREEN_GLOBAL_EVALUATION:
+        result = render_global_evaluation()
+        if result is not None:
+            ctrl.global_evaluation = result
+            export_session_data(ctrl)
+            log.info(
+                "Session complete (A*) | pid={} | exp={} | conditions={}",
+                ctrl.participant_id,
+                st.session_state.logger.experiment_id,
+                len(ctrl.condition_results),
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_ADS_AWARENESS:
+        result = render_ads_awareness()
+        if result is not None:
+            st.session_state.logger.log(
+                "ads_awareness_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_ADS_RECALL:
+        result = render_ads_recall()
+        if result is not None:
+            st.session_state.logger.log(
+                "ads_recall_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_ADS_PERCEPTION:
+        result = render_ads_perception()
+        if result is not None:
+            st.session_state.logger.log(
+                "ads_perception_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_LLM_EVALUATION:
+        result = render_llm_evaluation()
+        if result is not None:
+            st.session_state.logger.log(
+                "llm_evaluation_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_GODSPEED:
+        result = render_godspeed()
+        if result is not None:
+            st.session_state.logger.log(
+                "godspeed_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
     elif scr == SCREEN_OCEAN:
         result = render_ocean(params.bfi_version)
         if result is not None:
@@ -697,17 +763,25 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_GLOBAL_EVALUATION:
-        result = render_global_evaluation()
+    elif scr == SCREEN_DEMOGRAPHICS:
+        result = render_demographics_end()
         if result is not None:
-            ctrl.global_evaluation = result
-            export_session_data(ctrl)
-            log.info(
-                "Session complete (A*) | pid={} | exp={} | conditions={}",
-                ctrl.participant_id,
-                st.session_state.logger.experiment_id,
-                len(ctrl.condition_results),
+            st.session_state.logger.log(
+                "demographics_post_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_DECEPTION_DISCLOSURE:
+        result = render_deception_disclosure()
+        if result is not None:
+            st.session_state.logger.log(
+                "deception_disclosure_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            if result.get("withdrew"):
+                log.warning("Participant {} withdrew at deception disclosure", ctrl.participant_id)
             ctrl.advance()
             st.rerun()
 
