@@ -50,6 +50,26 @@ from core.experiment.surveys import (
     GLOBAL_OPEN_ENDED_PROMPT,
     FINAL_SURVEY_ITEMS,
     FINAL_OPEN_ENDED_PROMPT,
+    ADS_AWARENESS_CATEGORICAL,
+    ADS_AWARENESS_OPEN_ENDED,
+    ADS_RECALL_CATEGORICAL,
+    ADS_RECALL_LIKERT,
+    ADS_RECALL_SCALE_MIN,
+    ADS_RECALL_SCALE_MAX,
+    ADS_PERCEPTION_LIKERT,
+    ADS_PERCEPTION_OPEN_ENDED,
+    ADS_PERCEPTION_SCALE_MIN,
+    ADS_PERCEPTION_SCALE_MAX,
+    LLM_EVAL_CATEGORIES,
+    LLM_EVAL_SCALE_MIN,
+    LLM_EVAL_SCALE_MAX,
+    GODSPEED_SEMANTIC,
+    GODSPEED_REASK_LIKERT,
+    GODSPEED_SCALE_MIN,
+    GODSPEED_SCALE_MAX,
+    DEMOGRAPHICS_END_TEXT,
+    DEMOGRAPHICS_END_CATEGORICAL,
+    DECEPTION_DISCLOSURE_TEXT,
 )
 from core.ad_injection import get_injector
 from core.ad_injection.ad_links import (
@@ -1016,6 +1036,282 @@ def render_global_evaluation() -> Optional[dict]:
         return responses
     elif not all_answered:
         st.info("Please answer all Likert questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# ADS AWARENESS  (Section 1 of post-experiment)
+# ═══════════════════════════════════════════════════════════════
+
+def render_ads_awareness() -> Optional[dict]:
+    st.header("Ads Awareness")
+    st.caption("The following questions refer to your experience during the interaction with the chatbot.")
+
+    responses: dict = {}
+    all_answered = True
+
+    for item in ADS_AWARENESS_CATEGORICAL:
+        value = st.radio(
+            item["text"],
+            item["options"],
+            index=None,
+            horizontal=True,
+            key=f"ads_aware_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    for item in ADS_AWARENESS_OPEN_ENDED:
+        value = st.text_area(item["text"], key=f"ads_aware_{item['id']}")
+        responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        return responses
+    elif not all_answered:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# ADS RECALL / INTERPRETATION  (Section 2 of post-experiment)
+# ═══════════════════════════════════════════════════════════════
+
+def render_ads_recall() -> Optional[dict]:
+    st.header("Ads Recall / Interpretation")
+    st.caption("The following questions refer to specific pieces of content that may have appeared during your interaction.")
+
+    responses: dict = {}
+    all_answered = True
+
+    for item in ADS_RECALL_CATEGORICAL:
+        value = st.radio(
+            item["text"],
+            item["options"],
+            index=None,
+            horizontal=True,
+            key=f"ads_recall_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    st.markdown("**Rate your agreement with the following:**")
+
+    for item in ADS_RECALL_LIKERT:
+        if item["id"] == "recall_rating":
+            value = st.radio(
+                item["text"],
+                options=list(range(ADS_RECALL_SCALE_MIN, ADS_RECALL_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"ads_recall_{item['id']}",
+            )
+        else:
+            value = st.radio(
+                item["text"],
+                options=list(range(ADS_RECALL_SCALE_MIN, ADS_RECALL_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"ads_recall_{item['id']}",
+            )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        return responses
+    elif not all_answered:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# ADS PERCEPTION  (Section 3 of post-experiment)
+# ═══════════════════════════════════════════════════════════════
+
+def render_ads_perception() -> Optional[dict]:
+    st.header("Ads Perception")
+    st.caption("Please rate your level of agreement with each statement.")
+
+    responses: dict = {}
+    all_answered = True
+
+    for item in ADS_PERCEPTION_LIKERT:
+        value = st.radio(
+            item["text"],
+            options=list(range(ADS_PERCEPTION_SCALE_MIN, ADS_PERCEPTION_SCALE_MAX + 1)),
+            format_func=lambda v: f"{v}",
+            horizontal=True,
+            index=None,
+            key=f"ads_perception_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    for item in ADS_PERCEPTION_OPEN_ENDED:
+        value = st.text_area(item["text"], key=f"ads_perception_{item['id']}")
+        responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        return responses
+    elif not all_answered:
+        st.info("Please answer all Likert questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# LLM PERFORMANCE EVALUATION  (Section 4 of post-experiment)
+# 5 categories × 3 items = 15 Likert items
+# ═══════════════════════════════════════════════════════════════
+
+def render_llm_evaluation() -> Optional[dict]:
+    st.header("LLM Performance Evaluation")
+    st.caption("Please rate your level of agreement with each statement (1 = Strongly disagree, 7 = Strongly agree).")
+
+    responses: dict = {}
+    all_answered = True
+
+    for category, items in LLM_EVAL_CATEGORIES.items():
+        st.subheader(category)
+        for item in items:
+            value = st.radio(
+                item["text"],
+                options=list(range(LLM_EVAL_SCALE_MIN, LLM_EVAL_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"llm_eval_{item['id']}",
+            )
+            if value is None:
+                all_answered = False
+            else:
+                responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        return responses
+    elif not all_answered:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# GODSPEED (simplified)  (Section 5 of post-experiment)
+# 7 semantic differentials + 2 re-ask Likerts
+# ═══════════════════════════════════════════════════════════════
+
+def render_godspeed() -> Optional[dict]:
+    st.header("Overall Experience")
+    st.caption("Please rate your impression of the chatbot on the following scales (1 = left descriptor, 7 = right descriptor).")
+
+    responses: dict = {}
+    all_answered = True
+
+    for item in GODSPEED_SEMANTIC:
+        col1, col2, col3 = st.columns([1, 3, 1])
+        with col1:
+            st.markdown(f"**{item['left']}**")
+        with col2:
+            value = st.radio(
+                item["text"],
+                options=list(range(GODSPEED_SCALE_MIN, GODSPEED_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"godspeed_{item['id']}",
+                label_visibility="collapsed",
+            )
+        with col3:
+            st.markdown(f"**{item['right']}**")
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    st.markdown("**Final questions about your experience:**")
+    for item in GODSPEED_REASK_LIKERT:
+        value = st.radio(
+            item["text"],
+            options=list(range(GODSPEED_SCALE_MIN, GODSPEED_SCALE_MAX + 1)),
+            format_func=lambda v: f"{v}",
+            horizontal=True,
+            index=None,
+            key=f"godspeed_{item['id']}",
+        )
+        if value is None:
+            all_answered = False
+        else:
+            responses[item["id"]] = value
+
+    st.divider()
+    if all_answered and st.button("Continue", type="primary"):
+        return responses
+    elif not all_answered:
+        st.info("Please answer all questions to continue.")
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# DEMOGRAPHICS (post-experiment, Section 6 – optional)
+# ═══════════════════════════════════════════════════════════════
+
+def render_demographics_end() -> Optional[dict]:
+    st.header("Demographics and Usage")
+    st.caption("All fields are optional.")
+
+    responses: dict = {}
+
+    for item in DEMOGRAPHICS_END_TEXT:
+        value = st.text_input(item["text"], key=f"demo_end_{item['id']}")
+        responses[item["id"]] = value
+
+    for item in DEMOGRAPHICS_END_CATEGORICAL:
+        value = st.radio(
+            item["text"],
+            item["options"],
+            index=None,
+            horizontal=True,
+            key=f"demo_end_{item['id']}",
+        )
+        responses[item["id"]] = value
+
+    st.divider()
+    if st.button("Continue", type="primary"):
+        return responses
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
+# DECEPTION DISCLOSURE  (Section 7 of post-experiment)
+# ═══════════════════════════════════════════════════════════════
+
+def render_deception_disclosure() -> Optional[dict]:
+    st.header("Deception Disclosure")
+    st.markdown(DECEPTION_DISCLOSURE_TEXT)
+    st.divider()
+
+    withdraw = st.text_input(
+        'Type "Withdraw" below if you would like to withdraw from this study. Otherwise, leave this blank and continue.',
+        key="deception_withdraw",
+    )
+
+    if st.button("Continue", type="primary"):
+        withdrew = withdraw.strip().lower() == "withdraw"
+        return {"withdrew": withdrew, "withdraw_text": withdraw.strip() if withdrew else ""}
     return None
 
 
