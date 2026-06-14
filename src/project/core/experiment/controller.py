@@ -3,9 +3,11 @@ Experiment Controller — Workflow A*.
 
 Implements the 5-condition within-subject protocol:
 
-  consent → demographics → instructions → warmup_chat → first_impression
+  consent → instructions → warmup_chat → first_impression
   → [condition_intro → condition_chat → post_condition_survey] × 5
-  → global_evaluation → ocean (BFI-10) → done
+  → global_evaluation → ads_awareness → ads_recall_interpretation
+  → ads_perception → llm_evaluation → godspeed
+  → ocean (BFI-10) → demographics → deception_disclosure → done
 
 Paper reference: Sections 6.3 — Experiment Controller, Workflow A*.
 """
@@ -31,8 +33,14 @@ from core.config import (
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
     SCREEN_POST_CONDITION_SURVEY,
-    SCREEN_OCEAN,
     SCREEN_GLOBAL_EVALUATION,
+    SCREEN_ADS_AWARENESS,
+    SCREEN_ADS_RECALL,
+    SCREEN_ADS_PERCEPTION,
+    SCREEN_LLM_EVALUATION,
+    SCREEN_GODSPEED,
+    SCREEN_OCEAN,
+    SCREEN_DECEPTION_DISCLOSURE,
     SCREEN_DONE,
     WARMUP_TASK_ID,
     WARMUP_TURNS,
@@ -43,7 +51,6 @@ from core.experiment.tasks import TaskDefinition, TASK_CATALOG, TASK_BY_ID
 # ── Screen lists ─────────────────────────────────
 _PRE_CONDITION_SCREENS: list[str] = [
     SCREEN_CONSENT,
-    SCREEN_DEMOGRAPHICS,
     SCREEN_INSTRUCTIONS,
     SCREEN_WARMUP_CHAT,
     SCREEN_FIRST_IMPRESSION,
@@ -57,7 +64,14 @@ _CONDITION_SCREENS: list[str] = [
 
 _POST_CONDITION_SCREENS: list[str] = [
     SCREEN_GLOBAL_EVALUATION,
+    SCREEN_ADS_AWARENESS,
+    SCREEN_ADS_RECALL,
+    SCREEN_ADS_PERCEPTION,
+    SCREEN_LLM_EVALUATION,
+    SCREEN_GODSPEED,
     SCREEN_OCEAN,
+    SCREEN_DEMOGRAPHICS,
+    SCREEN_DECEPTION_DISCLOSURE,
     SCREEN_DONE,
 ]
 

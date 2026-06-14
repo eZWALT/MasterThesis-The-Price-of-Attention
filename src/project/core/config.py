@@ -514,13 +514,19 @@ SCREEN_DEBRIEF:           str = "debrief"
 SCREEN_DONE:              str = "done"
 
 # Workflow A* screen names
-SCREEN_INSTRUCTIONS:           str = "instructions"
-SCREEN_WARMUP_CHAT:            str = "warmup_chat"
-SCREEN_FIRST_IMPRESSION:       str = "first_impression"
-SCREEN_CONDITION_INTRO:        str = "condition_intro"
-SCREEN_CONDITION_CHAT:         str = "condition_chat"
-SCREEN_POST_CONDITION_SURVEY:  str = "post_condition_survey"
-SCREEN_GLOBAL_EVALUATION:      str = "global_evaluation"
+SCREEN_INSTRUCTIONS:            str = "instructions"
+SCREEN_WARMUP_CHAT:             str = "warmup_chat"
+SCREEN_FIRST_IMPRESSION:        str = "first_impression"
+SCREEN_CONDITION_INTRO:         str = "condition_intro"
+SCREEN_CONDITION_CHAT:          str = "condition_chat"
+SCREEN_POST_CONDITION_SURVEY:   str = "post_condition_survey"
+SCREEN_GLOBAL_EVALUATION:       str = "global_evaluation"
+SCREEN_ADS_AWARENESS:           str = "ads_awareness"
+SCREEN_ADS_RECALL:              str = "ads_recall_interpretation"
+SCREEN_ADS_PERCEPTION:          str = "ads_perception"
+SCREEN_LLM_EVALUATION:          str = "llm_evaluation"
+SCREEN_GODSPEED:                str = "godspeed"
+SCREEN_DECEPTION_DISCLOSURE:    str = "deception_disclosure"
 
 
 # Per-study screens auto-advanced without rendering (extend these frozensets as needed).
