@@ -74,8 +74,13 @@ from core.ui.screens import (
 def init_session_state(params):
     """Ensure every expected key exists in st.session_state."""
     if "logger" not in st.session_state:
-        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
-        log_dir = LOG_DIR_DEV if (params.dev_mode or params.flow_test) else LOG_DIR
+        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_DIR_CALIBRATION, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
+        if params.calibration:
+            log_dir = LOG_DIR_CALIBRATION
+        elif params.dev_mode or params.flow_test:
+            log_dir = LOG_DIR_DEV
+        else:
+            log_dir = LOG_DIR
         st.session_state.logger = ExperimentLogger(
             log_dir=log_dir,
             flush_every_n=LOG_FLUSH_EVERY_N,
