@@ -18,7 +18,7 @@ Dependencies : rank-bm25 (CPU-only, lightweight).
 
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List
 
 from core.config import USE_HYBRID, BM25_WEIGHT, DENSE_WEIGHT, RRF_K
 from core.retrieval.stages.base import PipelineStage
@@ -82,8 +82,8 @@ class HybridRefiner(PipelineStage):
 
     def _bm25_rescore(
         self, query: str, items: List[CatalogItem]
-    ) -> List[CatalogItem]:
-        """Re-rank candidates with BM25 + RRF and return sorted list."""
+    ) -> tuple[List[CatalogItem], Dict[str, float]]:
+        """Re-rank candidates with BM25 + RRF and return (sorted_items, {item_id: rrf_score})."""
         from rank_bm25 import BM25Okapi
 
         tokenised_corpus = [self._tokenise_item(item) for item in items]
@@ -104,7 +104,10 @@ class HybridRefiner(PipelineStage):
             + self._bm25_w * (1.0 / (k + bm25_rank_of[dense_rank] + 1))
             for dense_rank in range(len(items))
         ]
-        return [item for _, item in sorted(zip(rrf_scores, items), key=lambda x: x[0], reverse=True)]
+        sorted_pairs = sorted(zip(rrf_scores, items), key=lambda x: x[0], reverse=True)
+        sorted_items = [item for _, item in sorted_pairs]
+        score_dict = {item.item_id: score for score, item in sorted_pairs}
+        return sorted_items, score_dict
 
     # ── PipelineStage interface ──────────────────────────────────────────
 
@@ -114,5 +117,5 @@ class HybridRefiner(PipelineStage):
 
         state.candidates = self._apply_metadata_filters(state.candidates)
         if state.candidates:
-            state.candidates = self._bm25_rescore(state.query, state.candidates)
+            state.candidates, state.hybrid_scores = self._bm25_rescore(state.query, state.candidates)
         return state

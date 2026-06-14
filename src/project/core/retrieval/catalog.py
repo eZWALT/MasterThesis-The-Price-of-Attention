@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import faiss
 import numpy as np
@@ -78,10 +78,13 @@ class AdCatalog:
     # SEARCH API (UNCHANGED)
     # ─────────────────────────────────────────────
 
-    def search(self, query_vec: np.ndarray, top_k: int) -> List[str]:
+    def search(self, query_vec: np.ndarray, top_k: int) -> List[Tuple[str, float]]:
         k = min(top_k, len(self._id_map))
-        _, indices = self._index.search(query_vec, k)
-        return [self._id_map[i] for i in indices[0] if i != -1]
+        distances, indices = self._index.search(query_vec, k)
+        return [
+            (self._id_map[i], float(distances[0][j]))
+            for j, i in enumerate(indices[0]) if i != -1
+        ]
 
     def get(self, item_id: str) -> CatalogItem:
         return self._items[item_id]
