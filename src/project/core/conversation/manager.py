@@ -19,6 +19,7 @@ It should never talk to the LLM directly.
 
 from __future__ import annotations
 
+import hashlib
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, Future
@@ -140,6 +141,7 @@ class ConversationManager:
         self.conversation_id: str = str(uuid.uuid4())
         self.messages: List[Dict[str, str]] = []
         self._system_prompt = self._build_system_prompt()
+        self.system_prompt_hash: str = hashlib.sha256(self._system_prompt.encode()).hexdigest()[:16]
 
         # ── Per-turn metrics (paper DVs) ──────────────────────
         self.turn_metrics: List[TurnMetrics] = []
@@ -405,6 +407,28 @@ class ConversationManager:
         )
         self.last_injection = injection
 
+        # 4b — log ad_injected event (which ad was actually shown)
+        if inject_ad and retrieval and retrieval.primary:
+            _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
+            self.logger.log(
+                "ad_injected",
+                compact_event_data(
+                    {
+                        "ad_id": retrieval.primary.source_item_id,
+                        "product_id": retrieval.primary.source_item_id,
+                        "ad_title": retrieval.primary.title,
+                        "ad_text": retrieval.primary.text[:200],
+                        "position": _position,
+                        "ad_mode": self.ad_mode,
+                    },
+                    turn=current_turn,
+                ),
+                self.ad_mode,
+                self.conversation_id,
+                source="system",
+                turn=current_turn,
+            )
+
         # 5 — LLM call (timed)
         llm_t0 = time.perf_counter()
         assistant_reply = self._call_llm(injection.system_overrides)
@@ -420,6 +444,10 @@ class ConversationManager:
                     "content": assistant_reply,
                     "msg_len": len(assistant_reply),
                     "llm_latency_ms": round(llm_latency_ms, 1),
+                    "model": self.model,
+                    "temperature": self.temperature,
+                    "max_tokens": self.max_tokens,
+                    "system_prompt_hash": self.system_prompt_hash,
                 },
                 turn=current_turn,
             ),
@@ -578,6 +606,28 @@ class ConversationManager:
         )
         self.last_injection = injection
 
+        # 4b — log ad_injected event (which ad was actually shown)
+        if inject_ad and retrieval and retrieval.primary:
+            _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
+            self.logger.log(
+                "ad_injected",
+                compact_event_data(
+                    {
+                        "ad_id": retrieval.primary.source_item_id,
+                        "product_id": retrieval.primary.source_item_id,
+                        "ad_title": retrieval.primary.title,
+                        "ad_text": retrieval.primary.text[:200],
+                        "position": _position,
+                        "ad_mode": self.ad_mode,
+                    },
+                    turn=current_turn,
+                ),
+                self.ad_mode,
+                self.conversation_id,
+                source="system",
+                turn=current_turn,
+            )
+
         # 5 — LLM call (streaming)
         system_msg = {"role": "system", "content": self._system_prompt}
         msgs = [system_msg] + injection.system_overrides + list(self.messages)
@@ -606,6 +656,10 @@ class ConversationManager:
                     "content": assistant_reply,
                     "msg_len": len(assistant_reply),
                     "llm_latency_ms": round(llm_latency_ms, 1),
+                    "model": self.model,
+                    "temperature": self.temperature,
+                    "max_tokens": self.max_tokens,
+                    "system_prompt_hash": self.system_prompt_hash,
                 },
                 turn=current_turn,
             ),

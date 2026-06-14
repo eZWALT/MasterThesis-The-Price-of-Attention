@@ -9,6 +9,7 @@ import uuid
 import random
 import streamlit as st
 from loguru import logger as log
+from pathlib import Path
 
 from core.config import (
     DEFAULT_MODEL,
@@ -33,6 +34,20 @@ from core.config import (
     SCREEN_DONE,
     WARMUP_TASK_ID,
     WARMUP_TURNS,
+    LLM_BACKEND,
+    LLM_THINK,
+    EMBEDDING_MODEL_NAME,
+    RERANKER_MODEL_NAME,
+    DENSE_TOP_K,
+    RERANKER_TOP_K,
+    RETRIEVAL_FINAL_TOP_N,
+    USE_HYBRID,
+    USE_RERANKER,
+    QUERY_EXPANSION_MODE,
+    HYDE_NUM_DOCS,
+    USE_CONTEXT_SUMMARY,
+    CATALOG_PATH,
+    STUDY_TYPE_CROWD,
 )
 from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
@@ -100,6 +115,63 @@ def init_session_state(params):
                 "skip_screens": sorted(params.skip_screens),
                 "protocol": "workflow_a_star",
                 "conditions": ctrl.condition_plan,
+            },
+            ad_mode="session",
+            conversation_id=pid,
+            source="system",
+        )
+
+        # Log experiment config snapshot for self-describing logs
+        try:
+            _ver = Path(__file__).resolve().parents[4] / "VERSION"
+            _version = _ver.read_text().strip() if _ver.exists() else "unknown"
+        except Exception:
+            _version = "unknown"
+
+        _active_pipeline_stages = []
+        if USE_CONTEXT_SUMMARY:
+            _active_pipeline_stages.append("ContextSummaryStage")
+        if QUERY_EXPANSION_MODE != "none":
+            _active_pipeline_stages.append("QueryExpansionStage")
+        _active_pipeline_stages.append("DenseRetriever")
+        if USE_HYBRID:
+            _active_pipeline_stages.append("HybridRefiner")
+        if USE_RERANKER:
+            _active_pipeline_stages.append("Reranker")
+        _active_pipeline_stages.append("AdFormatter")
+
+        st.session_state.logger.log(
+            "experiment_config",
+            {
+                "version": _version,
+                "llm": {
+                    "model": params.model or DEFAULT_MODEL,
+                    "temperature": DEFAULT_TEMPERATURE,
+                    "max_tokens": DEFAULT_MAX_TOKENS,
+                    "backend": LLM_BACKEND,
+                    "think": LLM_THINK,
+                },
+                "retrieval": {
+                    "embedding_model": EMBEDDING_MODEL_NAME,
+                    "reranker_model": RERANKER_MODEL_NAME,
+                    "dense_top_k": DENSE_TOP_K,
+                    "reranker_top_k": RERANKER_TOP_K,
+                    "final_top_n": RETRIEVAL_FINAL_TOP_N,
+                    "use_hybrid": USE_HYBRID,
+                    "use_reranker": USE_RERANKER,
+                    "query_expansion_mode": QUERY_EXPANSION_MODE,
+                    "hyde_num_docs": HYDE_NUM_DOCS,
+                    "use_context_summary": USE_CONTEXT_SUMMARY,
+                    "catalog_path": CATALOG_PATH,
+                    "active_stages": _active_pipeline_stages,
+                },
+                "experiment": {
+                    "study_type": params.study_type,
+                    "n_trials": params.n_trials,
+                    "turns_min": params.turns_min,
+                    "turns_max": params.turns_max,
+                    "calibration": params.calibration,
+                },
             },
             ad_mode="session",
             conversation_id=pid,
@@ -563,6 +635,23 @@ def run_participant_mode(params):
                 st.session_state.logger.log(
                     "condition_complete",
                     _condition_summary_for_log(condition_record),
+                    ad_mode=cfg["ad_mode"],
+                    conversation_id=mgr.conversation_id,
+                    source="system",
+                    turn=mgr.turn_count,
+                )
+                st.session_state.logger.log(
+                    "conversation_completed",
+                    {
+                        "condition": condition_id,
+                        "ad_mode": cfg["ad_mode"],
+                        "ad_shown": len(mgr.ad_turns_actual) > 0,
+                        "ad_id": mgr.last_retrieval.primary.source_item_id
+                            if mgr.last_retrieval and mgr.last_retrieval.primary else None,
+                        "task_id": task.id,
+                        "total_turns": mgr.turn_count,
+                        "ad_turn": cfg["ad_turn"],
+                    },
                     ad_mode=cfg["ad_mode"],
                     conversation_id=mgr.conversation_id,
                     source="system",
