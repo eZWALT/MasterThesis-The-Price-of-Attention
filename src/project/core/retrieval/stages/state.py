@@ -86,6 +86,9 @@ class PipelineState:
 
     # ── Stage 2 / 3 output ────────────────────────────
     candidates: List[CatalogItem] = field(default_factory=list)
+    # Per-stage retrieval scores for logging/benchmarking
+    dense_scores: Dict[str, float] = field(default_factory=dict)   # item_id → FAISS IP score
+    hybrid_scores: Dict[str, float] = field(default_factory=dict)  # item_id → RRF fused score
 
     # ── Stage 4 output ────────────────────────────────
     ranked: List[RankedCandidate] = field(default_factory=list)
@@ -94,3 +97,7 @@ class PipelineState:
     # Imported lazily to avoid a circular reference at module load time.
     top_ad: Optional[Any] = None   # type: Ad (core.ad_injection.models) — primary pick
     top_ads: List[Any] = field(default_factory=list)  # type: List[Ad] — top-N for LLM
+
+    # Per-stage item snapshots for benchmark logging.
+    # Populated by AdRetrievalPipeline.run() after each stage executes.
+    stage_snapshots: Dict[str, List[Dict]] = field(default_factory=dict)

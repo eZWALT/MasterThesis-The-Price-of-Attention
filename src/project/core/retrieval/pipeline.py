@@ -84,6 +84,7 @@ def _build_retrieval_diag(state: PipelineState) -> Dict[str, Any]:
         "hyde_chars": len(state.expanded_query) if state.expanded_query else 0,
         "retrieval_stage_ms": {k: round(v, 1) for k, v in state.stage_ms.items()},
         "retrieval_total_ms": round(total_ms, 1),
+        "stage_snapshots": dict(state.stage_snapshots),
     }
 
 
@@ -161,6 +162,44 @@ class AdRetrievalPipeline:
                     name,
                     len(state.ranked),
                 )
+
+            # ── Snapshot per-stage results for benchmark logging ──
+            if name == "DenseRetriever" and state.candidates:
+                state.stage_snapshots["dense"] = [
+                    {
+                        "item_id": it.item_id,
+                        "title": it.title,
+                        "score": round(state.dense_scores.get(it.item_id, 0.0), 4),
+                    }
+                    for it in state.candidates
+                ]
+            elif name == "HybridRefiner" and state.hybrid_scores:
+                state.stage_snapshots["hybrid"] = [
+                    {
+                        "item_id": it.item_id,
+                        "title": it.title,
+                        "score": round(state.hybrid_scores.get(it.item_id, 0.0), 4),
+                    }
+                    for it in state.candidates
+                ]
+            elif name == "Reranker" and state.ranked:
+                state.stage_snapshots["reranker"] = [
+                    {
+                        "item_id": rc.item.item_id,
+                        "title": rc.item.title,
+                        "score": round(rc.score, 4),
+                    }
+                    for rc in state.ranked
+                ]
+            elif name == "AdFormatter" and state.top_ads:
+                state.stage_snapshots["final"] = [
+                    {
+                        "item_id": ad.source_item_id,
+                        "title": ad.title,
+                        "score": round(ad.relevance_score, 4),
+                    }
+                    for ad in state.top_ads
+                ]
 
         wall_ms = elapsed_ms(run_t0)
         self.last_state = state
