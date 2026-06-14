@@ -197,6 +197,162 @@ FINAL_OPEN_ENDED_PROMPT: str = (
     "Any other comments? (optional)"
 )
 
+# ═══════════════════════════════════════════════════════════════
+# ADS AWARENESS  (post-experiment, Section 1)
+# ═══════════════════════════════════════════════════════════════
+ADS_AWARENESS_SCALE_MIN: int = 1
+ADS_AWARENESS_SCALE_MAX: int = 7
+
+ADS_AWARENESS_CATEGORICAL: list[dict] = [
+    {"id": "aware_noticed",     "text": "Did you notice any additional content that was not directly related to the task?",                "options": ["Yes", "No"]},
+    {"id": "aware_confidence",  "text": "How confident are you in your answer above?",                                                    "options": ["Low", "Medium", "High"]},
+    {"id": "aware_which_tasks", "text": "In which tasks (if any) did you notice this?",                                                   "options": ["Task 1", "Task 2", "Task 3", "Task 4", "Task 5", "Not sure / cannot recall"]},
+    {"id": "aware_when",        "text": "When did you notice this?",                                                                      "options": ["Early in the interaction", "Later in the interaction", "Throughout the interaction", "Not sure"]},
+    {"id": "aware_where",       "text": "Where did you notice this?",                                                                     "options": ["Within the assistant\u2019s responses", "In separate UI elements or sections", "Both", "Not sure"]},
+    {"id": "aware_brands",      "text": "Did the chatbot mention any brands, products, or external references during the interaction?",   "options": ["Yes", "No", "Not sure"]},
+]
+
+ADS_AWARENESS_OPEN_ENDED: list[dict] = [
+    {"id": "aware_description",       "text": "What did you notice? Please describe briefly.",                                        "optional": True},
+    {"id": "aware_brands_description","text": "If yes, please briefly describe what you remember.",                                   "optional": True},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# ADS RECALL / INTERPRETATION  (post-experiment, Section 2)
+# ═══════════════════════════════════════════════════════════════
+ADS_RECALL_SCALE_MIN: int = 1
+ADS_RECALL_SCALE_MAX: int = 7
+
+ADS_RECALL_CATEGORICAL: list[dict] = [
+    {"id": "recall_remember", "text": "Do you remember this content?",        "options": ["Yes", "No", "Not sure"]},
+    {"id": "recall_what",     "text": "What do you think this content was?",  "options": ["Normal chatbot response, advice or recommendations", "Promotional or sponsored-type content", "Not sure", "Other (please specify)"]},
+]
+
+ADS_RECALL_LIKERT: list[dict] = [
+    {"id": "recall_influence", "text": "This content influenced my thinking or decision making."},
+    {"id": "recall_rating",    "text": "How would you rate this content overall? (1 = Very negative, 7 = Very positive)"},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# ADS PERCEPTION  (post-experiment, Section 3)
+# ═══════════════════════════════════════════════════════════════
+ADS_PERCEPTION_SCALE_MIN: int = 1
+ADS_PERCEPTION_SCALE_MAX: int = 7
+
+ADS_PERCEPTION_LIKERT: list[dict] = [
+    {"id": "perception_advertising", "text": "I felt like the chatbot was advertising or marketing content to me."},
+    {"id": "perception_manipulate",  "text": "I felt like the chatbot was trying to influence or manipulate me through its responses."},
+    {"id": "perception_companies",   "text": "I think that technology companies will start integrating advertising into their chatbots (e.g., ChatGPT, Claude, Grok, Gemini, Bing Chat, etc.)."},
+]
+
+ADS_PERCEPTION_OPEN_ENDED: list[dict] = [
+    {"id": "perception_benefits_drawbacks", "text": "Briefly, what do you see as the benefits or drawbacks of advertising through chatbots?", "optional": False},
+    {"id": "perception_detect",             "text": "Do you think you could tell whether a chatbot was instructed to advertise content to you? If yes, how do you think you could tell?", "optional": False},
+    {"id": "perception_interesting",        "text": "Was there a response from the chatbot you found interesting or problematic that you would like to highlight?", "optional": True},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# LLM PERFORMANCE EVALUATION  (post-experiment, Section 4)
+# 5 constructs × 3 items = 15 items, 7-pt Likert
+# ═══════════════════════════════════════════════════════════════
+LLM_EVAL_SCALE_MIN: int = 1
+LLM_EVAL_SCALE_MAX: int = 7
+
+LLM_EVAL_CATEGORIES: dict[str, list[dict]] = {
+    "Credibility": [
+        {"id": "credibility_reliable",  "text": "The chatbot provided reliable responses."},
+        {"id": "credibility_false",     "text": "The chatbot provided false information."},
+        {"id": "credibility_made_up",   "text": "The chatbot made up information that was not real."},
+    ],
+    "Helpfulness": [
+        {"id": "helpfulness_helpful",    "text": "The chatbot gave helpful responses."},
+        {"id": "helpfulness_addressed",  "text": "The chatbot adequately addressed my request."},
+        {"id": "helpfulness_not_aid",    "text": "The chatbot gave a response that did not aid me."},
+    ],
+    "Convincingness": [
+        {"id": "convincingness_convincing",    "text": "The chatbot provided convincing responses."},
+        {"id": "convincingness_changed_mind",  "text": "The chatbot\u2019s responses changed my mind."},
+        {"id": "convincingness_skeptical",     "text": "I was skeptical of the chatbot\u2019s responses."},
+    ],
+    "Relevance": [
+        {"id": "relevance_relevant",    "text": "The chatbot gave relevant responses."},
+        {"id": "relevance_addressed",   "text": "The chatbot\u2019s suggestions addressed my questions."},
+        {"id": "relevance_not_useful",  "text": "The chatbot gave responses that were not useful."},
+    ],
+    "Neutrality": [
+        {"id": "neutrality_neutral",      "text": "The chatbot gave neutral (fair) responses."},
+        {"id": "neutrality_impartial",    "text": "The chatbot gave impartial and unbiased responses."},
+        {"id": "neutrality_opinionated",  "text": "The chatbot provided opinionated responses."},
+    ],
+}
+
+def flatten_llm_eval_items() -> list[dict]:
+    items: list[dict] = []
+    for _cat, cat_items in LLM_EVAL_CATEGORIES.items():
+        items.extend(cat_items)
+    return items
+
+# ═══════════════════════════════════════════════════════════════
+# GODSPEED (simplified)  (post-experiment, Section 5)
+# 7 semantic differentials + 2 re-ask Likerts
+# ═══════════════════════════════════════════════════════════════
+GODSPEED_SCALE_MIN: int = 1
+GODSPEED_SCALE_MAX: int = 7
+
+GODSPEED_SEMANTIC: list[dict] = [
+    {"id": "godspeed_positive",     "text": "Positive \u2013 Negative",          "left": "Positive",     "right": "Negative"},
+    {"id": "godspeed_friendly",     "text": "Friendly \u2013 Unfriendly",       "left": "Friendly",     "right": "Unfriendly"},
+    {"id": "godspeed_competent",    "text": "Competent \u2013 Incompetent",      "left": "Competent",    "right": "Incompetent"},
+    {"id": "godspeed_sensible",     "text": "Sensible \u2013 Foolish",           "left": "Sensible",     "right": "Foolish"},
+    {"id": "godspeed_responsible",  "text": "Responsible \u2013 Irresponsible",  "left": "Responsible",  "right": "Irresponsible"},
+    {"id": "godspeed_knowledgeable","text": "Knowledgeable \u2013 Ignorant",     "left": "Knowledgeable","right": "Ignorant"},
+    {"id": "godspeed_pleasant",     "text": "Pleasant \u2013 Unpleasant",        "left": "Pleasant",     "right": "Unpleasant"},
+]
+
+GODSPEED_REASK_LIKERT: list[dict] = [
+    {"id": "reuse_assistant", "text": "Based on your experience, would you use this assistant again?"},
+    {"id": "reuse_system",    "text": "How likely are you to use a system like this in the future?"},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# DEMOGRAPHICS  (post-experiment, Section 6 – optional)
+# ═══════════════════════════════════════════════════════════════
+DEMOGRAPHICS_END_TEXT: list[dict] = [
+    {"id": "demo_age",       "text": "Age"},
+    {"id": "demo_gender",    "text": "Gender"},
+    {"id": "demo_education", "text": "Highest achieved level of education"},
+]
+
+DEMOGRAPHICS_END_CATEGORICAL: list[dict] = [
+    {"id": "demo_llm_frequency", "text": "How often do you use LLM-based systems?", "options": ["Daily", "Weekly", "Monthly", "Rarely"]},
+    {"id": "demo_expertise",     "text": "Level of Expertise of LLM systems",        "options": ["Low", "Normal (Regular User)", "High (Power User, uses Agents)", "AI Engineer", "LLM Researcher"]},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# DECEPTION DISCLOSURE TEXT
+# ═══════════════════════════════════════════════════════════════
+DECEPTION_DISCLOSURE_TEXT: str = (
+    "In this study, we utilized deception to avoid biasing the study responses. "
+    "In actuality, we are not only studying the viability of creating personalities for AI. "
+    "The primary focus of our study is related to using chatbots for advertising purposes. "
+    "We are interested in studying the potential risks and ethical concerns of having chatbots serve advertisements. "
+    "We needed to use deception to avoid biasing your behavior. In particular, we did not want you to focus on or "
+    "actively look for advertisements and sponsored content within the chatbot\u2019s responses. "
+    "We also did not want you to view the chatbot in a negative or adversarial light due to preconceived feelings towards advertising. "
+    "Please note that any advertisements which may have been served to you were not actual advertisements, just simulated ones. "
+    "We are not affiliated, sponsored by, or associated with any of the brands that may have been mentioned by the chatbot. "
+    "These products and brands were selected randomly, and there were no sponsorships or connections between us or our research study "
+    "and these products/brands. We understand if you feel troubled as a result of this deception. "
+    "At this point, you have the option to withdraw your participation and data from this study and retain 100% of the original "
+    "agreed-upon compensation. If you would like to continue participating in the remainder of this study, you may click ahead to the next page. "
+    "For full transparency and disclosure, here is what we instructed ChatGPT to do during your interactions with it: "
+    "To mention the product/brand in a positive light when the timing or topic is relevant, and to personalize its response "
+    "to the user when promoting the product/brand. By typing \u201cWithdraw\u201d into the entry below: I am indicating that I wish to "
+    "withdraw my participation and data from this study. If you wish to continue in the study, simply click to the next page "
+    "without typing into the field below. Type \u201cWithdraw\u201d below if you would like to withdraw from this study. "
+    "Otherwise, leave this blank and continue."
+)
+
 
 def score_ocean(
     raw_responses: List[int],
