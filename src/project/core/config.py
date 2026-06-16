@@ -196,8 +196,8 @@ STUDY_DEFAULTS: dict[str, dict] = {
 # └─────────────────────────────────────────────────────────────────────────┘
 
 TRIALS_PER_SESSION: int    = 10
-MIN_TURNS_PER_TRIAL: int   = 3
-MAX_TURNS_PER_TRIAL: int   = 20
+MIN_TURNS_PER_TRIAL: int   = 5
+MAX_TURNS_PER_TRIAL: int   = 5
 
 # Minimum number of trials a participant must complete before the
 # "Leave study early" button appears in the sidebar.  Participants
