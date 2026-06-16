@@ -3,8 +3,8 @@ Experiment Controller — Workflow A*.
 
 Implements the 5-condition within-subject protocol:
 
-  consent → instructions → warmup_chat → first_impression
-  → [condition_intro → condition_chat → post_condition_survey] × 5
+  consent → instructions → warmup_chat
+  → [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
   → ads_awareness → ads_recall_interpretation → ads_perception
   → llm_evaluation → godspeed → ocean (BFI-10) → demographics
   → deception_disclosure → done
@@ -29,10 +29,9 @@ from core.config import (
     SCREEN_DEMOGRAPHICS,
     SCREEN_INSTRUCTIONS,
     SCREEN_WARMUP_CHAT,
-    SCREEN_FIRST_IMPRESSION,
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
-    SCREEN_TASK_CONCLUSION,
+    SCREEN_CONDITION_CONCLUSION,
     SCREEN_POST_CONDITION_SURVEY,
     SCREEN_ADS_AWARENESS,
     SCREEN_ADS_RECALL,
@@ -53,13 +52,12 @@ _PRE_CONDITION_SCREENS: list[str] = [
     SCREEN_CONSENT,
     SCREEN_INSTRUCTIONS,
     SCREEN_WARMUP_CHAT,
-    SCREEN_FIRST_IMPRESSION,
 ]
 
 _CONDITION_SCREENS: list[str] = [
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
-    SCREEN_TASK_CONCLUSION,
+    SCREEN_CONDITION_CONCLUSION,
     SCREEN_POST_CONDITION_SURVEY,
 ]
 
@@ -117,7 +115,6 @@ class ExperimentController:
 
         # ── Collected data ────────────────────────────
         self.demographics: Dict[str, Any] = {}
-        self.first_impression: Dict[str, Any] = {}
         self.ocean_raw: List[int] = []
         self.ocean_scores: Dict[str, float] = {}
         self.condition_results: List[Dict[str, Any]] = []   # one per condition
