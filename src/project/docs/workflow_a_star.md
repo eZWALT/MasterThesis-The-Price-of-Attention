@@ -22,8 +22,8 @@ window.  The `no_ads` condition never injects.
 ## Participant Flow
 
 ```
-consent → demographics → instructions → warmup_chat → first_impression
-→ [condition_intro → condition_chat → post_condition_survey] × 5
+consent → demographics → instructions → warmup_chat
+→ [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
 → ocean (BFI-10) → vals → global_evaluation → done
 ```
 
