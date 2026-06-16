@@ -230,7 +230,7 @@ BASELINE_CONTINUE_LABEL: str = "Continue"
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  5.  EXPERIMENT CONDITIONS & ADVERTISING MODES                           │
-# │  Workflow A*: 5-condition within-subject design                         │
+# │  Workflow B: 5-condition within-subject design                         │
 # │  Paper: Section 3.2 — Advertising Modes.                                │
 # └─────────────────────────────────────────────────────────────────────────┘
 
@@ -513,7 +513,7 @@ SCREEN_FINAL_SURVEY:      str = "final_survey"
 SCREEN_DEBRIEF:           str = "debrief"
 SCREEN_DONE:              str = "done"
 
-# Workflow A* screen names
+# Workflow B screen names
 SCREEN_INSTRUCTIONS:            str = "instructions"
 SCREEN_WARMUP_CHAT:             str = "warmup_chat"
 SCREEN_FIRST_IMPRESSION:        str = "first_impression"

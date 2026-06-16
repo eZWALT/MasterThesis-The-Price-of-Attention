@@ -128,7 +128,7 @@ def get_ocean_items(version: str = "10") -> list[tuple[str, str, bool]]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# POST-CONDITION SURVEY  (after each condition chat — Workflow A*)
+# POST-CONDITION SURVEY  (after each condition chat — Workflow B)
 # ═══════════════════════════════════════════════════════════════
 POST_CONDITION_SCALE_MIN: int = 1
 POST_CONDITION_SCALE_MAX: int = 7
@@ -166,7 +166,7 @@ POST_TRIAL_ITEMS: list[dict[str, str]] = [
 
 
 # ═══════════════════════════════════════════════════════════════
-# GLOBAL EVALUATION  (end of session — Workflow A*)
+# GLOBAL EVALUATION  (end of session — Workflow B)
 # ═══════════════════════════════════════════════════════════════
 GLOBAL_EVAL_SCALE_MIN: int = 1
 GLOBAL_EVAL_SCALE_MAX: int = 7

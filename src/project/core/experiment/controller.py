@@ -1,5 +1,5 @@
 """
-Experiment Controller — Workflow A*.
+Experiment Controller — Workflow B.
 
 Implements the 5-condition within-subject protocol:
 
@@ -12,7 +12,7 @@ Implements the 5-condition within-subject protocol:
 Tasks are counterbalanced with Latin-square rotation (by cb_group or pid hash).
 Conditions are shuffled independently, then zipped with tasks.
 
-Paper reference: Sections 6.3 — Experiment Controller, Workflow A*.
+Paper reference: Sections 6.3 — Experiment Controller, Workflow B.
 """
 
 from __future__ import annotations
@@ -77,7 +77,7 @@ _POST_CONDITION_SCREENS: list[str] = [
 
 class ExperimentController:
     """
-    Workflow A* state machine.
+    Workflow B state machine.
 
     Pure state — no Streamlit dependency.  UI calls ``advance()``
     and reads ``current_screen`` to decide what to render.

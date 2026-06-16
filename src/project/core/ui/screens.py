@@ -16,7 +16,6 @@ import time
 import streamlit as st
 from typing import Optional
 
-from core.ui.components import render_countdown
 from core.config import (
     DEFAULT_MAX_TOKENS,
     CONSENT_TITLE,
@@ -755,7 +754,7 @@ def render_final_survey() -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — INSTRUCTIONS
+# WORKFLOW B — INSTRUCTIONS
 # ═══════════════════════════════════════════════════════════════
 
 def render_instructions() -> bool:
@@ -773,17 +772,14 @@ def render_instructions() -> bool:
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — WARM-UP CHAT
+# WORKFLOW B — WARM-UP CHAT
 # ═══════════════════════════════════════════════════════════════
 
 def render_warmup_chat(manager: ConversationManager) -> bool:
     """
     Warm-up conversation — no ads, no Likert after.
     Returns True when user clicks 'Done'.
-    Shows a 90-second countdown timer in the sidebar.
     """
-    render_countdown(seconds=90, label="Warm-up", key="warmup")
-
     st.header("Warm-Up Conversation")
     st.info(
         "This is a practice conversation to get familiar with the interface. "
@@ -811,7 +807,7 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — FIRST IMPRESSION (non-Likert)
+# WORKFLOW B — FIRST IMPRESSION (non-Likert)
 # ═══════════════════════════════════════════════════════════════
 
 def render_first_impression() -> Optional[dict]:
@@ -860,7 +856,7 @@ def render_first_impression() -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — CONDITION INTRO
+# WORKFLOW B — CONDITION INTRO
 # ═══════════════════════════════════════════════════════════════
 
 def render_condition_intro(
@@ -886,7 +882,7 @@ def render_condition_intro(
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — CONDITION CHAT
+# WORKFLOW B — CONDITION CHAT
 # ═══════════════════════════════════════════════════════════════
 
 def render_condition_chat(
@@ -957,7 +953,7 @@ def render_condition_chat(
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — TASK CONCLUSION
+# WORKFLOW B — TASK CONCLUSION
 # ═══════════════════════════════════════════════════════════════
 
 def render_condition_conclusion(
@@ -1000,7 +996,7 @@ def render_condition_conclusion(
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — POST-CONDITION SURVEY
+# WORKFLOW B — POST-CONDITION SURVEY
 # ═══════════════════════════════════════════════════════════════
 
 def render_post_condition_survey(condition_number: int) -> Optional[dict]:
@@ -1043,7 +1039,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW A* — GLOBAL EVALUATION
+# WORKFLOW B — GLOBAL EVALUATION
 # ═══════════════════════════════════════════════════════════════
 
 def render_global_evaluation() -> Optional[dict]:

@@ -1,5 +1,5 @@
 """
-Participant flow — Workflow A*: session state, screen dispatcher,
+Participant flow — Workflow B: session state, screen dispatcher,
 progress sidebar, and dev-flow skip helpers.
 """
 
@@ -117,7 +117,7 @@ def init_session_state(params):
         st.session_state.controller = ctrl
         st.session_state.experiment_params = params
         log.info(
-            "Session init (A*) | pid={} | study={} | skip={} | exp={} | run={}",
+            "Session init (B) | pid={} | study={} | skip={} | exp={} | run={}",
             pid,
             params.study_type,
             sorted(params.skip_screens),
@@ -529,11 +529,11 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
 
 
 # ═══════════════════════════════════════════════════════════════
-# PARTICIPANT SCREEN DISPATCHER (Workflow A*)
+# PARTICIPANT SCREEN DISPATCHER (Workflow B)
 # ═══════════════════════════════════════════════════════════════
 
 def run_participant_mode(params):
-    """Drive the participant through Workflow A* protocol."""
+    """Drive the participant through Workflow B protocol."""
     ctrl: ExperimentController = st.session_state.controller
     scr = ctrl.current_screen
 
