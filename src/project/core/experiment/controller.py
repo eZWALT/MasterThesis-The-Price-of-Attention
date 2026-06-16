@@ -3,7 +3,7 @@ Experiment Controller — Workflow A*.
 
 Implements the 5-condition within-subject protocol:
 
-  consent → instructions → warmup_chat
+  consent → warmup_chat
   → [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
   → ads_awareness → ads_recall_interpretation → ads_perception
   → llm_evaluation → godspeed → ocean (BFI-10) → demographics
@@ -27,7 +27,6 @@ from core.config import (
     FINISH_BUTTON_VISIBLE_FROM_TURN,
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
-    SCREEN_INSTRUCTIONS,
     SCREEN_WARMUP_CHAT,
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
@@ -50,7 +49,6 @@ from core.experiment.tasks import TaskDefinition, TASK_CATALOG, TASK_BY_ID
 # ── Screen lists ─────────────────────────────────
 _PRE_CONDITION_SCREENS: list[str] = [
     SCREEN_CONSENT,
-    SCREEN_INSTRUCTIONS,
     SCREEN_WARMUP_CHAT,
 ]
 
