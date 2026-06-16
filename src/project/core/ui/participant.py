@@ -28,6 +28,7 @@ from core.config import (
     SCREEN_FIRST_IMPRESSION,
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
+    SCREEN_TASK_CONCLUSION,
     SCREEN_POST_CONDITION_SURVEY,
     SCREEN_GLOBAL_EVALUATION,
     SCREEN_ADS_AWARENESS,
@@ -67,6 +68,7 @@ from core.ui.screens import (
     render_first_impression,
     render_condition_intro,
     render_condition_chat,
+    render_task_conclusion,
     render_post_condition_survey,
     render_global_evaluation,
     render_ads_awareness,
@@ -682,6 +684,29 @@ def run_participant_mode(params):
                 st.session_state.condition_manager = None
                 ctrl.advance()
                 st.rerun()
+
+    elif scr == SCREEN_TASK_CONCLUSION:
+        task = cfg["task"]
+        result = render_task_conclusion(
+            condition_number=ctrl.condition_number,
+            total_conditions=ctrl.n_conditions,
+            task_title=task.title,
+            task_prompt=task.participant_prompt,
+        )
+        if result is not None:
+            st.session_state.logger.log(
+                "task_conclusion_submitted",
+                {
+                    "task_id": task.id,
+                    "task_title": task.title,
+                    "conclusion": result["conclusion"],
+                },
+                ad_mode=cfg["ad_mode"],
+                conversation_id=ctrl.participant_id,
+                source="user",
+            )
+            ctrl.advance()
+            st.rerun()
 
     elif scr == SCREEN_POST_CONDITION_SURVEY:
         result = render_post_condition_survey(ctrl.condition_number)

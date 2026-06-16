@@ -953,6 +953,49 @@ def render_condition_chat(
 
 
 # ═══════════════════════════════════════════════════════════════
+# WORKFLOW A* — TASK CONCLUSION
+# ═══════════════════════════════════════════════════════════════
+
+def render_task_conclusion(
+    condition_number: int,
+    total_conditions: int,
+    task_title: str,
+    task_prompt: str,
+) -> Optional[dict]:
+    """
+    Post-chat conclusion screen: user writes their findings/results.
+
+    Returns dict on submit, None otherwise.
+    """
+    st.header(f"Conversation {condition_number} of {total_conditions} — Your Findings")
+    st.caption("Before moving on, please summarise what you learned from this conversation.")
+
+    st.markdown(
+        f"<div style='text-align:center; font-size:1.1em; padding:30px 20px; "
+        f"background:#1a1d24; border-radius:12px; margin:20px 0;'>"
+        f"<strong>{task_title}</strong><br><br>"
+        f"{task_prompt}"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+    conclusion = st.text_area(
+        "What did you find? What conclusions or decisions did you reach?",
+        height=250,
+        placeholder="Describe what information you found, what you decided, or what you learned...",
+        key=f"task_conclusion_{condition_number}",
+    )
+
+    if st.button("Submit findings", type="primary"):
+        if not conclusion.strip():
+            st.warning("Please write something before submitting.")
+            return None
+        return {"conclusion": conclusion.strip(), "task_title": task_title}
+
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
 # WORKFLOW A* — POST-CONDITION SURVEY
 # ═══════════════════════════════════════════════════════════════
 
