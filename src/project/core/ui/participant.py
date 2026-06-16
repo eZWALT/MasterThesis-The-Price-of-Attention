@@ -587,7 +587,6 @@ def run_participant_mode(params):
                 ctrl.condition_number,
                 ctrl.n_conditions,
                 cfg["condition"],
-                task.participant_prompt,
             ):
                 log.info(
                     "Condition {}/{} starting | pid={} | condition={} | task={} | ad_mode={}",

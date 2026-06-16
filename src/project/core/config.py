@@ -244,11 +244,11 @@ CONDITIONS: list[str] = [
 ]
 
 CONDITION_LABELS: dict[str, str] = {
-    "no_ads":       "No Ads",
-    "inline_early": "Inline Ad (Early)",
-    "inline_late":  "Inline Ad (Late)",
-    "block_early":  "Block Ad (Early)",
-    "block_late":   "Block Ad (Late)",
+    "no_ads":       "NO",
+    "inline_early": "IN-EA",
+    "inline_late":  "IN-LA",
+    "block_early":  "BL-EA",
+    "block_late":   "BL-LA",
 }
 
 # Each condition → (injector_key, timing_window)
