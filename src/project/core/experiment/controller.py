@@ -9,6 +9,9 @@ Implements the 5-condition within-subject protocol:
   → llm_evaluation → godspeed → ocean (BFI-10) → demographics
   → deception_disclosure → done
 
+Tasks are counterbalanced with Latin-square rotation (by cb_group or pid hash).
+Conditions are shuffled independently, then zipped with tasks.
+
 Paper reference: Sections 6.3 — Experiment Controller, Workflow A*.
 """
 
@@ -129,9 +132,11 @@ class ExperimentController:
 
         Strategy:
           1. Pick 5 tasks (first 5 from catalog, or supplied list).
-          2. Shuffle conditions + tasks together if seed is set.
-          3. Apply Latin-square rotation to conditions by cb_group / pid hash.
-          4. Sample exactly 1 ad turn per condition window.
+          2. Latin-square rotate tasks by cb_group / pid hash so each
+             participant sees tasks in a different sequential order.
+          3. Shuffle conditions independently (using seed when set).
+          4. Zip the two shuffled lists together.
+          5. Sample exactly 1 ad turn per condition window.
         """
         conditions = list(CONDITIONS)
         tasks = (tasks or TASK_CATALOG[:5])[:5]
@@ -139,22 +144,17 @@ class ExperimentController:
         while len(tasks) < 5:
             tasks.append(TASK_CATALOG[len(tasks) % len(TASK_CATALOG)])
 
-        # Zip and optionally shuffle
-        paired = list(zip(conditions, tasks))
+        # Latin-square rotation of tasks (removes order bias)
+        n = len(tasks)
+        row = (self.cb_group % n) if self.cb_group is not None else (hash(self.participant_id) % n)
+        tasks = tasks[row:] + tasks[:row]
+
+        # Shuffle conditions independently
         if self.seed is not None:
             rng = random.Random(self.seed)
-            rng.shuffle(paired)
-            conditions, tasks = zip(*paired) if paired else (conditions, tasks)
-            conditions = list(conditions)
-            tasks = list(tasks)
-
-        # Latin-square rotation of conditions
-        n = len(conditions)
-        if self.cb_group is not None:
-            row = self.cb_group % n
+            rng.shuffle(conditions)
         else:
-            row = hash(self.participant_id) % n
-        conditions = conditions[row:] + conditions[:row]
+            random.shuffle(conditions)
 
         # Build plan with per-condition ad_turn assignment
         self.condition_plan = []
