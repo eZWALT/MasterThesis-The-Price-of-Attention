@@ -25,10 +25,9 @@ from core.config import (
     SCREEN_DEMOGRAPHICS,
     SCREEN_INSTRUCTIONS,
     SCREEN_WARMUP_CHAT,
-    SCREEN_FIRST_IMPRESSION,
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
-    SCREEN_TASK_CONCLUSION,
+    SCREEN_CONDITION_CONCLUSION,
     SCREEN_POST_CONDITION_SURVEY,
     SCREEN_GLOBAL_EVALUATION,
     SCREEN_ADS_AWARENESS,
@@ -65,10 +64,9 @@ from core.ui.screens import (
     render_ocean,
     render_instructions,
     render_warmup_chat,
-    render_first_impression,
     render_condition_intro,
     render_condition_chat,
-    render_task_conclusion,
+    render_condition_conclusion,
     render_post_condition_survey,
     render_global_evaluation,
     render_ads_awareness,
@@ -345,7 +343,6 @@ def export_session_data(ctrl: ExperimentController):
             "participant_id": ctrl.participant_id,
             "calibration": ctrl.calibration,
             "demographics": ctrl.demographics,
-            "first_impression": ctrl.first_impression,
             "ocean_raw": ctrl.ocean_raw,
             "ocean_scores": ctrl.ocean_scores,
             "condition_summaries": [_condition_summary_for_log(cr) for cr in ctrl.condition_results],
@@ -366,8 +363,6 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
     scr = ctrl.current_screen
     if scr == SCREEN_DEMOGRAPHICS and not ctrl.demographics:
         ctrl.demographics = {"age": 0, "gender": "skip", "education": "skip"}
-    elif scr == SCREEN_FIRST_IMPRESSION and not ctrl.first_impression:
-        ctrl.first_impression = {"first_impression_text": "skip", "reuse_intent": "Maybe", "sentiment_label": "Neutral"}
     elif scr == SCREEN_OCEAN and not ctrl.ocean_raw:
         items = get_ocean_items(bfi_version)
         ctrl.ocean_raw = [4] * len(items)
@@ -585,17 +580,6 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_FIRST_IMPRESSION:
-        result = render_first_impression()
-        if result is not None:
-            ctrl.first_impression = result
-            st.session_state.logger.log(
-                "first_impression_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
     elif scr == SCREEN_CONDITION_INTRO:
         cfg = ctrl.current_condition_config
         if cfg:
@@ -610,6 +594,24 @@ def run_participant_mode(params):
                     "Condition {}/{} starting | pid={} | condition={} | task={} | ad_mode={}",
                     ctrl.condition_number, ctrl.n_conditions,
                     ctrl.participant_id, cfg["condition"], task.id, cfg["ad_mode"],
+                )
+                from core.retrieval import count_items_by_categories
+                pool_size = count_items_by_categories(task.relevant_categories)
+                st.session_state.logger.log(
+                    "condition_started",
+                    {
+                        "condition": cfg["condition"],
+                        "ad_mode": cfg["ad_mode"],
+                        "task_id": task.id,
+                        "task_title": task.title,
+                        "task_genre": task.genre,
+                        "relevant_categories": task.relevant_categories,
+                        "pool_size": pool_size,
+                        "pool_categories": task.relevant_categories,
+                    },
+                    ad_mode=cfg["ad_mode"],
+                    conversation_id=ctrl.participant_id,
+                    source="system",
                 )
                 st.session_state.condition_manager = None
                 ctrl.advance()
@@ -651,9 +653,15 @@ def run_participant_mode(params):
                     "messages": list(mgr.messages),
                 }
                 ctrl.condition_results.append(condition_record)
+                from core.retrieval import count_items_by_categories
+                pool_size = count_items_by_categories(task.relevant_categories)
                 st.session_state.logger.log(
                     "condition_complete",
-                    _condition_summary_for_log(condition_record),
+                    {
+                        **_condition_summary_for_log(condition_record),
+                        "relevant_categories": task.relevant_categories,
+                        "pool_size": pool_size,
+                    },
                     ad_mode=cfg["ad_mode"],
                     conversation_id=mgr.conversation_id,
                     source="system",
@@ -670,6 +678,8 @@ def run_participant_mode(params):
                         "task_id": task.id,
                         "total_turns": mgr.turn_count,
                         "ad_turn": cfg["ad_turn"],
+                        "relevant_categories": task.relevant_categories,
+                        "pool_size": pool_size,
                     },
                     ad_mode=cfg["ad_mode"],
                     conversation_id=mgr.conversation_id,
@@ -685,21 +695,26 @@ def run_participant_mode(params):
                 ctrl.advance()
                 st.rerun()
 
-    elif scr == SCREEN_TASK_CONCLUSION:
+    elif scr == SCREEN_CONDITION_CONCLUSION:
+        cfg = ctrl.current_condition_config
         task = cfg["task"]
-        result = render_task_conclusion(
+        result = render_condition_conclusion(
             condition_number=ctrl.condition_number,
             total_conditions=ctrl.n_conditions,
             task_title=task.title,
             task_prompt=task.participant_prompt,
         )
         if result is not None:
+            from core.retrieval import count_items_by_categories
+            pool_size = count_items_by_categories(task.relevant_categories)
             st.session_state.logger.log(
-                "task_conclusion_submitted",
+                "condition_conclusion_submitted",
                 {
                     "task_id": task.id,
                     "task_title": task.title,
                     "conclusion": result["conclusion"],
+                    "relevant_categories": task.relevant_categories,
+                    "pool_size": pool_size,
                 },
                 ad_mode=cfg["ad_mode"],
                 conversation_id=ctrl.participant_id,

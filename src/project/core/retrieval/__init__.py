@@ -97,4 +97,32 @@ def reset_pipeline_singleton() -> None:
     _pipeline = None
 
 
-__all__ = ["retrieve_ad", "reset_pipeline_singleton"]
+def get_pipeline_catalog():
+    """Return the AdCatalog instance used by the current pipeline, or None."""
+    global _pipeline
+    if _pipeline is None:
+        return None
+    catalog = getattr(_pipeline, "_catalog", None)
+    if catalog is not None:
+        return catalog
+    for stage in getattr(_pipeline, "_stages", []) or []:
+        cat = getattr(stage, "_catalog", None)
+        if cat is not None:
+            return cat
+    return None
+
+
+def count_items_by_categories(categories: list[str]) -> int:
+    """Count catalog items whose metadata.filename matches any of the given categories."""
+    catalog = get_pipeline_catalog()
+    if catalog is None:
+        return 0
+    cat_set = set(categories)
+    count = 0
+    for item in catalog._items.values():
+        if item.metadata.get("filename", "") in cat_set:
+            count += 1
+    return count
+
+
+__all__ = ["retrieve_ad", "reset_pipeline_singleton", "count_items_by_categories", "get_pipeline_catalog"]

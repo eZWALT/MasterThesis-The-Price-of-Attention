@@ -956,7 +956,7 @@ def render_condition_chat(
 # WORKFLOW A* — TASK CONCLUSION
 # ═══════════════════════════════════════════════════════════════
 
-def render_task_conclusion(
+def render_condition_conclusion(
     condition_number: int,
     total_conditions: int,
     task_title: str,
@@ -983,7 +983,7 @@ def render_task_conclusion(
         "What did you find? What conclusions or decisions did you reach?",
         height=250,
         placeholder="Describe what information you found, what you decided, or what you learned...",
-        key=f"task_conclusion_{condition_number}",
+        key=f"condition_conclusion_{condition_number}",
     )
 
     if st.button("Submit findings", type="primary"):
