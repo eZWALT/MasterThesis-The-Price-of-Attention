@@ -41,13 +41,13 @@ TASK_CATALOG: list[TaskDefinition] = [
         title="Choose a gardening birthday gift",
         genre="Social",
         participant_prompt=(
-            "Your friend loves gardening and their birthday is coming up. "
-            "You know very little about plants or gardening. You want to choose "
-            "a useful and thoughtful gardening-related gift, but you are unsure "
-            "what would be appropriate."
-            "\n\n"
-            "Find information that would help you understand basic gardening "
-            "needs and select a suitable gift for your friend."
+            "Your close friend is an enthusiastic gardener and their birthday is coming up. "
+            "You know they spend a lot of time caring for plants, but you personally have "
+            "very little knowledge of gardening.\n\n"
+            "You want to choose a thoughtful and genuinely useful gardening-related gift, "
+            "but you are unsure what would be appropriate or not too basic for someone experienced.\n\n"
+            "Find information that would help you understand what gardeners typically use "
+            "and select a single suitable gift atleast."
         ),
         system_prompt_extension=(
             "The user is choosing a gardening gift for an expert friend while "
@@ -64,75 +64,70 @@ TASK_CATALOG: list[TaskDefinition] = [
         title="Choose the best laptop within a budget",
         genre="Transactional",
         participant_prompt=(
-            "You need a new laptop for software development and your "
+            "You need a new laptop for your work or studies, and your "
             "budget is capped at €1,200. You are unsure which "
-            "specifications matter most for writing, compiling, and "
-            "running code, and you want to avoid overspending on features "
-            "you will not use. Find information that would help you "
-            "compare laptop options, understand which specs to prioritise "
-            "for development work, and choose the best fit within your "
-            "budget."
+            "specifications matter most for tasks like writing, 3d-editing, "
+            "running software, or other typical workload-related activities, "
+            "and you want to avoid overspending on features you will not use.\n\n"
+            "Find information that would help you compare laptop options, "
+            "understand which specs to prioritise for your needs, and choose "
+            "a good fit within your budget."
         ),
         system_prompt_extension=(
-            "The user needs a laptop under €1,200 for software "
-            "development. Help them compare options and recommend the best "
-            "fit while respecting the budget constraint. Explain which "
-            "specifications matter most for development — CPU, RAM, "
-            "storage type, display — and which are less critical. Compare "
-            "concrete models at different price points and highlight "
-            "trade-offs. Ask about their tech stack, whether they need "
-            "GPU acceleration, portability needs, and which specs they "
-            "are unsure about."
+            "The user needs a laptop under €1,200 for work or study-related use, "
+            "with possible variation in workload depending on their context.\n\n"
+            "Help them compare options and recommend the best fit while respecting "
+            "the budget constraint. Explain which specifications matter most "
+            "(e.g., CPU, RAM, storage, GPU when relevant) and which are less critical.\n\n"
+            "Compare concrete models at different price points and highlight trade-offs. "
+            "If useful, ask about their intended use to better tailor recommendations, "
+            "but keep the focus on helping them reach a single suitable choice."
         ),
-        description="Transactional task — comparing laptops under €1,200 for software development, learning which specs matter most.",
+        description="Transactional task — comparing laptops under €1,200 and learning which specs matter for the user's needs.",
     ),
 
     # 3 ──────────────────────────────────────────────────────
     TaskDefinition(
         id="swt_study_environment",
-        title="Create a better study environment",
+        title="Improve your study environment",
         genre="Transactional",
         participant_prompt=(
-            "You are beginning an intensive course that will require "
-            "several months of focused study from home. Your current setup "
-            "is distracting and uncomfortable, and you need to make it "
-            "easier to concentrate without overcomplicating the space. "
-            "Find information that would help you decide what changes to "
-            "your study environment would be most useful."
+            "You are beginning an intensive multi-month online course that will require "
+            "many hours of focused self-study from home.\n\n"
+            "Your current study setup is distracting and uncomfortable, making it hard to concentrate "
+            "for long periods without feeling tired or burned out.\n\n"
+            "Find information that would help you decide what changes to your study environment "
+            "would improve your ability to focus, stay comfortable, and study effectively over time.\n\n"
+            "Focus on tangible home office setup elements such as furniture, equipment, and room setup."
         ),
         system_prompt_extension=(
-            "The user needs to improve their home study environment for "
-            "an intensive multi-month course. Help them identify practical "
-            "changes — desk, chair, lighting, noise management, "
-            "organisation — that reduce distraction without overcomplicating "
-            "the space. Ask about their current setup, main distractions, "
-            "budget, and study schedule."
+            "The user is improving a home study environment for long-term remote studying.\n\n"
+            "Help them identify concrete, physical improvements (e.g., desk, chair, lighting, monitor setup, "
+            "noise reduction tools, organization solutions). Avoid lifestyle or habit advice.\n\n"
+            "Keep the output grounded in actionable, physical changes they could implement or buy. "
+            "Guide toward a small set of concrete setup improvements that improve comfort and focus."
         ),
-        description="Transactional task — improving a home study environment for focused work.",
+        description="Transactional task — improving a physical home office setup for long-term study.",
     ),
-
     # 4 ──────────────────────────────────────────────────────
     TaskDefinition(
         id="swt_fitness_restart",
-        title="Prepare for a fitness restart",
+        title="Restart your fitness routine",
         genre="Social",
         participant_prompt=(
-            "You want to become more active again after a long break. You "
-            "have limited time, some uncertainty about motivation, and no "
-            "clear idea whether home workouts, classes, running, or "
-            "another activity would suit you best. Find information that "
-            "would help you identify realistic fitness options that match "
-            "your schedule, preferences, and constraints."
+            "You want to become more active again after a long break, but your schedule is irregular "
+            "and your motivation has been inconsistent in the past.\n\n"
+            "You are unsure whether home workouts, gyms, running, or structured classes would be realistic "
+            "for you long-term.\n\n"
+            "Find information that would help you choose a sustainable fitness approach that fits your lifestyle "
+            "and constraints and which sport you would like to initiate."
         ),
         system_prompt_extension=(
-            "The user wants to restart fitness after a long break. Help "
-            "them compare realistic options — home workouts, classes, "
-            "running, apps, personal training — that fit their schedule, "
-            "motivation level, and preferences. Ask about their past "
-            "experience with exercise, current fitness level, available "
-            "time, and what has or hasn't worked before."
+            "The user is restarting fitness after a break. Help them compare realistic options "
+            "(home workouts, gym, running, classes, apps) based on schedule, motivation, and preferences. "
+            "Guide them toward a single sustainable option."
         ),
-        description="Social task — finding realistic fitness options after a long break.",
+        description="Social task — selecting a sustainable fitness approach.",
     ),
 
     # 5 ──────────────────────────────────────────────────────
@@ -141,25 +136,18 @@ TASK_CATALOG: list[TaskDefinition] = [
         title="Choose a pet and prepare its basic setup",
         genre="Informational",
         participant_prompt=(
-            "A relative has offered you a pet as a gift, but you must decide "
-            "which type to take responsibility for. You have limited time, "
-            "budget, and space, and the decision will affect your daily "
-            "routine for years. Different pets (dogs, cats, rabbits, birds, "
-            "fish, reptiles) require very different levels of care and "
-            "commitment. Find information that would help you compare pet "
-            "options and decide which one best fits your lifestyle, then "
-            "identify the basic items needed to properly care for it."
+            "A relative has offered you a pet as a gift, but you must decide which type to take responsibility for long-term.\n\n"
+            "You have limited time, budget, and space, and this decision will affect your daily routine for years.\n\n"
+            "Different pets (dogs, cats, rabbits, birds, fish, reptiles) vary significantly in care requirements, cost, and commitment.\n\n"
+            "Find information that would help you compare options and select one pet that best fits your lifestyle, "
+            "then identify the basic items needed to care for it."
         ),
         system_prompt_extension=(
-            "The user must choose a pet they will be responsible for long-term. "
-            "Help them compare pet types (dogs, cats, rabbits, birds, fish, "
-            "reptiles) on time commitment, cost, space, maintenance, and "
-            "emotional needs. Ensure they converge toward a single choice; "
-            "once a preference forms, help refine it. After a choice emerges, "
-            "help identify essential starter items (food, habitat, accessories, "
-            "maintenance tools) without framing it as shopping."
+            "The user must choose one pet to take long-term responsibility for. "
+            "Help them compare pet types (dogs, cats, rabbits, birds, fish, reptiles) based on time, cost, space, and care needs. "
+            "Ensure they converge to a single final pet choice. After selection, help identify essential care/setup items."
         ),
-        description="Decision task — choose a pet under constraints and identify basic care requirements.",
+        description="Decision task — choose a pet and identify basic care requirements.",
     ),
 
     # ── Remaining tasks (order not critical) ────────────────
