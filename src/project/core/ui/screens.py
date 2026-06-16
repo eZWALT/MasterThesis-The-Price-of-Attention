@@ -670,7 +670,7 @@ def render_post_trial_survey(trial_number: int) -> Optional[dict]:
     Likert survey after each trial.
     Returns dict of {item_id: score} on submit, None otherwise.
     """
-    st.header(f"Post-Conversation Survey (Trial {trial_number})")
+    st.header(f"Post-Task Questionnaire (Trial {trial_number})")
     st.caption("Please rate the following statements about the conversation you just had.")
 
     responses: dict[str, int] = {}
@@ -995,7 +995,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
     """
     12-item Likert survey after each condition (4 constructs × 3 items each).
     """
-    st.header(f"Post-Conversation Survey")
+    st.header("Post-Task Questionnaire")
     st.caption("Please rate the following statements about the conversation you just had (1 = Strongly disagree, 7 = Strongly agree).")
 
     responses: dict[str, int] = {}
