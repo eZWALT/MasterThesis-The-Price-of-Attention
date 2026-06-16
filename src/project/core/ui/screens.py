@@ -863,19 +863,8 @@ def render_condition_intro(
     condition_number: int,
     total_conditions: int,
     condition_id: str,
-    task_prompt: str,
 ) -> bool:
-    """Show which condition + task is next."""
-    label = CONDITION_LABELS.get(condition_id, condition_id)
     st.header(f"Conversation {condition_number} of {total_conditions}")
-    st.caption(f"Condition: {label}")
-    st.markdown(
-        f"<div style='text-align:center; font-size:1.2em; padding:40px 20px; "
-        f"background:#1a1d24; border-radius:12px; margin:20px 0;'>"
-        f"{task_prompt}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
     if st.button("Start conversation", type="primary"):
         return True
     return False
@@ -908,7 +897,7 @@ def render_condition_chat(
     label = CONDITION_LABELS.get(condition_id, condition_id)
 
     if manager.task:
-        st.caption(f"📝 {manager.task.participant_prompt}")
+        st.info(manager.task.participant_prompt)
 
     with st.sidebar:
         progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
