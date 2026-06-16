@@ -31,6 +31,7 @@ from core.config import (
     MAX_TURNS_PER_TRIAL,
     AD_SIDE_PANEL_MODES,
 )
+from core.experiment.tasks import TaskDefinition
 from core.experiment.surveys import (
     OCEAN_ITEMS,
     OCEAN_SCALE_MIN,
@@ -863,8 +864,10 @@ def render_condition_intro(
     condition_number: int,
     total_conditions: int,
     condition_id: str,
+    task: TaskDefinition,
 ) -> bool:
     st.header(f"Conversation {condition_number} of {total_conditions}")
+    st.info(task.participant_prompt)
     if st.button("Start conversation", type="primary"):
         return True
     return False
