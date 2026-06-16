@@ -24,6 +24,7 @@ class TaskDefinition:
     system_prompt_extension: str        # Appended to BASE_SYSTEM_PROMPT
     description: str = ""               # Internal researcher note
     gold_items: List[str] = field(default_factory=list)  # ground-truth answers for benchmark metrics
+    relevant_categories: List[str] = field(default_factory=list)  # Amazon meta-categories for retrieval filtering
 
 
 # ── Task catalog ──────────────────────────────────────────────
@@ -56,6 +57,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "single gift recommendation. Ask clarifying questions if needed."
         ),
         description="Social task — selecting a gardening-related gift for a knowledgeable friend.",
+        relevant_categories=["meta_Patio_Lawn_and_Garden", "meta_Home_and_Kitchen", "meta_Arts_Crafts_and_Sewing", "meta_Gift_Cards"],
     ),
 
     # 2 ──────────────────────────────────────────────────────
@@ -84,6 +86,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "but keep the focus on helping them reach a single suitable choice."
         ),
         description="Transactional task — comparing laptops under €1,200 and learning which specs matter for the user's needs.",
+        relevant_categories=["meta_Electronics", "meta_Cell_Phones_and_Accessories", "meta_Office_Products", "meta_Software"],
     ),
 
     # 3 ──────────────────────────────────────────────────────
@@ -108,6 +111,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "Guide toward a small set of concrete setup improvements that improve comfort and focus."
         ),
         description="Transactional task — improving a physical home office setup for long-term study.",
+        relevant_categories=["meta_Office_Products", "meta_Home_and_Kitchen", "meta_Electronics", "meta_Tools_and_Home_Improvement"],
     ),
     # 4 ──────────────────────────────────────────────────────
     TaskDefinition(
@@ -128,6 +132,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "Guide them toward a single sustainable option."
         ),
         description="Social task — selecting a sustainable fitness approach.",
+        relevant_categories=["meta_Sports_and_Outdoors", "meta_Health_and_Household", "meta_Clothing_Shoes_and_Jewelry"],
     ),
 
     # 5 ──────────────────────────────────────────────────────
@@ -148,6 +153,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "Ensure they converge to a single final pet choice. After selection, help identify essential care/setup items."
         ),
         description="Decision task — choose a pet and identify basic care requirements.",
+        relevant_categories=["meta_Pet_Supplies"],
     ),
 
     # ── Remaining tasks (order not critical) ────────────────
@@ -173,6 +179,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "interests, and what they want to get out of the hobby."
         ),
         description="Social task — finding a hobby that matches personality, time, and budget constraints.",
+        relevant_categories=["meta_Sports_and_Outdoors", "meta_Arts_Crafts_and_Sewing", "meta_Musical_Instruments", "meta_Books", "meta_Toys_and_Games"],
     ),
     TaskDefinition(
         id="swt_photography_event",
@@ -194,6 +201,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "conditions, type of event, and what kind of shots they need."
         ),
         description="Informational task — preparing a photography kit for a community event.",
+        relevant_categories=["meta_Electronics", "meta_Arts_Crafts_and_Sewing", "meta_Clothing_Shoes_and_Jewelry"],
     ),
     TaskDefinition(
         id="swt_anniversary_surprise",
@@ -219,6 +227,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "felt special in the past."
         ),
         description="Social task — planning a meaningful anniversary surprise that reflects the relationship.",
+        relevant_categories=["meta_Clothing_Shoes_and_Jewelry", "meta_Gift_Cards", "meta_Home_and_Kitchen", "meta_Beauty_and_Personal_Care"],
     ),
     TaskDefinition(
         id="swt_plasticfree_living",
@@ -248,6 +257,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "to change."
         ),
         description="Informational task — discovering hidden sources of plastic in daily life and finding realistic alternatives to reduce microplastic exposure.",
+        relevant_categories=["meta_Health_and_Household", "meta_Health_and_Personal_Care", "meta_Grocery_and_Gourmet_Food", "meta_Beauty_and_Personal_Care", "meta_Home_and_Kitchen"],
     ),
     TaskDefinition(
         id="swt_dev_role_setup",
@@ -269,6 +279,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "specific tech stack, meeting frequency, and travel needs."
         ),
         description="Informational task — researching a home dev workstation within a budget.",
+        relevant_categories=["meta_Electronics", "meta_Office_Products", "meta_Software", "meta_Tools_and_Home_Improvement"],
     ),
     TaskDefinition(
         id="swt_remote_collab",
@@ -289,6 +300,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "noise level, and meeting patterns."
         ),
         description="Informational task — finding the right communication gear for remote work.",
+        relevant_categories=["meta_Electronics", "meta_Office_Products", "meta_Tools_and_Home_Improvement"],
     ),
     TaskDefinition(
         id="swt_pricing_strategy",
@@ -310,6 +322,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "landscape."
         ),
         description="Informational task — researching pricing strategies for a small online business.",
+        relevant_categories=["meta_Office_Products", "meta_Software", "meta_Books"],
     ),
     TaskDefinition(
         id="swt_choose_destination",
@@ -330,6 +343,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "and travel duration preferences."
         ),
         description="Transactional task — choosing a travel destination that fits personal constraints.",
+        relevant_categories=["meta_Books", "meta_Sports_and_Outdoors", "meta_Clothing_Shoes_and_Jewelry"],
     ),
     TaskDefinition(
         id="swt_dinner_party",
@@ -352,6 +366,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "evening they want to create."
         ),
         description="Transactional task — planning a dinner party for guests with diverse preferences.",
+        relevant_categories=["meta_Home_and_Kitchen", "meta_Grocery_and_Gourmet_Food", "meta_Arts_Crafts_and_Sewing"],
     ),
     TaskDefinition(
         id="swt_friend_new_job",
@@ -374,6 +389,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "preparation they are in."
         ),
         description="Social task — finding useful support or gifts for a friend starting a new job.",
+        relevant_categories=["meta_Office_Products", "meta_Clothing_Shoes_and_Jewelry", "meta_Electronics", "meta_Books"],
     ),
     TaskDefinition(
         id="swt_friend_moving_abroad",
@@ -396,6 +412,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "they are."
         ),
         description="Social task — finding practical and emotional support ideas for a friend moving abroad.",
+        relevant_categories=["meta_Books", "meta_Home_and_Kitchen", "meta_Electronics", "meta_Clothing_Shoes_and_Jewelry"],
     ),
     TaskDefinition(
         id="swt_creative_weekend",
@@ -418,6 +435,7 @@ TASK_CATALOG: list[TaskDefinition] = [
             "materials, space constraints, and past creative experience."
         ),
         description="Social task — comparing creative weekend project ideas that are realistic and rewarding.",
+        relevant_categories=["meta_Arts_Crafts_and_Sewing", "meta_Books", "meta_Musical_Instruments", "meta_Toys_and_Games", "meta_Home_and_Kitchen"],
     ),
 ]
 

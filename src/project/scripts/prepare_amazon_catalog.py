@@ -124,6 +124,9 @@ def _to_catalog_item(row: dict) -> dict:
     from core.ad_injection.models import catalog_image_url
 
     metadata = {}
+    filename = str(row.get("filename") or "").strip()
+    if filename:
+        metadata["filename"] = filename
     for k in [
         "store",
         "average_rating",

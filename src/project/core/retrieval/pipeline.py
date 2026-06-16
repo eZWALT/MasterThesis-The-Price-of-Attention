@@ -115,17 +115,26 @@ class AdRetrievalPipeline:
             self._stages = build_default_stages(catalog, embedding_model)
         self.last_state: Optional[PipelineState] = None
 
-    def run(self, query: str, context: List[Dict[str, str]]) -> AdRetrievalResult | None:
+    def run(
+        self,
+        query: str,
+        context: List[Dict[str, str]],
+        categories: Optional[List[str]] = None,
+    ) -> AdRetrievalResult | None:
         """
         Execute all stages in order and return ranked ads.
 
         Returns None if the pipeline produces no candidates
         (caller should fall back to mock ad).
+
+        Parameters
+        ----------
+        categories : optional list of allowed meta-category strings for filtering.
         """
         from core.log import logger
         from core.retrieval.query_text import build_retrieval_query
 
-        state = PipelineState(query=query, context=context)
+        state = PipelineState(query=query, context=context, categories=categories or [])
         effective_query = build_retrieval_query(query, context)
         if effective_query != query:
             logger.debug(

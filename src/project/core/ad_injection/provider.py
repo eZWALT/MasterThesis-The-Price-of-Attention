@@ -19,7 +19,7 @@ Or change AD_BACKEND in core/config.py for dev convenience.
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from core.config import (
     AD_BACKEND,
@@ -40,18 +40,18 @@ def get_ad(
     query: str = "",
     context: List[Dict] | None = None,
     backend: str | None = None,
+    categories: Optional[List[str]] = None,
 ) -> AdRetrievalResult:
     """
     Return ranked ads to inject at the current conversation turn.
 
     Parameters
     ----------
-    query   : the user's latest message (used by the RAG backend).
-    context : full conversation history (used by the RAG backend).
-    backend : optional per-call override — "mock" | "rag".
-              Defaults to the module-level AD_BACKEND setting.
-              Use backend="mock" in dev mode (?rag=0) to bypass
-              the retrieval pipeline without changing env vars.
+    query      : the user's latest message (used by the RAG backend).
+    context    : full conversation history (used by the RAG backend).
+    backend    : optional per-call override — "mock" | "rag".
+                 Defaults to the module-level AD_BACKEND setting.
+    categories : optional list of allowed meta-category strings for retrieval filtering.
 
     Returns
     -------
@@ -60,7 +60,7 @@ def get_ad(
     """
     effective = backend if backend in ("mock", "rag") else AD_BACKEND
     if effective == "rag":
-        return _rag_ad(query, context or [])
+        return _rag_ad(query, context or [], categories=categories)
     return _mock_ad()
 
 
@@ -77,11 +77,15 @@ def _mock_ad() -> AdRetrievalResult:
     return AdRetrievalResult(ads=[ad])
 
 
-def _rag_ad(query: str, context: List[Dict]) -> AdRetrievalResult:
+def _rag_ad(
+    query: str,
+    context: List[Dict],
+    categories: Optional[List[str]] = None,
+) -> AdRetrievalResult:
     """Full 5-stage retrieval pipeline (lazy import to keep startup fast)."""
     from core.retrieval import retrieve_ad
 
-    result = retrieve_ad(query, context)
+    result = retrieve_ad(query, context, categories=categories)
     if result is None or not result.has_ads:
         return _mock_ad()
     return result
