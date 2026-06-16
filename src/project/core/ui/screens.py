@@ -903,9 +903,10 @@ def render_condition_chat(
         st.info(manager.task.participant_prompt)
 
     with st.sidebar:
-        progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
-        st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
-        st.caption(f"Condition: {label}")
+        if calibration or flow_test:
+            progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
+            st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
+            st.caption(f"Condition: {label}")
 
         if calibration and manager.turn_count >= manager.finish_from:
             if manager.turn_count < manager.min_turns:
@@ -928,7 +929,8 @@ def render_condition_chat(
         _render_turn_ads(manager, ad_mode)
 
     if manager.must_end:
-        st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
+        if calibration or flow_test:
+            st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
         return True
 
     if user_input := st.chat_input("Send a message..."):

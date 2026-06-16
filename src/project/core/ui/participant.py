@@ -503,10 +503,11 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
         st.caption(f"📍 {labels.get(ctrl.current_screen, ctrl.current_screen)}")
 
         _condition_screens = {SCREEN_CONDITION_INTRO, SCREEN_CONDITION_CHAT, SCREEN_POST_CONDITION_SURVEY}
-        cfg = ctrl.current_condition_config
-        if cfg and ctrl.current_screen in _condition_screens:
-            cond_label = CONDITION_LABELS.get(cfg["condition"], cfg["condition"])
-            st.caption(f"Condition: {cond_label}")
+        if flow_test:
+            cfg = ctrl.current_condition_config
+            if cfg and ctrl.current_screen in _condition_screens:
+                cond_label = CONDITION_LABELS.get(cfg["condition"], cfg["condition"])
+                st.caption(f"Condition: {cond_label}")
 
         # Early-exit button during conditions
         if ctrl.can_exit_early and ctrl.current_screen in _condition_screens:
