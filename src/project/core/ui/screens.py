@@ -16,6 +16,7 @@ import time
 import streamlit as st
 from typing import Optional
 
+from core.ui.components import render_countdown
 from core.config import (
     DEFAULT_MAX_TOKENS,
     CONSENT_TITLE,
@@ -779,7 +780,10 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
     """
     Warm-up conversation — no ads, no Likert after.
     Returns True when user clicks 'Done'.
+    Shows a 90-second countdown timer in the sidebar.
     """
+    render_countdown(seconds=90, label="Warm-up", key="warmup")
+
     st.header("Warm-Up Conversation")
     st.info(
         "This is a practice conversation to get familiar with the interface. "
