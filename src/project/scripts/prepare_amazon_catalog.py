@@ -232,8 +232,10 @@ def process(
 # ──────────────────────────────────────────────────────────────────────────────
 
 def build_faiss_index(catalog_path: str, index_path: str) -> None:
+    import json
+    import faiss
+    import numpy as np
     from core.config import EMBEDDING_MODEL_NAME, EMBEDDING_DEVICE
-    from core.retrieval.catalog import AdCatalog
     from core.retrieval.embeddings import build_embedding_model
 
     logger.info("Building FAISS index (batch_size=16, dtype=bfloat16)")
@@ -241,16 +243,27 @@ def build_faiss_index(catalog_path: str, index_path: str) -> None:
     embed = build_embedding_model(
         model_name=EMBEDDING_MODEL_NAME,
         device=EMBEDDING_DEVICE,
-        batch_size=16,  # Use smaller batch size for lower memory usage
-        dtype="bfloat16",  # Force bfloat16 for lower VRAM
+        batch_size=16,
+        dtype="bfloat16",
     )
 
-    AdCatalog.load(
-        catalog_path=catalog_path,
-        index_path=index_path,
-        embed=embed,
-        force_rebuild=True,
-    )
+    texts: list[str] = []
+    with open(catalog_path) as f:
+        for line in f:
+            obj = json.loads(line)
+            text = obj.get("text", "").strip()
+            if text:
+                texts.append(text)
+
+    logger.info("Encoding {} items", len(texts))
+    all_embeddings = embed.encode(texts)
+
+    dim = all_embeddings.shape[1]
+    index = faiss.IndexFlatIP(dim)
+    index.add(all_embeddings)
+
+    faiss.write_index(index, str(index_path))
+    logger.info("FAISS index written -> {} ({} vectors, dim={})", index_path, index.ntotal, dim)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
