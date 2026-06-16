@@ -376,7 +376,12 @@ class ConversationManager:
         retrieval: Optional[AdRetrievalResult] = None
         if inject_ad:
             retrieval_t0 = time.perf_counter()
-            retrieval = get_ad(query=user_input, context=self.messages, backend=self._ad_backend)
+            retrieval = get_ad(
+                query=user_input,
+                context=self.messages,
+                backend=self._ad_backend,
+                categories=self.task.relevant_categories if self.task else None,
+            )
             self.last_retrieval = retrieval
             self.last_retrieval_ad_mode = self.ad_mode if retrieval and retrieval.has_ads else None
             retrieval_latency_ms = (time.perf_counter() - retrieval_t0) * 1000.0
@@ -575,7 +580,12 @@ class ConversationManager:
         retrieval: Optional[AdRetrievalResult] = None
         if inject_ad:
             retrieval_t0 = time.perf_counter()
-            retrieval = get_ad(query=user_input, context=self.messages, backend=self._ad_backend)
+            retrieval = get_ad(
+                query=user_input,
+                context=self.messages,
+                backend=self._ad_backend,
+                categories=self.task.relevant_categories if self.task else None,
+            )
             self.last_retrieval = retrieval
             self.last_retrieval_ad_mode = self.ad_mode if retrieval and retrieval.has_ads else None
             retrieval_latency_ms = (time.perf_counter() - retrieval_t0) * 1000.0

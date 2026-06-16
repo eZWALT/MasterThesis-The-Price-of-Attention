@@ -23,7 +23,11 @@ from core.log import logger
 _pipeline = None
 
 
-def retrieve_ad(query: str, context: List[Dict[str, str]]) -> Optional[AdRetrievalResult]:
+def retrieve_ad(
+    query: str,
+    context: List[Dict[str, str]],
+    categories: Optional[List[str]] = None,
+) -> Optional[AdRetrievalResult]:
     """
     Run the full 5-stage retrieval pipeline and return ranked ads.
 
@@ -32,14 +36,15 @@ def retrieve_ad(query: str, context: List[Dict[str, str]]) -> Optional[AdRetriev
 
     Parameters
     ----------
-    query   : user's latest message.
-    context : full conversation history as list of {role, content} dicts.
+    query      : user's latest message.
+    context    : full conversation history as list of {role, content} dicts.
+    categories : optional list of allowed meta-category strings (e.g. ["meta_Electronics"]).
     """
     global _pipeline
     if _pipeline is None:
         _pipeline = _build_pipeline()
 
-    result = _pipeline.run(query, context)
+    result = _pipeline.run(query, context, categories=categories)
     from core.retrieval.log_util import is_warmup_query
 
     if result is None or not result.has_ads:

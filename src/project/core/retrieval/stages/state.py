@@ -66,6 +66,7 @@ class PipelineState:
     # ── Input ─────────────────────────────────────────
     query: str
     context: List[Dict[str, str]] = field(default_factory=list)
+    categories: List[str] = field(default_factory=list)  # allowed Amazon meta-categories for filtering
 
     # ── Stage 0-pre: query preprocessing (optional) ───
     # context_summary : one-sentence compression of the conversation history.

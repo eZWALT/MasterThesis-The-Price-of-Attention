@@ -56,17 +56,23 @@ class HybridRefiner(PipelineStage):
 
     # ── private ─────────────────────────────────────────────────────────
 
-    def _apply_metadata_filters(self, items: List[CatalogItem]) -> List[CatalogItem]:
+    def _apply_metadata_filters(
+        self, items: List[CatalogItem], filters: dict | None = None
+    ) -> List[CatalogItem]:
         """Remove items that fail any active metadata filter."""
-        if not self._filters:
+        filters = filters or self._filters
+        if not filters:
             return items
         filtered = []
+        allowed_cats = filters.get("categories")
+        max_price = filters.get("max_price")
         for item in items:
-            if "category" in self._filters:
-                if item.category != self._filters["category"]:
+            if allowed_cats:
+                item_cat = item.metadata.get("filename", "")
+                if item_cat not in allowed_cats:
                     continue
-            if "max_price" in self._filters:
-                if item.price > self._filters["max_price"]:
+            if max_price is not None:
+                if item.price > max_price:
                     continue
             filtered.append(item)
         return filtered
@@ -115,7 +121,10 @@ class HybridRefiner(PipelineStage):
         if not self._enabled or not state.candidates:
             return state
 
-        state.candidates = self._apply_metadata_filters(state.candidates)
+        filters = dict(self._filters)
+        if state.categories:
+            filters["categories"] = list(state.categories)
+        state.candidates = self._apply_metadata_filters(state.candidates, filters)
         if state.candidates:
             state.candidates, state.hybrid_scores = self._bm25_rescore(state.query, state.candidates)
         return state
