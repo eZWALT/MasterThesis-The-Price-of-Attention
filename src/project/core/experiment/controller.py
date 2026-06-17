@@ -97,7 +97,7 @@ class ExperimentController:
 
         # Screen state
         self.current_screen: str = SCREEN_CONSENT
-        self._previous_screen: str | None = None
+        self._screen_history: list[str] = []
         self.current_condition_index: int = 0   # 0-based
         self._condition_sub_index: int = 0       # index within _CONDITION_SCREENS
 
@@ -187,7 +187,7 @@ class ExperimentController:
     def advance(self, _skip_save: bool = False) -> str:
         scr = self.current_screen
         if not _skip_save:
-            self._previous_screen = scr
+            self._screen_history.append(scr)
 
         # Pre-condition sequence
         if scr in _PRE_CONDITION_SCREENS:
@@ -225,10 +225,8 @@ class ExperimentController:
 
     def go_back(self) -> str:
         """Go back to the previous screen (dev-flow only)."""
-        if self._previous_screen is not None:
-            prev = self._previous_screen
-            self._previous_screen = self.current_screen
-            self.current_screen = prev
+        if self._screen_history:
+            self.current_screen = self._screen_history.pop()
         return self.current_screen
 
     # ── Condition helpers ───────────────────────
