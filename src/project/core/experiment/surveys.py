@@ -358,17 +358,23 @@ GODSPEED_REASK_LIKERT: list[dict] = [
 ]
 
 # ═══════════════════════════════════════════════════════════════
-# DEMOGRAPHICS  (post-experiment, Section 6 – optional)
+# DEMOGRAPHICS  (post-experiment, extended)
 # ═══════════════════════════════════════════════════════════════
-DEMOGRAPHICS_END_TEXT: list[dict] = [
+
+DEMOGRAPHICS_TEXT: list[dict] = [
     {"id": "demo_age",       "text": "Age"},
-    {"id": "demo_gender",    "text": "Gender"},
-    {"id": "demo_education", "text": "Highest achieved level of education"},
+    {"id": "demo_occupation","text": "Please type your occupation below or leave it blank if you prefer not to say."},
 ]
 
-DEMOGRAPHICS_END_CATEGORICAL: list[dict] = [
-    {"id": "demo_llm_frequency", "text": "How often do you use LLM-based systems?", "options": ["Daily", "Weekly", "Monthly", "Rarely"]},
-    {"id": "demo_expertise",     "text": "Level of Expertise of LLM systems",        "options": ["Low", "Normal (Regular User)", "High (Power User, uses Agents)", "AI Engineer", "LLM Researcher"]},
+DEMOGRAPHICS_SELECT: list[dict] = [
+    {"id": "demo_sex",       "text": "Sex",                    "options": ["Female", "Male", "Non-binary", "Prefer not to say"]},
+    {"id": "demo_education", "text": "Highest achieved level of education", "options": ["High School", "Bachelor's Degree", "Master's Degree", "PhD", "Other"]},
+    {"id": "demo_familiarity", "text": "Please indicate your level of familiarity with chatbots. (E.g., ChatGPT, Gemini, etc.)", "options": ["Unfamiliar", "Somewhat Unfamiliar", "Somewhat Familiar", "Familiar"]},
+    {"id": "demo_frequency", "text": "How frequently do you use chatbots?", "options": ["Fewer than 5 times ever", "1\u20135 times per month", "1\u20135 times per week", "1\u20135 times per day", "Greater than 5 times per day"]},
+]
+
+DEMOGRAPHICS_MULTISELECT: list[dict] = [
+    {"id": "demo_chatbots_used", "text": "Which chatbots have you used in the past? (Leave blank if none)", "options": ["ChatGPT", "Gemini / Bard", "Bing Chatbot", "Open Assistant", "Other"]},
 ]
 
 # ═══════════════════════════════════════════════════════════════

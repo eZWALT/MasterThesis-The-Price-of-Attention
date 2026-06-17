@@ -47,8 +47,9 @@ from core.experiment.surveys import (
     RECALL_ITEMS,
     RECALL_SCALE_MIN,
     RECALL_SCALE_MAX,
-    DEMOGRAPHICS_END_TEXT,
-    DEMOGRAPHICS_END_CATEGORICAL,
+    DEMOGRAPHICS_TEXT,
+    DEMOGRAPHICS_SELECT,
+    DEMOGRAPHICS_MULTISELECT,
     DECEPTION_DISCLOSURE_TEXT,
 )
 from core.ad_injection import get_injector
@@ -1226,19 +1227,23 @@ def render_demographics_end() -> Optional[dict]:
 
     responses: dict = {}
 
-    for item in DEMOGRAPHICS_END_TEXT:
+    for item in DEMOGRAPHICS_TEXT:
         value = st.text_input(item["text"], key=f"demo_end_{item['id']}")
         responses[item["id"]] = value
 
-    for item in DEMOGRAPHICS_END_CATEGORICAL:
+    for item in DEMOGRAPHICS_SELECT:
         value = st.radio(
             item["text"],
             item["options"],
             index=None,
-            horizontal=True,
+            horizontal=False,
             key=f"demo_end_{item['id']}",
         )
         responses[item["id"]] = value
+
+    for item in DEMOGRAPHICS_MULTISELECT:
+        selected = [opt for opt in item["options"] if st.checkbox(opt, key=f"demo_end_{item['id']}_{opt}")]
+        responses[item["id"]] = selected if selected else []
 
     st.divider()
     if st.button("Continue", type="primary"):
