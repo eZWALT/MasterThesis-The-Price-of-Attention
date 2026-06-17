@@ -1079,20 +1079,25 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             )
             responses[f"{item['id']}_text"] = elab
 
+        all_open_answered = True
         for item in POST_CONDITION_PERSONALITY_OPEN:
             value = st.text_area(
                 item["text"],
                 key=f"pcs_pers_open_{condition_number}_{item['id']}",
             )
             responses[item["id"]] = value
+            if not value.strip():
+                all_open_answered = False
 
         st.divider()
-        if all_answered and st.button("Continue", type="primary"):
+        if all_answered and all_open_answered and st.button("Continue", type="primary"):
             st.session_state[responses_key] = responses
             st.session_state[section_key] = 2
             st.rerun()
         elif not all_answered:
             st.info("Please answer all Likert questions to continue.")
+        elif not all_open_answered:
+            st.info("Please answer both open-ended questions to continue.")
         return None
 
     # ── Section 3: LLM Behaviours ──────────────────────────────
