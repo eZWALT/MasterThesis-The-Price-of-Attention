@@ -65,8 +65,9 @@ def main():
     params = parse_query_params()
     _configure_retrieval_once(params)
 
-    _warmup_llm()
-    _warmup_retrieval()
+    if not params.dry_run:
+        _warmup_llm()
+        _warmup_retrieval()
 
     st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON, layout="wide")
     init_session_state(params)

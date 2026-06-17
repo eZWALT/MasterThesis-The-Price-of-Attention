@@ -216,6 +216,7 @@ def _get_or_create_warmup_manager() -> ConversationManager:
     mgr = st.session_state.warmup_manager
     if mgr is None:
         ctrl: ExperimentController = st.session_state.controller
+        experiment_params = st.session_state.get("experiment_params")
         warmup_task = TASK_BY_ID.get(WARMUP_TASK_ID, TASK_CATALOG[0])
         mgr = ConversationManager(
             ad_mode="",
@@ -229,7 +230,7 @@ def _get_or_create_warmup_manager() -> ConversationManager:
             finish_from=1,
             ad_turns=[],
             use_rag=True,
-            dry_run=params.dry_run,
+            dry_run=getattr(experiment_params, "dry_run", False),
         )
         st.session_state.warmup_manager = mgr
     return mgr
