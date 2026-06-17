@@ -63,9 +63,9 @@ def _configure_retrieval_once(params) -> None:
 
 def main():
     params = parse_query_params()
-    _configure_retrieval_once(params)
 
     if not params.dry_run:
+        _configure_retrieval_once(params)
         _warmup_llm()
         _warmup_retrieval()
 
