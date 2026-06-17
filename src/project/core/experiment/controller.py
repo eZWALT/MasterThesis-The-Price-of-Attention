@@ -119,7 +119,7 @@ class ExperimentController:
         self.ocean_raw: List[int] = []
         self.ocean_scores: Dict[str, float] = {}
         self.condition_results: List[Dict[str, Any]] = []   # one per condition
-        self.condition_surveys: List[Dict[str, int]] = []    # post-condition Likert
+        self.condition_surveys: List[Dict[str, int | str]] = []    # post-condition Likert + text
 
     # ── Counterbalancing ─────────────────────────
 

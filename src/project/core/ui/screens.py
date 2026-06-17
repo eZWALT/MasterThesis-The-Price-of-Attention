@@ -44,7 +44,10 @@ from core.experiment.surveys import (
     POST_TRIAL_ITEMS,
     POST_CONDITION_SCALE_MIN,
     POST_CONDITION_SCALE_MAX,
-    POST_CONDITION_ITEMS,
+    POST_CONDITION_LLM_ITEMS,
+    POST_CONDITION_PERSONALITY_LIKERT,
+    POST_CONDITION_PERSONALITY_OPEN,
+    POST_CONDITION_BEHAVIOUR_ITEMS,
     GLOBAL_EVAL_SCALE_MIN,
     GLOBAL_EVAL_SCALE_MAX,
     GLOBAL_EVAL_ITEMS,
@@ -995,41 +998,122 @@ def render_condition_conclusion(
 
 def render_post_condition_survey(condition_number: int) -> Optional[dict]:
     """
-    12-item Likert survey after each condition (4 constructs × 3 items each).
+    3-section multi-step post-condition survey:
+      1. LLM Evaluation (15 items, 7-pt Likert)
+      2. Chatbot Personality (3 Likert + text, 2 open-ended)
+      3. LLM Behaviours (2 Likert, 7-pt)
+    Progress is tracked in session state per condition_number.
     """
     st.header("Post-Task Questionnaire")
-    st.caption("Please rate the following statements about the conversation you just had (1 = Strongly disagree, 7 = Strongly agree).")
 
-    responses: dict[str, int] = {}
-    all_answered = True
+    section_key = f"pcs_section_{condition_number}"
+    if section_key not in st.session_state:
+        st.session_state[section_key] = 0
 
-    for item in POST_CONDITION_ITEMS:
-        value = st.radio(
-            item["text"],
-            options=list(range(POST_CONDITION_SCALE_MIN, POST_CONDITION_SCALE_MAX + 1)),
-            format_func=lambda v: f"{v}",
-            horizontal=True,
-            index=None,
-            key=f"post_condition_{condition_number}_{item['id']}",
+    responses_key = f"pcs_responses_{condition_number}"
+    if responses_key not in st.session_state:
+        st.session_state[responses_key] = {}
+
+    section = st.session_state[section_key]
+    responses = st.session_state[responses_key]
+
+    # ── Section 1: LLM Performance Evaluation ──────────────────
+    if section == 0:
+        st.subheader("Section 1 of 3 — Chatbot Evaluation")
+        st.caption(
+            "Please answer the following questions about the chatbot. "
+            "Rate your level of agreement (1 = Strongly disagree, 7 = Strongly agree)."
         )
-        if value is None:
-            all_answered = False
-        else:
+        all_answered = True
+        for item in POST_CONDITION_LLM_ITEMS:
+            value = st.radio(
+                item["text"],
+                options=list(range(POST_CONDITION_SCALE_MIN, POST_CONDITION_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"pcs_llm_{condition_number}_{item['id']}",
+            )
+            if value is None:
+                all_answered = False
+            else:
+                responses[item["id"]] = value
+
+        if all_answered and st.button("Continue", type="primary"):
+            st.session_state[responses_key] = responses
+            st.session_state[section_key] = 1
+            st.rerun()
+        elif not all_answered:
+            st.info("Please answer all questions to continue.")
+        return None
+
+    # ── Section 2: Chatbot Personality ─────────────────────────
+    elif section == 1:
+        st.subheader("Section 2 of 3 — Chatbot Personality")
+        all_answered = True
+
+        for item in POST_CONDITION_PERSONALITY_LIKERT:
+            value = st.radio(
+                item["text"],
+                options=list(range(POST_CONDITION_SCALE_MIN, POST_CONDITION_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"pcs_pers_lik_{condition_number}_{item['id']}",
+            )
+            if value is None:
+                all_answered = False
+            else:
+                responses[item["id"]] = value
+            elab = st.text_area(
+                item["elaboration"],
+                key=f"pcs_pers_txt_{condition_number}_{item['id']}",
+            )
+            responses[f"{item['id']}_text"] = elab
+
+        for item in POST_CONDITION_PERSONALITY_OPEN:
+            value = st.text_area(
+                item["text"],
+                key=f"pcs_pers_open_{condition_number}_{item['id']}",
+            )
             responses[item["id"]] = value
 
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
-        invalid = [
-            iid for iid, v in responses.items()
-            if not (POST_CONDITION_SCALE_MIN <= v <= POST_CONDITION_SCALE_MAX)
-        ]
-        if invalid:
-            st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
-            return None
-        return responses
-    elif not all_answered:
-        st.info("Please answer all questions to continue.")
-    return None
+        if all_answered and st.button("Continue", type="primary"):
+            st.session_state[responses_key] = responses
+            st.session_state[section_key] = 2
+            st.rerun()
+        elif not all_answered:
+            st.info("Please answer all Likert questions to continue.")
+        return None
+
+    # ── Section 3: LLM Behaviours ──────────────────────────────
+    elif section == 2:
+        st.subheader("Section 3 of 3 — Chatbot Behaviours")
+        st.caption("Rate your level of agreement (1 = Strongly disagree, 7 = Strongly agree).")
+        all_answered = True
+
+        for item in POST_CONDITION_BEHAVIOUR_ITEMS:
+            value = st.radio(
+                item["text"],
+                options=list(range(POST_CONDITION_SCALE_MIN, POST_CONDITION_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"pcs_beh_{condition_number}_{item['id']}",
+            )
+            if value is None:
+                all_answered = False
+            else:
+                responses[item["id"]] = value
+
+        st.divider()
+        if all_answered and st.button("Submit", type="primary"):
+            del st.session_state[section_key]
+            del st.session_state[responses_key]
+            return responses
+        elif not all_answered:
+            st.info("Please answer all questions to continue.")
+        return None
 
 
 # ═══════════════════════════════════════════════════════════════
