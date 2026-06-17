@@ -119,13 +119,15 @@ class ConversationManager:
         ad_turns: Optional[List[int]] = None,
         force_ad: bool = False,
         use_rag: Optional[bool] = None,
+        dry_run: bool = False,
     ):
         self.ad_mode = ad_mode
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.task = task
-        self.llm = llm_client or LLMClient()
+        self.dry_run = dry_run
+        self.llm = llm_client or LLMClient(mock=dry_run)
         self.logger = logger or ExperimentLogger()
         self.attention_estimator = attention_estimator
         self.min_turns = min_turns

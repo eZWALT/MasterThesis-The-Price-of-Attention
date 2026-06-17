@@ -47,10 +47,12 @@ class LLMClient:
         api_url: str = API_URL,
         ollama_api_base: str = OLLAMA_API_BASE,
         timeout: int = LLM_TIMEOUT_SECONDS,
+        mock: bool = False,
     ):
         self.api_url = api_url
         self.ollama_api_base = ollama_api_base
         self.timeout = timeout
+        self.mock = mock
 
     def warmup(self, model: str) -> None:
         """
@@ -101,6 +103,8 @@ class LLMClient:
         ------
         RuntimeError on any network or API error.
         """
+        if self.mock:
+            return self._mock_chat()
         if LLM_BACKEND == "ollama":
             return self._chat_ollama(messages, model, temperature, max_tokens)
         return self._chat_openai(messages, model, temperature, max_tokens)
@@ -120,6 +124,9 @@ class LLMClient:
         RuntimeError on any network or API error (emitted as the first
         yielded token so the UI can display it).
         """
+        if self.mock:
+            yield from self._mock_chat_stream()
+            return
         if LLM_BACKEND == "ollama":
             yield from self._chat_ollama_stream(messages, model, temperature, max_tokens)
         else:
@@ -242,3 +249,21 @@ class LLMClient:
                             yield content
         except Exception as e:
             yield f"⚠️ {e}"
+
+    # ── mock (dry-run mode, no HTTP calls) ─────────────────────
+
+    _MOCK_RESPONSE: str = (
+        "That's a great question! Based on what you've told me, "
+        "I'd recommend looking into a few different options. "
+        "Consider factors like your budget, lifestyle, and specific needs. "
+        "Would you like me to help you compare some choices?"
+    )
+
+    def _mock_chat(self) -> str:
+        return self._MOCK_RESPONSE
+
+    def _mock_chat_stream(self) -> Generator[str, None, None]:
+        import time
+        for token in self._MOCK_RESPONSE.split():
+            yield token + " "
+            time.sleep(0.02)

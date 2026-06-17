@@ -250,6 +250,7 @@ class ExperimentParams:
     # Available only when dev=true|flow; silently ignored in production.
     force_ad: bool = False                  # ?force_ad=1 → inject ad on every turn
     use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
+    dry_run: bool = False                   # ?dry_run=1 → mock LLM + mock ads, zero cost
 
     def apply_study_defaults(self, explicitly_set: set) -> None:
         """
@@ -460,6 +461,12 @@ def parse_query_params() -> ExperimentParams:
             params.use_rag = False
         elif rag_raw == "1":
             params.use_rag = True
+
+        # ?dry_run=1  — mock everything (LLM + ads), zero cost, no GPU
+        dry_raw = p.get("dry_run", "").strip().lower()
+        if dry_raw in ("1", "true", "yes"):
+            params.dry_run = True
+            params.use_rag = False
 
     # ── Apply study-type smart defaults for unset params ──────
     params.apply_study_defaults(explicitly_set)

@@ -229,6 +229,7 @@ def _get_or_create_warmup_manager() -> ConversationManager:
             finish_from=1,
             ad_turns=[],
             use_rag=True,
+            dry_run=params.dry_run,
         )
         st.session_state.warmup_manager = mgr
     return mgr
@@ -293,6 +294,7 @@ def _get_or_create_condition_manager(
             ad_turns=ad_turns,
             force_ad=force_ad,
             use_rag=use_rag,
+            dry_run=params.dry_run,
         )
         st.session_state.condition_manager = mgr
     elif flow_test:
