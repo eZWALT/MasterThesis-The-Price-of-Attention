@@ -361,7 +361,8 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         ctrl.ocean_raw = [4] * len(items)
         ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
     elif scr == SCREEN_ADS_RECALL:
-        pass
+        st.session_state.pop("recall_step", None)
+        st.session_state.pop("recall_responses", None)
     elif scr == SCREEN_POST_CONDITION_SURVEY:
         stub = {k: 4 for k in [
             "llm_reliable", "llm_helpful", "llm_made_up", "llm_changed_mind",
@@ -376,6 +377,10 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
             "personality_brands", "personality_sponsored",
         ]})
         ctrl.condition_surveys.append(stub)
+        # Clean up sub-step state so Back starts at section 0
+        cn = ctrl.condition_number
+        st.session_state.pop(f"pcs_section_{cn}", None)
+        st.session_state.pop(f"pcs_responses_{cn}", None)
     elif scr == SCREEN_CONDITION_CHAT:
         ctrl.condition_results.append({
             "condition_id": "skip",
@@ -458,7 +463,19 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("⏪ Back", use_container_width=True):
-                    ctrl.go_back()
+                    scr = ctrl.current_screen
+                    stepped = False
+                    if scr == SCREEN_POST_CONDITION_SURVEY:
+                        sk = f"pcs_section_{ctrl.condition_number}"
+                        if st.session_state.get(sk, 0) > 0:
+                            st.session_state[sk] -= 1
+                            stepped = True
+                    elif scr == SCREEN_ADS_RECALL:
+                        if st.session_state.get("recall_step", 0) > 0:
+                            st.session_state["recall_step"] -= 1
+                            stepped = True
+                    if not stepped:
+                        ctrl.go_back()
                     st.rerun()
             with col2:
                 if st.button("⏭ Skip", use_container_width=True):
