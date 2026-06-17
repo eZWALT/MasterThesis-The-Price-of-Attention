@@ -368,7 +368,19 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         ctrl.ocean_raw = [4] * len(items)
         ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
     elif scr == SCREEN_POST_CONDITION_SURVEY:
-        ctrl.condition_surveys.append({k: 4 for k in ["trust", "usefulness", "satisfaction"]})
+        stub = {k: 4 for k in [
+            "llm_reliable", "llm_helpful", "llm_made_up", "llm_changed_mind",
+            "llm_not_useful", "llm_neutral", "llm_false", "llm_addressed",
+            "llm_impartial", "llm_suggestions", "llm_opinionated", "llm_not_aid",
+            "llm_skeptical", "llm_relevant", "llm_convincing",
+            "personality_trust", "personality_influence", "personality_changed_mind",
+            "behaviour_pushing", "behaviour_manipulate",
+        ]}
+        stub.update({k: "" for k in [
+            "personality_trust_text", "personality_influence_text", "personality_changed_mind_text",
+            "personality_brands", "personality_sponsored",
+        ]})
+        ctrl.condition_surveys.append(stub)
     elif scr == SCREEN_GLOBAL_EVALUATION:
         ctrl.global_evaluation = {k: 4 for k in ["overall_trust", "overall_usefulness", "ad_awareness", "ad_disruption", "willingness_reuse"]}
         ctrl.global_evaluation["open_ended"] = "skip"

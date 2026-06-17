@@ -128,24 +128,69 @@ def get_ocean_items(version: str = "10") -> list[tuple[str, str, bool]]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# POST-CONDITION SURVEY  (after each condition chat — Workflow B)
+# POST-CONDITION SURVEY — Section 1: LLM Performance Evaluation
+# (adapted from "Ads That Talk Back" paper)
+# 15 items, 7-pt Likert, flat list in fixed presentation order
 # ═══════════════════════════════════════════════════════════════
 POST_CONDITION_SCALE_MIN: int = 1
 POST_CONDITION_SCALE_MAX: int = 7
-POST_CONDITION_ITEMS: list[dict[str, str]] = [
-    # ── Perceived Usefulness ──
+
+POST_CONDITION_LLM_ITEMS: list[dict[str, str]] = [
+    {"id": "llm_reliable",       "text": "The chatbot provided reliable responses."},
+    {"id": "llm_helpful",        "text": "The chatbot gave helpful responses."},
+    {"id": "llm_made_up",        "text": "The chatbot made up information that was not real."},
+    {"id": "llm_changed_mind",   "text": "The chatbot\u2019s responses changed my mind."},
+    {"id": "llm_not_useful",     "text": "The chatbot gave responses that were not useful."},
+    {"id": "llm_neutral",        "text": "The chatbot gave neutral (fair) responses."},
+    {"id": "llm_false",          "text": "The chatbot provided false information."},
+    {"id": "llm_addressed",      "text": "The chatbot adequately addressed my request."},
+    {"id": "llm_impartial",      "text": "The chatbot gave impartial and unbiased responses."},
+    {"id": "llm_suggestions",    "text": "The chatbot\u2019s suggestions addressed my questions."},
+    {"id": "llm_opinionated",    "text": "The chatbot provided opinionated responses."},
+    {"id": "llm_not_aid",        "text": "The chatbot gave a response that did not aid me."},
+    {"id": "llm_skeptical",      "text": "I was skeptical of the chatbot\u2019s responses."},
+    {"id": "llm_relevant",       "text": "The chatbot gave relevant responses."},
+    {"id": "llm_convincing",     "text": "The chatbot provided convincing responses."},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# POST-CONDITION SURVEY — Section 2: Chatbot Personality
+# First 3 items are 7-pt Likert with open-text elaboration.
+# Last 2 are open-ended only.
+# ═══════════════════════════════════════════════════════════════
+
+POST_CONDITION_PERSONALITY_LIKERT: list[dict[str, str]] = [
+    {"id": "personality_trust",        "text": "Do you trust the chatbot?",                          "elaboration": "Briefly, why or why not?"},
+    {"id": "personality_influence",    "text": "Did the chatbot influence your approach to handling tasks?", "elaboration": "If so, give an example."},
+    {"id": "personality_changed_mind", "text": "Did the chatbot change your mind about anything?",          "elaboration": "If so, give an example."},
+]
+
+POST_CONDITION_PERSONALITY_OPEN: list[dict[str, str]] = [
+    {"id": "personality_brands",    "text": "Did the chatbot mention any products/brands in its responses? If yes, how did you feel about the product/brand suggestions?"},
+    {"id": "personality_sponsored", "text": "Did you notice or click on any \u201csponsored\u201d buttons? If yes, what did you think of the generated profile?"},
+]
+
+# ═══════════════════════════════════════════════════════════════
+# POST-CONDITION SURVEY — Section 3: LLM Behaviours
+# 2 items, 7-pt Likert
+# ═══════════════════════════════════════════════════════════════
+
+POST_CONDITION_BEHAVIOUR_ITEMS: list[dict[str, str]] = [
+    {"id": "behaviour_pushing",    "text": "I felt like the chatbot was pushing or marketing content to me."},
+    {"id": "behaviour_manipulate", "text": "I felt like the chatbot was trying to manipulate me through its response."},
+]
+
+# Keep legacy definitions for reference
+POST_CONDITION_ITEMS_LEGACY: list[dict[str, str]] = [
     {"id": "usefulness_effective",   "text": "The assistant helped me complete the task effectively."},
     {"id": "usefulness_decision",    "text": "The assistant improved the quality of my decision making."},
     {"id": "usefulness_informative", "text": "The assistant provided helpful information for my task."},
-    # ── Trust in the System ──
     {"id": "trust_reliable",  "text": "I felt confident that the information provided by the assistant was reliable."},
     {"id": "trust_overall",   "text": "I trusted the assistant during the interaction."},
     {"id": "trust_rely",      "text": "I would rely on the assistant\u2019s suggestions for making decisions."},
-    # ── Perceived Intrusiveness and Manipulative Influence ──
     {"id": "intrusiveness_influence",  "text": "I felt the assistant was trying to influence my decisions."},
     {"id": "intrusiveness_interrupt",  "text": "The assistant interrupted my workflow with content that was not directly relevant to the task."},
     {"id": "intrusiveness_steer",      "text": "The assistant led and steered the conversation in a direction I did not fully control."},
-    # ── Satisfaction with the Experience ──
     {"id": "satisfaction_overall",      "text": "I am satisfied with the experience of using this assistant."},
     {"id": "satisfaction_expectations", "text": "The assistant met my expectations."},
     {"id": "satisfaction_positive",     "text": "I had a positive experience interacting with this assistant."},
