@@ -765,9 +765,9 @@ def render_instructions() -> bool:
     """Brief task explanation before warm-up."""
     st.header("About This Study")
     st.markdown(
-        "You will chat with an AI shopping assistant across several "
+        "You will chat with an AI assistant across several "
         "short conversations. Each conversation will present you with "
-        "a different shopping task.\n\n"
+        "a different task.\n\n"
         "After each conversation, you will answer a few brief questions "
         "about your experience.\n\n"
         "Take your time and interact naturally with the assistant."
@@ -996,6 +996,33 @@ def render_condition_conclusion(
 # WORKFLOW B — POST-CONDITION SURVEY
 # ═══════════════════════════════════════════════════════════════
 
+def _step_indicator(current: int, total: int) -> str:
+    """HTML step indicator: filled circles for completed/current, empty for remaining."""
+    dots = []
+    for i in range(total):
+        if i < current:
+            dots.append("&#9679;")   # filled
+        elif i == current:
+            dots.append("&#9679;")   # current (filled, highlighted below)
+        else:
+            dots.append("&#9678;")   # hollow
+    # current step gets accent colour; completed steps muted
+    steps_html = "".join(
+        f'<span style="color:{"#ff9800" if i == current else "#555"}; '
+        f'font-size:1.6rem; margin:0 4px;">{d}</span>'
+        for i, d in enumerate(dots)
+    )
+    labels_html = (
+        f'<div style="display:flex; justify-content:center; gap:20px; '
+        f'font-size:0.8rem; color:#888; margin-top:-6px;">'
+        f'<span>Evaluation</span>'
+        f'<span>Personality</span>'
+        f'<span>Behaviours</span>'
+        f'</div>'
+    )
+    return f'<div style="text-align:center; padding:12px 0;">{steps_html}</div>{labels_html}'
+
+
 def render_post_condition_survey(condition_number: int) -> Optional[dict]:
     """
     3-section multi-step post-condition survey:
@@ -1017,9 +1044,12 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
     section = st.session_state[section_key]
     responses = st.session_state[responses_key]
 
+    # Step indicator at top
+    st.markdown(_step_indicator(section, 3), unsafe_allow_html=True)
+
     # ── Section 1: LLM Performance Evaluation ──────────────────
     if section == 0:
-        st.subheader("Section 1 of 3 — Chatbot Evaluation")
+        st.subheader("Evaluation")
         st.caption(
             "Please answer the following questions about the chatbot. "
             "Rate your level of agreement (1 = Strongly disagree, 7 = Strongly agree)."
@@ -1039,6 +1069,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             else:
                 responses[item["id"]] = value
 
+        st.divider()
         if all_answered and st.button("Continue", type="primary"):
             st.session_state[responses_key] = responses
             st.session_state[section_key] = 1
@@ -1049,7 +1080,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
 
     # ── Section 2: Chatbot Personality ─────────────────────────
     elif section == 1:
-        st.subheader("Section 2 of 3 — Chatbot Personality")
+        st.subheader("Personality")
         all_answered = True
 
         for item in POST_CONDITION_PERSONALITY_LIKERT:
@@ -1078,6 +1109,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             )
             responses[item["id"]] = value
 
+        st.divider()
         if all_answered and st.button("Continue", type="primary"):
             st.session_state[responses_key] = responses
             st.session_state[section_key] = 2
@@ -1088,7 +1120,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
 
     # ── Section 3: LLM Behaviours ──────────────────────────────
     elif section == 2:
-        st.subheader("Section 3 of 3 — Chatbot Behaviours")
+        st.subheader("Behaviours")
         st.caption("Rate your level of agreement (1 = Strongly disagree, 7 = Strongly agree).")
         all_answered = True
 
@@ -1168,7 +1200,7 @@ def render_global_evaluation() -> Optional[dict]:
 # ═══════════════════════════════════════════════════════════════
 
 def render_ads_awareness() -> Optional[dict]:
-    st.header("Ads Awareness")
+    st.header("Awareness")
     st.caption("The following questions refer to your experience during the interaction with the chatbot.")
 
     responses: dict = {}
@@ -1204,7 +1236,7 @@ def render_ads_awareness() -> Optional[dict]:
 # ═══════════════════════════════════════════════════════════════
 
 def render_ads_recall() -> Optional[dict]:
-    st.header("Ads Recall / Interpretation")
+    st.header("Recall / Interpretation")
     st.caption("The following questions refer to specific pieces of content that may have appeared during your interaction.")
 
     responses: dict = {}
@@ -1263,7 +1295,7 @@ def render_ads_recall() -> Optional[dict]:
 # ═══════════════════════════════════════════════════════════════
 
 def render_ads_perception() -> Optional[dict]:
-    st.header("Ads Perception")
+    st.header("Perception")
     st.caption("Please rate your level of agreement with each statement.")
 
     responses: dict = {}
