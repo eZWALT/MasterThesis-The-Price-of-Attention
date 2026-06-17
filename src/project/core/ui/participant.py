@@ -372,7 +372,7 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
             "personality_trust", "personality_influence", "personality_changed_mind",
             "behaviour_pushing", "behaviour_manipulate",
         ]}
-        stub.update({k: "" for k in [
+        stub.update({k: "(skip)" for k in [
             "personality_trust_text", "personality_influence_text", "personality_changed_mind_text",
             "personality_brands", "personality_sponsored",
         ]})
