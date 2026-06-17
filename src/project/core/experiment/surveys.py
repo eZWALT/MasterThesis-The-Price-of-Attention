@@ -160,9 +160,9 @@ POST_CONDITION_LLM_ITEMS: list[dict[str, str]] = [
 # ═══════════════════════════════════════════════════════════════
 
 POST_CONDITION_PERSONALITY_LIKERT: list[dict[str, str]] = [
-    {"id": "personality_trust",        "text": "Do you trust the chatbot?",                          "elaboration": "Briefly, why or why not?"},
-    {"id": "personality_influence",    "text": "Did the chatbot influence your approach to handling tasks?", "elaboration": "If so, give an example."},
-    {"id": "personality_changed_mind", "text": "Did the chatbot change your mind about anything?",          "elaboration": "If so, give an example."},
+    {"id": "personality_trust",        "text": "Do you trust the chatbot?",                          "elaboration": "Briefly, why or why not? (Optional)"},
+    {"id": "personality_influence",    "text": "Did the chatbot influence your approach to handling tasks?", "elaboration": "If so, give an example. (Optional)"},
+    {"id": "personality_changed_mind", "text": "Did the chatbot change your mind about anything?",          "elaboration": "If so, give an example. (Optional)"},
 ]
 
 POST_CONDITION_PERSONALITY_OPEN: list[dict[str, str]] = [
@@ -362,8 +362,8 @@ GODSPEED_REASK_LIKERT: list[dict] = [
 # ═══════════════════════════════════════════════════════════════
 
 DEMOGRAPHICS_TEXT: list[dict] = [
-    {"id": "demo_age",       "text": "Age"},
-    {"id": "demo_occupation","text": "Please type your occupation below or leave it blank if you prefer not to say."},
+    {"id": "demo_age",       "text": "Age (Optional)"},
+    {"id": "demo_occupation","text": "Please type your occupation below or leave it blank if you prefer not to say. (Optional)"},
 ]
 
 DEMOGRAPHICS_SELECT: list[dict] = [
