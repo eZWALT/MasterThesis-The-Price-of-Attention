@@ -29,7 +29,6 @@ from core.config import (
     CONDITION_LABELS,
     PRACTICE_TASK_PROMPT,
     MAX_TURNS_PER_TRIAL,
-    AD_SIDE_PANEL_MODES,
 )
 from core.experiment.tasks import TaskDefinition
 from core.experiment.surveys import (
@@ -39,38 +38,15 @@ from core.experiment.surveys import (
     OCEAN_SCALE_LABELS,
     OCEAN_INSTRUCTIONS,
     get_ocean_items,
-    POST_TRIAL_SCALE_MIN,
-    POST_TRIAL_SCALE_MAX,
-    POST_TRIAL_ITEMS,
     POST_CONDITION_SCALE_MIN,
     POST_CONDITION_SCALE_MAX,
     POST_CONDITION_LLM_ITEMS,
     POST_CONDITION_PERSONALITY_LIKERT,
     POST_CONDITION_PERSONALITY_OPEN,
     POST_CONDITION_BEHAVIOUR_ITEMS,
-    GLOBAL_EVAL_SCALE_MIN,
-    GLOBAL_EVAL_SCALE_MAX,
-    GLOBAL_EVAL_ITEMS,
-    GLOBAL_OPEN_ENDED_PROMPT,
-    FINAL_SURVEY_ITEMS,
-    FINAL_OPEN_ENDED_PROMPT,
-    ADS_AWARENESS_CATEGORICAL,
-    ADS_AWARENESS_OPEN_ENDED,
-    ADS_RECALL_CATEGORICAL,
-    ADS_RECALL_LIKERT,
-    ADS_RECALL_SCALE_MIN,
-    ADS_RECALL_SCALE_MAX,
-    ADS_PERCEPTION_LIKERT,
-    ADS_PERCEPTION_OPEN_ENDED,
-    ADS_PERCEPTION_SCALE_MIN,
-    ADS_PERCEPTION_SCALE_MAX,
-    LLM_EVAL_CATEGORIES,
-    LLM_EVAL_SCALE_MIN,
-    LLM_EVAL_SCALE_MAX,
-    GODSPEED_SEMANTIC,
-    GODSPEED_REASK_LIKERT,
-    GODSPEED_SCALE_MIN,
-    GODSPEED_SCALE_MAX,
+    RECALL_ITEMS,
+    RECALL_SCALE_MIN,
+    RECALL_SCALE_MAX,
     DEMOGRAPHICS_END_TEXT,
     DEMOGRAPHICS_END_CATEGORICAL,
     DECEPTION_DISCLOSURE_TEXT,
@@ -1149,275 +1125,94 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
-# WORKFLOW B — GLOBAL EVALUATION
+# RECALL  (post-experiment, 4-step — one per ad condition)
 # ═══════════════════════════════════════════════════════════════
 
-def render_global_evaluation() -> Optional[dict]:
-    """
-    End-of-session global evaluation + open-ended debrief.
-    """
-    st.header("Final Evaluation")
-    st.caption("Please reflect on the entire session.")
+def _ad_condition_label(condition_id: str) -> str:
+    """Short label for an ad condition (avoid 'ad' in participant-facing text)."""
+    mapping = {
+        "inline_early": "Conversation A",
+        "inline_late":  "Conversation B",
+        "block_early":  "Conversation C",
+        "block_late":   "Conversation D",
+    }
+    return mapping.get(condition_id, condition_id)
 
-    responses: dict[str, int | str] = {}
-    all_answered = True
-
-    for item in GLOBAL_EVAL_ITEMS:
-        value = st.radio(
-            item["text"],
-            options=list(range(GLOBAL_EVAL_SCALE_MIN, GLOBAL_EVAL_SCALE_MAX + 1)),
-            format_func=lambda v: f"{v}",
-            horizontal=True,
-            index=None,
-            key=f"global_{item['id']}",
-        )
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    st.divider()
-    st.subheader("Debrief")
-    open_text = st.text_area(GLOBAL_OPEN_ENDED_PROMPT, key="global_open_ended")
-    responses["open_ended"] = open_text
-
-    if all_answered and st.button("Submit", type="primary"):
-        invalid = [
-            iid for iid, v in responses.items()
-            if isinstance(v, int) and not (GLOBAL_EVAL_SCALE_MIN <= v <= GLOBAL_EVAL_SCALE_MAX)
-        ]
-        if invalid:
-            st.error(f"Invalid response values detected ({invalid}). Please re-select those items.")
-            return None
-        return responses
-    elif not all_answered:
-        st.info("Please answer all Likert questions to continue.")
-    return None
-
-
-# ═══════════════════════════════════════════════════════════════
-# ADS AWARENESS  (Section 1 of post-experiment)
-# ═══════════════════════════════════════════════════════════════
-
-def render_ads_awareness() -> Optional[dict]:
-    st.header("Awareness")
-    st.caption("The following questions refer to your experience during the interaction with the chatbot.")
-
-    responses: dict = {}
-    all_answered = True
-
-    for item in ADS_AWARENESS_CATEGORICAL:
-        value = st.radio(
-            item["text"],
-            item["options"],
-            index=None,
-            horizontal=True,
-            key=f"ads_aware_{item['id']}",
-        )
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    for item in ADS_AWARENESS_OPEN_ENDED:
-        value = st.text_area(item["text"], key=f"ads_aware_{item['id']}")
-        responses[item["id"]] = value
-
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
-        return responses
-    elif not all_answered:
-        st.info("Please answer all questions to continue.")
-    return None
-
-
-# ═══════════════════════════════════════════════════════════════
-# ADS RECALL / INTERPRETATION  (Section 2 of post-experiment)
-# ═══════════════════════════════════════════════════════════════
 
 def render_ads_recall() -> Optional[dict]:
-    st.header("Recall / Interpretation")
-    st.caption("The following questions refer to specific pieces of content that may have appeared during your interaction.")
+    """
+    4-step recall section, one step per ad condition (no_ads excluded).
+    Each step asks the same set of placeholder questions for a specific condition.
+    """
+    st.header("Recall")
 
-    responses: dict = {}
+    ctrl = st.session_state.controller
+    ad_conditions = [
+        cfg for cfg in ctrl.condition_plan
+        if cfg["condition"] != "no_ads"
+    ]
+
+    step_key = "recall_step"
+    if step_key not in st.session_state:
+        st.session_state[step_key] = 0
+
+    responses_key = "recall_responses"
+    if responses_key not in st.session_state:
+        st.session_state[responses_key] = {}
+
+    step = st.session_state[step_key]
+    responses = st.session_state[responses_key]
+
+    # Step indicator
+    total = len(ad_conditions)
+    dots_html = "".join(
+        f'<span style="color:{"#ff9800" if i == step else "#555"}; '
+        f'font-size:1.6rem; margin:0 4px;">'
+        f'{"&#9679;" if i <= step else "&#9678;"}</span>'
+        for i in range(total)
+    )
+    st.markdown(
+        f'<div style="text-align:center; padding:12px 0;">{dots_html}</div>'
+        f'<div style="text-align:center; font-size:0.85rem; color:#888; '
+        f'margin-top:-4px;">Step {step + 1} of {total}</div>',
+        unsafe_allow_html=True,
+    )
+
+    condition = ad_conditions[step]
+    label = _ad_condition_label(condition["condition"])
+
+    st.subheader(label)
+
     all_answered = True
-
-    for item in ADS_RECALL_CATEGORICAL:
+    for item in RECALL_ITEMS:
         value = st.radio(
             item["text"],
-            item["options"],
-            index=None,
-            horizontal=True,
-            key=f"ads_recall_{item['id']}",
-        )
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    st.divider()
-    st.markdown("**Rate your agreement with the following:**")
-
-    for item in ADS_RECALL_LIKERT:
-        if item["id"] == "recall_rating":
-            value = st.radio(
-                item["text"],
-                options=list(range(ADS_RECALL_SCALE_MIN, ADS_RECALL_SCALE_MAX + 1)),
-                format_func=lambda v: f"{v}",
-                horizontal=True,
-                index=None,
-                key=f"ads_recall_{item['id']}",
-            )
-        else:
-            value = st.radio(
-                item["text"],
-                options=list(range(ADS_RECALL_SCALE_MIN, ADS_RECALL_SCALE_MAX + 1)),
-                format_func=lambda v: f"{v}",
-                horizontal=True,
-                index=None,
-                key=f"ads_recall_{item['id']}",
-            )
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
-        return responses
-    elif not all_answered:
-        st.info("Please answer all questions to continue.")
-    return None
-
-
-# ═══════════════════════════════════════════════════════════════
-# ADS PERCEPTION  (Section 3 of post-experiment)
-# ═══════════════════════════════════════════════════════════════
-
-def render_ads_perception() -> Optional[dict]:
-    st.header("Perception")
-    st.caption("Please rate your level of agreement with each statement.")
-
-    responses: dict = {}
-    all_answered = True
-
-    for item in ADS_PERCEPTION_LIKERT:
-        value = st.radio(
-            item["text"],
-            options=list(range(ADS_PERCEPTION_SCALE_MIN, ADS_PERCEPTION_SCALE_MAX + 1)),
+            options=list(range(RECALL_SCALE_MIN, RECALL_SCALE_MAX + 1)),
             format_func=lambda v: f"{v}",
             horizontal=True,
             index=None,
-            key=f"ads_perception_{item['id']}",
+            key=f"recall_{condition['condition']}_{item['id']}",
         )
         if value is None:
             all_answered = False
         else:
-            responses[item["id"]] = value
+            responses[f"{condition['condition']}_{item['id']}"] = value
 
     st.divider()
-    for item in ADS_PERCEPTION_OPEN_ENDED:
-        value = st.text_area(item["text"], key=f"ads_perception_{item['id']}")
-        responses[item["id"]] = value
-
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
-        return responses
-    elif not all_answered:
-        st.info("Please answer all Likert questions to continue.")
-    return None
-
-
-# ═══════════════════════════════════════════════════════════════
-# LLM PERFORMANCE EVALUATION  (Section 4 of post-experiment)
-# 5 categories × 3 items = 15 Likert items
-# ═══════════════════════════════════════════════════════════════
-
-def render_llm_evaluation() -> Optional[dict]:
-    st.header("LLM Performance Evaluation")
-    st.caption("Please rate your level of agreement with each statement (1 = Strongly disagree, 7 = Strongly agree).")
-
-    responses: dict = {}
-    all_answered = True
-
-    for category, items in LLM_EVAL_CATEGORIES.items():
-        st.subheader(category)
-        for item in items:
-            value = st.radio(
-                item["text"],
-                options=list(range(LLM_EVAL_SCALE_MIN, LLM_EVAL_SCALE_MAX + 1)),
-                format_func=lambda v: f"{v}",
-                horizontal=True,
-                index=None,
-                key=f"llm_eval_{item['id']}",
-            )
-            if value is None:
-                all_answered = False
-            else:
-                responses[item["id"]] = value
-
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
-        return responses
-    elif not all_answered:
-        st.info("Please answer all questions to continue.")
-    return None
-
-
-# ═══════════════════════════════════════════════════════════════
-# GODSPEED (simplified)  (Section 5 of post-experiment)
-# 7 semantic differentials + 2 re-ask Likerts
-# ═══════════════════════════════════════════════════════════════
-
-def render_godspeed() -> Optional[dict]:
-    st.header("Overall Experience")
-    st.caption("Please rate your impression of the chatbot on the following scales (1 = left descriptor, 7 = right descriptor).")
-
-    responses: dict = {}
-    all_answered = True
-
-    for item in GODSPEED_SEMANTIC:
-        col1, col2, col3 = st.columns([1, 3, 1])
-        with col1:
-            st.markdown(f"**{item['left']}**")
-        with col2:
-            value = st.radio(
-                item["text"],
-                options=list(range(GODSPEED_SCALE_MIN, GODSPEED_SCALE_MAX + 1)),
-                format_func=lambda v: f"{v}",
-                horizontal=True,
-                index=None,
-                key=f"godspeed_{item['id']}",
-                label_visibility="collapsed",
-            )
-        with col3:
-            st.markdown(f"**{item['right']}**")
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    st.divider()
-    st.markdown("**Final questions about your experience:**")
-    for item in GODSPEED_REASK_LIKERT:
-        value = st.radio(
-            item["text"],
-            options=list(range(GODSPEED_SCALE_MIN, GODSPEED_SCALE_MAX + 1)),
-            format_func=lambda v: f"{v}",
-            horizontal=True,
-            index=None,
-            key=f"godspeed_{item['id']}",
-        )
-        if value is None:
-            all_answered = False
-        else:
-            responses[item["id"]] = value
-
-    st.divider()
-    if all_answered and st.button("Continue", type="primary"):
-        return responses
-    elif not all_answered:
-        st.info("Please answer all questions to continue.")
+    if step < total - 1:
+        if all_answered and st.button("Continue", type="primary"):
+            st.session_state[responses_key] = responses
+            st.session_state[step_key] = step + 1
+            st.rerun()
+        elif not all_answered:
+            st.info("Please answer all questions to continue.")
+    else:
+        if all_answered and st.button("Submit", type="primary"):
+            del st.session_state[step_key]
+            del st.session_state[responses_key]
+            return responses
+        elif not all_answered:
+            st.info("Please answer all questions to continue.")
     return None
 
 

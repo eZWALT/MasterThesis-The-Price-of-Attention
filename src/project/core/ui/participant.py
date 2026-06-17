@@ -29,12 +29,7 @@ from core.config import (
     SCREEN_CONDITION_CHAT,
     SCREEN_CONDITION_CONCLUSION,
     SCREEN_POST_CONDITION_SURVEY,
-    SCREEN_GLOBAL_EVALUATION,
-    SCREEN_ADS_AWARENESS,
     SCREEN_ADS_RECALL,
-    SCREEN_ADS_PERCEPTION,
-    SCREEN_LLM_EVALUATION,
-    SCREEN_GODSPEED,
     SCREEN_OCEAN,
     SCREEN_DECEPTION_DISCLOSURE,
     SCREEN_DONE,
@@ -68,12 +63,7 @@ from core.ui.screens import (
     render_condition_chat,
     render_condition_conclusion,
     render_post_condition_survey,
-    render_global_evaluation,
-    render_ads_awareness,
     render_ads_recall,
-    render_ads_perception,
-    render_llm_evaluation,
-    render_godspeed,
     render_demographics_end,
     render_deception_disclosure,
     render_done,
@@ -367,6 +357,8 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         items = get_ocean_items(bfi_version)
         ctrl.ocean_raw = [4] * len(items)
         ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
+    elif scr == SCREEN_ADS_RECALL:
+        pass
     elif scr == SCREEN_POST_CONDITION_SURVEY:
         stub = {k: 4 for k in [
             "llm_reliable", "llm_helpful", "llm_made_up", "llm_changed_mind",
@@ -381,10 +373,6 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
             "personality_brands", "personality_sponsored",
         ]})
         ctrl.condition_surveys.append(stub)
-    elif scr == SCREEN_GLOBAL_EVALUATION:
-        ctrl.global_evaluation = {k: 4 for k in ["overall_trust", "overall_usefulness", "ad_awareness", "ad_disruption", "willingness_reuse"]}
-        ctrl.global_evaluation["open_ended"] = "skip"
-        export_session_data(ctrl)
     elif scr == SCREEN_CONDITION_CHAT:
         ctrl.condition_results.append({
             "condition_id": "skip",
@@ -503,11 +491,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             SCREEN_CONDITION_INTRO: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_CONDITION_CHAT: f"Condition {ctrl.condition_number}/{ctrl.n_conditions}",
             SCREEN_POST_CONDITION_SURVEY: "Post-Task Questionnaire",
-            SCREEN_ADS_AWARENESS: "Awareness",
             SCREEN_ADS_RECALL: "Recall",
-            SCREEN_ADS_PERCEPTION: "Perception",
-            SCREEN_LLM_EVALUATION: "Evaluation",
-            SCREEN_GODSPEED: "Overall Experience",
             SCREEN_OCEAN: "Personality",
             SCREEN_DECEPTION_DISCLOSURE: "Debrief",
             SCREEN_DONE: "Done ✓",
@@ -752,51 +736,11 @@ def run_participant_mode(params):
             ctrl.advance()
             st.rerun()
 
-    elif scr == SCREEN_ADS_AWARENESS:
-        result = render_ads_awareness()
-        if result is not None:
-            st.session_state.logger.log(
-                "ads_awareness_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
     elif scr == SCREEN_ADS_RECALL:
         result = render_ads_recall()
         if result is not None:
             st.session_state.logger.log(
                 "ads_recall_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
-    elif scr == SCREEN_ADS_PERCEPTION:
-        result = render_ads_perception()
-        if result is not None:
-            st.session_state.logger.log(
-                "ads_perception_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
-    elif scr == SCREEN_LLM_EVALUATION:
-        result = render_llm_evaluation()
-        if result is not None:
-            st.session_state.logger.log(
-                "llm_evaluation_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
-    elif scr == SCREEN_GODSPEED:
-        result = render_godspeed()
-        if result is not None:
-            st.session_state.logger.log(
-                "godspeed_submitted", result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
             ctrl.advance()

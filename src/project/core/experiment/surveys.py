@@ -263,19 +263,17 @@ ADS_AWARENESS_OPEN_ENDED: list[dict] = [
 ]
 
 # ═══════════════════════════════════════════════════════════════
-# ADS RECALL / INTERPRETATION  (post-experiment, Section 2)
+# ADS RECALL  (post-experiment, 4-step — one per ad condition)
+# Placeholder: symmetrical questions for inline_early, inline_late,
+# block_early, block_late (no_ads excluded).
 # ═══════════════════════════════════════════════════════════════
-ADS_RECALL_SCALE_MIN: int = 1
-ADS_RECALL_SCALE_MAX: int = 7
+RECALL_SCALE_MIN: int = 1
+RECALL_SCALE_MAX: int = 7
 
-ADS_RECALL_CATEGORICAL: list[dict] = [
-    {"id": "recall_remember", "text": "Do you remember this content?",        "options": ["Yes", "No", "Not sure"]},
-    {"id": "recall_what",     "text": "What do you think this content was?",  "options": ["Normal chatbot response, advice or recommendations", "Promotional or sponsored-type content", "Not sure", "Other (please specify)"]},
-]
-
-ADS_RECALL_LIKERT: list[dict] = [
-    {"id": "recall_influence", "text": "This content influenced my thinking or decision making."},
-    {"id": "recall_rating",    "text": "How would you rate this content overall? (1 = Very negative, 7 = Very positive)"},
+RECALL_ITEMS: list[dict[str, str]] = [
+    # ── placeholder items ──
+    {"id": "recall_noticed",  "text": "Did you notice any additional content during this conversation?"},
+    {"id": "recall_remember", "text": "Do you remember what the additional content was about?"},
 ]
 
 # ═══════════════════════════════════════════════════════════════

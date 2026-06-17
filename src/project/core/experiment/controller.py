@@ -5,9 +5,8 @@ Implements the 5-condition within-subject protocol:
 
   consent → warmup_chat
   → [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
-  → ads_awareness → ads_recall_interpretation → ads_perception
-  → llm_evaluation → godspeed → ocean (BFI-10) → demographics
-  → deception_disclosure → done
+  → recall (4 steps, one per ad condition)
+  → ocean (BFI-10) → demographics → deception_disclosure → done
 
 Tasks are counterbalanced with Latin-square rotation (by cb_group or pid hash).
 Conditions are shuffled independently, then zipped with tasks.
@@ -35,11 +34,7 @@ from core.config import (
     SCREEN_CONDITION_CHAT,
     SCREEN_CONDITION_CONCLUSION,
     SCREEN_POST_CONDITION_SURVEY,
-    SCREEN_ADS_AWARENESS,
     SCREEN_ADS_RECALL,
-    SCREEN_ADS_PERCEPTION,
-    SCREEN_LLM_EVALUATION,
-    SCREEN_GODSPEED,
     SCREEN_OCEAN,
     SCREEN_DECEPTION_DISCLOSURE,
     SCREEN_DONE,
@@ -63,11 +58,7 @@ _CONDITION_SCREENS: list[str] = [
 ]
 
 _POST_CONDITION_SCREENS: list[str] = [
-    SCREEN_ADS_AWARENESS,
     SCREEN_ADS_RECALL,
-    SCREEN_ADS_PERCEPTION,
-    SCREEN_LLM_EVALUATION,
-    SCREEN_GODSPEED,
     SCREEN_OCEAN,
     SCREEN_DEMOGRAPHICS,
     SCREEN_DECEPTION_DISCLOSURE,
