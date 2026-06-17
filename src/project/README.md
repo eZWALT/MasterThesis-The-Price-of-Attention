@@ -42,6 +42,25 @@ python scripts/prepare_amazon_catalog.py --build-index
 Open http://localhost:7777 — participant mode.  
 Open http://localhost:7777?dev=true — developer mode with free-chat.  
 Open http://localhost:7777?dev=flow — participant flow walkthrough.  
+Open http://localhost:7777?dev=flow&dry_run=1 — flow walkthrough without GPU/models.
+
+### Dry-Run Mode
+
+`?dry_run=1` launches the full participant flow **without loading any ML models**
+or requiring a GPU. Useful for UI development, questionnaire testing, and CI.
+
+What it does:
+- Skips LLM warmup (no model download, no Ollama/vLLM needed)
+- Skips retrieval pipeline config (no sentence-transformers download)
+- `LLMClient` returns mock replies instantly (no HTTP call)
+- Forces `use_rag=False` so ads are synthetic placeholders
+- No FAISS index required — works on a bare checkout
+
+Combines with `dev=flow` to walk through every screen end-to-end in seconds:
+
+```bash
+open http://localhost:7777?dev=flow&dry_run=1
+```
 
 ### Switching backends
 
