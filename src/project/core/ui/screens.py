@@ -66,6 +66,7 @@ from core.ad_injection.ad_links import (
 )
 from core.ad_injection.models import (
     Ad,
+    ad_image_url,
     format_products_block,
 )
 from core.conversation import ConversationManager
