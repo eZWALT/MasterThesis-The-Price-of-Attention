@@ -281,7 +281,7 @@ RECALL_ITEMS: list[dict[str, str]] = [
 ]
 
 RECALL_OPEN_ENDED: list[dict[str, str]] = [
-    {"id": "recall_purpose", "text": "What do you think was the purpose of this content, and did it affect how much you trust the system?"},
+    {"id": "recall_reaction", "text": "Please describe your reaction to this content. What stood out to you, and how did it fit (or not fit) within the conversation? Feel free to share anything you liked, disliked, found useful, found distracting, or found unusual, as well as what you think the purpose of this content was."},
 ]
 
 # ═══════════════════════════════════════════════════════════════

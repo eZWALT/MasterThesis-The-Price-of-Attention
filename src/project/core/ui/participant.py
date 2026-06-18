@@ -421,6 +421,8 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
                     "I need help finding a good supplement for my workout routine. "
                     "What would you recommend?"
                 )
+                stub_result["ad_info"]["inline_ctx_before"] = []
+                stub_result["ad_info"]["inline_ctx_after"] = []
         ctrl.condition_results.append(stub_result)
         st.session_state.condition_manager = None
     elif scr == SCREEN_WARMUP_CHAT:
@@ -709,11 +711,23 @@ def run_participant_mode(params):
                     }
                     if cfg["ad_mode"] in ("inline_early", "inline_late") and cfg["ad_turn"] is not None:
                         t = cfg["ad_turn"]
-                        idx = 2 * t  # assistant msg at turn t is messages[2*t]
+                        idx = 2 * t
                         if idx < len(mgr.messages) and mgr.messages[idx].get("role") == "assistant":
                             ad_info["inline_response"] = mgr.messages[idx]["content"]
                         if idx - 1 >= 0 and mgr.messages[idx - 1].get("role") == "user":
                             ad_info["inline_user_msg"] = mgr.messages[idx - 1]["content"]
+                        ctx_before = []
+                        for i in range(max(0, idx - 4), idx - 1):
+                            role = mgr.messages[i].get("role", "")
+                            content = mgr.messages[i].get("content", "")
+                            ctx_before.append({"role": role, "content": content[:500]})
+                        ctx_after = []
+                        for i in range(idx + 1, min(len(mgr.messages), idx + 4)):
+                            role = mgr.messages[i].get("role", "")
+                            content = mgr.messages[i].get("content", "")
+                            ctx_after.append({"role": role, "content": content[:500]})
+                        ad_info["inline_ctx_before"] = ctx_before
+                        ad_info["inline_ctx_after"] = ctx_after
 
                 condition_record = {
                     "condition_id": condition_id,
