@@ -49,6 +49,9 @@ from core.config import (
     USE_CONTEXT_SUMMARY,
     CATALOG_PATH,
     STUDY_TYPE_CROWD,
+    MOCK_AD_TITLE,
+    MOCK_AD_TEXT,
+    MOCK_AD_CTA,
 )
 from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
@@ -382,13 +385,31 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         st.session_state.pop(f"pcs_section_{cn}", None)
         st.session_state.pop(f"pcs_responses_{cn}", None)
     elif scr == SCREEN_CONDITION_CHAT:
-        ctrl.condition_results.append({
-            "condition_id": "skip",
-            "ad_mode": "skip",
-            "task_id": "skip",
+        cfg = ctrl.current_condition_config
+        cond_id = cfg["condition"] if cfg else "skip"
+        task = cfg["task"] if cfg else TASK_CATALOG[0]
+        ad_mode = cfg.get("ad_mode", "") if cfg else ""
+        stub_result = {
+            "condition_id": cond_id,
+            "ad_mode": ad_mode,
+            "task_id": task.id,
+            "task_prompt": task.participant_prompt,
             "turns": 0,
             "messages": [],
-        })
+        }
+        if ad_mode:
+            stub_result["ad_info"] = {
+                "title": MOCK_AD_TITLE,
+                "text": MOCK_AD_TEXT,
+                "cta": MOCK_AD_CTA,
+                "question": "",
+                "source_item_id": "mock",
+                "image_url": None,
+                "ad_mode": ad_mode,
+                "ad_turn": cfg.get("ad_turn"),
+                "inline_response": MOCK_AD_TEXT,
+            }
+        ctrl.condition_results.append(stub_result)
         st.session_state.condition_manager = None
     elif scr == SCREEN_WARMUP_CHAT:
         st.session_state.warmup_manager = None
