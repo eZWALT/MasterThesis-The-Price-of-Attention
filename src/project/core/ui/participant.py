@@ -197,8 +197,6 @@ def init_session_state(params):
     # Dev mode state
     if "dev_manager" not in st.session_state:
         st.session_state.dev_manager = None
-    if "dev_trial_complete" not in st.session_state:
-        st.session_state.dev_trial_complete = False
 
     # Dev ad-control overrides
     if "dev_force_ad" not in st.session_state:

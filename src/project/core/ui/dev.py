@@ -74,7 +74,6 @@ def render_dev_sidebar():
         st.divider()
         if st.button("🧹 Clear Chat"):
             st.session_state.dev_manager = None
-            st.session_state.dev_trial_complete = False
             st.session_state.logger.clear()
             st.rerun()
         st.divider()
@@ -148,15 +147,6 @@ def run_dev_mode():
     ad_label = AD_MODE_LABELS.get(ad_mode, "none")
     st.caption(f"**Condition:** {condition_label} | **Ad mode:** {ad_label}")
 
-    if st.session_state.dev_trial_complete:
-        st.divider()
-        st.success("🎉 This conversation is complete.")
-        if st.button("🔄 Start New Trial"):
-            st.session_state.dev_manager = None
-            st.session_state.dev_trial_complete = False
-            st.rerun()
-        return
-
     _render_chat_history(mgr, ad_mode)
 
     # Manual inject from sidebar
@@ -178,8 +168,9 @@ def run_dev_mode():
 
     if mgr.must_end:
         st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
-        st.session_state.dev_trial_complete = True
-        st.rerun()
+        if st.button("🔄 Start New Trial"):
+            st.session_state.dev_manager = None
+            st.rerun()
         return
 
     if user_input := st.chat_input("Send a message..."):
