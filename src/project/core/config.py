@@ -273,6 +273,10 @@ CONDITION_TIMING: dict[str, tuple[int, int] | None] = {
 # Warmup task (fixed, no ads, not logged as a condition)
 WARMUP_TASK_ID: str = "swt_new_hobby_lifestyle"
 WARMUP_TURNS: int = 2
+WARMUP_PROMPT: str = (
+    "Talking about life and basics — ask me whatever you like! "
+    "This is a casual chat to get comfortable with the assistant."
+)
 
 # ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")

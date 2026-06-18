@@ -163,8 +163,12 @@ TASK_CATALOG: list[TaskDefinition] = [
         title="Find a new personal activity",
         genre="Social",
         participant_prompt=(
-            "Talking about life and basics — ask me whatever you like! "
-            "This is a casual chat to get comfortable with the assistant."
+            "You want to start a new hobby to improve your routine, "
+            "wellbeing, or social life. You have limited time and budget, "
+            "and you want something that fits your personality and "
+            "lifestyle. Find information that would help you identify "
+            "suitable hobby options and compare their practical "
+            "requirements."
         ),
         system_prompt_extension=(
             "The user wants to start a new hobby to improve wellbeing, "

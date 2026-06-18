@@ -28,6 +28,7 @@ from core.config import (
     AD_MODE_LABELS,
     CONDITION_LABELS,
     PRACTICE_TASK_PROMPT,
+    WARMUP_PROMPT,
     MAX_TURNS_PER_TRIAL,
 )
 from core.experiment.tasks import TaskDefinition
@@ -800,17 +801,16 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
         st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
 
     # Task prompt in blue box
-    if manager.task:
-        st.markdown(f'''
-        <div style="
-            background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
-            border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
-        ">
-            <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
-            {html_module.escape(manager.task.participant_prompt)}
-        </div>''',
-        unsafe_allow_html=True,
-        )
+    st.markdown(f'''
+    <div style="
+        background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
+        border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
+    ">
+        <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+        {html_module.escape(WARMUP_PROMPT)}
+    </div>''',
+    unsafe_allow_html=True,
+    )
 
     for msg in manager.messages:
         with st.chat_message(msg["role"]):
