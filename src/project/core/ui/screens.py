@@ -45,6 +45,7 @@ from core.experiment.surveys import (
     POST_CONDITION_PERSONALITY_OPEN,
     POST_CONDITION_BEHAVIOUR_ITEMS,
     RECALL_ITEMS,
+    RECALL_OPEN_ENDED,
     RECALL_SCALE_MIN,
     RECALL_SCALE_MAX,
     DEMOGRAPHICS_TEXT,
@@ -1148,7 +1149,9 @@ def _ad_condition_label(condition_id: str) -> str:
 def render_ads_recall() -> Optional[dict]:
     """
     4-step recall section, one step per ad condition (no_ads excluded).
-    Each step asks the same set of placeholder questions for a specific condition.
+    Each step shows the ad that was presented (title, description, task prompt,
+    image if available, and inline context for inline modes), followed by
+    7 Likert questions (noticeability → system trust shift) + 1 open-ended.
     """
     st.header("Recall")
 
@@ -1169,6 +1172,13 @@ def render_ads_recall() -> Optional[dict]:
     step = st.session_state[step_key]
     responses = st.session_state[responses_key]
 
+    # Look up the condition_result for this condition to get ad_info
+    cfg = ad_conditions[step]
+    cond_id = cfg["condition"]
+    result = next((r for r in ctrl.condition_results if r.get("condition_id") == cond_id), {})
+    ad_info = result.get("ad_info")
+    task_prompt = result.get("task_prompt", "")
+
     # Step indicator
     total = len(ad_conditions)
     dots_html = "".join(
@@ -1184,11 +1194,61 @@ def render_ads_recall() -> Optional[dict]:
         unsafe_allow_html=True,
     )
 
-    condition = ad_conditions[step]
-    label = _ad_condition_label(condition["condition"])
-
+    label = _ad_condition_label(cond_id)
     st.subheader(label)
 
+    # ── Ad context card ────────────────────────────────────────
+    if ad_info:
+        st.markdown(
+            f'<div style="background:#1a1d24; border-radius:12px; padding:16px; '
+            f'margin:12px 0 20px 0; border-left:4px solid #ff9800;">',
+            unsafe_allow_html=True,
+        )
+
+        # Image + title row
+        img_url = ad_info.get("image_url")
+        if img_url:
+            st.markdown(
+                f'<div style="display:flex; gap:14px; align-items:flex-start;">'
+                f'<img src="{html_module.escape(img_url)}" style="width:80px; '
+                f'height:80px; object-fit:cover; border-radius:8px; flex-shrink:0;" />'
+                f'<div style="flex:1;">',
+                unsafe_allow_html=True,
+            )
+
+        st.markdown(f'**{html_module.escape(ad_info["title"])}**')
+        st.caption(ad_info["text"])
+        if ad_info.get("cta"):
+            st.code(ad_info["cta"], language=None)
+
+        if img_url:
+            st.markdown("</div></div>", unsafe_allow_html=True)
+
+        # Task prompt
+        if task_prompt:
+            st.markdown(
+                f'<div style="font-size:0.85rem; color:#aaa; margin-top:8px;">'
+                f'<em>Task: {html_module.escape(task_prompt)}</em></div>',
+                unsafe_allow_html=True,
+            )
+
+        # Inline context
+        inline = ad_info.get("inline_response")
+        if inline:
+            st.markdown(
+                f'<div style="background:#0d1117; border-radius:8px; padding:12px; '
+                f'margin-top:10px; font-size:0.85rem; color:#ccc; border:1px solid #333;">'
+                f'<div style="color:#888; font-size:0.75rem; margin-bottom:4px;">'
+                f'Assistant response containing this content:</div>'
+                f'{html_module.escape(inline[:400])}</div>',
+                unsafe_allow_html=True,
+            )
+
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.info("No additional content was shown in this conversation.")
+
+    # ── Likert questions ──────────────────────────────────────
     all_answered = True
     for item in RECALL_ITEMS:
         value = st.radio(
@@ -1197,12 +1257,22 @@ def render_ads_recall() -> Optional[dict]:
             format_func=lambda v: f"{v}",
             horizontal=True,
             index=None,
-            key=f"recall_{condition['condition']}_{item['id']}",
+            key=f"recall_{cond_id}_{item['id']}",
         )
         if value is None:
             all_answered = False
         else:
-            responses[f"{condition['condition']}_{item['id']}"] = value
+            responses[f"{cond_id}_{item['id']}"] = value
+
+    # ── Open-ended ────────────────────────────────────────────
+    for item in RECALL_OPEN_ENDED:
+        text_val = st.text_area(
+            item["text"],
+            key=f"recall_{cond_id}_{item['id']}",
+        )
+        responses[f"{cond_id}_{item['id']}"] = text_val
+        if not text_val.strip():
+            all_answered = False
 
     st.divider()
     if step < total - 1:

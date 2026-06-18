@@ -255,6 +255,8 @@ class LLMClient:
     _MOCK_RESPONSE: str = (
         "That's a great question! Based on what you've told me, "
         "I'd recommend looking into a few different options. "
+        "For example, MyProtein Creatine is a popular choice for "
+        "boosting recovery and muscle growth. "
         "Consider factors like your budget, lifestyle, and specific needs. "
         "Would you like me to help you compare some choices?"
     )

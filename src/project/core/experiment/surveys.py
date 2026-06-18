@@ -264,16 +264,24 @@ ADS_AWARENESS_OPEN_ENDED: list[dict] = [
 
 # ═══════════════════════════════════════════════════════════════
 # ADS RECALL  (post-experiment, 4-step — one per ad condition)
-# Placeholder: symmetrical questions for inline_early, inline_late,
-# block_early, block_late (no_ads excluded).
+# Trust / credibility upgrade: 7 Likert + 1 open-ended.
+# Separates ad-level credibility from system-level trust shift.
 # ═══════════════════════════════════════════════════════════════
 RECALL_SCALE_MIN: int = 1
 RECALL_SCALE_MAX: int = 7
 
 RECALL_ITEMS: list[dict[str, str]] = [
-    # ── placeholder items ──
-    {"id": "recall_noticed",  "text": "Did you notice any additional content during this conversation?"},
-    {"id": "recall_remember", "text": "Do you remember what the additional content was about?"},
+    {"id": "recall_noticeability",  "text": "How noticeable was this content in the conversation?"},
+    {"id": "recall_memory",         "text": "How well do you remember this content?"},
+    {"id": "recall_relevance",      "text": "How relevant was this content to your task?"},
+    {"id": "recall_influence",      "text": "How much did this content influence your decisions or thinking?"},
+    {"id": "recall_intrusiveness",  "text": "How intrusive was this content in the conversation?"},
+    {"id": "recall_credibility",    "text": "How trustworthy did this content feel?"},
+    {"id": "recall_trust_shift",    "text": "After seeing this content, how much do you trust the AI system overall?"},
+]
+
+RECALL_OPEN_ENDED: list[dict[str, str]] = [
+    {"id": "recall_purpose", "text": "What do you think was the purpose of this content, and did it affect how much you trust the system?"},
 ]
 
 # ═══════════════════════════════════════════════════════════════
