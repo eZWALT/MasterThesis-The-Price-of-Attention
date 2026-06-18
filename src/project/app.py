@@ -44,10 +44,13 @@ def _warmup_retrieval() -> None:
     """
     from core.retrieval import retrieve_ad
     from core.log import logger
-    retrieve_ad("warmup", [])
-    from core.retrieval.log_util import log_retrieval
+    try:
+        retrieve_ad("warmup", [])
+        from core.retrieval.log_util import log_retrieval
 
-    log_retrieval("warm — ready to serve")
+        log_retrieval("warm — ready to serve")
+    except FileNotFoundError:
+        logger.warning("FAISS index not found — skipping retrieval warmup (mock ads will be used)")
 
 
 def _configure_retrieval_once(params) -> None:
