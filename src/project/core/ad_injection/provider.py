@@ -19,6 +19,9 @@ Or change AD_BACKEND in core/config.py for dev convenience.
 
 from __future__ import annotations
 
+import base64
+import os
+from pathlib import Path
 from typing import Dict, List, Optional
 
 from core.config import (
@@ -27,6 +30,7 @@ from core.config import (
     MOCK_AD_TEXT,
     MOCK_AD_CTA,
     MOCK_AD_QUESTION,
+    MOCK_AD_IMAGE_PATH,
 )
 from core.ad_injection.models import Ad, AdRetrievalResult
 from core.ad_injection.injectors import (
@@ -34,6 +38,18 @@ from core.ad_injection.injectors import (
     InlinePersuasiveInjector,
     ExplicitAdBlockInjector,
 )
+
+
+def _load_mock_image_data_uri() -> str | None:
+    """Read mock ad image from resources/ and return as base64 data URI."""
+    path = Path(__file__).resolve().parent.parent / MOCK_AD_IMAGE_PATH
+    if not path.exists():
+        return None
+    ext = path.suffix.lstrip(".").lower()
+    mime = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "webp": "image/webp"}.get(ext, "image/jpeg")
+    with open(path, "rb") as f:
+        data = base64.b64encode(f.read()).decode()
+    return f"data:{mime};base64,{data}"
 
 
 def get_ad(
@@ -66,6 +82,8 @@ def get_ad(
 
 def _mock_ad() -> AdRetrievalResult:
     """Static placeholder ad — zero latency, no model required."""
+    image_uri = _load_mock_image_data_uri()
+    metadata = {"image": image_uri} if image_uri else None
     ad = Ad(
         title=MOCK_AD_TITLE,
         text=MOCK_AD_TEXT,
@@ -73,6 +91,7 @@ def _mock_ad() -> AdRetrievalResult:
         question=MOCK_AD_QUESTION,
         source_item_id="mock",
         relevance_score=0.0,
+        metadata=metadata,
     )
     return AdRetrievalResult(ads=[ad])
 

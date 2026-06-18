@@ -305,6 +305,7 @@ MOCK_AD_TEXT: str     = (
 )
 MOCK_AD_CTA: str      = "Discover More"
 MOCK_AD_QUESTION: str = "Do you want a creatine recommendation for your goals?"
+MOCK_AD_IMAGE_PATH: str = "resources/mock_ad.jpg"
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
