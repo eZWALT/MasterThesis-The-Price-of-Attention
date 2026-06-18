@@ -398,6 +398,7 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
             "messages": [],
         }
         if ad_mode:
+            is_inline = ad_mode in ("inline_early", "inline_late")
             stub_result["ad_info"] = {
                 "title": MOCK_AD_TITLE,
                 "text": MOCK_AD_TEXT,
@@ -405,10 +406,23 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
                 "question": "",
                 "source_item_id": "mock",
                 "image_url": None,
+                "product_url": f"https://example.com/product/{MOCK_AD_TITLE.lower().replace(' ', '-')}",
                 "ad_mode": ad_mode,
                 "ad_turn": cfg.get("ad_turn"),
-                "inline_response": MOCK_AD_TEXT,
             }
+            if is_inline:
+                stub_result["ad_info"]["inline_response"] = (
+                    "That's a great question! Based on what you've told me, "
+                    "I'd recommend looking into a few different options. "
+                    "For example, MyProtein Creatine is a popular choice for "
+                    "boosting recovery and muscle growth. "
+                    "Consider factors like your budget, lifestyle, and specific needs. "
+                    "Would you like me to help you compare some choices?"
+                )
+                stub_result["ad_info"]["inline_user_msg"] = (
+                    "I need help finding a good supplement for my workout routine. "
+                    "What would you recommend?"
+                )
         ctrl.condition_results.append(stub_result)
         st.session_state.condition_manager = None
     elif scr == SCREEN_WARMUP_CHAT:
@@ -674,6 +688,7 @@ def run_participant_mode(params):
                 from dataclasses import asdict
                 from datetime import datetime
                 from core.ad_injection.models import ad_image_url
+                from core.ad_injection.ad_links import ad_product_url
 
                 end_reason = "max_turns" if mgr.must_end else "user_ended"
                 continuation_summary = mgr.finalize_trial(reason=end_reason)
@@ -690,6 +705,7 @@ def run_participant_mode(params):
                         "question": primary.question,
                         "source_item_id": primary.source_item_id,
                         "image_url": ad_image_url(primary),
+                        "product_url": ad_product_url(primary),
                         "ad_mode": cfg["ad_mode"],
                         "ad_turn": cfg["ad_turn"],
                     }
@@ -698,6 +714,8 @@ def run_participant_mode(params):
                         idx = 2 * t  # assistant msg at turn t is messages[2*t]
                         if idx < len(mgr.messages) and mgr.messages[idx].get("role") == "assistant":
                             ad_info["inline_response"] = mgr.messages[idx]["content"]
+                        if idx - 1 >= 0 and mgr.messages[idx - 1].get("role") == "user":
+                            ad_info["inline_user_msg"] = mgr.messages[idx - 1]["content"]
 
                 condition_record = {
                     "condition_id": condition_id,
