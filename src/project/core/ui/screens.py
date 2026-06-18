@@ -1276,23 +1276,56 @@ def render_ads_recall() -> Optional[dict]:
         parts.append('</div>')  # end details column
         parts.append('</div>')  # end body row
 
-        # ── Inline context bubble ──
-        inline = ad_info.get("inline_response")
-        if inline and is_inline:
-            preview = inline[:400]
+        # ── Product URL ──
+        product_url = ad_info.get("product_url")
+        if product_url:
             parts.append(f'''
-        <div style="
-            margin-top:14px; background:#0d1117; border-radius:10px; padding:14px;
-            border:1px solid #2d2d2d; position:relative;
-        ">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                <div style="width:6px; height:6px; border-radius:50%; background:#58a6ff;"></div>
-                <span style="color:#888; font-size:0.72rem; font-weight:500; letter-spacing:0.3px;">ASSISTANT RESPONSE (SHOWN IN CHAT)</span>
-            </div>
-            <div style="font-size:0.85rem; color:#c9d1d9; line-height:1.55; white-space:pre-wrap;">
-                {html_module.escape(preview)}
-            </div>
+        <div style="margin-top:12px; font-size:0.78rem; color:#58a6ff;">
+            🔗 {html_module.escape(product_url)}
         </div>''')
+
+        # ── Inline context: conversation excerpt ──
+        inline_user = ad_info.get("inline_user_msg")
+        inline_asst = ad_info.get("inline_response")
+        if is_inline and (inline_user or inline_asst):
+            title = ad_info["title"]
+            parts.append(f'''
+        <div style="margin-top:14px; border-top:1px solid #333; padding-top:14px;">
+            <div style="color:#888; font-size:0.7rem; font-weight:600; letter-spacing:0.5px; margin-bottom:10px;">
+                ╱  EXCERPT FROM THE CONVERSATION
+            </div>''')
+            # User message bubble
+            if inline_user:
+                user_trunc = inline_user if len(inline_user) < 300 else inline_user[:300] + "..."
+                parts.append(f'''
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <div style="width:28px; height:28px; border-radius:50%;
+                            background:#30363d; flex-shrink:0;
+                            display:flex; align-items:center; justify-content:center;
+                            font-size:0.7rem; color:#ccc;">U</div>
+                <div style="flex:1; background:#161b22; border-radius:10px 10px 10px 4px;
+                            padding:10px 14px; font-size:0.82rem; color:#c9d1d9; line-height:1.5;">
+                    {html_module.escape(user_trunc)}
+                </div>
+            </div>''')
+            # Assistant response bubble
+            if inline_asst:
+                highlighted = html_module.escape(inline_asst).replace(
+                    html_module.escape(title),
+                    f'<strong style="color:{mode_color}">{html_module.escape(title)}</strong>',
+                )
+                parts.append(f'''
+            <div style="display:flex; gap:10px; margin-bottom:4px;">
+                <div style="width:28px; height:28px; border-radius:50%;
+                            background:#1f6feb; flex-shrink:0;
+                            display:flex; align-items:center; justify-content:center;
+                            font-size:0.7rem; color:#fff;">A</div>
+                <div style="flex:1; background:#0d1117; border:1px solid #2d2d2d; border-radius:10px 10px 4px 10px;
+                            padding:10px 14px; font-size:0.82rem; color:#c9d1d9; line-height:1.55; white-space:pre-wrap;">
+                    {highlighted}
+                </div>
+            </div>''')
+            parts.append('</div>')
 
         parts.append('</div>')
         st.markdown("".join(parts), unsafe_allow_html=True)
