@@ -1258,14 +1258,13 @@ def render_ads_recall() -> Optional[dict]:
 
         # ── Task context ──
         if task_prompt:
-            short_task = task_prompt[:120] + "..." if len(task_prompt) > 120 else task_prompt
             parts.append(f'''
         <div style="
             margin-top:14px; padding:10px 14px; background:#12141a; border-radius:8px;
-            border-left:3px solid #555; font-size:0.8rem; color:#999; line-height:1.4;
+            border-left:3px solid #555; font-size:0.8rem; color:#999; line-height:1.5;
         ">
-            <span style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px;">Your Task</span>
-            {html_module.escape(short_task)}
+            <span style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:4px;">Your Task</span>
+            {html_module.escape(task_prompt)}
         </div>''')
 
         # ── Inline context bubble ──
