@@ -1233,15 +1233,9 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
 # RECALL  (post-experiment, 4-step — one per ad condition)
 # ═══════════════════════════════════════════════════════════════
 
-def _ad_condition_label(condition_id: str) -> str:
-    """Short label for an ad condition (avoid 'ad' in participant-facing text)."""
-    mapping = {
-        "inline_early": "Conversation A",
-        "inline_late":  "Conversation B",
-        "block_early":  "Conversation C",
-        "block_late":   "Conversation D",
-    }
-    return mapping.get(condition_id, condition_id)
+def _ad_condition_label(condition_id: str, step: int = 0) -> str:
+    """Short label for an ad condition — numbered by presentation order."""
+    return f"Conversation {step + 1}"
 
 
 def render_ads_recall() -> Optional[dict]:
@@ -1292,7 +1286,7 @@ def render_ads_recall() -> Optional[dict]:
         unsafe_allow_html=True,
     )
 
-    label = _ad_condition_label(cond_id)
+    label = _ad_condition_label(cond_id, step)
     st.subheader(label)
 
     # ── Instruction text ───────────────────────────────────────
