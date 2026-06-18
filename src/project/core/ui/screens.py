@@ -1197,7 +1197,28 @@ def render_ads_recall() -> Optional[dict]:
     label = _ad_condition_label(cond_id)
     st.subheader(label)
 
-    # ── Ad context card ────────────────────────────────────────
+    # ── Instruction text ───────────────────────────────────────
+    st.markdown(
+        f'<div style="font-size:0.85rem; color:#999; line-height:1.5; margin-bottom:12px;">'
+        f'Below is a summary of what happened in this conversation. '
+        f'Review it, then answer the questions below.</div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Task context (above ad card) ──────────────────────────
+    if task_prompt:
+        st.markdown(f'''
+        <div style="
+            background:#12141a; border-radius:10px; padding:14px 16px; margin-bottom:16px;
+            border-left:3px solid #58a6ff; font-size:0.85rem; color:#ccc; line-height:1.55;
+        ">
+            <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+            {html_module.escape(task_prompt)}
+        </div>''',
+        unsafe_allow_html=True,
+    )
+
+    # ── Ad card ───────────────────────────────────────────────
     if ad_info:
         img_url = ad_info.get("image_url")
         ad_mode_type = ad_info.get("ad_mode", "")
@@ -1206,14 +1227,13 @@ def render_ads_recall() -> Optional[dict]:
         mode_tag = "In-Conversation Mention" if is_inline else "Promotional Card"
         mode_color = "#e6b91e" if is_inline else "#ff6b35"
 
-        # ── Main container ──
         parts = [f'''<div style="
             background: linear-gradient(135deg, #1a1d24 0%, #20232b 100%);
-            border-radius:14px; padding:20px; margin:16px 0 24px 0;
+            border-radius:14px; padding:20px; margin:0 0 24px 0;
             border:1px solid #333; box-shadow:0 4px 16px rgba(0,0,0,0.3);
         ">''']
 
-        # ── Header row: mode tag + label ──
+        # ── Header row: mode tag ──
         parts.append(f'''
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
             <span style="
@@ -1255,17 +1275,6 @@ def render_ads_recall() -> Optional[dict]:
 
         parts.append('</div>')  # end details column
         parts.append('</div>')  # end body row
-
-        # ── Task context ──
-        if task_prompt:
-            parts.append(f'''
-        <div style="
-            margin-top:14px; padding:10px 14px; background:#12141a; border-radius:8px;
-            border-left:3px solid #555; font-size:0.8rem; color:#999; line-height:1.5;
-        ">
-            <span style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:4px;">Your Task</span>
-            {html_module.escape(task_prompt)}
-        </div>''')
 
         # ── Inline context bubble ──
         inline = ad_info.get("inline_response")
