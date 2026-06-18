@@ -945,13 +945,16 @@ def render_condition_conclusion(
     st.header(f"Conversation {condition_number} of {total_conditions} — Your Findings")
     st.caption("Before moving on, please summarise what you learned from this conversation.")
 
-    st.markdown(
-        f"<div style='text-align:center; font-size:1.1em; padding:30px 20px; "
-        f"background:#1a1d24; border-radius:12px; margin:20px 0;'>"
-        f"<strong>{task_title}</strong><br><br>"
-        f"{task_prompt}"
-        f"</div>",
-        unsafe_allow_html=True,
+    st.markdown(f'''
+    <div style="
+        background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
+        border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
+    ">
+        <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Your Task</div>
+        <strong style="color:#e0e0e0; display:block; margin-bottom:6px;">{html_module.escape(task_title)}</strong>
+        {html_module.escape(task_prompt)}
+    </div>''',
+    unsafe_allow_html=True,
     )
 
     conclusion = st.text_area(
