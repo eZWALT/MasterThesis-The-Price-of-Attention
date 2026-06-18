@@ -43,12 +43,13 @@ def build_retrieval_log_data(
 ) -> Dict[str, Any]:
     """Structured retrieval row for JSONL (HyDE passages logged once per retrieval)."""
     ad = retrieval.primary
+    ad_metadata = ad.metadata or {}
     payload: Dict[str, Any] = {
         "query": query,
         "ad_title": ad.title,
         "ad_item_id": ad.source_item_id,
-        "ad_source": ad.metadata.get("source", "amazon"),
-        "ad_category": ad.metadata.get("category", ""),
+        "ad_source": ad_metadata.get("source", "amazon"),
+        "ad_category": ad_metadata.get("category", ""),
         "ad_relevance_score": ad.relevance_score,
         "ad_cta": ad.cta,
         "candidate_count": len(retrieval.ads),
