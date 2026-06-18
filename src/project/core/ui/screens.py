@@ -233,6 +233,19 @@ def _render_turn_ads(
     """Render participant-visible ads for the current turn (compact, no descriptions)."""
     if not manager.should_inject_ad:
         return
+
+    # Dry-run shortcut: show mock ad banner directly, no injector
+    if manager.dry_run:
+        if manager.last_retrieval and manager.last_retrieval.primary:
+            ad = manager.last_retrieval.primary
+            payload = {
+                "header": "Sponsored",
+                "title": ad.title,
+                "cta": ad.cta or "Discover More",
+            }
+            _render_ad_banner(payload, ad_mode="explicit_ad_block", manager=manager, turn=manager.turn_count, ad=ad)
+        return
+
     if not _ad_display_state_matches_mode(manager, ad_mode):
         return
 

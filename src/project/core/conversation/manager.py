@@ -406,16 +406,17 @@ class ConversationManager:
                     turn=current_turn,
                 )
 
+        # 4a — inject ad into conversation (skip in dry_run — banner only)
         injector = get_injector(self.ad_mode) if inject_ad else None
         injection = (
             injector.inject(retrieval, self.messages)
-            if injector and retrieval and retrieval.has_ads
+            if injector and retrieval and retrieval.has_ads and not self.dry_run
             else InjectionResult()
         )
         self.last_injection = injection
 
         # 4b — log ad_injected event (which ad was actually shown)
-        if inject_ad and retrieval and retrieval.primary:
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
             self.logger.log(
                 "ad_injected",
@@ -610,16 +611,17 @@ class ConversationManager:
                     turn=current_turn,
                 )
 
+        # 4a — inject ad into conversation (skip in dry_run — banner only)
         injector = get_injector(self.ad_mode) if inject_ad else None
         injection = (
             injector.inject(retrieval, self.messages)
-            if injector and retrieval and retrieval.has_ads
+            if injector and retrieval and retrieval.has_ads and not self.dry_run
             else InjectionResult()
         )
         self.last_injection = injection
 
         # 4b — log ad_injected event (which ad was actually shown)
-        if inject_ad and retrieval and retrieval.primary:
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
             self.logger.log(
                 "ad_injected",

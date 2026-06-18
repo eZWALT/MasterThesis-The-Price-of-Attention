@@ -83,7 +83,7 @@ def get_ad(
 def _mock_ad() -> AdRetrievalResult:
     """Static placeholder ad — zero latency, no model required."""
     image_uri = _load_mock_image_data_uri()
-    metadata = {"image": image_uri} if image_uri else None
+    metadata: dict = {"image": image_uri} if image_uri else {}
     ad = Ad(
         title=MOCK_AD_TITLE,
         text=MOCK_AD_TEXT,
