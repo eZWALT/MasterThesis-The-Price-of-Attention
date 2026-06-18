@@ -652,16 +652,38 @@ def run_participant_mode(params):
             if render_condition_chat(mgr, condition_id, flow_test=params.flow_test, calibration=params.calibration):
                 from dataclasses import asdict
                 from datetime import datetime
+                from core.ad_injection.models import ad_image_url
 
                 end_reason = "max_turns" if mgr.must_end else "user_ended"
                 continuation_summary = mgr.finalize_trial(reason=end_reason)
 
                 trial_end_ts = datetime.now().isoformat()
+
+                ad_info = None
+                if mgr.last_retrieval and mgr.last_retrieval.has_ads:
+                    primary = mgr.last_retrieval.primary
+                    ad_info = {
+                        "title": primary.title,
+                        "text": primary.text,
+                        "cta": primary.cta,
+                        "question": primary.question,
+                        "source_item_id": primary.source_item_id,
+                        "image_url": ad_image_url(primary),
+                        "ad_mode": cfg["ad_mode"],
+                        "ad_turn": cfg["ad_turn"],
+                    }
+                    if cfg["ad_mode"] in ("inline_early", "inline_late") and cfg["ad_turn"] is not None:
+                        t = cfg["ad_turn"]
+                        idx = 2 * t  # assistant msg at turn t is messages[2*t]
+                        if idx < len(mgr.messages) and mgr.messages[idx].get("role") == "assistant":
+                            ad_info["inline_response"] = mgr.messages[idx]["content"]
+
                 condition_record = {
                     "condition_id": condition_id,
                     "ad_mode": cfg["ad_mode"],
                     "ad_turn": cfg["ad_turn"],
                     "task_id": task.id,
+                    "task_prompt": task.participant_prompt,
                     "conversation_id": mgr.conversation_id,
                     "initial_intent": mgr.initial_intent,
                     "intent_history": list(mgr.intent_history),
@@ -672,6 +694,7 @@ def run_participant_mode(params):
                     "turn_metrics": [asdict(m) for m in mgr.turn_metrics],
                     "continuation": continuation_summary,
                     "messages": list(mgr.messages),
+                    "ad_info": ad_info,
                 }
                 ctrl.condition_results.append(condition_record)
                 from core.retrieval import count_items_by_categories
