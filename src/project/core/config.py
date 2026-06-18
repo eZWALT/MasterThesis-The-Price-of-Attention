@@ -180,13 +180,13 @@ STUDY_DEFAULTS: dict[str, dict] = {
         "n_trials":    10,
         "bfi_version": "10",
         "turns_min":   5,
-        "turns_max":   20,
+        "turns_max":   5,
     },
     STUDY_TYPE_CROWD: {
         "n_trials":    10,
         "bfi_version": "10",
-        "turns_min":   3,
-        "turns_max":   20,
+        "turns_min":   5,
+        "turns_max":   5,
     },
 }
 
