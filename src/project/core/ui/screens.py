@@ -793,10 +793,24 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
     Returns True when user clicks 'Done'.
     """
     st.header("Warm-Up Conversation")
-    st.info(
-        "This is a practice conversation to get familiar with the interface. "
-        "Chat naturally with the assistant."
-    )
+
+    # Turn progress in sidebar
+    with st.sidebar:
+        progress = min(manager.turn_count / manager.max_turns, 1.0)
+        st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
+
+    # Task prompt in blue box
+    if manager.task:
+        st.markdown(f'''
+        <div style="
+            background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
+            border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
+        ">
+            <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+            {html_module.escape(manager.task.participant_prompt)}
+        </div>''',
+        unsafe_allow_html=True,
+        )
 
     for msg in manager.messages:
         with st.chat_message(msg["role"]):
