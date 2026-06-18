@@ -653,10 +653,11 @@ def render_trial_chat(
     # Compact ads above chat input (banner where applicable)
     _render_turn_ads(manager, ad_mode)
 
-    # Max turns reached → auto-end
+    # Max turns reached → show continue button (let user read last message)
     if manager.must_end:
         st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
-        return True
+        if st.button("Continue to questionnaire", type="primary", use_container_width=True):
+            return True
 
     # Chat input
     if user_input := st.chat_input("Send a message..."):
@@ -967,7 +968,7 @@ def render_condition_chat(
         if calibration or flow_test:
             st.caption(f"Condition: {label}")
 
-        if calibration and manager.turn_count >= manager.finish_from:
+        if manager.turn_count >= manager.finish_from:
             if manager.turn_count < manager.min_turns:
                 st.info(
                     f"💬 Keep chatting — you need at least {manager.min_turns} turns "
@@ -988,9 +989,9 @@ def render_condition_chat(
         _render_turn_ads(manager, ad_mode)
 
     if manager.must_end:
-        if calibration or flow_test:
-            st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
-        return True
+        st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
+        if st.button("Continue to questionnaire", type="primary", use_container_width=True):
+            return True
 
     if user_input := st.chat_input("Send a message..."):
         if not user_input.strip():
