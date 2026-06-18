@@ -1199,52 +1199,95 @@ def render_ads_recall() -> Optional[dict]:
 
     # ── Ad context card ────────────────────────────────────────
     if ad_info:
-        st.markdown(
-            f'<div style="background:#1a1d24; border-radius:12px; padding:16px; '
-            f'margin:12px 0 20px 0; border-left:4px solid #ff9800;">',
-            unsafe_allow_html=True,
-        )
-
-        # Image + title row
         img_url = ad_info.get("image_url")
-        if img_url:
-            st.markdown(
-                f'<div style="display:flex; gap:14px; align-items:flex-start;">'
-                f'<img src="{html_module.escape(img_url)}" style="width:80px; '
-                f'height:80px; object-fit:cover; border-radius:8px; flex-shrink:0;" />'
-                f'<div style="flex:1;">',
-                unsafe_allow_html=True,
-            )
+        ad_mode_type = ad_info.get("ad_mode", "")
+        is_inline = ad_mode_type in ("inline_early", "inline_late")
 
-        st.markdown(f'**{html_module.escape(ad_info["title"])}**')
-        st.caption(ad_info["text"])
+        mode_tag = "In-Conversation Mention" if is_inline else "Promotional Card"
+        mode_color = "#e6b91e" if is_inline else "#ff6b35"
+
+        # ── Main container ──
+        parts = [f'''<div style="
+            background: linear-gradient(135deg, #1a1d24 0%, #20232b 100%);
+            border-radius:14px; padding:20px; margin:16px 0 24px 0;
+            border:1px solid #333; box-shadow:0 4px 16px rgba(0,0,0,0.3);
+        ">''']
+
+        # ── Header row: mode tag + label ──
+        parts.append(f'''
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+            <span style="
+                background:{mode_color}22; color:{mode_color};
+                font-size:0.7rem; font-weight:600; letter-spacing:0.5px;
+                padding:3px 10px; border-radius:20px; border:1px solid {mode_color}44;
+            ">{mode_tag}</span>
+        </div>''')
+
+        # ── Body: image + details ──
+        parts.append('<div style="display:flex; gap:16px; align-items:flex-start;">')
+
+        if img_url:
+            parts.append(f'''
+            <div style="flex-shrink:0;">
+                <img src="{html_module.escape(img_url)}"
+                     style="width:88px; height:88px; object-fit:cover; border-radius:10px;
+                            border:1px solid #3a3a3a; background:#0d0d0d;"
+                     alt="Product image" />
+            </div>''')
+
+        parts.append('<div style="flex:1; min-width:0;">')
+        parts.append(f'''
+        <div style="font-size:1.05rem; font-weight:600; color:#f0f0f0; margin-bottom:4px; line-height:1.3;">
+            {html_module.escape(ad_info["title"])}
+        </div>''')
+        parts.append(f'''
+        <div style="font-size:0.88rem; color:#bbb; line-height:1.5; margin-bottom:8px;">
+            {html_module.escape(ad_info["text"])}
+        </div>''')
+
         if ad_info.get("cta"):
-            st.code(ad_info["cta"], language=None)
+            parts.append(f'''
+        <div style="display:inline-block; background:{mode_color}18; color:{mode_color};
+                    font-size:0.78rem; font-weight:500; padding:3px 12px; border-radius:6px;
+                    border:1px solid {mode_color}33;">
+            {html_module.escape(ad_info["cta"])}
+        </div>''')
 
-        if img_url:
-            st.markdown("</div></div>", unsafe_allow_html=True)
+        parts.append('</div>')  # end details column
+        parts.append('</div>')  # end body row
 
-        # Task prompt
+        # ── Task context ──
         if task_prompt:
-            st.markdown(
-                f'<div style="font-size:0.85rem; color:#aaa; margin-top:8px;">'
-                f'<em>Task: {html_module.escape(task_prompt)}</em></div>',
-                unsafe_allow_html=True,
-            )
+            short_task = task_prompt[:120] + "..." if len(task_prompt) > 120 else task_prompt
+            parts.append(f'''
+        <div style="
+            margin-top:14px; padding:10px 14px; background:#12141a; border-radius:8px;
+            border-left:3px solid #555; font-size:0.8rem; color:#999; line-height:1.4;
+        ">
+            <span style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:2px;">Your Task</span>
+            {html_module.escape(short_task)}
+        </div>''')
 
-        # Inline context
+        # ── Inline context bubble ──
         inline = ad_info.get("inline_response")
-        if inline:
-            st.markdown(
-                f'<div style="background:#0d1117; border-radius:8px; padding:12px; '
-                f'margin-top:10px; font-size:0.85rem; color:#ccc; border:1px solid #333;">'
-                f'<div style="color:#888; font-size:0.75rem; margin-bottom:4px;">'
-                f'Assistant response containing this content:</div>'
-                f'{html_module.escape(inline[:400])}</div>',
-                unsafe_allow_html=True,
-            )
+        if inline and is_inline:
+            preview = inline[:400]
+            parts.append(f'''
+        <div style="
+            margin-top:14px; background:#0d1117; border-radius:10px; padding:14px;
+            border:1px solid #2d2d2d; position:relative;
+        ">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                <div style="width:6px; height:6px; border-radius:50%; background:#58a6ff;"></div>
+                <span style="color:#888; font-size:0.72rem; font-weight:500; letter-spacing:0.3px;">ASSISTANT RESPONSE (SHOWN IN CHAT)</span>
+            </div>
+            <div style="font-size:0.85rem; color:#c9d1d9; line-height:1.55; white-space:pre-wrap;">
+                {html_module.escape(preview)}
+            </div>
+        </div>''')
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        parts.append('</div>')
+        st.markdown("".join(parts), unsafe_allow_html=True)
     else:
         st.info("No additional content was shown in this conversation.")
 
