@@ -692,9 +692,13 @@ def render_post_trial_survey(trial_number: int) -> Optional[dict]:
         else:
             responses[item["id"]] = value
 
+    # Progress bar
+    answered = sum(1 for v in responses.values() if v is not None)
+    total = len(POST_TRIAL_ITEMS)
+    st.progress(answered / total, text=f"{answered} of {total} answered")
+
     st.divider()
     if all_answered and st.button("Continue", type="primary"):
-        # Validate all values are within the expected scale before returning
         invalid = [
             iid for iid, v in responses.items()
             if not (POST_TRIAL_SCALE_MIN <= v <= POST_TRIAL_SCALE_MAX)
@@ -736,6 +740,11 @@ def render_final_survey() -> Optional[dict]:
             all_answered = False
         else:
             responses[item["id"]] = value
+
+    # Progress bar (Likert items only)
+    answered_likert = sum(1 for v in responses.values() if isinstance(v, int))
+    total_likert = len(FINAL_SURVEY_ITEMS)
+    st.progress(answered_likert / total_likert, text=f"{answered_likert} of {total_likert} answered")
 
     st.divider()
     st.subheader("Debrief")
@@ -847,6 +856,8 @@ def render_first_impression() -> Optional[dict]:
     )
 
     all_filled = bool(text and reuse and sentiment)
+    answered_count = sum([bool(text), bool(sentiment), bool(reuse)])
+    st.progress(answered_count / 3, text=f"{answered_count} of 3 answered")
     if all_filled and st.button("Continue", type="primary"):
         return {
             "first_impression_text": text,
@@ -923,9 +934,9 @@ def render_condition_chat(
         )
 
     with st.sidebar:
+        progress = min(manager.turn_count / manager.max_turns, 1.0)
+        st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
         if calibration or flow_test:
-            progress = min(manager.turn_count / manager.max_turns, 1.0)
-            st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
             st.caption(f"Condition: {label}")
 
         if calibration and manager.turn_count >= manager.finish_from:
@@ -1089,6 +1100,9 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             else:
                 responses[item["id"]] = value
 
+        answered_llm = sum(1 for item in POST_CONDITION_LLM_ITEMS if item["id"] in responses)
+        st.progress(answered_llm / len(POST_CONDITION_LLM_ITEMS), text=f"Section 1: {answered_llm} of {len(POST_CONDITION_LLM_ITEMS)} answered")
+
         st.divider()
         if all_answered and st.button("Continue", type="primary"):
             st.session_state[responses_key] = responses
@@ -1132,6 +1146,16 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             if not value.strip():
                 all_open_answered = False
 
+        answered_s2 = sum(
+            1 for item in POST_CONDITION_PERSONALITY_LIKERT
+            if item["id"] in responses and responses[item["id"]] is not None
+        ) + sum(
+            1 for item in POST_CONDITION_PERSONALITY_OPEN
+            if item["id"] in responses and responses[item["id"]].strip()
+        )
+        total_s2 = len(POST_CONDITION_PERSONALITY_LIKERT) + len(POST_CONDITION_PERSONALITY_OPEN)
+        st.progress(answered_s2 / total_s2, text=f"Section 2: {answered_s2} of {total_s2} answered")
+
         st.divider()
         if all_answered and all_open_answered and st.button("Continue", type="primary"):
             st.session_state[responses_key] = responses
@@ -1162,6 +1186,9 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
                 all_answered = False
             else:
                 responses[item["id"]] = value
+
+        answered_s3 = sum(1 for item in POST_CONDITION_BEHAVIOUR_ITEMS if item["id"] in responses)
+        st.progress(answered_s3 / len(POST_CONDITION_BEHAVIOUR_ITEMS), text=f"Section 3: {answered_s3} of {len(POST_CONDITION_BEHAVIOUR_ITEMS)} answered")
 
         st.divider()
         if all_answered and st.button("Submit", type="primary"):
