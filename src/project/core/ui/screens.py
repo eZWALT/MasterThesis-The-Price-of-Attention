@@ -439,7 +439,16 @@ def render_practice(manager: ConversationManager) -> bool:
     Returns True when user clicks 'Done practising'.
     """
     st.header("Practice Round")
-    st.info(PRACTICE_TASK_PROMPT)
+    st.markdown(f'''
+    <div style="
+        background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
+        border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
+    ">
+        <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+        {html_module.escape(PRACTICE_TASK_PROMPT)}
+    </div>''',
+    unsafe_allow_html=True,
+    )
 
     # Chat history
     for msg in manager.messages:
@@ -472,12 +481,15 @@ def render_practice(manager: ConversationManager) -> bool:
 def render_trial_intro(trial_number: int, total_trials: int, task_prompt: str) -> bool:
     """Show task description before a trial starts."""
     st.header(f"Conversation {trial_number} of {total_trials}")
-    st.markdown(
-        f"<div style='text-align:center; font-size:1.2em; padding:40px 20px; "
-        f"background:#1a1d24; border-radius:12px; margin:20px 0;'>"
-        f"{task_prompt}"
-        f"</div>",
-        unsafe_allow_html=True,
+    st.markdown(f'''
+    <div style="
+        background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
+        border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
+    ">
+        <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+        {html_module.escape(task_prompt)}
+    </div>''',
+    unsafe_allow_html=True,
     )
     if st.button("Start conversation", type="primary"):
         return True
@@ -588,7 +600,16 @@ def render_trial_chat(
 
     # Task reminder at top
     if manager.task:
-        st.caption(f"📝 {manager.task.participant_prompt}")
+        st.markdown(f'''
+        <div style="
+            background:#12141a; border-radius:10px; padding:14px 16px; margin-bottom:16px;
+            border-left:3px solid #58a6ff; font-size:0.85rem; color:#ccc; line-height:1.55;
+        ">
+            <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+            {html_module.escape(manager.task.participant_prompt)}
+        </div>''',
+        unsafe_allow_html=True,
+        )
 
     # Turn progress + finish button in sidebar
     with st.sidebar:
@@ -848,7 +869,16 @@ def render_condition_intro(
     task: TaskDefinition,
 ) -> bool:
     st.header(f"Conversation {condition_number} of {total_conditions}")
-    st.info(task.participant_prompt)
+    st.markdown(f'''
+    <div style="
+        background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
+        border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.55;
+    ">
+        <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+        {html_module.escape(task.participant_prompt)}
+    </div>''',
+    unsafe_allow_html=True,
+    )
     if st.button("Start conversation", type="primary"):
         return True
     return False
@@ -881,7 +911,16 @@ def render_condition_chat(
     label = CONDITION_LABELS.get(condition_id, condition_id)
 
     if manager.task:
-        st.info(manager.task.participant_prompt)
+        st.markdown(f'''
+        <div style="
+            background:#12141a; border-radius:10px; padding:14px 16px; margin-bottom:16px;
+            border-left:3px solid #58a6ff; font-size:0.85rem; color:#ccc; line-height:1.55;
+        ">
+            <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Your Task</div>
+            {html_module.escape(manager.task.participant_prompt)}
+        </div>''',
+        unsafe_allow_html=True,
+        )
 
     with st.sidebar:
         if calibration or flow_test:
