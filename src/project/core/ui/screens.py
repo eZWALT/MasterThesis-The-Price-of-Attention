@@ -592,8 +592,8 @@ def render_trial_chat(
 
     # Turn progress + finish button in sidebar
     with st.sidebar:
-        progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
-        st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
+        progress = min(manager.turn_count / manager.max_turns, 1.0)
+        st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
 
         # "I've finished" button — visible from manager.finish_from onwards
         if manager.turn_count >= manager.finish_from:
@@ -885,8 +885,8 @@ def render_condition_chat(
 
     with st.sidebar:
         if calibration or flow_test:
-            progress = min(manager.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
-            st.progress(progress, text=f"Turn {manager.turn_count} / {MAX_TURNS_PER_TRIAL}")
+            progress = min(manager.turn_count / manager.max_turns, 1.0)
+            st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
             st.caption(f"Condition: {label}")
 
         if calibration and manager.turn_count >= manager.finish_from:

@@ -83,8 +83,8 @@ def render_dev_sidebar():
             _render_dev_ad_controls(mgr=mgr)
         st.divider()
         if mgr:
-            progress = min(mgr.turn_count / MAX_TURNS_PER_TRIAL, 1.0)
-            st.progress(progress, text=f"Turn {mgr.turn_count} / {MAX_TURNS_PER_TRIAL}")
+            progress = min(mgr.turn_count / mgr.max_turns, 1.0)
+            st.progress(progress, text=f"Turn {mgr.turn_count} / {mgr.max_turns}")
             st.markdown(f"**Can end:** {mgr.can_end}")
             st.markdown("**System prompt:**")
             st.code(mgr.system_prompt, language="text")
