@@ -445,6 +445,12 @@ def parse_query_params() -> ExperimentParams:
         params.finish_from = 5
         explicitly_set.update({"turns_min", "turns_max"})
 
+    # ?dry_run=1  — mock everything (LLM + ads), zero cost, no GPU
+    dry_raw = p.get("dry_run", "").strip().lower()
+    if dry_raw in ("1", "true", "yes"):
+        params.dry_run = True
+        params.use_rag = False
+
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:
         # ?force_ad=1  — inject an ad on every turn regardless of ad_turns schedule
@@ -461,12 +467,6 @@ def parse_query_params() -> ExperimentParams:
             params.use_rag = False
         elif rag_raw == "1":
             params.use_rag = True
-
-        # ?dry_run=1  — mock everything (LLM + ads), zero cost, no GPU
-        dry_raw = p.get("dry_run", "").strip().lower()
-        if dry_raw in ("1", "true", "yes"):
-            params.dry_run = True
-            params.use_rag = False
 
     # ── Apply study-type smart defaults for unset params ──────
     params.apply_study_defaults(explicitly_set)
