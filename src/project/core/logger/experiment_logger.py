@@ -108,6 +108,8 @@ class ExperimentLogger:
         # File path
         self._log_dir = Path(log_dir) / self.experiment_id
         self._log_dir.mkdir(parents=True, exist_ok=True)
+        # Ensure host user can clean up log dirs created by Docker root.
+        self._log_dir.chmod(0o777)
         self._log_path = self._log_dir / f"{self.run_id}.jsonl"
 
         # Background writer thread (daemon — dies with main)
