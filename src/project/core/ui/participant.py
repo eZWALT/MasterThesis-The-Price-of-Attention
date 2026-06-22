@@ -468,7 +468,12 @@ def _render_dev_ad_controls(mgr=None) -> None:
             (m["content"] for m in reversed(mgr.messages) if m["role"] == "user"),
             "",
         )
-        ad = get_ad(query=last_user, context=mgr.messages, backend=backend)
+        ad = get_ad(
+            query=last_user,
+            context=mgr.messages,
+            backend=backend,
+            task_prompt=mgr.task.participant_prompt if mgr.task else "",
+        )
         mgr.last_retrieval = ad
         mgr.last_retrieval_ad_mode = mgr.ad_mode if ad and ad.has_ads else None
         injector = get_injector(mgr.ad_mode)

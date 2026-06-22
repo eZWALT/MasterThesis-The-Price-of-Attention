@@ -27,6 +27,7 @@ def retrieve_ad(
     query: str,
     context: List[Dict[str, str]],
     categories: Optional[List[str]] = None,
+    task_prompt: str = "",
 ) -> Optional[AdRetrievalResult]:
     """
     Run the full 5-stage retrieval pipeline and return ranked ads.
@@ -36,15 +37,16 @@ def retrieve_ad(
 
     Parameters
     ----------
-    query      : user's latest message.
-    context    : full conversation history as list of {role, content} dicts.
-    categories : optional list of allowed meta-category strings (e.g. ["meta_Electronics"]).
+    query       : user's latest message.
+    context     : full conversation history as list of {role, content} dicts.
+    categories  : optional list of allowed meta-category strings (e.g. ["meta_Electronics"]).
+    task_prompt : participant-facing task scenario used as HyDE context.
     """
     global _pipeline
     if _pipeline is None:
         _pipeline = _build_pipeline()
 
-    result = _pipeline.run(query, context, categories=categories)
+    result = _pipeline.run(query, context, categories=categories, task_prompt=task_prompt)
     from core.retrieval.log_util import is_warmup_query
 
     if result is None or not result.has_ads:

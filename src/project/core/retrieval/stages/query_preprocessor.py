@@ -107,18 +107,22 @@ def _preview(text: str, max_chars: int) -> str:
 
 
 def _context_block_for_hyde(state: PipelineState) -> str:
-    """Conversation text for HyDE — one LLM call, no separate summary pass."""
+    """Conversation + task context for HyDE — one LLM call, no separate summary pass."""
+    parts = []
+    if state.task_prompt:
+        parts.append(state.task_prompt)
     if state.context_summary:
-        return state.context_summary
-    if not state.context:
-        return "(none)"
-    lines = []
-    for msg in state.context[-6:]:
-        role = msg.get("role", "user").capitalize()
-        content = (msg.get("content") or "").strip()
-        if content:
-            lines.append(f"{role}: {content}")
-    return "\n".join(lines) if lines else "(none)"
+        parts.append(state.context_summary)
+    elif state.context:
+        lines = []
+        for msg in state.context[-6:]:
+            role = msg.get("role", "user").capitalize()
+            content = (msg.get("content") or "").strip()
+            if content:
+                lines.append(f"{role}: {content}")
+        if lines:
+            parts.append("\n".join(lines))
+    return "\n\n---\n\n".join(parts) if parts else "(none)"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -216,7 +220,7 @@ class QueryExpansionStage(PipelineStage):
     Config keys (core.config)
     -------------------------
     QUERY_EXPANSION_MODE : str — "none" | "hyde" | "expand"
-    HYDE_PROMPT          : str template with {query}, {context_summary}
+    HYDE_PROMPT          : str template with {query}, {context_block}
     QUERY_EXPANSION_PROMPT : str template with {query}, {context_summary}
 
     Parameters
