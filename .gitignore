@@ -215,3 +215,4 @@ src/project/.hf_cache/
 # Ignore large or generated files
 src/project/data/catalogs/catalog.jsonl
 src/project/data/catalogs/amazon*session-ses_*.md
+session-ses_*.md
