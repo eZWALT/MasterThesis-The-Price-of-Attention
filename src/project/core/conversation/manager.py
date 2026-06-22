@@ -383,6 +383,7 @@ class ConversationManager:
                 context=self.messages,
                 backend=self._ad_backend,
                 categories=self.task.relevant_categories if self.task else None,
+                task_prompt=self.task.participant_prompt if self.task else "",
             )
             self.last_retrieval = retrieval
             self.last_retrieval_ad_mode = self.ad_mode if retrieval and retrieval.has_ads else None
@@ -588,6 +589,7 @@ class ConversationManager:
                 context=self.messages,
                 backend=self._ad_backend,
                 categories=self.task.relevant_categories if self.task else None,
+                task_prompt=self.task.participant_prompt if self.task else "",
             )
             self.last_retrieval = retrieval
             self.last_retrieval_ad_mode = self.ad_mode if retrieval and retrieval.has_ads else None

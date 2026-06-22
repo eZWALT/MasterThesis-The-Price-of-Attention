@@ -74,10 +74,13 @@ class PipelineState:
     # expanded_query  : HyDE doc / LLM-rewritten query used for embedding.
     #                   Written by QueryExpansionStage; falls back to `query`
     #                   when empty.
+    # task_prompt     : participant-facing task scenario for HyDE context.
+    #                   Passed from ConversationManager via retrieve_ad().
     context_summary: str = ""
     expanded_query: str = ""
     # HyDE: multiple hypothetical docs from one LLM call (fused in DenseRetriever).
     hyde_documents: List[str] = field(default_factory=list)
+    task_prompt: str = ""
 
     # Per-stage wall times (ms), filled by AdRetrievalPipeline.run().
     stage_ms: Dict[str, float] = field(default_factory=dict)

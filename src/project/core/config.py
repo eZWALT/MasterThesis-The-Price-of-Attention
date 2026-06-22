@@ -95,7 +95,7 @@ CONTEXT_SUMMARY_PROMPT: str = (
 # ── 2.4  HyDE — Hypothetical Document Embedding (Stage 0b, pre-retrieval) ─
 #         Generates a fake product description; embedding it shifts the query
 #         vector closer to the catalog's document distribution (Gao et al. 2022).
-#         Placeholders: {query}, {context_summary}
+#         Placeholders: {query}, {context_block}
 #         Enabled via: QUERY_EXPANSION_MODE="hyde" / ?qe=hyde
 HYDE_PROMPT: str = (
     "You write hypothetical product listings for semantic search. "
@@ -106,10 +106,10 @@ HYDE_PROMPT: str = (
     "tokens total — leave room for all listings and --- separators.\n"
     "Each listing must be a DIFFERENT plausible product angle for the same need. "
     "Use concrete nouns; avoid fluff, brands, prices, and CTAs. "
-    "Stay on topic from the query and conversation.\n\n"
+    "Stay on topic from the query, conversation, and task scenario.\n\n"
     "Separate listings with a line containing only: ---\n\n"
     "User need: {query}\n"
-    "Conversation:\n{context_block}\n\n"
+    "Context:\n{context_block}\n\n"
     "Listing 1:"
 )
 

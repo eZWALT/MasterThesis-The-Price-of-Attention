@@ -120,6 +120,7 @@ class AdRetrievalPipeline:
         query: str,
         context: List[Dict[str, str]],
         categories: Optional[List[str]] = None,
+        task_prompt: str = "",
     ) -> AdRetrievalResult | None:
         """
         Execute all stages in order and return ranked ads.
@@ -129,12 +130,13 @@ class AdRetrievalPipeline:
 
         Parameters
         ----------
-        categories : optional list of allowed meta-category strings for filtering.
+        categories  : optional list of allowed meta-category strings for filtering.
+        task_prompt : participant-facing task scenario for HyDE context.
         """
         from core.log import logger
         from core.retrieval.query_text import build_retrieval_query
 
-        state = PipelineState(query=query, context=context, categories=categories or [])
+        state = PipelineState(query=query, context=context, categories=categories or [], task_prompt=task_prompt)
         effective_query = build_retrieval_query(query, context)
         if effective_query != query:
             logger.debug(
