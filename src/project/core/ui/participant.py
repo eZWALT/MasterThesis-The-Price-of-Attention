@@ -504,6 +504,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             participant_id=ctrl.participant_id,
             log_dir=st.session_state.logger._log_dir,
             run_id=st.session_state.logger.run_id,
+            current_screen=ctrl.current_screen,
         )
         if study_type or flow_test:
             st.divider()
