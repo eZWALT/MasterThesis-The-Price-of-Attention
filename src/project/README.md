@@ -150,3 +150,43 @@ src/project/
 ├── scripts/                # catalog builder
 └── tests/                  # query_params, baseline, logger
 ```
+
+---
+
+## Running on the Cluster (tmux + cron)
+
+Keeps the experiment alive across SSH drops, internet outages, and server reboots.
+
+### First time
+
+```bash
+ssh atlas
+git clone <repo-url> && cd src/project
+# install deps, build index, configure .env
+crontab -e
+# add this line:
+* * * * * tmux has-session -t calibration 2>/dev/null || tmux new-session -d -s calibration 'cd ~/src/project && python app.py'
+# launch manually:
+python app.py
+```
+
+Ctrl+B → d to detach (session keeps running on the server).
+
+### Reconnect later
+
+```bash
+ssh atlas -t "tmux attach -t calibration"
+```
+
+### Check if alive
+
+```bash
+ssh atlas "tmux ls"
+# → calibration: 1 windows (created Mon Jun 23 15:30:00 2026)
+```
+
+### Kill the session
+
+```bash
+ssh atlas "tmux kill-session -t calibration"
+```
