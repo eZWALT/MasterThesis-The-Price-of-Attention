@@ -410,22 +410,22 @@ def _reset_baseline_timer() -> None:
 
 if _HAVE_WEBRTC:
 
-    class _BaselineRecorder(VideoProcessorBase):
-        """Collects webcam frames during baseline recording."""
+    class _SessionRecorder(VideoProcessorBase):
+        """Collects webcam frames throughout the entire session."""
 
         def __init__(self) -> None:
-            self.frames: list = []
+            self.session_frames: list = []
             self._count: int = 0
 
         def recv(self, frame):
             """Downsample to ~15 fps by capturing every other frame."""
             self._count += 1
             if self._count % 2 == 0:
-                self.frames.append(frame)
+                self.session_frames.append(frame)
             return frame
 
 
-    def _save_video(frames: list, output_path: Path, fps: int = 15) -> None:
+    def save_session_video(frames: list, output_path: Path, fps: int = 15) -> None:
         """Write collected av.VideoFrame objects to an MP4 file."""
         if not frames:
             return
@@ -446,43 +446,94 @@ if _HAVE_WEBRTC:
         container.close()
 
 
-    def _finalize_baseline() -> None:
-        """Save recorded video and clean up session state."""
-        buffer = st.session_state.pop("baseline_frames_buffer", [])
-        if buffer:
-            try:
-                log_dir: Path = st.session_state.logger._log_dir
-                video_path = log_dir / f"{st.session_state.logger.run_id}_baseline.mp4"
-                _save_video(buffer, video_path)
-                st.session_state.logger.log(
-                    "baseline_video_saved",
-                    {"path": str(video_path), "frames": len(buffer)},
-                    ad_mode="session",
-                    conversation_id=st.session_state.controller.participant_id,
-                    source="system",
-                )
-            except Exception as exc:
-                st.warning(f"Failed to save baseline video: {exc}")
-        clear_baseline_session_state()
+    def render_webcam_preview(
+        study_type: str,
+        participant_id: str,
+        log_dir: Path,
+        run_id: str,
+    ) -> None:
+        """Small webcam preview in the sidebar — active for the entire session.
+
+        Must be called from ``render_progress_sidebar`` (every screen) so the
+        WebRTC connection stays alive across screen transitions.
+        """
+        if study_type != "lab":
+            return
+
+        st.markdown(
+            "<div style='font-size:0.75rem; color:#888; text-transform:uppercase; "
+            "letter-spacing:0.4px; margin-bottom:4px;'>🎥 Eye Tracking</div>",
+            unsafe_allow_html=True,
+        )
+
+        ctx = webrtc_streamer(
+            key="session_webcam",
+            video_processor_factory=_SessionRecorder,
+            mode=WebRtcMode.SENDRECV,
+            media_stream_constraints={"video": True, "audio": False},
+            async_processing=True,
+            video_html_attrs={
+                "style": "width:100%; max-width:240px; border-radius:8px;",
+                "controls": False,
+                "autoplay": True,
+                "muted": True,
+            },
+        )
+
+        # Store frames in session state so they survive screen transitions
+        if ctx and ctx.video_processor and ctx.video_processor.session_frames:
+            buf = st.session_state.setdefault("_webcam_frames", [])
+            buf.extend(ctx.video_processor.session_frames)
+            ctx.video_processor.session_frames.clear()
+
+        st.caption("🔴 Recording")
+
+
+    def finalize_webcam_recording() -> None:
+        """Save the session-long webcam recording and clean up."""
+        buf = st.session_state.pop("_webcam_frames", [])
+        if not buf:
+            return
+        try:
+            log_dir: Path = st.session_state.logger._log_dir
+            video_path = log_dir / f"{st.session_state.logger.run_id}_eyetracking.mp4"
+            save_session_video(buf, video_path)
+            st.session_state.logger.log(
+                "eyetracking_video_saved",
+                {"path": str(video_path), "frames": len(buf)},
+                ad_mode="session",
+                conversation_id=st.session_state.controller.participant_id,
+                source="system",
+            )
+        except Exception as exc:
+            st.warning(f"Failed to save eye-tracking video: {exc}")
 
 
 else:
+    # ── No-op fallbacks ──────────────────────────────────────────
 
-    def _finalize_baseline() -> None:
-        """No-op fallback when streamlit-webrtc is not installed."""
-        clear_baseline_session_state()
+    def render_webcam_preview(
+        study_type: str,
+        participant_id: str,
+        log_dir: Path,
+        run_id: str,
+    ) -> None:
+        if study_type == "lab":
+            st.caption("🎥 Camera — install `streamlit-webrtc`")
+
+    def finalize_webcam_recording() -> None:
+        pass
 
 
-# ── Main render function ──────────────────────────────────────────────────
+# ── Baseline screen ───────────────────────────────────────────────────────
 
 
 def render_baseline() -> bool:
     """
-    Eye-tracking baseline screen with live webcam recording.
+    Baseline / eye-tracking calibration screen with countdown.
 
-    Uses streamlit-webrtc to show a live camera feed and collect frames.
-    A fragment handles the countdown and Continue button independently.
-    Returns True when the countdown is over and the user clicks Continue.
+    The live webcam feed lives in the sidebar (see ``render_webcam_preview``).
+    This function only shows the instructions, a camera icon, and the timer.
     """
     if st.session_state.pop("_baseline_user_confirmed", False):
         return True
@@ -490,7 +541,6 @@ def render_baseline() -> bool:
     if not st.session_state.get("_baseline_screen_active"):
         st.session_state._baseline_screen_active = True
         _reset_baseline_timer()
-        st.session_state.baseline_frames_buffer = []
 
     st.header(BASELINE_TITLE)
 
@@ -506,23 +556,13 @@ def render_baseline() -> bool:
     unsafe_allow_html=True,
     )
 
-    # Live webcam feed
-    if _HAVE_WEBRTC:
-        ctx = webrtc_streamer(
-            key="baseline_webcam",
-            video_processor_factory=_BaselineRecorder,
-            mode=WebRtcMode.SENDRECV,
-            media_stream_constraints={"video": True, "audio": False},
-            async_processing=True,
-        )
-        # Drain collected frames on each rerun
-        if ctx and ctx.video_processor and ctx.video_processor.frames:
-            st.session_state.baseline_frames_buffer.extend(ctx.video_processor.frames)
-            ctx.video_processor.frames.clear()
-    else:
-        st.info("📷 Camera feed unavailable — install `streamlit-webrtc` and `av` for webcam recording.")
+    # Camera icon
+    st.markdown(
+        "<div style='text-align:center; font-size:3em; padding:10px 0 0 0;'>📷</div>",
+        unsafe_allow_html=True,
+    )
 
-    # Timer fragment (auto-refreshes every second — independent of webrtc)
+    # Timer fragment (auto-refreshes every second)
     @st.fragment(run_every=1)
     def _baseline_timer() -> None:
         elapsed = time.time() - st.session_state.baseline_start
@@ -538,7 +578,7 @@ def render_baseline() -> bool:
         else:
             st.success(BASELINE_COMPLETE_MESSAGE)
             if st.button(BASELINE_CONTINUE_LABEL, type="primary", key="baseline_continue"):
-                _finalize_baseline()
+                clear_baseline_session_state()
                 st.session_state._baseline_user_confirmed = True
                 st.rerun()
 
