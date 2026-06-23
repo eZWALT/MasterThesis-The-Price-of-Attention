@@ -12,17 +12,14 @@ never hardcoded.
 from __future__ import annotations
 
 import html as html_module
+import threading
 import time
 from pathlib import Path
 from typing import Optional
 
-import av
+import cv2
+import numpy as np
 import streamlit as st
-try:
-    from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
-    _HAVE_WEBRTC = True
-except ImportError:
-    _HAVE_WEBRTC = False
 
 from core.config import (
     DEFAULT_MAX_TOKENS,
@@ -408,121 +405,127 @@ def _reset_baseline_timer() -> None:
 # ── Webcam recording helpers ──────────────────────────────────────────────
 
 
-if _HAVE_WEBRTC:
+class _WebcamCapture:
+    """Background thread that continuously captures frames from the lab webcam."""
 
-    class _SessionRecorder(VideoProcessorBase):
-        """Collects webcam frames throughout the entire session."""
+    def __init__(self, camera_id: int = 0) -> None:
+        self._camera_id = camera_id
+        self._running = False
+        self._lock = threading.Lock()
+        self._latest_frame: Optional[np.ndarray] = None
+        self._recorded_frames: list[np.ndarray] = []
+        self._frame_count: int = 0
 
-        def __init__(self) -> None:
-            self.session_frames: list = []
-            self._count: int = 0
+    def start(self) -> None:
+        self._cap = cv2.VideoCapture(self._camera_id)
+        if not self._cap.isOpened():
+            raise RuntimeError(f"Cannot open camera {self._camera_id}")
+        self._running = True
+        self._thread = threading.Thread(target=self._capture_loop, daemon=True)
+        self._thread.start()
 
-        def recv(self, frame):
-            """Downsample to ~15 fps by capturing every other frame."""
-            self._count += 1
-            if self._count % 2 == 0:
-                self.session_frames.append(frame)
-            return frame
+    def _capture_loop(self) -> None:
+        while self._running:
+            ret, frame = self._cap.read()
+            if not ret:
+                continue
+            with self._lock:
+                self._latest_frame = frame
+                self._frame_count += 1
+                if self._frame_count % 2 == 0:
+                    self._recorded_frames.append(frame.copy())
 
+    def get_frame(self) -> Optional[np.ndarray]:
+        with self._lock:
+            return self._latest_frame.copy() if self._latest_frame is not None else None
 
-    def save_session_video(frames: list, output_path: Path, fps: int = 15) -> None:
-        """Write collected av.VideoFrame objects to an MP4 file."""
+    def drain_frames(self) -> list[np.ndarray]:
+        with self._lock:
+            frames = self._recorded_frames[:]
+            self._recorded_frames.clear()
+            return frames
+
+    def stop(self) -> None:
+        self._running = False
+        if hasattr(self, "_thread"):
+            self._thread.join(timeout=2)
+        if hasattr(self, "_cap"):
+            self._cap.release()
+
+    def save_video(self, output_path: Path, fps: int = 15) -> None:
+        frames = self.drain_frames()
         if not frames:
             return
-        first = frames[0].to_ndarray(format="bgr24")
-        h, w = first.shape[:2]
-        container = av.open(str(output_path), mode="w")
-        stream = container.add_stream("h264", rate=fps)
-        stream.width = w
-        stream.height = h
-        stream.pix_fmt = "yuv420p"
+        h, w = frames[0].shape[:2]
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        out = cv2.VideoWriter(str(output_path), fourcc, fps, (w, h))
         for frame in frames:
-            raw = frame.to_ndarray(format="bgr24")
-            av_frame = av.VideoFrame.from_ndarray(raw, format="bgr24")
-            for packet in stream.encode(av_frame):
-                container.mux(packet)
-        for packet in stream.encode():
-            container.mux(packet)
-        container.close()
+            out.write(frame)
+        out.release()
 
 
-    def render_webcam_preview(
-        study_type: str,
-        participant_id: str,
-        log_dir: Path,
-        run_id: str,
-    ) -> None:
-        """Small webcam preview in the sidebar — active for the entire session.
+def render_webcam_preview(
+    study_type: str,
+    participant_id: str,
+    log_dir: Path,
+    run_id: str,
+) -> None:
+    """Live webcam preview in the sidebar — active for the entire lab session.
 
-        Must be called from ``render_progress_sidebar`` (every screen) so the
-        WebRTC connection stays alive across screen transitions.
-        """
-        if study_type != "lab":
+    Starts the background capture on first call.  Called from
+    ``render_progress_sidebar`` on every screen so the preview keeps showing.
+    """
+    if study_type != "lab":
+        return
+
+    # Lazy-start the background capture
+    if "webcam" not in st.session_state:
+        try:
+            cam = _WebcamCapture()
+            cam.start()
+            st.session_state.webcam = cam
+        except RuntimeError as exc:
+            st.warning(f"Webcam unavailable: {exc}")
             return
 
-        st.markdown(
-            "<div style='font-size:0.75rem; color:#888; text-transform:uppercase; "
-            "letter-spacing:0.4px; margin-bottom:4px;'>🎥 Eye Tracking</div>",
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        "<div style='font-size:0.75rem; color:#888; text-transform:uppercase; "
+        "letter-spacing:0.4px; margin-bottom:4px;'>🎥 Eye Tracking</div>",
+        unsafe_allow_html=True,
+    )
 
-        ctx = webrtc_streamer(
-            key="session_webcam",
-            video_processor_factory=_SessionRecorder,
-            mode=WebRtcMode.SENDRECV,
-            media_stream_constraints={"video": True, "audio": False},
-            async_processing=True,
-            video_html_attrs={
-                "style": "width:100%; max-width:240px; border-radius:8px;",
-                "controls": False,
-                "autoplay": True,
-                "muted": True,
-            },
-        )
+    cam: _WebcamCapture = st.session_state.webcam
 
-        # Store frames in session state so they survive screen transitions
-        if ctx and ctx.video_processor and ctx.video_processor.session_frames:
-            buf = st.session_state.setdefault("_webcam_frames", [])
-            buf.extend(ctx.video_processor.session_frames)
-            ctx.video_processor.session_frames.clear()
-
+    # Live preview (auto-refreshing fragment)
+    @st.fragment(run_every=0.2)
+    def _feed() -> None:
+        frame = cam.get_frame()
+        if frame is not None:
+            st.image(frame, channels="BGR", width=240, use_container_width=True)
         st.caption("🔴 Recording")
 
-
-    def finalize_webcam_recording() -> None:
-        """Save the session-long webcam recording and clean up."""
-        buf = st.session_state.pop("_webcam_frames", [])
-        if not buf:
-            return
-        try:
-            log_dir: Path = st.session_state.logger._log_dir
-            video_path = log_dir / f"{st.session_state.logger.run_id}_eyetracking.mp4"
-            save_session_video(buf, video_path)
-            st.session_state.logger.log(
-                "eyetracking_video_saved",
-                {"path": str(video_path), "frames": len(buf)},
-                ad_mode="session",
-                conversation_id=st.session_state.controller.participant_id,
-                source="system",
-            )
-        except Exception as exc:
-            st.warning(f"Failed to save eye-tracking video: {exc}")
+    _feed()
 
 
-else:
-    # ── No-op fallbacks ──────────────────────────────────────────
-
-    def render_webcam_preview(
-        study_type: str,
-        participant_id: str,
-        log_dir: Path,
-        run_id: str,
-    ) -> None:
-        if study_type == "lab":
-            st.caption("🎥 Camera — install `streamlit-webrtc`")
-
-    def finalize_webcam_recording() -> None:
-        pass
+def finalize_webcam_recording() -> None:
+    """Stop the background capture and save the session video."""
+    cam = st.session_state.pop("webcam", None)
+    if cam is None:
+        return
+    try:
+        log_dir: Path = st.session_state.logger._log_dir
+        video_path = log_dir / f"{st.session_state.logger.run_id}_eyetracking.mp4"
+        cam.save_video(video_path)
+        cam.stop()
+        st.session_state.logger.log(
+            "eyetracking_video_saved",
+            {"path": str(video_path)},
+            ad_mode="session",
+            conversation_id=st.session_state.controller.participant_id,
+            source="system",
+        )
+    except Exception as exc:
+        st.warning(f"Failed to save eye-tracking video: {exc}")
 
 
 # ── Baseline screen ───────────────────────────────────────────────────────
