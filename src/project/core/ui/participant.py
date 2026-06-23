@@ -497,10 +497,10 @@ def _sync_dev_overrides(mgr) -> None:
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════════
 
-def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False, bfi_version: str = "10", study_type: str | None = None):
+def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False, bfi_version: str = "10", study_type: str | None = None, webcam_enabled: bool = False):
     with st.sidebar:
         render_webcam_preview(
-            study_type=study_type or "crowd",
+            webcam_enabled=webcam_enabled,
             participant_id=ctrl.participant_id,
             log_dir=st.session_state.logger._log_dir,
             run_id=st.session_state.logger.run_id,
@@ -619,6 +619,7 @@ def run_participant_mode(params):
         flow_test=params.flow_test,
         bfi_version=params.bfi_version,
         study_type=params.study_type,
+        webcam_enabled=params.webcam_enabled,
     )
 
     # Handle skip logic

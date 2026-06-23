@@ -251,6 +251,7 @@ class ExperimentParams:
     force_ad: bool = False                  # ?force_ad=1 → inject ad on every turn
     use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
     dry_run: bool = False                   # ?dry_run=1 → mock LLM + mock ads, zero cost
+    webcam_enabled: bool = False            # ?webcam=1 → enable session-wide webcam recording
 
     def apply_study_defaults(self, explicitly_set: set) -> None:
         """
@@ -450,6 +451,11 @@ def parse_query_params() -> ExperimentParams:
     if dry_raw in ("1", "true", "yes"):
         params.dry_run = True
         params.use_rag = False
+
+    # ?webcam=1  — enable session-wide webcam recording (lab study or dev)
+    webcam_raw = p.get("webcam", "").strip().lower()
+    if webcam_raw in ("1", "true", "yes"):
+        params.webcam_enabled = True
 
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:

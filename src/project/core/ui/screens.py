@@ -481,7 +481,7 @@ class _WebcamCapture:
 
 
 def render_webcam_preview(
-    study_type: str,
+    webcam_enabled: bool,
     participant_id: str,
     log_dir: Path,
     run_id: str,
@@ -496,7 +496,7 @@ def render_webcam_preview(
     Starts the background capture on first call.  Call from
     ``render_progress_sidebar`` on every screen so the recording stays alive.
     """
-    if study_type != "lab":
+    if not webcam_enabled:
         return
 
     # Lazy-start the background capture
