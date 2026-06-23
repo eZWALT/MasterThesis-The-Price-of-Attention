@@ -14,8 +14,11 @@ python scripts/prepare_amazon_catalog.py --build-index
 ./launch.sh
 ```
 
-Open http://localhost:7777 — participant mode.  
-`?dev=true` → free-chat.  `?dev=flow&dry_run=1` → walkthrough, no GPU.
+Open http://localhost:7777 — participant mode (crowd).  
+`?study=lab` → lab flow (baseline visible).  
+`?webcam=1` → enable session-wide webcam recording (any study type).  
+`?dev=true` → free-chat.  
+`?dev=flow&dry_run=1` → walkthrough, no GPU.
 
 ### Dry run
 
@@ -46,10 +49,11 @@ consent → baseline [30s eye-tracking] → warmup_chat
 | Study type | `skip` | Webcam | Use case |
 |---|---|---|---|
 | `crowd` (default) | `baseline` | ❌ | Prolific/MTurk — remote |
-| `lab` | — | ✅ full session → `{run_id}_eyetracking.mp4` | EEG lab, in-person |
+| `lab` | — | opt-in via `?webcam=1` | EEG lab, in-person |
 
 Webcam recording runs as a background daemon thread from baseline to `SCREEN_DONE`.
-Preview appears in the sidebar during baseline only. Saved to the experiment log directory.
+Preview appears in the sidebar during baseline only. Saved to `{run_id}_eyetracking.mp4`.
+Opt in with `?webcam=1` on any study type (lab or crowd).
 
 ---
 
