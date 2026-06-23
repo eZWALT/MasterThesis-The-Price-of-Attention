@@ -399,10 +399,10 @@ def _reset_baseline_timer() -> None:
 
 def render_baseline() -> bool:
     """
-    Relaxation baseline screen with countdown.
+    Eye-tracking baseline screen with countdown.
 
     Uses a Streamlit fragment so only the timer refreshes — not the whole app.
-    That avoids re-rendering prior screens (e.g. OCEAN widgets) on each tick.
+    That avoids re-rendering prior screens on each tick.
     Returns True when time is up and the user clicks Continue.
     """
     if st.session_state.pop("_baseline_user_confirmed", False):
@@ -413,10 +413,23 @@ def render_baseline() -> bool:
         _reset_baseline_timer()
 
     st.header(BASELINE_TITLE)
+
+    # Styled instruction box
+    st.markdown(f'''
+    <div style="
+        background:#12141a; border-radius:10px; padding:20px 22px; margin:20px 0;
+        border-left:3px solid #58a6ff; font-size:0.95rem; color:#ccc; line-height:1.6;
+    ">
+        <div style="color:#777; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Instructions</div>
+        {BASELINE_INSTRUCTION.format(duration_label=_format_duration_label(BASELINE_DURATION_SECONDS))}
+    </div>''',
+    unsafe_allow_html=True,
+    )
+
+    # Camera icon
     st.markdown(
-        BASELINE_INSTRUCTION.format(
-            duration_label=_format_duration_label(BASELINE_DURATION_SECONDS),
-        )
+        "<div style='text-align:center; font-size:3em; padding:10px 0 0 0;'>📷</div>",
+        unsafe_allow_html=True,
     )
 
     @st.fragment(run_every=1)
@@ -426,7 +439,7 @@ def render_baseline() -> bool:
         if remaining > 0:
             mins, secs = divmod(remaining, 60)
             st.markdown(
-                f"<div style='text-align:center; font-size:3em; padding:60px 0;'>"
+                f"<div style='text-align:center; font-size:3em; padding:20px 0 40px 0;'>"
                 f"⏳ {mins:02d}:{secs:02d}"
                 f"</div>",
                 unsafe_allow_html=True,
