@@ -381,9 +381,6 @@ DEMOGRAPHICS_SELECT: list[dict] = [
     {"id": "demo_frequency", "text": "How frequently do you use chatbots?", "options": ["Fewer than 5 times ever", "1\u20135 times per month", "1\u20135 times per week", "1\u20135 times per day", "Greater than 5 times per day"]},
 ]
 
-DEMOGRAPHICS_MULTISELECT: list[dict] = [
-    {"id": "demo_chatbots_used", "text": "Which chatbots have you used in the past? (Leave blank if none)", "options": ["ChatGPT", "Gemini / Bard", "Bing Chatbot", "Open Assistant", "Other"]},
-]
 
 # ═══════════════════════════════════════════════════════════════
 # DECEPTION DISCLOSURE TEXT
