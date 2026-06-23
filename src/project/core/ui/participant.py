@@ -72,6 +72,8 @@ from core.ui.screens import (
     render_demographics_end,
     render_deception_disclosure,
     render_done,
+    render_webcam_preview,
+    finalize_webcam_recording,
 )
 
 
@@ -331,7 +333,8 @@ def _condition_summary_for_log(condition_result: dict) -> dict:
 
 
 def export_session_data(ctrl: ExperimentController):
-    """Persist session-level aggregates."""
+    """Persist session-level aggregates and finalize eye-tracking video."""
+    finalize_webcam_recording()
     logger: ExperimentLogger = st.session_state.logger
     logger.log(
         "session_complete",
@@ -496,6 +499,14 @@ def _sync_dev_overrides(mgr) -> None:
 
 def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False, bfi_version: str = "10", study_type: str | None = None):
     with st.sidebar:
+        render_webcam_preview(
+            study_type=study_type or "crowd",
+            participant_id=ctrl.participant_id,
+            log_dir=st.session_state.logger._log_dir,
+            run_id=st.session_state.logger.run_id,
+        )
+        if study_type or flow_test:
+            st.divider()
         if study_type:
             st.caption(f"Study: {STUDY_TYPE_LABELS.get(study_type, study_type)}")
         if flow_test:
@@ -547,6 +558,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
 
         labels = {
             SCREEN_CONSENT: "Consent",
+            SCREEN_BASELINE: "Eye-Tracking Baseline",
             SCREEN_DEMOGRAPHICS: "Demographics",
             SCREEN_INSTRUCTIONS: "Instructions",
             SCREEN_WARMUP_CHAT: "Warm-Up",
