@@ -395,6 +395,50 @@ src/project/
 └────────────────────────────────────────────────────────┘
 ```
 
+### Thread Architecture
+
+The process runs **three threads** total — no separate containers or processes:
+
+```
+┌─ Main thread ──────────────────────────────────────────────────────┐
+│  Streamlit event loop + all Python code                            │
+│                                                                    │
+│  On every user turn (sequential, blocking):                        │
+│    intent (BERT) → embed (BERT) → FAISS → reranker → LLM          │
+│         ~50ms         ~200ms      ~10ms    ~500ms    ~2-10s        │
+│                                                                    │
+│  Intent (ThradBERT) runs on EVERY turn (~50ms).                    │
+│  Retrieval pipeline (embed + FAISS + reranker) runs ONLY on        │
+│  ad-injection turns (configurable interval).                       │
+│                                                                    │
+│  The UI freezes during ML calls (Streamlit is single-threaded).    │
+│  LLM response is streamed token-by-token via st.write_stream.      │
+└────────────────────────────────────────────────────────────────────┘
+
+┌─ Webcam daemon thread ─────────────────────────────────────────────┐
+│  _WebcamCapture._capture_loop()                                    │
+│  cv2.VideoCapture(0) in a tight loop:                              │
+│    read frame → store latest (for preview) → buffer every 2nd      │
+│    frame (for session video). Runs at camera framerate (~30fps).   │
+│  Started at baseline, stopped at SCREEN_DONE.                      │
+│  No impact on UI or ML latency (pure Python, GIL-friendly I/O).    │
+└────────────────────────────────────────────────────────────────────┘
+
+┌─ Logger daemon thread ─────────────────────────────────────────────┐
+│  ExperimentLogger._writer_loop()                                   │
+│  Drains an in-memory queue to JSONL on disk:                       │
+│    log() → queue.put(event)  (~0.02ms, non-blocking)               │
+│    writer thread → json.dumps + fsync                              │
+│  Flush: every 25 events OR every 60s.                              │
+│  Crash-safe: atexit + daemon drain.                                │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+All three threads are **daemon threads** — they terminate automatically when the
+main process exits. No Docker sidecar, no subprocess, no shared memory needed.
+
+---
+
 ### Key Concept: Attention Shift
 
 - **Attention state**: $A_t = P(Z \mid C_{\le t})$
