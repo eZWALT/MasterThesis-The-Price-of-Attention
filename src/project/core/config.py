@@ -218,7 +218,7 @@ FINISH_BUTTON_VISIBLE_FROM_TURN: int = int(os.getenv("FINISH_BUTTON_VISIBLE_FROM
 # 1-indexed user turns at which ads are automatically injected.
 AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every turn for dev=flow
 
-BASELINE_DURATION_SECONDS: int = int(os.getenv("BASELINE_DURATION_SECONDS", "60"))
+BASELINE_DURATION_SECONDS: int = int(os.getenv("BASELINE_DURATION_SECONDS", "30"))
 BASELINE_TITLE: str = "Baseline Recording"
 BASELINE_INSTRUCTION: str = (
     "Please **relax** and look at the screen. "
@@ -539,7 +539,7 @@ SCREEN_DECEPTION_DISCLOSURE:    str = "deception_disclosure"
 # lab   → full protocol incl. EEG/eye-tracking baseline
 # crowd → remote Prolific-style; no physiology hardware
 STUDY_SKIP_SCREENS: dict[str, frozenset[str]] = {
-    STUDY_TYPE_LAB: frozenset({SCREEN_DEMOGRAPHICS}),
+    STUDY_TYPE_LAB: frozenset(),
     STUDY_TYPE_CROWD: frozenset({SCREEN_BASELINE, SCREEN_DEMOGRAPHICS}),
 }
 

@@ -3,7 +3,7 @@ Experiment Controller — Workflow B.
 
 Implements the 5-condition within-subject protocol:
 
-  consent → warmup_chat
+  consent → baseline → warmup_chat
   → [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
   → recall (4 steps, one per ad condition)
   → ocean (BFI-10) → demographics → deception_disclosure → done
@@ -30,6 +30,7 @@ from core.config import (
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
     SCREEN_WARMUP_CHAT,
+    SCREEN_BASELINE,
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
     SCREEN_CONDITION_CONCLUSION,
@@ -47,6 +48,7 @@ from core.experiment.tasks import TaskDefinition, TASK_CATALOG, TASK_BY_ID
 # ── Screen lists ─────────────────────────────────
 _PRE_CONDITION_SCREENS: list[str] = [
     SCREEN_CONSENT,
+    SCREEN_BASELINE,
     SCREEN_WARMUP_CHAT,
 ]
 

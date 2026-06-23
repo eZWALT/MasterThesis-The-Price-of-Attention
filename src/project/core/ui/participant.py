@@ -24,6 +24,7 @@ from core.config import (
     SCREEN_CONSENT,
     SCREEN_DEMOGRAPHICS,
     SCREEN_INSTRUCTIONS,
+    SCREEN_BASELINE,
     SCREEN_WARMUP_CHAT,
     SCREEN_CONDITION_INTRO,
     SCREEN_CONDITION_CHAT,
@@ -58,6 +59,7 @@ from core.logger import ExperimentLogger
 from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, TASK_BY_ID, score_ocean, get_ocean_items
 from core.ui.screens import (
     render_consent,
+    render_baseline,
     render_demographics,
     render_ocean,
     render_instructions,
@@ -626,6 +628,11 @@ def run_participant_mode(params):
                 "consent_granted", {},
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_BASELINE:
+        if render_baseline():
             ctrl.advance()
             st.rerun()
 
