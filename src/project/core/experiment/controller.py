@@ -3,7 +3,7 @@ Experiment Controller — Workflow B.
 
 Implements the 5-condition within-subject protocol:
 
-  consent → baseline → warmup_chat
+  consent → baseline (eye-tracking, 30 s) → warmup_chat
   → [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
   → recall (4 steps, one per ad condition)
   → ocean (BFI-10) → demographics → deception_disclosure → done
