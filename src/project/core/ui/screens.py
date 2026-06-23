@@ -13,8 +13,16 @@ from __future__ import annotations
 
 import html as html_module
 import time
-import streamlit as st
+from pathlib import Path
 from typing import Optional
+
+import av
+import streamlit as st
+try:
+    from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, WebRtcMode
+    _HAVE_WEBRTC = True
+except ImportError:
+    _HAVE_WEBRTC = False
 
 from core.config import (
     DEFAULT_MAX_TOKENS,
@@ -397,13 +405,84 @@ def _reset_baseline_timer() -> None:
     st.session_state.baseline_start = time.time()
 
 
+# ── Webcam recording helpers ──────────────────────────────────────────────
+
+
+if _HAVE_WEBRTC:
+
+    class _BaselineRecorder(VideoProcessorBase):
+        """Collects webcam frames during baseline recording."""
+
+        def __init__(self) -> None:
+            self.frames: list = []
+            self._count: int = 0
+
+        def recv(self, frame):
+            """Downsample to ~15 fps by capturing every other frame."""
+            self._count += 1
+            if self._count % 2 == 0:
+                self.frames.append(frame)
+            return frame
+
+
+    def _save_video(frames: list, output_path: Path, fps: int = 15) -> None:
+        """Write collected av.VideoFrame objects to an MP4 file."""
+        if not frames:
+            return
+        first = frames[0].to_ndarray(format="bgr24")
+        h, w = first.shape[:2]
+        container = av.open(str(output_path), mode="w")
+        stream = container.add_stream("h264", rate=fps)
+        stream.width = w
+        stream.height = h
+        stream.pix_fmt = "yuv420p"
+        for frame in frames:
+            raw = frame.to_ndarray(format="bgr24")
+            av_frame = av.VideoFrame.from_ndarray(raw, format="bgr24")
+            for packet in stream.encode(av_frame):
+                container.mux(packet)
+        for packet in stream.encode():
+            container.mux(packet)
+        container.close()
+
+
+    def _finalize_baseline() -> None:
+        """Save recorded video and clean up session state."""
+        buffer = st.session_state.pop("baseline_frames_buffer", [])
+        if buffer:
+            try:
+                log_dir: Path = st.session_state.logger._log_dir
+                video_path = log_dir / f"{st.session_state.logger.run_id}_baseline.mp4"
+                _save_video(buffer, video_path)
+                st.session_state.logger.log(
+                    "baseline_video_saved",
+                    {"path": str(video_path), "frames": len(buffer)},
+                    ad_mode="session",
+                    conversation_id=st.session_state.controller.participant_id,
+                    source="system",
+                )
+            except Exception as exc:
+                st.warning(f"Failed to save baseline video: {exc}")
+        clear_baseline_session_state()
+
+
+else:
+
+    def _finalize_baseline() -> None:
+        """No-op fallback when streamlit-webrtc is not installed."""
+        clear_baseline_session_state()
+
+
+# ── Main render function ──────────────────────────────────────────────────
+
+
 def render_baseline() -> bool:
     """
-    Eye-tracking baseline screen with countdown.
+    Eye-tracking baseline screen with live webcam recording.
 
-    Uses a Streamlit fragment so only the timer refreshes — not the whole app.
-    That avoids re-rendering prior screens on each tick.
-    Returns True when time is up and the user clicks Continue.
+    Uses streamlit-webrtc to show a live camera feed and collect frames.
+    A fragment handles the countdown and Continue button independently.
+    Returns True when the countdown is over and the user clicks Continue.
     """
     if st.session_state.pop("_baseline_user_confirmed", False):
         return True
@@ -411,6 +490,7 @@ def render_baseline() -> bool:
     if not st.session_state.get("_baseline_screen_active"):
         st.session_state._baseline_screen_active = True
         _reset_baseline_timer()
+        st.session_state.baseline_frames_buffer = []
 
     st.header(BASELINE_TITLE)
 
@@ -426,33 +506,43 @@ def render_baseline() -> bool:
     unsafe_allow_html=True,
     )
 
-    # Camera icon
-    st.markdown(
-        "<div style='text-align:center; font-size:3em; padding:10px 0 0 0;'>📷</div>",
-        unsafe_allow_html=True,
-    )
+    # Live webcam feed
+    if _HAVE_WEBRTC:
+        ctx = webrtc_streamer(
+            key="baseline_webcam",
+            video_processor_factory=_BaselineRecorder,
+            mode=WebRtcMode.SENDRECV,
+            media_stream_constraints={"video": True, "audio": False},
+            async_processing=True,
+        )
+        # Drain collected frames on each rerun
+        if ctx and ctx.video_processor and ctx.video_processor.frames:
+            st.session_state.baseline_frames_buffer.extend(ctx.video_processor.frames)
+            ctx.video_processor.frames.clear()
+    else:
+        st.info("📷 Camera feed unavailable — install `streamlit-webrtc` and `av` for webcam recording.")
 
+    # Timer fragment (auto-refreshes every second — independent of webrtc)
     @st.fragment(run_every=1)
-    def _baseline_countdown() -> None:
+    def _baseline_timer() -> None:
         elapsed = time.time() - st.session_state.baseline_start
         remaining = max(0, int(BASELINE_DURATION_SECONDS - elapsed))
         if remaining > 0:
             mins, secs = divmod(remaining, 60)
             st.markdown(
-                f"<div style='text-align:center; font-size:3em; padding:20px 0 40px 0;'>"
+                f"<div style='text-align:center; font-size:2.5em; padding:15px 0;'>"
                 f"⏳ {mins:02d}:{secs:02d}"
                 f"</div>",
                 unsafe_allow_html=True,
             )
-            return
+        else:
+            st.success(BASELINE_COMPLETE_MESSAGE)
+            if st.button(BASELINE_CONTINUE_LABEL, type="primary", key="baseline_continue"):
+                _finalize_baseline()
+                st.session_state._baseline_user_confirmed = True
+                st.rerun()
 
-        st.success(BASELINE_COMPLETE_MESSAGE)
-        if st.button(BASELINE_CONTINUE_LABEL, type="primary", key="baseline_continue"):
-            clear_baseline_session_state()
-            st.session_state._baseline_user_confirmed = True
-            st.rerun()
-
-    _baseline_countdown()
+    _baseline_timer()
     return False
 
 
