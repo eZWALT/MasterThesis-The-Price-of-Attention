@@ -217,3 +217,4 @@ src/project/data/catalogs/catalog.jsonl
 src/project/data/catalogs/amazon*.jsonl
 src/project/data/catalogs/amazon*session-ses_*.md
 session-ses_*.md
+src/project/logs/production/
