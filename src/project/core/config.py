@@ -228,6 +228,10 @@ BASELINE_INSTRUCTION: str = (
 BASELINE_COMPLETE_MESSAGE: str = "✓ Baseline recording complete."
 BASELINE_CONTINUE_LABEL: str = "Continue"
 
+WEBCAM_FPS: int       = int(os.getenv("WEBCAM_FPS", "30"))
+WEBCAM_WIDTH: int     = int(os.getenv("WEBCAM_WIDTH", "1280"))
+WEBCAM_HEIGHT: int    = int(os.getenv("WEBCAM_HEIGHT", "720"))
+
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  5.  EXPERIMENT CONDITIONS & ADVERTISING MODES                           │
