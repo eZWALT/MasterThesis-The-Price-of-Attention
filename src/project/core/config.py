@@ -540,7 +540,7 @@ SCREEN_DECEPTION_DISCLOSURE:    str = "deception_disclosure"
 # crowd → remote Prolific-style; no physiology hardware
 STUDY_SKIP_SCREENS: dict[str, frozenset[str]] = {
     STUDY_TYPE_LAB: frozenset(),
-    STUDY_TYPE_CROWD: frozenset({SCREEN_BASELINE, SCREEN_DEMOGRAPHICS}),
+    STUDY_TYPE_CROWD: frozenset({SCREEN_BASELINE}),
 }
 
 
