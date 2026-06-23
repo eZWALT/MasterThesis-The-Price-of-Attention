@@ -1,23 +1,37 @@
 """
-EEG integration — Lab Stream Layer (LSL) markers and stream reading.
+EEG integration — Lab Stream Layer (LSL) markers for time-locking.
 
-This module provides:
-  1. Marker emission — push event markers to LSL for time-locking EEG epochs
-  2. Stream reader  — (future) read raw EEG for real-time features
+Marker protocol
+---------------
+All markers are plain strings pushed as a single-channel sample.
+Naming convention:  `domain:value[:sub_value]`
 
-Markers are sent via the modality hook system in ConversationManager.
-They run in the CPU thread pool — non-blocking to the main thread.
+  session:start
+  session:end
 
-Integration:
-    from core.modalities.eeg import eeg_turn_hook
-    conversation_manager.register_modality_hook(eeg_turn_hook)
+  screen:{screen_name}             — entering a screen
 
-LSL marker protocol:
-    "turn_{N}"           — user turn N started
-    "ad_injected_{N}"    — ad was injected at turn N
-    "ad_mode_{mode}"     — which ad condition is active
+  condition:{id}:start
+  condition:{id}:end
+  condition:{id}:ad_mode:{mode}
 
-Requires: pylsl (pip install pylsl) — only imported at runtime.
+  baseline:start
+  baseline:end
+
+  turn:{n}                         — after assistant reply at turn n
+  ad_injected:{n}                  — ad injection at turn n
+
+  survey:{type}:submitted
+
+Usage from participant.py:
+    from core.modalities.eeg import marker
+
+    marker("screen:consent")
+    marker("condition:inline_early:start")
+    marker("survey:ocean:submitted")
+
+Requires: pylsl (pip install pylsl).  If pylsl is unavailable all
+calls are silently ignored — safe to call unconditionally.
 """
 
 from __future__ import annotations
@@ -58,16 +72,58 @@ def _get_outlet():
     return _outlet
 
 
-# ── Marker emission ──────────────────────────────────────────────────────────
+# ── Core marker emission ─────────────────────────────────────────────────────
 
-def send_marker(label: str) -> None:
-    """Push a single string marker to LSL (non-blocking, best-effort)."""
+def marker(label: str) -> None:
+    """Push a single string marker to LSL.
+
+    Idempotent, non-blocking, best-effort.  Safe to call even when
+    pylsl is not installed — returns silently.
+    """
     outlet = _get_outlet()
     if outlet:
         outlet.push_sample([label])
 
 
-# ── Modality hook (register with ConversationManager) ────────────────────────
+# ── Convenience helpers ──────────────────────────────────────────────────────
+
+def screen_marker(screen_name: str) -> None:
+    """Send a screen-entry marker (e.g. 'screen:consent')."""
+    marker(f"screen:{screen_name}")
+
+
+def condition_marker(condition_id: str, action: str, ad_mode: str = "") -> None:
+    """Send a condition lifecycle marker.
+
+    action: "start" | "end"
+    """
+    marker(f"condition:{condition_id}:{action}")
+    if ad_mode:
+        marker(f"condition:{condition_id}:ad_mode:{ad_mode}")
+
+
+def survey_marker(survey_type: str) -> None:
+    """Send a survey-submission marker (e.g. 'survey:ocean:submitted')."""
+    marker(f"survey:{survey_type}:submitted")
+
+
+def session_marker(action: str) -> None:
+    """Send a session lifecycle marker.
+
+    action: "start" | "end"
+    """
+    marker(f"session:{action}")
+
+
+def baseline_marker(action: str) -> None:
+    """Send a baseline lifecycle marker.
+
+    action: "start" | "end"
+    """
+    marker(f"baseline:{action}")
+
+
+# ── Modality hook (registered with ConversationManager) ─────────────────────
 
 def eeg_turn_hook(turn: int, ad_injected: bool, ad: Any) -> None:
     """
@@ -76,9 +132,6 @@ def eeg_turn_hook(turn: int, ad_injected: bool, ad: Any) -> None:
     Emits LSL markers that EEG recording software (BrainVision, OpenBCI,
     etc.) can time-lock to neural data for epoch extraction.
     """
-    send_marker(f"turn_{turn}")
+    marker(f"turn:{turn}")
     if ad_injected:
-        send_marker(f"ad_injected_{turn}")
-        if ad and hasattr(ad, "metadata"):
-            source = ad.metadata.get("source", "unknown")
-            send_marker(f"ad_source_{source}")
+        marker(f"ad_injected:{turn}")

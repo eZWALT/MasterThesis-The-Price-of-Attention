@@ -57,6 +57,13 @@ from core.config import (
 from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
 from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, TASK_BY_ID, score_ocean, get_ocean_items
+from core.modalities.eeg import (
+    screen_marker,
+    condition_marker,
+    survey_marker,
+    session_marker,
+    baseline_marker,
+)
 from core.ui.screens import (
     render_consent,
     render_baseline,
@@ -121,6 +128,7 @@ def init_session_state(params):
             st.session_state.logger.experiment_id,
             st.session_state.logger.run_id,
         )
+        session_marker("start")
         st.session_state.logger.log(
             "session_started",
             {
@@ -334,6 +342,7 @@ def _condition_summary_for_log(condition_result: dict) -> dict:
 
 def export_session_data(ctrl: ExperimentController):
     """Persist session-level aggregates and finalize eye-tracking video."""
+    session_marker("end")
     finalize_webcam_recording()
     logger: ExperimentLogger = st.session_state.logger
     logger.log(
@@ -638,6 +647,7 @@ def run_participant_mode(params):
 
     if scr == SCREEN_CONSENT:
         if render_consent():
+            screen_marker("consent")
             st.session_state.logger.log(
                 "consent_granted", {},
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
@@ -646,18 +656,26 @@ def run_participant_mode(params):
             st.rerun()
 
     elif scr == SCREEN_BASELINE:
+        if "baseline_started" not in st.session_state:
+            st.session_state.baseline_started = True
+            baseline_marker("start")
         if render_baseline():
+            baseline_marker("end")
+            screen_marker("baseline")
+            del st.session_state.baseline_started
             ctrl.advance()
             st.rerun()
 
     elif scr == SCREEN_INSTRUCTIONS:
         if render_instructions():
+            screen_marker("instructions")
             ctrl.advance()
             st.rerun()
 
     elif scr == SCREEN_WARMUP_CHAT:
         mgr = _get_or_create_warmup_manager()
         if render_warmup_chat(mgr):
+            screen_marker("warmup_chat")
             st.session_state.warmup_manager = None
             ctrl.advance()
             st.rerun()
@@ -672,6 +690,8 @@ def run_participant_mode(params):
                 cfg["condition"],
                 task,
             ):
+                screen_marker("condition_intro")
+                condition_marker(cfg["condition"], "start", cfg["ad_mode"])
                 log.info(
                     "Condition {}/{} starting | pid={} | condition={} | task={} | ad_mode={}",
                     ctrl.condition_number, ctrl.n_conditions,
@@ -755,6 +775,8 @@ def run_participant_mode(params):
                         ad_info["inline_ctx_before"] = ctx_before
                         ad_info["inline_ctx_after"] = ctx_after
 
+                screen_marker("condition_chat")
+                condition_marker(cfg["condition"], "end", cfg["ad_mode"])
                 condition_record = {
                     "condition_id": condition_id,
                     "ad_mode": cfg["ad_mode"],
@@ -826,6 +848,7 @@ def run_participant_mode(params):
             task_prompt=task.participant_prompt,
         )
         if result is not None:
+            screen_marker("condition_conclusion")
             from core.retrieval import count_items_by_categories
             pool_size = count_items_by_categories(task.relevant_categories)
             st.session_state.logger.log(
@@ -847,6 +870,7 @@ def run_participant_mode(params):
     elif scr == SCREEN_POST_CONDITION_SURVEY:
         result = render_post_condition_survey(ctrl.condition_number)
         if result is not None:
+            survey_marker("post_condition")
             ctrl.condition_surveys.append(result)
             st.session_state.logger.log(
                 "post_condition_survey_submitted",
@@ -859,6 +883,7 @@ def run_participant_mode(params):
     elif scr == SCREEN_ADS_RECALL:
         result = render_ads_recall()
         if result is not None:
+            survey_marker("ads_recall")
             st.session_state.logger.log(
                 "ads_recall_submitted", result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
@@ -869,6 +894,7 @@ def run_participant_mode(params):
     elif scr == SCREEN_OCEAN:
         result = render_ocean(params.bfi_version)
         if result is not None:
+            survey_marker("ocean")
             ctrl.ocean_raw = result
             items = get_ocean_items(params.bfi_version)
             ctrl.ocean_scores = score_ocean(result, items=items)
@@ -883,6 +909,7 @@ def run_participant_mode(params):
     elif scr == SCREEN_DEMOGRAPHICS:
         result = render_demographics_end()
         if result is not None:
+            survey_marker("demographics")
             st.session_state.logger.log(
                 "demographics_post_submitted", result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
@@ -893,6 +920,7 @@ def run_participant_mode(params):
     elif scr == SCREEN_DECEPTION_DISCLOSURE:
         result = render_deception_disclosure()
         if result is not None:
+            survey_marker("deception_disclosure")
             st.session_state.logger.log(
                 "deception_disclosure_submitted", result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",

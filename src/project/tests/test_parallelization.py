@@ -108,11 +108,11 @@ class TestEEGHook:
         eeg_turn_hook(turn=1, ad_injected=False, ad=None)
         eeg_turn_hook(turn=2, ad_injected=True, ad=MagicMock(metadata={"source": "test"}))
 
-    def test_send_marker_no_crash(self):
-        """send_marker is a no-op when LSL is unavailable."""
-        from core.modalities.eeg import send_marker
+    def test_marker_no_crash(self):
+        """marker() is a no-op when LSL is unavailable."""
+        from core.modalities.eeg import marker
         # Should not raise
-        send_marker("test_marker")
+        marker("test_marker")
 
 
 # ── Eye-Tracking Hook ─────────────────────────────────────────────────────────

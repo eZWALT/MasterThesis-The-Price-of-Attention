@@ -31,5 +31,6 @@ pytest>=8.0
 # brainflow==6.1.0        # BrainFlow LSL stream
 # tobii-research==1.11.2  # Tobii eye-tracking SDK
 
-# ── Webcam / Eye Tracking ─────────────────────────────────────────────────────
+# ── Webcam / EEG ──────────────────────────────────────────────────────────────
 opencv-python-headless>=4.9.0
+pylsl>=1.16.0
