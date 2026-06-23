@@ -469,11 +469,16 @@ def render_webcam_preview(
     participant_id: str,
     log_dir: Path,
     run_id: str,
+    current_screen: str = "",
 ) -> None:
-    """Live webcam preview in the sidebar — active for the entire lab session.
+    """Background webcam capture for the entire lab session.
 
-    Starts the background capture on first call.  Called from
-    ``render_progress_sidebar`` on every screen so the preview keeps showing.
+    The live preview is shown in the sidebar **only during the baseline screen**
+    to avoid slowing down the UI during conditions.  The capture thread keeps
+    running in the background regardless.
+
+    Starts the background capture on first call.  Call from
+    ``render_progress_sidebar`` on every screen so the recording stays alive.
     """
     if study_type != "lab":
         return
@@ -484,27 +489,36 @@ def render_webcam_preview(
             cam = _WebcamCapture()
             cam.start()
             st.session_state.webcam = cam
+            # Log start marker
+            st.session_state.logger.log(
+                "eyetracking_recording_started",
+                {},
+                ad_mode="session",
+                conversation_id=participant_id,
+                source="system",
+            )
         except RuntimeError as exc:
             st.warning(f"Webcam unavailable: {exc}")
             return
 
-    st.markdown(
-        "<div style='font-size:0.75rem; color:#888; text-transform:uppercase; "
-        "letter-spacing:0.4px; margin-bottom:4px;'>🎥 Eye Tracking</div>",
-        unsafe_allow_html=True,
-    )
+    # Only render live preview during baseline — hide it afterwards for performance
+    if current_screen == "baseline":
+        st.markdown(
+            "<div style='font-size:0.75rem; color:#888; text-transform:uppercase; "
+            "letter-spacing:0.4px; margin-bottom:4px;'>🎥 Eye Tracking</div>",
+            unsafe_allow_html=True,
+        )
 
-    cam: _WebcamCapture = st.session_state.webcam
+        cam: _WebcamCapture = st.session_state.webcam
 
-    # Live preview (auto-refreshing fragment)
-    @st.fragment(run_every=0.2)
-    def _feed() -> None:
-        frame = cam.get_frame()
-        if frame is not None:
-            st.image(frame, channels="BGR", width=240, use_container_width=True)
-        st.caption("🔴 Recording")
+        @st.fragment(run_every=0.2)
+        def _feed() -> None:
+            frame = cam.get_frame()
+            if frame is not None:
+                st.image(frame, channels="BGR", width=240, use_container_width=True)
+            st.caption("🔴 Recording")
 
-    _feed()
+        _feed()
 
 
 def finalize_webcam_recording() -> None:
