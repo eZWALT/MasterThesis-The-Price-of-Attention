@@ -35,6 +35,9 @@ from core.config import (
     PRACTICE_TASK_PROMPT,
     WARMUP_PROMPT,
     MAX_TURNS_PER_TRIAL,
+    WEBCAM_FPS,
+    WEBCAM_WIDTH,
+    WEBCAM_HEIGHT,
 )
 from core.experiment.tasks import TaskDefinition
 from core.experiment.surveys import (
@@ -408,32 +411,45 @@ def _reset_baseline_timer() -> None:
 class _WebcamCapture:
     """Background thread that continuously captures frames from the lab webcam."""
 
-    def __init__(self, camera_id: int = 0) -> None:
+    def __init__(
+        self,
+        camera_id: int = 0,
+        target_fps: int = 30,
+        width: int = 1280,
+        height: int = 720,
+    ) -> None:
         self._camera_id = camera_id
+        self._target_fps = target_fps
+        self._width = width
+        self._height = height
         self._running = False
         self._lock = threading.Lock()
         self._latest_frame: Optional[np.ndarray] = None
         self._recorded_frames: list[np.ndarray] = []
-        self._frame_count: int = 0
+        self._last_capture_ts: float = 0.0
 
     def start(self) -> None:
         self._cap = cv2.VideoCapture(self._camera_id)
         if not self._cap.isOpened():
             raise RuntimeError(f"Cannot open camera {self._camera_id}")
+        self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._width)
+        self._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self._height)
         self._running = True
         self._thread = threading.Thread(target=self._capture_loop, daemon=True)
         self._thread.start()
 
     def _capture_loop(self) -> None:
+        interval = 1.0 / self._target_fps
         while self._running:
             ret, frame = self._cap.read()
             if not ret:
                 continue
-            with self._lock:
-                self._latest_frame = frame
-                self._frame_count += 1
-                if self._frame_count % 2 == 0:
+            now = time.time()
+            if now - self._last_capture_ts >= interval:
+                with self._lock:
+                    self._latest_frame = frame
                     self._recorded_frames.append(frame.copy())
+                self._last_capture_ts = now
 
     def get_frame(self) -> Optional[np.ndarray]:
         with self._lock:
@@ -452,13 +468,13 @@ class _WebcamCapture:
         if hasattr(self, "_cap"):
             self._cap.release()
 
-    def save_video(self, output_path: Path, fps: int = 15) -> None:
+    def save_video(self, output_path: Path) -> None:
         frames = self.drain_frames()
         if not frames:
             return
         h, w = frames[0].shape[:2]
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        out = cv2.VideoWriter(str(output_path), fourcc, fps, (w, h))
+        out = cv2.VideoWriter(str(output_path), fourcc, self._target_fps, (w, h))
         for frame in frames:
             out.write(frame)
         out.release()
@@ -486,7 +502,11 @@ def render_webcam_preview(
     # Lazy-start the background capture
     if "webcam" not in st.session_state:
         try:
-            cam = _WebcamCapture()
+            cam = _WebcamCapture(
+                target_fps=WEBCAM_FPS,
+                width=WEBCAM_WIDTH,
+                height=WEBCAM_HEIGHT,
+            )
             cam.start()
             st.session_state.webcam = cam
             # Log start marker

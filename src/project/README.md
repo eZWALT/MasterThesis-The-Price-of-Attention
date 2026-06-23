@@ -101,7 +101,7 @@ The process runs **3 daemon threads** — no sidecars, no subprocesses.
 | Thread | Work |
 |---|---|
 | **Main** | Streamlit + all ML (intent→embed→FAISS→rerank→LLM). Blocks during ML; LLM streams. |
-| **Webcam** | `cv2.VideoCapture(0)` loop: latest frame → preview, every-2nd frame → session video. Lab only. |
+| **Webcam** | `cv2.VideoCapture(0)` at `WEBCAM_FPS` fps (default 30), `WEBCAM_WIDTH`×`WEBCAM_HEIGHT` (default 1280×720). Timer-gated capture. Lab only. |
 | **Logger** | Drains in-memory event queue to JSONL. ~0.02ms enqueue, flush every 25 events / 60s. |
 
 ---
