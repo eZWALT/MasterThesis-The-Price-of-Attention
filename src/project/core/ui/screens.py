@@ -51,7 +51,6 @@ from core.experiment.surveys import (
     RECALL_SCALE_MAX,
     DEMOGRAPHICS_TEXT,
     DEMOGRAPHICS_SELECT,
-    DEMOGRAPHICS_MULTISELECT,
     DECEPTION_DISCLOSURE_TEXT,
 )
 from core.ad_injection import get_injector
@@ -1504,10 +1503,6 @@ def render_demographics_end() -> Optional[dict]:
             key=f"demo_end_{item['id']}",
         )
         responses[item["id"]] = value
-
-    for item in DEMOGRAPHICS_MULTISELECT:
-        selected = [opt for opt in item["options"] if st.checkbox(opt, key=f"demo_end_{item['id']}_{opt}")]
-        responses[item["id"]] = selected if selected else []
 
     st.divider()
     if st.button("Continue", type="primary"):
