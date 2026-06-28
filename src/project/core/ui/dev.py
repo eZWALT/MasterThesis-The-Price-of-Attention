@@ -90,13 +90,6 @@ def render_dev_sidebar():
         st.divider()
         with st.expander("🧪 Debug / Logs"):
             st.json(st.session_state.logger.to_dicts())
-        with st.expander("📐 Attention Shift History"):
-            shifts = [e for e in st.session_state.logger.entries if e.event == "attention_shift"]
-            if shifts:
-                for s in shifts:
-                    st.write(f"Δ = {s.data['divergence']:.6f}  ({s.data['method']})")
-            else:
-                st.caption("No attention shifts recorded yet.")
         if st.button("💾 Export Logs (JSONL)"):
             path = st.session_state.logger.export_jsonl()
             st.success(f"Exported to {path}")

@@ -217,12 +217,11 @@ if mode == "Single file":
     m4.metric("Ad Clicks", len(stats["ad_clicks"]))
     m5.metric("Early Exits", len(stats["early_exits"]))
 
-    m6, m7, m8, m9, m10 = st.columns(5)
-    m6.metric("Trials Completed", len(stats["trial_completions"]))
-    m7.metric("Ads Shown (retrievals)", ec.get("retrieval", 0))
-    m8.metric("Surveys Submitted", len(stats["surveys"]))
-    m9.metric("Conversations", len(stats["convo_summaries"]))
-    m10.metric("Attention Shifts", ec.get("attention_shift", 0))
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Trials Completed", len(stats["trial_completions"]))
+    m2.metric("Ads Shown (retrievals)", ec.get("retrieval", 0))
+    m3.metric("Surveys Submitted", len(stats["surveys"]))
+    m4.metric("Conversations", len(stats["convo_summaries"]))
 
     st.divider()
 
@@ -306,22 +305,6 @@ if mode == "Single file":
         c2.metric("Median Response Time", f"{median_rt:.1f}s")
     else:
         st.info("No response time data (time_to_reply_ms is null for first messages).")
-
-    st.divider()
-
-    # ── Attention shift ───────────────────────────────────────
-    st.subheader("📐 Attention Shift")
-    shifts = [r for r in rows if r.get("event") == "attention_shift"]
-    if shifts:
-        shift_data = [{"index": i + 1, "trial": s.get("trial_index"),
-                       "turn": s.get("turn"),
-                       "divergence": (s.get("data", {}) or {}).get("divergence", 0)}
-                      for i, s in enumerate(shifts)]
-        sd_df = pd.DataFrame(shift_data)
-        st.line_chart(sd_df.set_index("index")["divergence"])
-        st.caption("Attention shift divergence (JSD) per event")
-    else:
-        st.info("No attention shift data in this log.")
 
     st.divider()
 
@@ -494,28 +477,6 @@ else:
         st.caption("Mean trial duration by ad_mode (seconds)")
     else:
         st.info("No completed trials with duration data.")
-
-    st.divider()
-
-    # ── Aggregated attention shift ────────────────────────────
-    st.subheader("📐 Aggregated Attention Shift")
-    all_shifts = [r for r in all_rows if r.get("event") == "attention_shift"]
-    if all_shifts:
-        shift_vals = [(r.get("data", {}) or {}).get("divergence", 0) for r in all_shifts]
-        c1, c2, c3 = st.columns(3)
-        c1.metric("N shifts", len(shift_vals))
-        c2.metric("Mean divergence", f"{sum(shift_vals)/len(shift_vals):.4f}")
-        c3.metric("Max divergence", f"{max(shift_vals):.4f}")
-
-        by_admode = defaultdict(list)
-        for r in all_shifts:
-            d = (r.get("data", {}) or {}).get("divergence", 0)
-            by_admode[r.get("ad_mode", "unknown")].append(d)
-        mode_mean_div = {k: sum(v)/len(v) for k, v in by_admode.items()}
-        st.bar_chart(mode_mean_div)
-        st.caption("Mean attention divergence by ad_mode")
-    else:
-        st.info("No attention shift data across selected files.")
 
     st.divider()
 

@@ -59,6 +59,7 @@ def _get_outlet():
             type="Markers",
             channel_count=1,
             nominal_srate=0,  # irregular rate
+            channel_format='string',
             source_id="rag-recsys-experiment",
         )
         _outlet = StreamOutlet(info)

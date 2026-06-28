@@ -58,14 +58,12 @@ class TestShouldInjectAd:
 
 @pytest.mark.unit
 class TestProcessUserMessage:
-    @patch("core.conversation.manager.compute_attention_shift")
     @patch("core.conversation.manager.get_ad")
     @patch.object(ConversationManager, "_classify_turn_intent", return_value="info")
     def test_stores_last_retrieval_and_injection(
-        self, _intent, mock_get_ad, mock_shift, sample_ad_retrieval
+        self, _intent, mock_get_ad, sample_ad_retrieval
     ):
         mock_get_ad.return_value = sample_ad_retrieval
-        mock_shift.return_value = MagicMock(divergence=0.1, method="jsd")
 
         mgr = _make_manager(force_ad=True, use_rag=False)
         mgr.llm = MagicMock()
@@ -80,11 +78,9 @@ class TestProcessUserMessage:
         mock_get_ad.assert_called_once()
         assert mock_get_ad.call_args.kwargs.get("backend") == "mock"
 
-    @patch("core.conversation.manager.compute_attention_shift")
     @patch("core.conversation.manager.get_ad")
     @patch.object(ConversationManager, "_classify_turn_intent", return_value="info")
-    def test_no_injection_when_not_ad_turn(self, _intent, mock_get_ad, mock_shift):
-        mock_shift.return_value = MagicMock(divergence=0.0, method="jsd")
+    def test_no_injection_when_not_ad_turn(self, _intent, mock_get_ad):
         mgr = _make_manager(ad_turns=[99], force_ad=False)
         mgr.llm = MagicMock()
         mgr.llm.chat.return_value = "ok"

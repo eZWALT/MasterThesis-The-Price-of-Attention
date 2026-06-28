@@ -8,7 +8,6 @@ Subpackages mirror the five system components from the paper (§6):
   ad_injection/       → 2. Advertisement Injection Engine
   experiment/         → 3. Experiment Controller
   logger/             → 5. Multimodal Logging System
-  attention_shift/    → Cross-cutting metric module (Δ_attn)
 """
 
 # ── Config (flat constants) ───────────────────────────────────
@@ -45,10 +44,3 @@ from core.experiment import TaskDefinition, TASK_CATALOG, TASK_BY_ID, Experiment
 
 # ── 4. Multimodal Logging System ──────────────────────────────
 from core.logger import ExperimentLogger, LogEntry
-
-# ── Attention Shift (metric) ──────────────────────────────────
-from core.attention_shift import (
-    compute_attention_shift,
-    AttentionShiftResult,
-    AttentionEstimator,
-)
