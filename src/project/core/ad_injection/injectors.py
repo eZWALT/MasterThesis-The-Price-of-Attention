@@ -82,9 +82,9 @@ class ExplicitAdBlockInjector(AdInjector):
     """
     Ad Type 3 — Explicit Ad Block (OpenAI-style).
 
-    A highly salient, visually separated panel is rendered beside or above
-    the conversation with a clear call-to-action.  The LLM response itself
-    is not modified.
+    A highly salient, visually separated panel is rendered beside the
+    conversation with a clear call-to-action.  The LLM is told what product
+    is being shown so it can sincerely discuss it if asked.
 
     Intrusiveness: highest (fully disclosed, unavoidable).
     """
@@ -94,10 +94,19 @@ class ExplicitAdBlockInjector(AdInjector):
         retrieval: AdRetrievalResult,
         conversation: List[Dict[str, str]],
     ) -> InjectionResult:
+        from core.config import AD_AWARENESS_SYSTEM_PROMPT
+
         ad = retrieval.primary
         if ad is None:
             return InjectionResult()
+
+        awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
+            ad_title=ad.title,
+            ad_text=ad.text[:300],
+        )
+
         return InjectionResult(
+            system_overrides=[{"role": "system", "content": awareness}],
             display_payload=enrich_display_payload(
                 ad, compact_display_payload(ad, header=EXPLICIT_AD_LABEL)
             ),
