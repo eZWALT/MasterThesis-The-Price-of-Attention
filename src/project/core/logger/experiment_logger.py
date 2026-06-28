@@ -84,7 +84,7 @@ class ExperimentLogger:
         experiment_id: Optional[str] = None,
         run_id: Optional[str] = None,
         participant_id: str = "unknown",
-        log_dir: str = "logs",
+        log_dir: str = "logs/production",
         flush_every_n: int = 25,
         flush_every_s: float = 60.0,
     ) -> None:
