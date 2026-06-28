@@ -404,7 +404,7 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
             "messages": [],
         }
         if ad_mode:
-            is_inline = ad_mode in ("inline_early", "inline_late")
+            is_inline = ad_mode == "inline_persuasive"
             stub_result["ad_info"] = {
                 "title": MOCK_AD_TITLE,
                 "text": MOCK_AD_TEXT,
@@ -736,20 +736,23 @@ def run_participant_mode(params):
                 trial_end_ts = datetime.now().isoformat()
 
                 ad_info = None
-                if mgr.last_retrieval and mgr.last_retrieval.has_ads:
-                    primary = mgr.last_retrieval.primary
-                    ad_info = {
-                        "title": primary.title,
-                        "text": primary.text,
-                        "cta": primary.cta,
-                        "question": primary.question,
-                        "source_item_id": primary.source_item_id,
-                        "image_url": ad_image_url(primary),
-                        "product_url": ad_product_url(primary),
-                        "ad_mode": cfg["ad_mode"],
-                        "ad_turn": cfg["ad_turn"],
-                    }
-                    if cfg["ad_mode"] in ("inline_early", "inline_late") and cfg["ad_turn"] is not None:
+                injected = mgr.injected_ad_info
+                if injected is not None:
+                    ad_info = {k: injected.get(k) for k in [
+                        "title", "text", "cta", "question", "source_item_id",
+                        "ad_mode", "ad_turn", "retrieval_backend",
+                        "retrieval_latency_ms", "query", "intent_label",
+                        "candidate_count", "candidate_titles",
+                    ]}
+                    # Use last_retrieval as fallback for image/product URLs
+                    if mgr.last_retrieval and mgr.last_retrieval.primary:
+                        ad_info["image_url"] = ad_image_url(mgr.last_retrieval.primary)
+                        ad_info["product_url"] = ad_product_url(mgr.last_retrieval.primary)
+                    else:
+                        ad_info["image_url"] = None
+                        ad_info["product_url"] = None
+                    is_inline = cfg["ad_mode"] == "inline_persuasive"
+                    if is_inline and cfg["ad_turn"] is not None:
                         t = cfg["ad_turn"]
                         idx = 2 * t
                         if idx < len(mgr.messages) and mgr.messages[idx].get("role") == "assistant":
