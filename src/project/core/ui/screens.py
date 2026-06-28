@@ -1094,7 +1094,17 @@ def render_condition_intro(
     condition_id: str,
     task: TaskDefinition,
 ) -> bool:
+    from core.config import TASK_CONTEXT_WARNING
     st.header(f"Conversation {condition_number} of {total_conditions}")
+    st.markdown(f'''
+    <div style="
+        background:#1a1a0e; border-radius:10px; padding:12px 16px; margin:12px 0 16px 0;
+        border-left:4px solid #ffd700; font-size:0.85rem; color:#e0d080; line-height:1.5;
+    ">
+        ⚠️ {html_module.escape(TASK_CONTEXT_WARNING)}
+    </div>''',
+    unsafe_allow_html=True,
+    )
     st.markdown(f'''
     <div style="
         background:#12141a; border-radius:10px; padding:16px 18px; margin:20px 0;
