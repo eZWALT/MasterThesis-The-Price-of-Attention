@@ -12,7 +12,6 @@ from loguru import logger as log
 from pathlib import Path
 
 from core.config import (
-    SCREEN_MODEL_PREFERENCE,
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
     DEFAULT_MAX_TOKENS,
@@ -76,7 +75,7 @@ from core.ui.screens import (
     render_condition_chat,
     render_condition_conclusion,
     render_post_condition_survey,
-    render_model_preference, render_ads_recall,
+    render_ads_recall,
     render_demographics_end,
     render_deception_disclosure,
     render_done,
@@ -370,18 +369,6 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         items = get_ocean_items(bfi_version)
         ctrl.ocean_raw = [4] * len(items)
         ctrl.ocean_scores = score_ocean(ctrl.ocean_raw, items=items)
-    elif scr == SCREEN_MODEL_PREFERENCE:
-        from core.ui.screens import render_model_preference
-        result = render_model_preference(ctrl)
-        if result is not None:
-            survey_marker("model_preference")
-            st.session_state.logger.log(
-                "model_preference_submitted", result,
-                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
-            )
-            ctrl.advance()
-            st.rerun()
-
     elif scr == SCREEN_ADS_RECALL:
         st.session_state.pop("recall_step", None)
         st.session_state.pop("recall_responses", None)
@@ -891,7 +878,7 @@ def run_participant_mode(params):
             st.rerun()
 
     elif scr == SCREEN_ADS_RECALL:
-        result = render_model_preference, render_ads_recall()
+        result = render_ads_recall()
         if result is not None:
             survey_marker("ads_recall")
             st.session_state.logger.log(
