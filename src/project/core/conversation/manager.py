@@ -142,6 +142,8 @@ class ConversationManager:
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
         self._ad_awareness_override: List[Dict[str, str]] = []  # persistent after ad injection
+        # Snapshot of injected ad + pipeline info at injection time (for ad recall survey).
+        self._injected_ad_info: Optional[Dict[str, Any]] = None
         # ── Intent tracking (ThradBERT, paper §RQ3) ──────────
         # initial_intent: classified from task prompt at conversation start
         # per-turn intent: classified each turn from compact context
@@ -172,6 +174,15 @@ class ConversationManager:
     def ad_backend(self) -> str | None:
         """Active ad backend override (mock/rag), or None for config default."""
         return self._ad_backend
+
+    @property
+    def injected_ad_info(self) -> dict | None:
+        """Snapshot of the injected ad + pipeline info (set at injection turn).
+
+        Returns None if no ad has been injected yet.  Used by participant.py
+        to build the ad_info dict for the recall survey at condition end.
+        """
+        return self._injected_ad_info
 
     # ── Modality Registration ─────────────────────────────────
 
@@ -412,6 +423,23 @@ class ConversationManager:
             self._ad_awareness_override = [
                 {"role": "system", "content": awareness}
             ]
+            # Snapshot ad content + pipeline info for ad recall survey
+            self._injected_ad_info = {
+                "title": retrieval.primary.title,
+                "text": retrieval.primary.text,
+                "cta": retrieval.primary.cta,
+                "question": retrieval.primary.question,
+                "source_item_id": retrieval.primary.source_item_id,
+                "relevance_score": retrieval.primary.relevance_score,
+                "ad_mode": self.ad_mode,
+                "ad_turn": current_turn,
+                "query": user_input,
+                "intent_label": turn_intent,
+                "retrieval_backend": self._ad_backend or "default",
+                "retrieval_latency_ms": round(retrieval_latency_ms, 1),
+                "candidate_count": len(retrieval.ads) if retrieval.ads else 0,
+                "candidate_titles": [a.title for a in retrieval.ads] if retrieval.ads else [],
+            }
 
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
@@ -601,6 +629,23 @@ class ConversationManager:
             self._ad_awareness_override = [
                 {"role": "system", "content": awareness}
             ]
+            # Snapshot ad content + pipeline info for ad recall survey
+            self._injected_ad_info = {
+                "title": retrieval.primary.title,
+                "text": retrieval.primary.text,
+                "cta": retrieval.primary.cta,
+                "question": retrieval.primary.question,
+                "source_item_id": retrieval.primary.source_item_id,
+                "relevance_score": retrieval.primary.relevance_score,
+                "ad_mode": self.ad_mode,
+                "ad_turn": current_turn,
+                "query": user_input,
+                "intent_label": turn_intent,
+                "retrieval_backend": self._ad_backend or "default",
+                "retrieval_latency_ms": round(retrieval_latency_ms, 1),
+                "candidate_count": len(retrieval.ads) if retrieval.ads else 0,
+                "candidate_titles": [a.title for a in retrieval.ads] if retrieval.ads else [],
+            }
 
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
@@ -757,6 +802,7 @@ class ConversationManager:
         self.last_injection = InjectionResult()
         self.last_retrieval_ad_mode = None
         self._ad_awareness_override = []
+        self._injected_ad_info = None
 
     def apply_ad_mode(self, ad_mode: str) -> None:
         """Switch injection style (dev flow); clears stale ads if the mode changed."""
