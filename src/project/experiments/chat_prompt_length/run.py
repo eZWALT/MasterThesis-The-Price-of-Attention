@@ -16,9 +16,9 @@ Metrics (from Ollama response metadata):
   - latency_ms
 
 Usage:
-  python -m experiments.chat_prompt_length.run --generations 10
-  python -m experiments.chat_prompt_length.run --quick
-  python -m experiments.chat_prompt_length.run --generations 5 --scenarios 3
+  python -m experiments.chat_prompt_length.run --generations 10 --label v1_production
+  python -m experiments.chat_prompt_length.run --quick --label smoke
+  python -m experiments.chat_prompt_length.run --generations 5 --scenarios 3 --label v2_concise
 """
 
 from __future__ import annotations
@@ -111,6 +111,11 @@ Examples:
         "--output-dir", type=str, default=None,
         help="Override output directory"
     )
+    parser.add_argument(
+        "--label", type=str, default=None,
+        help="Short name for this run (e.g. 'v1_production'). Stored as a folder "
+             "name so multiple runs can be compared side by side."
+    )
     args = parser.parse_args()
 
     # ── Quick mode overrides ────────────────────────────────────────────────
@@ -146,6 +151,7 @@ Examples:
         output_dir=output_dir,
         temperature=DEFAULT_TEMPERATURE,
         max_tokens=DEFAULT_MAX_TOKENS,
+        run_label=args.label,
     )
 
 
