@@ -5,7 +5,7 @@ Owns the multi-turn conversation state and orchestrates the
 per-turn pipeline:
 
     user message → system prompt → (ad overrides) → LLM call
-    → assistant reply → post-response ad injection → attention shift
+    → assistant reply → post-response ad injection → intent tracking
 
 Design principles (from paper §6.1):
   - A *fixed* base system prompt ensures cross-participant consistency.
@@ -22,7 +22,7 @@ from __future__ import annotations
 import hashlib
 import time
 import uuid
-from concurrent.futures import ThreadPoolExecutor, Future
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import List, Dict, Optional, Callable, Any, Generator
 from dataclasses import dataclass
@@ -36,11 +36,6 @@ from core.config import (
 )
 from core.ad_injection import get_ad, get_injector
 from core.ad_injection.models import Ad, AdRetrievalResult, InjectionResult
-from core.attention_shift import (
-    compute_attention_shift,
-    AttentionShiftResult,
-    AttentionEstimator,
-)
 from core.logger.payload import build_retrieval_log_data, compact_event_data
 from core.logger import ExperimentLogger
 from core.experiment.tasks import TaskDefinition
@@ -60,7 +55,6 @@ class TurnMetrics:
     ad_injected: bool                        # was an ad injected this turn?
     ad_title: Optional[str] = None           # ad title if injected
     ad_relevance_score: Optional[float] = None  # retrieval relevance score
-    attention_divergence: Optional[float] = None  # attention shift KL
     time_to_reply_ms: Optional[float] = None  # user delay since last assistant msg (set by UI)
     intent_label: str = ""                   # ThradBERT intent classification for this turn
     continued: bool = True                   # did the user send another message after this turn?
@@ -74,13 +68,12 @@ class TurnResult:
     turn_number: int = 0
     can_end: bool = False
     must_end: bool = False
-    attention_shift: Optional[AttentionShiftResult] = None
     error: Optional[str] = None
 
 
 # ── Shared thread pool for CPU-bound post-turn work ───────────
-# Used for BERT intent classification, attention shift, and future
-# modality processing (EEG markers, eye-tracking AOI, etc.).
+# Used for BERT intent classification and future modality processing
+# (EEG markers, eye-tracking AOI, etc.).
 # Daemon threads — die with main. Max 4 workers for CPU tasks.
 _CPU_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="turn-cpu")
 
@@ -100,7 +93,6 @@ class ConversationManager:
     task : optional task definition for this trial.
     llm_client : LLM backend client instance.
     logger : experiment logger instance.
-    attention_estimator : optional custom estimator for P(Z|C).
     """
 
     def __init__(
@@ -112,7 +104,6 @@ class ConversationManager:
         task: Optional[TaskDefinition] = None,
         llm_client: LLMClient | None = None,
         logger: ExperimentLogger | None = None,
-        attention_estimator: AttentionEstimator | None = None,
         min_turns: int = MIN_TURNS_PER_TRIAL,
         max_turns: int = MAX_TURNS_PER_TRIAL,
         finish_from: int | None = None,
@@ -129,7 +120,6 @@ class ConversationManager:
         self.dry_run = dry_run
         self.llm = llm_client or LLMClient(mock=dry_run)
         self.logger = logger or ExperimentLogger()
-        self.attention_estimator = attention_estimator
         self.min_turns = min_turns
         self.max_turns = max_turns
         self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
@@ -189,7 +179,7 @@ class ConversationManager:
         Register a callback for parallel post-turn processing.
 
         Hooks run in the CPU thread pool AFTER the LLM reply is ready,
-        in parallel with attention shift and intent classification.
+        in parallel with intent classification.
 
         Signature: hook(turn: int, ad_injected: bool, ad: Ad | None)
 
@@ -315,13 +305,11 @@ class ConversationManager:
         Steps:
           1. Enforce turn limit
           2. Record user message
-          3. Snapshot C_pre
-          4. Determine ad injection
-          5. Call LLM (system prompt + ad overrides + conversation)
-          6. Record assistant reply
-          7. Post-response injection (in-chat ads)
-          8. Snapshot C_post
-          9. Compute attention shift
+          3. Determine ad injection
+          4. Call LLM (system prompt + ad overrides + conversation)
+          5. Record assistant reply
+          6. Post-response injection (in-chat ads)
+          7. Fire modality hooks
         """
         # 1 — enforce limit
         if self.must_end:
@@ -358,10 +346,7 @@ class ConversationManager:
             turn=current_turn,
         )
 
-        # 3 — pre-ad snapshot
-        C_pre = list(self.messages)
-
-        # 3b — intent (ThradBERT) before retrieval so JSONL retrieval rows carry intent_label
+        # 3 — intent (ThradBERT) before retrieval so JSONL retrieval rows carry intent_label
         turn_intent = self._classify_turn_intent(user_input)
         self.intent_history.append(turn_intent)
         self.logger.log(
@@ -471,34 +456,11 @@ class ConversationManager:
             self.ad_turns_actual.append(current_turn)
             self.ads_by_turn[current_turn] = list(retrieval.ads)
 
-        # 8 — post-ad snapshot
-        C_post = list(self.messages)
-
-        # 9 — PARALLEL: attention shift (CPU-bound; non-blocking for Streamlit)
-        shift_future: Future = _CPU_POOL.submit(
-            compute_attention_shift, C_pre, C_post, self.attention_estimator
-        )
-        # Fire modality hooks in parallel (non-blocking, best-effort)
+        # 8 — fire modality hooks in parallel (non-blocking, best-effort)
         for hook in self._modality_hooks:
             _CPU_POOL.submit(hook, current_turn, inject_ad, retrieval.primary if retrieval else None)
 
-        # Collect parallel results
-        shift = shift_future.result()
-
-        # Log attention shift (after result is ready)
-        self.logger.log(
-            "attention_shift",
-            compact_event_data(
-                {"divergence": shift.divergence, "method": shift.method},
-                turn=current_turn,
-            ),
-            self.ad_mode,
-            self.conversation_id,
-            source="system",
-            turn=current_turn,
-        )
-
-        # 11 — record per-turn metrics for offline analysis
+        # 9 — record per-turn metrics for offline analysis
         metrics = TurnMetrics(
             turn=current_turn,
             user_msg_len=len(user_input),
@@ -507,7 +469,6 @@ class ConversationManager:
             ad_injected=inject_ad and bool(retrieval and retrieval.has_ads),
             ad_title=retrieval.primary.title if (inject_ad and retrieval and retrieval.primary) else None,
             ad_relevance_score=retrieval.primary.relevance_score if (inject_ad and retrieval and retrieval.primary) else None,
-            attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
             intent_label=turn_intent,
             continued=True,
@@ -520,7 +481,6 @@ class ConversationManager:
             turn_number=current_turn,
             can_end=self.can_end,
             must_end=self.must_end,
-            attention_shift=shift,
         )
 
     def process_user_message_stream(self, user_input: str) -> Generator[str, None, None]:
@@ -529,7 +489,7 @@ class ConversationManager:
 
         Yields tokens as the LLM generates them.  After the generator
         exhausts, self.messages contains the new assistant reply and
-        all post-processing (attention shift, metrics, logging) has
+        all post-processing (intent tracking, metrics, logging) has
         been completed.
 
         Callers must iterate the generator to drive the pipeline
@@ -564,10 +524,7 @@ class ConversationManager:
             turn=current_turn,
         )
 
-        # 3 — pre-ad snapshot
-        C_pre = list(self.messages)
-
-        # 3b — intent classification
+        # 3 — intent classification
         turn_intent = self._classify_turn_intent(user_input)
         self.intent_history.append(turn_intent)
         self.logger.log(
@@ -690,29 +647,9 @@ class ConversationManager:
             self.ad_turns_actual.append(current_turn)
             self.ads_by_turn[current_turn] = list(retrieval.ads)
 
-        # 8 — post-ad snapshot
-        C_post = list(self.messages)
-
-        # 9 — attention shift (CPU-bound)
-        shift_future: Future = _CPU_POOL.submit(
-            compute_attention_shift, C_pre, C_post, self.attention_estimator
-        )
+        # 8 — fire modality hooks in parallel (non-blocking, best-effort)
         for hook in self._modality_hooks:
             _CPU_POOL.submit(hook, current_turn, inject_ad, retrieval.primary if retrieval else None)
-
-        shift = shift_future.result()
-
-        self.logger.log(
-            "attention_shift",
-            compact_event_data(
-                {"divergence": shift.divergence, "method": shift.method},
-                turn=current_turn,
-            ),
-            self.ad_mode,
-            self.conversation_id,
-            source="system",
-            turn=current_turn,
-        )
 
         metrics = TurnMetrics(
             turn=current_turn,
@@ -722,7 +659,6 @@ class ConversationManager:
             ad_injected=inject_ad and bool(retrieval and retrieval.has_ads),
             ad_title=retrieval.primary.title if (inject_ad and retrieval and retrieval.primary) else None,
             ad_relevance_score=retrieval.primary.relevance_score if (inject_ad and retrieval and retrieval.primary) else None,
-            attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
             intent_label=turn_intent,
             continued=True,

@@ -13,11 +13,10 @@ Sections (in reading order)
   5.  ADVERTISING MODES
   6.  MOCK AD CONTENT
   7.  RETRIEVAL PIPELINE      ← stages 0a → 6, in pipeline order
-  8.  ATTENTION SHIFT
-  9.  UI
- 10.  LOGGING
- 11.  EXPERIMENT SCREENS
- 12.  CONSENT TEXT
+  8.  UI
+  9.  LOGGING
+ 10.  EXPERIMENT SCREENS
+ 11.  CONSENT TEXT
 """
 
 from __future__ import annotations
@@ -454,16 +453,7 @@ log_device_map(INTENT_DEVICE, EMBEDDING_DEVICE, RERANKER_DEVICE)
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
-# │  8.  ATTENTION SHIFT                                                    │
-# └─────────────────────────────────────────────────────────────────────────┘
-
-DEFAULT_DIVERGENCE_METHOD: str = "jsd"
-DEFAULT_N_CONCEPTS: int        = 16
-KL_EPSILON: float              = 1e-10
-
-
-# ┌─────────────────────────────────────────────────────────────────────────┐
-# │  9.  UI                                                                 │
+# │  8.  UI                                                                 │
 # └─────────────────────────────────────────────────────────────────────────┘
 
 APP_TITLE: str       = "Conversational Assistant"
