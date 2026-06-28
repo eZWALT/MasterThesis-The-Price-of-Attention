@@ -282,6 +282,12 @@ WARMUP_PROMPT: str = (
     "This is a casual chat to get comfortable with the assistant."
 )
 
+GOODBYE_MESSAGE: str = (
+    "I hope you enjoyed our conversation as much as I did, "
+    "and that you found something useful along the way. "
+    "See you soon!"
+)
+
 # ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 
@@ -491,7 +497,6 @@ SPINNER_ROTATE_MAX_SEC: float = 3.0   # max seconds before switching phrase
 
 LOG_DIR: str              = os.getenv("LOG_DIR", "logs/production")   # base dir for JSONL logs (prod)
 LOG_DIR_DEV: str          = "logs/development"                        # base dir for dev/flow logs
-LOG_DIR_CALIBRATION: str  = "logs/calibration"                        # base dir for calibration runs
 LOG_FLUSH_EVERY_N: int    = 25                                    # flush buffer every N events
 LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer timer (seconds)
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)

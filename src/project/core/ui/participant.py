@@ -91,10 +91,8 @@ from core.ui.screens import (
 def init_session_state(params):
     """Ensure every expected key exists in st.session_state."""
     if "logger" not in st.session_state:
-        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_DIR_CALIBRATION, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
-        if params.calibration:
-            log_dir = LOG_DIR_CALIBRATION
-        elif params.dev_mode or params.flow_test:
+        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
+        if params.dev_mode or params.flow_test:
             log_dir = LOG_DIR_DEV
         else:
             log_dir = LOG_DIR
@@ -115,7 +113,6 @@ def init_session_state(params):
             turns_min=params.turns_min,
             turns_max=params.turns_max,
             finish_from=params.finish_from,
-            calibration=params.calibration,
         )
         ctrl.build_condition_plan()
         st.session_state.controller = ctrl
@@ -133,9 +130,8 @@ def init_session_state(params):
             "session_started",
             {
                 "participant_id": pid,
-                "study_type": params.study_type,
-                "calibration": params.calibration,
-                "skip_screens": sorted(params.skip_screens),
+            "study_type": params.study_type,
+            "skip_screens": sorted(params.skip_screens),
                 "protocol": "workflow_a_star",
                 "conditions": ctrl.condition_plan,
             },
@@ -193,7 +189,6 @@ def init_session_state(params):
                     "n_trials": params.n_trials,
                     "turns_min": params.turns_min,
                     "turns_max": params.turns_max,
-                    "calibration": params.calibration,
                 },
             },
             ad_mode="session",
@@ -349,7 +344,6 @@ def export_session_data(ctrl: ExperimentController):
         "session_complete",
         {
             "participant_id": ctrl.participant_id,
-            "calibration": ctrl.calibration,
             "demographics": ctrl.demographics,
             "ocean_raw": ctrl.ocean_raw,
             "ocean_scores": ctrl.ocean_scores,
@@ -389,7 +383,7 @@ def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
         ]}
         stub.update({k: "(skip)" for k in [
             "personality_trust_text", "personality_influence_text", "personality_changed_mind_text",
-            "personality_brands", "personality_sponsored",
+            "personality_brands_text", "personality_sponsored_text",
         ]})
         ctrl.condition_surveys.append(stub)
         # Clean up sub-step state so Back starts at section 0
@@ -730,7 +724,7 @@ def run_participant_mode(params):
                 params,
                 flow_test=params.flow_test,
             )
-            if render_condition_chat(mgr, condition_id, flow_test=params.flow_test, calibration=params.calibration):
+            if render_condition_chat(mgr, condition_id, flow_test=params.flow_test):
                 from dataclasses import asdict
                 from datetime import datetime
                 from core.ad_injection.models import ad_image_url
