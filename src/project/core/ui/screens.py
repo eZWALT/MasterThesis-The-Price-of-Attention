@@ -340,7 +340,7 @@ def render_ocean(bfi_version: str = "10") -> Optional[list[int]]:
     items = get_ocean_items(bfi_version)
     n = len(items)
 
-    st.header("Personality Questionnaire")
+    st.header("About You")
     st.info(OCEAN_INSTRUCTIONS)
 
     responses: list[int] = []
