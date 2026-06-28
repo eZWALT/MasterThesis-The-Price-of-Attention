@@ -33,6 +33,7 @@ from core.config import (
     MAX_TURNS_PER_TRIAL,
     AD_INJECTION_TURNS,
     FINISH_BUTTON_VISIBLE_FROM_TURN,
+    LOG_DIR,
 )
 from core.ad_injection import get_ad, get_injector
 from core.ad_injection.models import Ad, AdRetrievalResult, InjectionResult
@@ -119,7 +120,7 @@ class ConversationManager:
         self.task = task
         self.dry_run = dry_run
         self.llm = llm_client or LLMClient(mock=dry_run)
-        self.logger = logger or ExperimentLogger()
+        self.logger = logger or ExperimentLogger(log_dir=LOG_DIR)
         self.min_turns = min_turns
         self.max_turns = max_turns
         self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
