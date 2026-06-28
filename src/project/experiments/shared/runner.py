@@ -11,10 +11,16 @@ Experiments call run_experiment() with their own cells and metadata.
 This module handles I/O, progress output, and result aggregation.
 
 Output layout (per experiment run):
-  output/<experiment_name>/<timestamp>/
+  output/<experiment_name>/<run_label>/    ← label or timestamp
     generations.jsonl   — one JSON record per LLM call
     summary.json        — aggregated stats per variant
     summary.txt         — human-readable comparison table
+
+Multiple runs of the same experiment are stored side by side:
+  output/chat_prompt_length/
+    v1_production/          ← --label v1_production
+    v2_concise_rewording/   ← --label v2_concise_rewording
+    20260628T134901Z/       ← auto-timestamp when no label given
 """
 
 from __future__ import annotations
@@ -82,6 +88,7 @@ def run_experiment(
     temperature: float = 0.7,
     max_tokens: int = 2048,
     num_ctx: int = 16384,
+    run_label: Optional[str] = None,
 ) -> Path:
     """
     Run the experiment and return the output directory path.
@@ -97,13 +104,18 @@ def run_experiment(
     temperature      : LLM sampling temperature
     max_tokens       : max tokens to generate per call
     num_ctx          : context window size
+    run_label        : short name for this run (e.g. "v1_production").
+                       Replaces timestamp in the output folder name so
+                       multiple runs of the same experiment (with different
+                       prompts, for example) are stored side by side and
+                       can be compared by the analysis scripts.
     """
     total_calls = len(cells) * generations
 
     # ── Output directory ────────────────────────────────────────────────────
     if output_dir is None:
-        ts = datetime.now().strftime("%Y%m%dT%H%M%SZ")
-        output_dir = Path(__file__).resolve().parent.parent / "output" / experiment_name / ts
+        folder = run_label if run_label else datetime.now().strftime("%Y%m%dT%H%M%SZ")
+        output_dir = Path(__file__).resolve().parent.parent / "output" / experiment_name / folder
     output_dir.mkdir(parents=True, exist_ok=True)
 
     generations_file = output_dir / "generations.jsonl"
@@ -194,6 +206,7 @@ def run_experiment(
 
     summary: Dict = {
         "experiment": experiment_name,
+        "run_label": run_label or "",
         "config": {
             "model": model,
             "ollama_url": ollama_url,
