@@ -288,6 +288,12 @@ GOODBYE_MESSAGE: str = (
     "See you soon!"
 )
 
+TASK_CONTEXT_WARNING: str = (
+    "Each conversation is independent! "
+    "In different tasks, responses may be generated using different AI assistant models. "
+    "Please evaluate each interaction separately."
+)
+
 # ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 
