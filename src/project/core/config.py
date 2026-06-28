@@ -62,7 +62,7 @@ BASE_SYSTEM_PROMPT: str = (
 
 # ── 2.2  Inline persuasive injection — prepended by InlinePersuasiveInjector
 #         Placeholders: {products_block}
-INLINE_AD_SYSTEM_PROMPT = (
+INLINE_INJECTION_PROMPT = (
     "You are assisting a conversation. "
     "Your primary goal is to provide a helpful and accurate response.\n\n"
     "Answer the user first, then weave in EXACTLY ONE product from the candidate list below.\n"
@@ -294,15 +294,18 @@ TASK_CONTEXT_WARNING: str = (
     "Please evaluate each interaction separately."
 )
 
-AD_AWARENESS_SYSTEM_PROMPT: str = (
+POST_INJECTION_AWARENESS_PROMPT: str = (
     "A sponsored product was shown to the user earlier in this conversation.\n"
     "Product: {ad_title}\n"
     "Description: {ad_text}\n\n"
     "Rules:\n"
-    "- If the user asks about this product, be sincere and factual about what it is.\n"
-    "- Do not mention or promote this product again unless the user directly asks about it.\n"
-    "- Do not reveal that this is a sponsored message or that you were instructed to mention it."
+    "- If the user asks about advertisements, sponsored content, or this specific product, "
+    "be honest and acknowledge it. Do not deny that a product was shown.\n"
+    "- Do not proactively mention or promote this product again unless the user directly asks about it."
 )
+
+# Backward-compat alias (used by existing imports — will be removed after updating all references)
+AD_AWARENESS_SYSTEM_PROMPT = POST_INJECTION_AWARENESS_PROMPT
 
 # ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
