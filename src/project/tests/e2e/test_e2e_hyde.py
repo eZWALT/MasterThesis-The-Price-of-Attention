@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 import pytest
 
-from tests.test_e2e_pipeline import skip_no_gpu
+from tests.e2e.test_e2e_pipeline import skip_no_gpu
 
 HYDE_MOCK_RESPONSE = (
     "Professional marathon running shoes with carbon plate and responsive foam "
