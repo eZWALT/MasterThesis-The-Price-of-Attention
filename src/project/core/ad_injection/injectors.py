@@ -17,7 +17,7 @@ from abc import ABC, abstractmethod
 from typing import List, Dict
 
 from core.config import (
-    INLINE_AD_SYSTEM_PROMPT,
+    INLINE_INJECTION_PROMPT,
     EXPLICIT_AD_LABEL,
 )
 from core.ad_injection.models import (
@@ -70,7 +70,7 @@ class InlinePersuasiveInjector(AdInjector):
         conversation: List[Dict[str, str]],
     ) -> InjectionResult:
         products_block = format_products_block(retrieval.ads)
-        system_instruction = INLINE_AD_SYSTEM_PROMPT.format(
+        system_instruction = INLINE_INJECTION_PROMPT.format(
             products_block=products_block,
         )
         return InjectionResult(
@@ -94,19 +94,16 @@ class ExplicitAdBlockInjector(AdInjector):
         retrieval: AdRetrievalResult,
         conversation: List[Dict[str, str]],
     ) -> InjectionResult:
-        from core.config import AD_AWARENESS_SYSTEM_PROMPT
+        from core.config import EXPLICIT_AD_LABEL
 
         ad = retrieval.primary
         if ad is None:
             return InjectionResult()
 
-        awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
-            ad_title=ad.title,
-            ad_text=ad.text[:300],
-        )
-
+        # No system override at injection time — the ad is purely visual.
+        # Awareness for subsequent turns is handled by the conversation
+        # manager via _ad_awareness_override.
         return InjectionResult(
-            system_overrides=[{"role": "system", "content": awareness}],
             display_payload=enrich_display_payload(
                 ad, compact_display_payload(ad, header=EXPLICIT_AD_LABEL)
             ),

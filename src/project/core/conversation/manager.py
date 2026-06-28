@@ -415,7 +415,7 @@ class ConversationManager:
 
         # 4a.1 — persist ad awareness for all subsequent turns
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
-            from core.config import AD_AWARENESS_SYSTEM_PROMPT
+            from core.config import POST_INJECTION_AWARENESS_PROMPT as AD_AWARENESS_SYSTEM_PROMPT
             awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
                 ad_title=retrieval.primary.title,
                 ad_text=retrieval.primary.text[:300],
@@ -621,7 +621,7 @@ class ConversationManager:
 
         # 4a.1 — persist ad awareness for all subsequent turns
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
-            from core.config import AD_AWARENESS_SYSTEM_PROMPT
+            from core.config import POST_INJECTION_AWARENESS_PROMPT as AD_AWARENESS_SYSTEM_PROMPT
             awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
                 ad_title=retrieval.primary.title,
                 ad_text=retrieval.primary.text[:300],
