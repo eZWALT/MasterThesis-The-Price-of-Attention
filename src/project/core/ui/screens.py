@@ -237,20 +237,21 @@ def _render_turn_ads(
     manager: ConversationManager,
     ad_mode: str,
 ) -> None:
-    """Render participant-visible ads for the current turn (compact, no descriptions)."""
-    if not manager.should_inject_ad:
+    """Render participant-visible ads persistently until conversation ends.
+
+    Once an ad has been retrieved (manager.last_retrieval is populated),
+    the banner stays visible on every subsequent turn.  This is by design:
+    the explicit ad block is a persistent UI element, not a transient
+    per-turn flash.
+
+    Ads are only shown for ad conditions (not no_ads) and only when the
+    current ad_mode matches the retrieval's ad_mode (guards dev
+    mode-switching).
+    """
+    if not ad_mode:
         return
 
-    # Dry-run shortcut: show mock ad banner directly, no injector
-    if manager.dry_run:
-        if manager.last_retrieval and manager.last_retrieval.primary:
-            ad = manager.last_retrieval.primary
-            payload = {
-                "header": "Sponsored",
-                "title": ad.title,
-                "cta": ad.cta or "Discover More",
-            }
-            _render_ad_banner(payload, ad_mode="explicit_ad_block", manager=manager, turn=manager.turn_count, ad=ad)
+    if not manager.last_retrieval or not manager.last_retrieval.has_ads:
         return
 
     if not _ad_display_state_matches_mode(manager, ad_mode):
@@ -367,7 +368,7 @@ def render_ocean(bfi_version: str = "10") -> Optional[list[int]]:
     if answered == n and st.button("Continue", type="primary"):
         return responses
     elif answered < n:
-        st.info("Please answer all questions to continue.")
+        st.info("Please answer all statements to continue.")
     return None
 
 
@@ -832,22 +833,25 @@ def render_trial_chat(
     # Compact ads above chat input (banner where applicable)
     _render_turn_ads(manager, ad_mode)
 
-    # Max turns reached → show continue button (let user read last message)
+    # Max turns reached → show goodbye + done button
     if manager.must_end:
-        st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
-        if st.button("Continue to questionnaire", type="primary", use_container_width=True):
+        from core.config import GOODBYE_MESSAGE
+        if not any(m.get("role") == "assistant" and m.get("content") == GOODBYE_MESSAGE for m in manager.messages):
+            manager.messages.append({"role": "assistant", "content": GOODBYE_MESSAGE})
+        with st.chat_message("assistant"):
+            st.markdown(GOODBYE_MESSAGE)
+        if st.button("Done", type="primary", use_container_width=True):
             return True
-
-    # Chat input
-    if user_input := st.chat_input("Send a message..."):
-        if not user_input.strip():
-            st.warning("Please enter a message before sending.")
-        else:
-            with st.chat_message("user"):
-                st.markdown(user_input.strip())
-            with st.chat_message("assistant"):
-                st.write_stream(manager.process_user_message_stream(user_input.strip()))
-            st.rerun()
+    else:
+        if user_input := st.chat_input("Send a message..."):
+            if not user_input.strip():
+                st.warning("Please enter a message before sending.")
+            else:
+                with st.chat_message("user"):
+                    st.markdown(user_input.strip())
+                with st.chat_message("assistant"):
+                    st.write_stream(manager.process_user_message_stream(user_input.strip()))
+                st.rerun()
 
     return False
 
@@ -903,7 +907,7 @@ def render_post_trial_survey(trial_number: int) -> Optional[dict]:
             return None
         return responses
     elif not all_answered:
-        st.info("Please answer all questions to continue.")
+        st.info("Please answer all statements to continue.")
     return None
 
 
@@ -956,7 +960,7 @@ def render_final_survey() -> Optional[dict]:
             return None
         return responses
     elif not all_answered:
-        st.info("Please answer all Likert questions to continue.")
+        st.info("Please answer all Likert statements to continue.")
     return None
 
 
@@ -971,7 +975,7 @@ def render_instructions() -> bool:
         "You will chat with an AI assistant across several "
         "short conversations. Each conversation will present you with "
         "a different task.\n\n"
-        "After each conversation, you will answer a few brief questions "
+        "After each conversation, you will answer a few brief statements "
         "about your experience.\n\n"
         "Take your time and interact naturally with the assistant."
     )
@@ -1010,18 +1014,21 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
         with st.chat_message(msg["role"]):
             _render_chat_message(msg)
 
-    if manager.turn_count >= 1:
-        st.divider()
-        if st.button("Done — continue to study", type="primary"):
+    if manager.must_end:
+        if st.button("Done", type="primary", use_container_width=True):
             return True
-
-    if user_input := st.chat_input("Send a message..."):
-        if user_input.strip():
-            with st.chat_message("user"):
-                st.markdown(user_input.strip())
-            with st.chat_message("assistant"):
-                st.write_stream(manager.process_user_message_stream(user_input.strip()))
-            st.rerun()
+    else:
+        if manager.turn_count >= 1:
+            st.divider()
+            if st.button("Done", type="primary", use_container_width=True):
+                return True
+        if user_input := st.chat_input("Send a message..."):
+            if user_input.strip():
+                with st.chat_message("user"):
+                    st.markdown(user_input.strip())
+                with st.chat_message("assistant"):
+                    st.write_stream(manager.process_user_message_stream(user_input.strip()))
+                st.rerun()
 
     return False
 
@@ -1073,7 +1080,7 @@ def render_first_impression() -> Optional[dict]:
             "sentiment_label": sentiment,
         }
     elif not all_filled:
-        st.info("Please answer all questions to continue.")
+        st.info("Please answer all statements to continue.")
     return None
 
 
@@ -1111,14 +1118,13 @@ def render_condition_chat(
     manager: ConversationManager,
     condition_id: str,
     flow_test: bool = False,
-    calibration: bool = False,
 ) -> bool:
     """
     Condition-aware chat interface.
 
     Handles no_ads (no ad injection) and ad conditions (single ad at ad_turn).
-    In calibration mode, shows an early-exit button (researcher can end anytime
-    after min_turns). In production/dev-flow, participants must complete all turns.
+    Participants must complete all turns; after the final turn a goodbye
+    message appears with a single Done button.
     """
     from core.config import CONDITION_AD_MODE
 
@@ -1144,19 +1150,8 @@ def render_condition_chat(
     with st.sidebar:
         progress = min(manager.turn_count / manager.max_turns, 1.0)
         st.progress(progress, text=f"Turn {manager.turn_count} / {manager.max_turns}")
-        if calibration or flow_test:
+        if flow_test:
             st.caption(f"Condition: {label}")
-
-        if manager.turn_count >= manager.finish_from:
-            if manager.turn_count < manager.min_turns:
-                st.info(
-                    f"💬 Keep chatting — you need at least {manager.min_turns} turns "
-                    "before you can finish."
-                )
-            else:
-                st.success("You can keep chatting or finish when you're ready.")
-            if st.button("🏁 I've finished", type="primary", use_container_width=True):
-                return True
 
     _render_chat_history(manager, ad_mode)
 
@@ -1168,19 +1163,23 @@ def render_condition_chat(
         _render_turn_ads(manager, ad_mode)
 
     if manager.must_end:
-        st.caption(f"Maximum turns ({MAX_TURNS_PER_TRIAL}) reached.")
-        if st.button("Continue to questionnaire", type="primary", use_container_width=True):
+        from core.config import GOODBYE_MESSAGE
+        if not any(m.get("role") == "assistant" and m.get("content") == GOODBYE_MESSAGE for m in manager.messages):
+            manager.messages.append({"role": "assistant", "content": GOODBYE_MESSAGE})
+        with st.chat_message("assistant"):
+            st.markdown(GOODBYE_MESSAGE)
+        if st.button("Done", type="primary", use_container_width=True):
             return True
-
-    if user_input := st.chat_input("Send a message..."):
-        if not user_input.strip():
-            st.warning("Please enter a message before sending.")
-        else:
-            with st.chat_message("user"):
-                st.markdown(user_input.strip())
-            with st.chat_message("assistant"):
-                st.write_stream(manager.process_user_message_stream(user_input.strip()))
-            st.rerun()
+    else:
+        if user_input := st.chat_input("Send a message..."):
+            if not user_input.strip():
+                st.warning("Please enter a message before sending.")
+            else:
+                with st.chat_message("user"):
+                    st.markdown(user_input.strip())
+                with st.chat_message("assistant"):
+                    st.write_stream(manager.process_user_message_stream(user_input.strip()))
+                st.rerun()
 
     return False
 
@@ -1290,8 +1289,8 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
     if section == 0:
         st.subheader("Evaluation")
         st.caption(
-            "Please answer the following questions about the chatbot. "
-            "Rate your level of agreement (1 = Strongly disagree, 7 = Strongly agree)."
+            "Please rate your level of agreement with the following statements about the chatbot. "
+            "(1 = Strongly disagree, 7 = Strongly agree)."
         )
         all_answered = True
         for item in POST_CONDITION_LLM_ITEMS:
@@ -1317,12 +1316,17 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             st.session_state[section_key] = 1
             st.rerun()
         elif not all_answered:
-            st.info("Please answer all questions to continue.")
+            st.info("Please answer all statements to continue.")
         return None
 
     # ── Section 2: Chatbot Personality ─────────────────────────
     elif section == 1:
         st.subheader("Personality")
+        st.caption(
+            "Please rate your level of agreement with the following statements about the chatbot. "
+            "(1 = Strongly disagree, 7 = Strongly agree). "
+            "There are optional open-ended fields if you would like to give more detail."
+        )
         all_answered = True
 
         for item in POST_CONDITION_PERSONALITY_LIKERT:
@@ -1346,39 +1350,50 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
 
         all_open_answered = True
         for item in POST_CONDITION_PERSONALITY_OPEN:
-            value = st.text_area(
+            value = st.radio(
                 item["text"],
-                key=f"pcs_pers_open_{condition_number}_{item['id']}",
+                options=list(range(POST_CONDITION_SCALE_MIN, POST_CONDITION_SCALE_MAX + 1)),
+                format_func=lambda v: f"{v}",
+                horizontal=True,
+                index=None,
+                key=f"pcs_pers_open_lik_{condition_number}_{item['id']}",
             )
-            responses[item["id"]] = value
-            if not value.strip():
-                all_open_answered = False
+            if value is None:
+                all_answered = False
+            else:
+                responses[item["id"]] = value
+            elab = st.text_area(
+                item["elaboration"],
+                key=f"pcs_pers_open_txt_{condition_number}_{item['id']}",
+            )
+            responses[f"{item['id']}_text"] = elab
 
         answered_s2 = sum(
             1 for item in POST_CONDITION_PERSONALITY_LIKERT
             if item["id"] in responses and responses[item["id"]] is not None
         ) + sum(
             1 for item in POST_CONDITION_PERSONALITY_OPEN
-            if item["id"] in responses and responses[item["id"]].strip()
+            if item["id"] in responses and responses[item["id"]] is not None
         )
         total_s2 = len(POST_CONDITION_PERSONALITY_LIKERT) + len(POST_CONDITION_PERSONALITY_OPEN)
         st.progress(answered_s2 / total_s2, text=f"Section 2: {answered_s2} of {total_s2} answered")
 
         st.divider()
-        if all_answered and all_open_answered and st.button("Continue", type="primary"):
+        if all_answered and st.button("Continue", type="primary"):
             st.session_state[responses_key] = responses
             st.session_state[section_key] = 2
             st.rerun()
         elif not all_answered:
-            st.info("Please answer all Likert questions to continue.")
-        elif not all_open_answered:
-            st.info("Please answer both open-ended questions to continue.")
+            st.info("Please answer all Likert statements to continue.")
         return None
 
     # ── Section 3: LLM Behaviours ──────────────────────────────
     elif section == 2:
         st.subheader("Behaviours")
-        st.caption("Rate your level of agreement (1 = Strongly disagree, 7 = Strongly agree).")
+        st.caption(
+            "Please rate your level of agreement with the following statements about the chatbot. "
+            "(1 = Strongly disagree, 7 = Strongly agree)."
+        )
         all_answered = True
 
         for item in POST_CONDITION_BEHAVIOUR_ITEMS:
@@ -1404,7 +1419,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
             del st.session_state[responses_key]
             return responses
         elif not all_answered:
-            st.info("Please answer all questions to continue.")
+            st.info("Please answer all statements to continue.")
         return None
 
 
@@ -1422,7 +1437,7 @@ def render_ads_recall() -> Optional[dict]:
     4-step recall section, one step per ad condition (no_ads excluded).
     Each step shows the ad that was presented (title, description, task prompt,
     image if available, and inline context for inline modes), followed by
-    7 Likert questions (noticeability → system trust shift) + 1 open-ended.
+    7 Likert statements (noticeability → system trust shift) + 1 open-ended.
     """
     st.header("Recall")
 
@@ -1472,7 +1487,7 @@ def render_ads_recall() -> Optional[dict]:
     st.markdown(
         f'<div style="font-size:0.85rem; color:#999; line-height:1.5; margin-bottom:12px;">'
         f'Below is a summary of what happened in this conversation. '
-        f'Review it, then answer the questions below.</div>',
+        f'Review it, then answer the statements below.</div>',
         unsafe_allow_html=True,
     )
 
@@ -1616,7 +1631,11 @@ def render_ads_recall() -> Optional[dict]:
     else:
         st.info("No additional content was shown in this conversation.")
 
-    # ── Likert questions ──────────────────────────────────────
+    # ── Likert statements ─────────────────────────────────────
+    st.caption(
+        "Please rate your level of agreement with the following statements about the content above. "
+        "(1 = Strongly disagree, 7 = Strongly agree)."
+    )
     all_answered = True
     for item in RECALL_ITEMS:
         value = st.radio(
@@ -1649,14 +1668,14 @@ def render_ads_recall() -> Optional[dict]:
             st.session_state[step_key] = step + 1
             st.rerun()
         elif not all_answered:
-            st.info("Please answer all questions to continue.")
+            st.info("Please answer all statements to continue.")
     else:
         if all_answered and st.button("Submit", type="primary"):
             del st.session_state[step_key]
             del st.session_state[responses_key]
             return responses
         elif not all_answered:
-            st.info("Please answer all questions to continue.")
+            st.info("Please answer all statements to continue.")
     return None
 
 
