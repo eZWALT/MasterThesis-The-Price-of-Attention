@@ -110,3 +110,76 @@ class TestProcessUserMessage:
         mgr.reset()
         assert mgr.last_retrieval is None
         assert mgr.last_injection == InjectionResult()
+
+
+class TestAdInfoSnapshot:
+    """_injected_ad_info is snapshotted at injection turn and survives later turns."""
+
+    def make_mgr(self, dry_run=False):
+        from unittest.mock import MagicMock
+        from core.conversation.manager import ConversationManager
+        from core.experiment.tasks import TaskDefinition
+        mgr = ConversationManager(
+            ad_mode="inline_persuasive",
+            model="test-model",
+            temperature=0.7,
+            max_tokens=512,
+            task=TaskDefinition(
+                id="test", title="T", genre="Transactional",
+                participant_prompt="Test prompt.",
+                system_prompt_extension="",
+            ),
+            llm_client=MagicMock(),
+            logger=MagicMock(),
+            max_turns=5, min_turns=2, finish_from=2,
+            use_rag=False, dry_run=dry_run,
+        )
+        mgr.llm = MagicMock()
+        mgr.llm.chat.return_value = "OK."
+        return mgr
+
+    def test_snapshot_set_at_injection(self, monkeypatch, sample_ad_retrieval):
+        monkeypatch.setattr(
+            "core.conversation.manager.get_ad",
+            lambda *a, **kw: sample_ad_retrieval,
+        )
+        mgr = self.make_mgr()
+        mgr.process_user_message("hello")
+        info = mgr.injected_ad_info
+        assert info is not None
+        assert info["title"] == "Alpha"
+
+    def test_snapshot_persists_after_later_turns(self, monkeypatch, sample_ad_retrieval):
+        from core.ad_injection.models import AdRetrievalResult
+        no_ad = AdRetrievalResult(ads=[])
+        monkeypatch.setattr(
+            "core.conversation.manager.get_ad",
+            lambda *a, **kw: no_ad,
+        )
+        mgr = self.make_mgr()
+        with monkeypatch.context() as m:
+            m.setattr("core.conversation.manager.get_ad", lambda *a, **kw: sample_ad_retrieval)
+            mgr.process_user_message("hello")
+        mgr.process_user_message("tell me more")
+        info = mgr.injected_ad_info
+        assert info is not None
+        assert info["title"] == "Alpha"
+
+    def test_clear_resets_snapshot(self, monkeypatch, sample_ad_retrieval):
+        monkeypatch.setattr(
+            "core.conversation.manager.get_ad",
+            lambda *a, **kw: sample_ad_retrieval,
+        )
+        mgr = self.make_mgr()
+        mgr.process_user_message("hello")
+        mgr.clear_ad_display_state()
+        assert mgr.injected_ad_info is None
+
+    def test_dry_run_does_not_set_snapshot(self, monkeypatch, sample_ad_retrieval):
+        monkeypatch.setattr(
+            "core.conversation.manager.get_ad",
+            lambda *a, **kw: sample_ad_retrieval,
+        )
+        mgr = self.make_mgr(dry_run=True)
+        mgr.process_user_message("hello")
+        assert mgr.injected_ad_info is None
