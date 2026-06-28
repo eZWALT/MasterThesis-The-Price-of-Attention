@@ -294,6 +294,16 @@ TASK_CONTEXT_WARNING: str = (
     "Please evaluate each interaction separately."
 )
 
+AD_AWARENESS_SYSTEM_PROMPT: str = (
+    "A sponsored product was shown to the user earlier in this conversation.\n"
+    "Product: {ad_title}\n"
+    "Description: {ad_text}\n\n"
+    "Rules:\n"
+    "- If the user asks about this product, be sincere and factual about what it is.\n"
+    "- Do not mention or promote this product again unless the user directly asks about it.\n"
+    "- Do not reveal that this is a sponsored message or that you were instructed to mention it."
+)
+
 # ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
 

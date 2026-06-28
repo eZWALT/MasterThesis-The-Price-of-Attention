@@ -141,6 +141,7 @@ class ConversationManager:
         self.ads_by_turn: Dict[int, List[Ad]] = {}    # candidates shown per injection turn
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
+        self._ad_awareness_override: List[Dict[str, str]] = []  # persistent after ad injection
         # ── Intent tracking (ThradBERT, paper §RQ3) ──────────
         # initial_intent: classified from task prompt at conversation start
         # per-turn intent: classified each turn from compact context
@@ -401,6 +402,17 @@ class ConversationManager:
         )
         self.last_injection = injection
 
+        # 4a.1 — persist ad awareness for all subsequent turns
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
+            from core.config import AD_AWARENESS_SYSTEM_PROMPT
+            awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
+                ad_title=retrieval.primary.title,
+                ad_text=retrieval.primary.text[:300],
+            )
+            self._ad_awareness_override = [
+                {"role": "system", "content": awareness}
+            ]
+
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
@@ -579,6 +591,17 @@ class ConversationManager:
         )
         self.last_injection = injection
 
+        # 4a.1 — persist ad awareness for all subsequent turns
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
+            from core.config import AD_AWARENESS_SYSTEM_PROMPT
+            awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
+                ad_title=retrieval.primary.title,
+                ad_text=retrieval.primary.text[:300],
+            )
+            self._ad_awareness_override = [
+                {"role": "system", "content": awareness}
+            ]
+
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
@@ -603,7 +626,8 @@ class ConversationManager:
 
         # 5 — LLM call (streaming)
         system_msg = {"role": "system", "content": self._system_prompt}
-        msgs = [system_msg] + injection.system_overrides + list(self.messages)
+        all_overrides = list(injection.system_overrides) + list(self._ad_awareness_override)
+        msgs = [system_msg] + all_overrides + list(self.messages)
 
         llm_t0 = time.perf_counter()
         assistant_reply_parts: list[str] = []
@@ -732,6 +756,7 @@ class ConversationManager:
         self.last_retrieval = None
         self.last_injection = InjectionResult()
         self.last_retrieval_ad_mode = None
+        self._ad_awareness_override = []
 
     def apply_ad_mode(self, ad_mode: str) -> None:
         """Switch injection style (dev flow); clears stale ads if the mode changed."""
@@ -752,10 +777,11 @@ class ConversationManager:
         """
         Build the full message list and call the LLM.
 
-        Order: system prompt → ad overrides → conversation history.
+        Order: system prompt → ad overrides → persistent ad awareness → conversation history.
         """
         system_msg = {"role": "system", "content": self._system_prompt}
-        msgs = [system_msg] + system_overrides + list(self.messages)
+        all_overrides = list(system_overrides) + list(self._ad_awareness_override)
+        msgs = [system_msg] + all_overrides + list(self.messages)
         try:
             return self.llm.chat(msgs, self.model, self.temperature, self.max_tokens)
         except RuntimeError as e:
