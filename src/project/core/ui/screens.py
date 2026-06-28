@@ -1441,6 +1441,43 @@ def _ad_condition_label(condition_id: str, step: int = 0) -> str:
     """Short label for an ad condition — numbered by presentation order."""
     return f"Conversation {step + 1}"
 
+def render_model_preference(controller) -> Optional[dict]:
+    """Model preference ranking — shown after all conditions, before ad recall."""
+    from core.config import CONDITION_LABELS
+
+    st.header("Which model did you like the most?")
+    st.markdown(
+        "You experienced several different AI assistant models across the conversations. "
+        "Please rate each one on how much you liked it overall."
+    )
+
+    responses: dict[str, int] = {}
+    all_answered = True
+
+    for i, plan in enumerate(controller.condition_plan):
+        cond_id = plan["condition"]
+        label = CONDITION_LABELS.get(cond_id, cond_id)
+        label_clean = label.replace("_", " ").title()
+        score = st.radio(
+            f"**Conversation {i + 1}** ({label_clean})",
+            options=list(range(1, 8)),
+            format_func=lambda v: {1: "1 — Disliked a lot", 2: "2", 3: "3", 4: "4 — Neutral", 5: "5", 6: "6", 7: "7 — Liked a lot"}.get(v, str(v)),
+            horizontal=True,
+            index=None,
+            key=f"model_pref_{cond_id}",
+        )
+        responses[cond_id] = score
+        if score is None:
+            all_answered = False
+
+    if not all_answered:
+        st.info("Please answer all questions to continue.")
+
+    if all_answered and st.button("Submit", type="primary"):
+        return responses
+    return None
+
+
 
 def render_ads_recall() -> Optional[dict]:
     """
