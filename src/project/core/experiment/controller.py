@@ -86,13 +86,11 @@ class ExperimentController:
         turns_min: int = MIN_TURNS_PER_TRIAL,
         turns_max: int = MAX_TURNS_PER_TRIAL,
         finish_from: Optional[int] = None,
-        calibration: bool = False,
     ):
         self.participant_id = participant_id
         self.model = model
         self.seed = seed
         self.cb_group = cb_group
-        self.calibration = calibration
         self.turns_min = turns_min
         self.turns_max = turns_max
         self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
