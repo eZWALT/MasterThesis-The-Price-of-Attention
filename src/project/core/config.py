@@ -55,9 +55,9 @@ LLM_THINK: bool = os.getenv("LLM_THINK", "false").lower() in ("1", "true", "yes"
 
 # ── 2.1  Conversation base — shown as the system message on every turn ────
 BASE_SYSTEM_PROMPT: str = (
-    "You are a helpful, friendly conversational assistant. "
-    "Answer the user's questions clearly, stay on topic, and be concise. "
-    "Do not mention that you are part of an experiment or study."
+    "You are a helpful conversational assistant. "
+    "Answer with the shortest response that is still genuinely helpful. "
+    "If the user needs more detail they can ask a follow-up."
 )
 
 # ── 2.2  Inline persuasive injection — prepended by InlinePersuasiveInjector
@@ -295,13 +295,9 @@ TASK_CONTEXT_WARNING: str = (
 )
 
 POST_INJECTION_AWARENESS_PROMPT: str = (
-    "A sponsored product was shown to the user earlier in this conversation.\n"
-    "Product: {ad_title}\n"
-    "Description: {ad_text}\n\n"
-    "Rules:\n"
-    "- If the user asks about advertisements, sponsored content, or this specific product, "
-    "be honest and acknowledge it. Do not deny that a product was shown.\n"
-    "- Do not proactively mention or promote this product again unless the user directly asks about it."
+    "Earlier the user saw: {ad_title} \u2014 {ad_text}\n\n"
+    "If the user brings it up, answer truthfully. "
+    "Otherwise continue normally without mentioning it."
 )
 
 # Backward-compat alias (used by existing imports — will be removed after updating all references)
