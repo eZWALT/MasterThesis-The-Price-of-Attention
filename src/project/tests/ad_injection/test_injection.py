@@ -17,7 +17,7 @@ from core.ad_injection.injectors import (
     InlinePersuasiveInjector,
     ExplicitAdBlockInjector,
 )
-from core.config import INLINE_AD_SYSTEM_PROMPT
+from core.config import INLINE_INJECTION_PROMPT
 
 
 def _sample_ads(n: int = 3) -> AdRetrievalResult:
@@ -190,7 +190,7 @@ class TestInjectorRegistry:
 
     def test_inline_prompt_template_accepts_products_block(self):
         block = format_products_block(_sample_ads(1).ads)
-        rendered = INLINE_AD_SYSTEM_PROMPT.format(products_block=block)
+        rendered = INLINE_INJECTION_PROMPT.format(products_block=block)
         assert "Product 1" in rendered
         assert "{products_block}" not in rendered
 
