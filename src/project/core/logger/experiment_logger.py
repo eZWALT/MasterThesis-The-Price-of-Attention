@@ -4,11 +4,11 @@ Experiment Logger — production-grade structured event logging.
 Design: mini event-sourcing system.
   - Append-only JSONL on disk (one line per event, crash-safe)
   - Buffered writes (flush every N events OR T seconds)
-  - Hierarchical IDs: experiment_id > run_id > participant_id > conversation_id
+  - Hierarchical IDs: experiment_id > participant_id > conversation_id
   - Every event carries full context for independent queryability
 
 Output: one JSONL file per experiment run at:
-    logs/{experiment_id}/{run_id}.jsonl
+    logs/{experiment_id}/events.jsonl
 
 Paper reference: Section 6.5 — Multimodal Logging System.
 """
@@ -16,21 +16,22 @@ Paper reference: Section 6.5 — Multimodal Logging System.
 from __future__ import annotations
 
 import atexit
+from datetime import datetime, timezone
 import csv
 import json
 import queue
 import threading
+
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from core.logger.identity import make_experiment_id, make_run_id
+from core.logger.identity import make_experiment_id, make_participant_id
 
 # Sentinel to signal the writer thread to stop
 _STOP = object()
-
 
 # ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -44,12 +45,12 @@ class LogEntry:
     """
     # Identity
     experiment_id: str
-    run_id: str
     participant_id: str
     conversation_id: str
 
     # Event
     timestamp: str           # ISO-8601 UTC
+    unix_ts: int            # unix epoch seconds
     event: str               # user_message | assistant_reply | intent_classified | retrieval | ...
     source: str              # "user" | "model" | "system" | "retrieval"
     step_index: int          # global monotonic counter within this run
@@ -62,7 +63,6 @@ class LogEntry:
     # Payload
     data: Any                # free-form event-specific data
 
-
 # ── Logger ────────────────────────────────────────────────────────────────────
 
 class ExperimentLogger:
@@ -72,7 +72,7 @@ class ExperimentLogger:
     Parameters
     ----------
     experiment_id  : stable ID for this experiment configuration.
-    run_id         : unique per app launch.
+
     participant_id : human subject ID (set later via set_participant).
     log_dir        : base directory for log files.
     flush_every_n  : flush buffer to disk every N events.
@@ -82,15 +82,14 @@ class ExperimentLogger:
     def __init__(
         self,
         experiment_id: Optional[str] = None,
-        run_id: Optional[str] = None,
-        participant_id: str = "unknown",
+        participant_id: str = "",
         log_dir: str = "logs/production",
         flush_every_n: int = 25,
         flush_every_s: float = 60.0,
     ) -> None:
         self.experiment_id = experiment_id or make_experiment_id()
-        self.run_id = run_id or make_run_id()
-        self.participant_id = participant_id
+
+        self.participant_id = participant_id or make_participant_id()
         self.flush_every_n = flush_every_n
         self.flush_every_s = flush_every_s
 
@@ -110,7 +109,7 @@ class ExperimentLogger:
         self._log_dir.mkdir(parents=True, exist_ok=True)
         # Ensure host user can clean up log dirs created by Docker root.
         self._log_dir.chmod(0o777)
-        self._log_path = self._log_dir / f"{self.run_id}.jsonl"
+        self._log_path = self._log_dir / "events.jsonl"
 
         # Background writer thread (daemon — dies with main)
         self._writer_thread = threading.Thread(
@@ -156,10 +155,10 @@ class ExperimentLogger:
             self._step_counter += 1
             entry = LogEntry(
                 experiment_id=self.experiment_id,
-                run_id=self.run_id,
                 participant_id=self.participant_id,
                 conversation_id=conversation_id,
                 timestamp=datetime.now(timezone.utc).isoformat(),
+                unix_ts=int(time.time()),
                 event=event,
                 source=source,
                 step_index=self._step_counter,
@@ -184,7 +183,7 @@ class ExperimentLogger:
 
     def set_participant(self, participant_id: str) -> None:
         """Update participant ID (set after consent/demographics)."""
-        self.participant_id = participant_id
+        self.participant_id = participant_id or make_participant_id()
 
     @property
     def trial_index(self) -> int:
@@ -237,7 +236,7 @@ class ExperimentLogger:
 
         Flattens the `data` dict into top-level columns prefixed with `d_`.
         """
-        out_path = Path(path) if path else (self._log_dir / f"{self.run_id}.csv")
+        out_path = Path(path) if path else (self._log_dir / "export.csv")
 
         # Collect all data keys across entries for consistent columns
         all_data_keys: set = set()
@@ -247,7 +246,7 @@ class ExperimentLogger:
         sorted_data_keys = sorted(all_data_keys)
 
         base_fields = [
-            "experiment_id", "run_id", "participant_id", "conversation_id",
+            "experiment_id", "participant_id", "conversation_id",
             "timestamp", "event", "source", "step_index",
             "ad_mode", "trial_index", "turn",
         ]
@@ -259,7 +258,6 @@ class ExperimentLogger:
             for entry in self._entries:
                 row = {
                     "experiment_id": entry.experiment_id,
-                    "run_id": entry.run_id,
                     "participant_id": entry.participant_id,
                     "conversation_id": entry.conversation_id,
                     "timestamp": entry.timestamp,
@@ -284,7 +282,7 @@ class ExperimentLogger:
         Unlike the live append file (which may have partial writes from
         crashes), this produces a validated export.
         """
-        out_path = Path(path) if path else (self._log_dir / f"{self.run_id}_export.jsonl")
+        out_path = Path(path) if path else (self._log_dir / "export.jsonl")
         with open(out_path, "w", encoding="utf-8") as f:
             for entry in self._entries:
                 f.write(json.dumps(asdict(entry), default=str) + "\n")

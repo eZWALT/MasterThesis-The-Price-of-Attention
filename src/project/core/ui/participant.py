@@ -96,16 +96,17 @@ def init_session_state(params):
             log_dir = LOG_DIR_DEV
         else:
             log_dir = LOG_DIR
+        pid = params.participant_id or str(uuid.uuid4())[:8]
         st.session_state.logger = ExperimentLogger(
             log_dir=log_dir,
             flush_every_n=LOG_FLUSH_EVERY_N,
             flush_every_s=LOG_FLUSH_EVERY_S,
+            participant_id=pid,
         )
 
     if "controller" not in st.session_state:
-        pid = params.participant_id or str(uuid.uuid4())[:8]
         ctrl = ExperimentController(
-            participant_id=pid,
+            participant_id=st.session_state.logger.participant_id,
             tasks=params.tasks,
             model=params.model or DEFAULT_MODEL,
             seed=params.seed,
@@ -118,12 +119,11 @@ def init_session_state(params):
         st.session_state.controller = ctrl
         st.session_state.experiment_params = params
         log.info(
-            "Session init (B) | pid={} | study={} | skip={} | exp={} | run={}",
+            "Session init (B) | pid={} | study={} | skip={} | exp={}",
             pid,
             params.study_type,
             sorted(params.skip_screens),
             st.session_state.logger.experiment_id,
-            st.session_state.logger.run_id,
         )
         session_marker("start")
         st.session_state.logger.log(
@@ -506,7 +506,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             webcam_enabled=webcam_enabled,
             participant_id=ctrl.participant_id,
             log_dir=st.session_state.logger._log_dir,
-            run_id=st.session_state.logger.run_id,
+            experiment_id=st.session_state.logger.experiment_id,
             current_screen=ctrl.current_screen,
         )
         if study_type or flow_test:

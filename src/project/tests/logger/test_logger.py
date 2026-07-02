@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from core.logger import ExperimentLogger, make_experiment_id, make_run_id
+from core.logger import ExperimentLogger, make_experiment_id
 from core.logger.identity import make_experiment_id as _make_exp_id
 from core.logger.payload import compact_event_data, compact_retrieval_diag
 
@@ -48,19 +48,11 @@ class TestIdentity:
         assert len(parts) == 3  # exp, timestamp, hash
         assert len(parts[2]) == 8  # 8-char config hash
 
-    def test_experiment_id_deterministic(self):
-        """Same config → same experiment ID (within same second)."""
+    def test_experiment_id_unique(self):
+        """Each call produces a different suffix (random, not config-hash)."""
         id1 = _make_exp_id()
         id2 = _make_exp_id()
-        # Hash portion should be the same (config hasn't changed)
-        assert id1.split("_")[2] == id2.split("_")[2]
-
-    def test_run_id_unique(self):
-        id1 = make_run_id()
-        id2 = make_run_id()
         assert id1 != id2
-        assert id1.startswith("run_")
-        assert id2.startswith("run_")
 
 
 # ── Logger basics ──────────────────────────────────────────────────────────

@@ -485,7 +485,7 @@ def render_webcam_preview(
     webcam_enabled: bool,
     participant_id: str,
     log_dir: Path,
-    run_id: str,
+    experiment_id: str,
     current_screen: str = "",
 ) -> None:
     """Background webcam capture for the entire lab session.
@@ -549,7 +549,7 @@ def finalize_webcam_recording() -> None:
         return
     try:
         log_dir: Path = st.session_state.logger._log_dir
-        video_path = log_dir / f"{st.session_state.logger.run_id}_eyetracking.mp4"
+        video_path = log_dir / f"{st.session_state.logger.experiment_id}_eyetracking.mp4"
         cam.save_video(video_path)
         cam.stop()
         st.session_state.logger.log(
