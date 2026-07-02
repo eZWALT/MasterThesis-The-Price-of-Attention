@@ -282,7 +282,7 @@ def _render_explicit_ad_banner(payload: dict) -> None:
 
 def render_consent() -> bool:
     """Show consent form. Returns True when user agrees and clicks Start."""
-    st.warning(
+    st.error(
         "Please do not refresh or navigate away from this page "
         "during the experiment. Your progress cannot be restored."
     )
