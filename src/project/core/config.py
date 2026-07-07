@@ -178,14 +178,14 @@ STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_LAB: {
         "n_trials":    10,
         "bfi_version": "10",
-        "turns_min":   5,
-        "turns_max":   5,
+        "turns_min":   4,
+        "turns_max":   4,
     },
     STUDY_TYPE_CROWD: {
         "n_trials":    10,
         "bfi_version": "10",
-        "turns_min":   5,
-        "turns_max":   5,
+        "turns_min":   4,
+        "turns_max":   4,
     },
 }
 
@@ -195,8 +195,8 @@ STUDY_DEFAULTS: dict[str, dict] = {
 # └─────────────────────────────────────────────────────────────────────────┘
 
 TRIALS_PER_SESSION: int    = 10
-MIN_TURNS_PER_TRIAL: int   = 5
-MAX_TURNS_PER_TRIAL: int   = 5
+MIN_TURNS_PER_TRIAL: int   = 4
+MAX_TURNS_PER_TRIAL: int   = 4
 
 # Minimum number of trials a participant must complete before the
 # "Leave study early" button appears in the sidebar.  Participants
@@ -504,6 +504,13 @@ SPINNER_PHRASES: list[str] = [
 ]
 SPINNER_ROTATE_MIN_SEC: float = 1.0   # min seconds before switching phrase
 SPINNER_ROTATE_MAX_SEC: float = 3.0   # max seconds before switching phrase
+
+
+# ── 9.  OPTIONAL QUESTION VISIBILITY ─────────────────────────────
+# When False, optional open-ended fields (elaboration text areas in
+# post-condition surveys, demographics) are hidden from participants.
+# Set env SHOW_OPTIONAL=1 to make them visible (no code change needed).
+SHOW_OPTIONAL_QUESTIONS: bool = os.getenv("SHOW_OPTIONAL", "").lower() in ("1", "true", "yes")
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐

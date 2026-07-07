@@ -67,14 +67,14 @@ class TestParseQueryParams:
         assert p.study_type == "crowd"
         assert "baseline" in p.skip_screens
         assert "demographics" in p.skip_screens
-        assert p.turns_min == 3
+        assert p.turns_min == 4
 
     def test_study_lab_includes_baseline(self):
         p = self._parse({"study": "lab"})
         assert p.study_type == "lab"
         assert "baseline" not in p.skip_screens
         assert "demographics" in p.skip_screens
-        assert p.turns_min == 5
+        assert p.turns_min == 4
 
     def test_study_crowd_merges_url_skip_with_protocol(self):
         p = self._parse({"study": "crowd", "skip": "consent"})
