@@ -22,6 +22,7 @@ import numpy as np
 import streamlit as st
 
 from core.config import (
+    SHOW_OPTIONAL_QUESTIONS,
     DEFAULT_MAX_TOKENS,
     CONSENT_TITLE,
     CONSENT_TEXT,
@@ -1339,7 +1340,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
         st.caption(
             "Please rate your level of agreement with the following statements about the chatbot. "
             "(1 = Strongly disagree, 7 = Strongly agree). "
-            "There are optional open-ended fields if you would like to give more detail."
+            "There are optional open-ended fields if you would like to give more detail." if SHOW_OPTIONAL_QUESTIONS else "Please rate each statement on the 1-7 scale."
         )
         all_answered = True
 
@@ -1356,11 +1357,14 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
                 all_answered = False
             else:
                 responses[item["id"]] = value
-            elab = st.text_area(
-                item["elaboration"],
-                key=f"pcs_pers_txt_{condition_number}_{item['id']}",
-            )
-            responses[f"{item['id']}_text"] = elab
+            if SHOW_OPTIONAL_QUESTIONS:
+                elab = st.text_area(
+                    item["elaboration"],
+                    key=f"pcs_pers_txt_{condition_number}_{item['id']}",
+                )
+                responses[f"{item['id']}_text"] = elab
+            else:
+                responses[f"{item['id']}_text"] = ""
 
         all_open_answered = True
         for item in POST_CONDITION_PERSONALITY_OPEN:
@@ -1376,11 +1380,14 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
                 all_answered = False
             else:
                 responses[item["id"]] = value
-            elab = st.text_area(
-                item["elaboration"],
-                key=f"pcs_pers_open_txt_{condition_number}_{item['id']}",
-            )
-            responses[f"{item['id']}_text"] = elab
+            if SHOW_OPTIONAL_QUESTIONS:
+                elab = st.text_area(
+                    item["elaboration"],
+                    key=f"pcs_pers_open_txt_{condition_number}_{item['id']}",
+                )
+                responses[f"{item['id']}_text"] = elab
+            else:
+                responses[f"{item['id']}_text"] = ""
 
         answered_s2 = sum(
             1 for item in POST_CONDITION_PERSONALITY_LIKERT
@@ -1559,10 +1566,6 @@ def render_ads_recall() -> Optional[dict]:
         <div style="font-size:1.05rem; font-weight:600; color:#f0f0f0; margin-bottom:4px; line-height:1.3;">
             {html_module.escape(ad_info["title"])}
         </div>''')
-        parts.append(f'''
-        <div style="font-size:0.88rem; color:#bbb; line-height:1.5; margin-bottom:8px;">
-            {html_module.escape(ad_info["text"])}
-        </div>''')
 
         if ad_info.get("cta"):
             parts.append(f'''
@@ -1703,8 +1706,11 @@ def render_demographics_end() -> Optional[dict]:
     responses: dict = {}
 
     for item in DEMOGRAPHICS_TEXT:
-        value = st.text_input(item["text"], key=f"demo_end_{item['id']}")
-        responses[item["id"]] = value
+        if SHOW_OPTIONAL_QUESTIONS:
+            value = st.text_input(item["text"], key=f"demo_end_{item['id']}")
+            responses[item["id"]] = value
+        else:
+            responses[item["id"]] = ""
 
     for item in DEMOGRAPHICS_SELECT:
         value = st.radio(

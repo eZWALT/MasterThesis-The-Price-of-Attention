@@ -271,12 +271,7 @@ RECALL_SCALE_MIN: int = 1
 RECALL_SCALE_MAX: int = 7
 
 RECALL_ITEMS: list[dict[str, str]] = [
-    {"id": "recall_noticeability",  "text": "I found this content noticeable in the conversation."},
     {"id": "recall_memory",         "text": "I feel I remember this content well."},
-    {"id": "recall_relevance",      "text": "I felt this content was relevant to my task."},
-    {"id": "recall_influence",      "text": "I felt this content influenced my decisions or thinking."},
-    {"id": "recall_intrusiveness",  "text": "I felt this content was intrusive in the conversation."},
-    {"id": "recall_credibility",    "text": "I felt this content was trustworthy."},
     {"id": "recall_trust_shift",    "text": "After seeing this content, I felt I could trust the chatbot overall."},
 ]
 
