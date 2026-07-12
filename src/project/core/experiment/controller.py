@@ -38,6 +38,8 @@ from core.config import (
     SCREEN_ADS_RECALL,
     SCREEN_OCEAN,
     SCREEN_DECEPTION_DISCLOSURE,
+    SCREEN_PROLIFIC_ID,
+    SCREEN_VALIDATION,
     SCREEN_DONE,
     WARMUP_TASK_ID,
     WARMUP_TURNS,
@@ -48,6 +50,7 @@ from core.experiment.tasks import TaskDefinition, TASK_CATALOG, TASK_BY_ID
 # ── Screen lists ─────────────────────────────────
 _PRE_CONDITION_SCREENS: list[str] = [
     SCREEN_CONSENT,
+    SCREEN_PROLIFIC_ID,
     SCREEN_BASELINE,
     SCREEN_WARMUP_CHAT,
 ]
@@ -63,6 +66,7 @@ _POST_CONDITION_SCREENS: list[str] = [
     SCREEN_ADS_RECALL,
     SCREEN_OCEAN,
     SCREEN_DEMOGRAPHICS,
+    SCREEN_VALIDATION,
     SCREEN_DECEPTION_DISCLOSURE,
     SCREEN_DONE,
 ]
@@ -111,6 +115,8 @@ class ExperimentController:
         self.ocean_scores: Dict[str, float] = {}
         self.condition_results: List[Dict[str, Any]] = []   # one per condition
         self.condition_surveys: List[Dict[str, int | str]] = []    # post-condition Likert + text
+        self.worker_id: str = ""
+        self.validation_results: Dict[str, Any] = {}
 
     # ── Counterbalancing ─────────────────────────
 

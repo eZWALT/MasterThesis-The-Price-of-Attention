@@ -555,13 +555,15 @@ SCREEN_ADS_PERCEPTION:          str = "ads_perception"
 SCREEN_LLM_EVALUATION:          str = "llm_evaluation"
 SCREEN_GODSPEED:                str = "godspeed"
 SCREEN_DECEPTION_DISCLOSURE:    str = "deception_disclosure"
+SCREEN_PROLIFIC_ID:           str = "prolific_id"
+SCREEN_VALIDATION:            str = "validation"
 
 
 # Per-study screens auto-advanced without rendering (extend these frozensets as needed).
 # lab   → full protocol incl. EEG/eye-tracking baseline
 # crowd → remote Prolific-style; no physiology hardware
 STUDY_SKIP_SCREENS: dict[str, frozenset[str]] = {
-    STUDY_TYPE_LAB: frozenset(),
+    STUDY_TYPE_LAB: frozenset({SCREEN_PROLIFIC_ID, SCREEN_VALIDATION}),
     STUDY_TYPE_CROWD: frozenset({SCREEN_BASELINE}),
 }
 

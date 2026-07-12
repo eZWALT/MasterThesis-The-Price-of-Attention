@@ -33,6 +33,8 @@ from core.config import (
     SCREEN_ADS_RECALL,
     SCREEN_OCEAN,
     SCREEN_DECEPTION_DISCLOSURE,
+    SCREEN_PROLIFIC_ID,
+    SCREEN_VALIDATION,
     SCREEN_DONE,
     WARMUP_TASK_ID,
     WARMUP_TURNS,
@@ -66,6 +68,7 @@ from core.modalities.eeg import (
 )
 from core.ui.screens import (
     render_consent,
+    render_prolific_id,
     render_baseline,
     render_demographics,
     render_ocean,
@@ -78,6 +81,7 @@ from core.ui.screens import (
     render_ads_recall,
     render_demographics_end,
     render_deception_disclosure,
+    render_validation_questions,
     render_done,
     render_webcam_preview,
     finalize_webcam_recording,
@@ -344,9 +348,11 @@ def export_session_data(ctrl: ExperimentController):
         "session_complete",
         {
             "participant_id": ctrl.participant_id,
+            "worker_id": ctrl.worker_id if ctrl.worker_id else None,
             "demographics": ctrl.demographics,
             "ocean_raw": ctrl.ocean_raw,
             "ocean_scores": ctrl.ocean_scores,
+            "validation": ctrl.validation_results,
             "condition_summaries": [_condition_summary_for_log(cr) for cr in ctrl.condition_results],
             "condition_surveys": ctrl.condition_surveys,
         },
@@ -363,7 +369,21 @@ def export_session_data(ctrl: ExperimentController):
 def dev_inject_stub_data(ctrl: ExperimentController, bfi_version: str = "10"):
     """Inject minimal stub data so the controller doesn't break on skip."""
     scr = ctrl.current_screen
-    if scr == SCREEN_DEMOGRAPHICS and not ctrl.demographics:
+    if scr == SCREEN_PROLIFIC_ID:
+        ctrl.worker_id = "DEV_STUB_WORKER"
+    elif scr == SCREEN_VALIDATION:
+        ctrl.validation_results = {
+            "correct": 5,
+            "false_positives": 0,
+            "false_negatives": 0,
+            "mistakes": 0,
+            "accuracy": 1.0,
+            "validation_failed": False,
+            "real_task_ids": [],
+            "distractor_task_ids": [],
+            "selected_task_ids": [],
+        }
+    elif scr == SCREEN_DEMOGRAPHICS and not ctrl.demographics:
         ctrl.demographics = {"age": 0, "gender": "skip", "education": "skip"}
     elif scr == SCREEN_OCEAN and not ctrl.ocean_raw:
         items = get_ocean_items(bfi_version)
@@ -562,6 +582,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
 
         labels = {
             SCREEN_CONSENT: "Consent",
+            SCREEN_PROLIFIC_ID: "Participant ID",
             SCREEN_BASELINE: "Eye-Tracking Baseline",
             SCREEN_DEMOGRAPHICS: "Demographics",
             SCREEN_INSTRUCTIONS: "Instructions",
@@ -571,6 +592,7 @@ def render_progress_sidebar(ctrl: ExperimentController, flow_test: bool = False,
             SCREEN_POST_CONDITION_SURVEY: "Post-Task Questionnaire",
             SCREEN_ADS_RECALL: "Recall",
             SCREEN_OCEAN: "About You",
+            SCREEN_VALIDATION: "Validation",
             SCREEN_DECEPTION_DISCLOSURE: "Debrief",
             SCREEN_DONE: "Done ✓",
         }
@@ -644,6 +666,18 @@ def run_participant_mode(params):
             screen_marker("consent")
             st.session_state.logger.log(
                 "consent_granted", {},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_PROLIFIC_ID:
+        result = render_prolific_id()
+        if result is not None:
+            ctrl.worker_id = result
+            st.session_state.logger.log(
+                "worker_id_set",
+                {"worker_id": result},
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
             ctrl.advance()
@@ -909,6 +943,18 @@ def run_participant_mode(params):
             survey_marker("demographics")
             st.session_state.logger.log(
                 "demographics_post_submitted", result,
+                ad_mode="session", conversation_id=ctrl.participant_id, source="user",
+            )
+            ctrl.advance()
+            st.rerun()
+
+    elif scr == SCREEN_VALIDATION:
+        result = render_validation_questions()
+        if result is not None:
+            ctrl.validation_results = result
+            st.session_state.logger.log(
+                "validation_submitted",
+                result,
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
             ctrl.advance()
