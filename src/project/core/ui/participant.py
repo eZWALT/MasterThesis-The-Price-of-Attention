@@ -11,6 +11,7 @@ import streamlit as st
 from loguru import logger as log
 from pathlib import Path
 
+from core.markers import MarkerClient, MarkerConfig
 from core.config import (
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
@@ -101,11 +102,18 @@ def init_session_state(params):
         else:
             log_dir = LOG_DIR
         pid = params.participant_id or str(uuid.uuid4())[:8]
+        marker_cfg = MarkerConfig(
+            url=params.marker_server_url,
+            timeout_s=2.0,
+        )
+        marker_client = MarkerClient(marker_cfg)
+        st.session_state.marker = marker_client
         st.session_state.logger = ExperimentLogger(
             log_dir=log_dir,
             flush_every_n=LOG_FLUSH_EVERY_N,
             flush_every_s=LOG_FLUSH_EVERY_S,
             participant_id=pid,
+            marker_client=marker_client,
         )
 
     if "controller" not in st.session_state:

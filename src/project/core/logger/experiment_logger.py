@@ -86,8 +86,10 @@ class ExperimentLogger:
         log_dir: str = "logs/production",
         flush_every_n: int = 25,
         flush_every_s: float = 60.0,
+        marker_client: Any = None,
     ) -> None:
         self.experiment_id = experiment_id or make_experiment_id()
+        self._marker_client = marker_client
 
         self.participant_id = participant_id or make_participant_id()
         self.flush_every_n = flush_every_n
@@ -168,6 +170,8 @@ class ExperimentLogger:
                 data=data,
             )
             self._entries.append(entry)
+            if self._marker_client is not None:
+                self._marker_client.send(event)
 
         # Enqueue for async disk write (never blocks caller)
         line = json.dumps(asdict(entry), default=str)

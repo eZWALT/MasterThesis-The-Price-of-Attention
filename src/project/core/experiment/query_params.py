@@ -171,6 +171,7 @@ from core.config import (
     SCREEN_FINAL_SURVEY,
     SCREEN_PROLIFIC_ID,
     SCREEN_VALIDATION,
+    MARKER_SERVER_URL,
     study_skip_screens,
 )
 from core.experiment.tasks import TASK_CATALOG, TASK_BY_ID, TaskDefinition
@@ -188,6 +189,7 @@ SKIPPABLE_SCREENS = {
     SCREEN_FINAL_SURVEY,
     SCREEN_PROLIFIC_ID,
     SCREEN_VALIDATION,
+    MARKER_SERVER_URL,
 }
 
 
@@ -244,7 +246,8 @@ class ExperimentParams:
     force_ad: bool = False                  # ?force_ad=1 → inject ad on every turn
     use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
     dry_run: bool = False                   # ?dry_run=1 → mock LLM + mock ads, zero cost
-    webcam_enabled: bool = False            # ?webcam=1 → enable session-wide webcam recording
+    webcam_enabled: bool = False
+    marker_server_url: str = ""            # ?webcam=1 → enable session-wide webcam recording
 
     def apply_study_defaults(self, explicitly_set: set) -> None:
         """
@@ -438,6 +441,13 @@ def parse_query_params() -> ExperimentParams:
     webcam_raw = p.get("webcam", "").strip().lower()
     if webcam_raw in ("1", "true", "yes"):
         params.webcam_enabled = True
+
+    # ── Marker server URL (optional, EEG markers) ────────────────
+    marker_raw = p.get("marker_url", "").strip()
+    if marker_raw:
+        params.marker_server_url = marker_raw
+    else:
+        params.marker_server_url = MARKER_SERVER_URL
 
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:
