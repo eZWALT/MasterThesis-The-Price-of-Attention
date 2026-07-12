@@ -1,0 +1,29 @@
+services:
+  marker-server:
+    build: .
+    ports:
+      - "9876:9876"
+    environment:
+      MARKER_BACKEND: log
+    restart: unless-stopped
+
+  marker-server-lsl:
+    build: .
+    ports:
+      - "9877:9876"
+    environment:
+      MARKER_BACKEND: lsl
+      MARKER_LSL_STREAM_NAME: ExperimentMarkers
+    restart: unless-stopped
+
+  marker-server-psychopy:
+    build: .
+    ports:
+      - "9878:9876"
+    environment:
+      MARKER_BACKEND: psychopy
+      MARKER_PARALLEL_ADDRESS: "0x378"
+      MARKER_PULSE_MS: "50"
+    devices:
+      - /dev/parport0:/dev/parport0
+    restart: unless-stopped
