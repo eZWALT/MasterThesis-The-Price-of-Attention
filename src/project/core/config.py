@@ -523,6 +523,10 @@ LOG_FLUSH_EVERY_N: int    = 25                                    # flush buffer
 LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer timer (seconds)
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)
 
+# ── Marker server (EEG markers — optional, disabled when empty) ─
+MARKER_SERVER_URL: str = os.getenv("MARKER_SERVER_URL", "")
+MARKER_TIMEOUT_S: float = float(os.getenv("MARKER_TIMEOUT_S", "2.0"))
+
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  11. EXPERIMENT SCREENS  (sequential flow)                              │
