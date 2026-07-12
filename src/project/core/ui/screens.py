@@ -36,6 +36,9 @@ from core.config import (
     PRACTICE_TASK_PROMPT,
     WARMUP_PROMPT,
     MAX_TURNS_PER_TRIAL,
+    STUDY_TYPE_CROWD,
+    SCREEN_PROLIFIC_ID,
+    SCREEN_VALIDATION,
     WEBCAM_FPS,
     WEBCAM_WIDTH,
     WEBCAM_HEIGHT,
@@ -299,6 +302,30 @@ def render_consent() -> bool:
 # ═══════════════════════════════════════════════════════════════
 # SCREEN 2 — DEMOGRAPHICS
 # ═══════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════
+# PROLIFIC WORKER ID  (crowdsourcing only)
+# ═══════════════════════════════════════════════════════════════
+
+def render_prolific_id() -> Optional[str]:
+    """Collect Prolific Worker ID. Returns the ID on submit, None otherwise."""
+    st.header("Participant ID")
+    st.markdown(
+        "Please enter your **Prolific Worker ID** below.\n\n"
+        "This will be used to link your responses to your Prolific account."
+    )
+    worker_id = st.text_input(
+        "Please enter your Prolific Worker ID.",
+        key="prolific_worker_id",
+        placeholder="e.g. 5a3b1c2d",
+    )
+    if st.button("Continue", type="primary"):
+        if not worker_id.strip():
+            st.warning("Please enter your Prolific Worker ID to continue.")
+            return None
+        return worker_id.strip()
+    return None
+
 
 def render_demographics() -> Optional[dict]:
     """
@@ -1749,14 +1776,118 @@ def render_deception_disclosure() -> Optional[dict]:
 
 
 # ═══════════════════════════════════════════════════════════════
+# VALIDATION QUESTIONS  (task recognition check)
+# ═══════════════════════════════════════════════════════════════
+
+import random as _random
+
+
+def _task_short_label(task) -> str:
+    """One-line description for a task."""
+    return task.title
+
+
+def render_validation_questions() -> Optional[dict]:
+    """
+    Task recognition check.
+
+    Displays 10 checkbox options (5 real tasks + 5 distractors).
+    Requires exactly 5 selections.  Returns scoring dict on submit.
+    """
+    ctrl = st.session_state.controller
+
+    real_tasks = [cfg["task"] for cfg in ctrl.condition_plan]
+    real_ids = {t.id for t in real_tasks}
+    # Distractors: tasks from catalog NOT in the participant's plan
+    from core.experiment.tasks import TASK_CATALOG
+    pool = [t for t in TASK_CATALOG if t.id not in real_ids]
+    rng = _random.Random(ctrl.seed if ctrl.seed else hash(ctrl.participant_id))
+    rng.shuffle(pool)
+    distractors = pool[:5]
+
+    # Build 10 options and shuffle
+    options = []
+    for t in real_tasks:
+        options.append({"task_id": t.id, "label": _task_short_label(t), "is_real": True})
+    for t in distractors:
+        options.append({"task_id": t.id, "label": _task_short_label(t), "is_real": False})
+    rng.shuffle(options)
+
+    st.header("Validation Questions")
+    st.markdown(
+        '> Please select the **five tasks** that you completed during this study. '
+        'Five options correspond to tasks you actually completed, '
+        'while the other five are distractors.'
+    )
+
+    selections = []
+    for i, opt in enumerate(options):
+        checked = st.checkbox(opt["label"], key=f"val_{i}")
+        if checked:
+            selections.append(opt)
+
+    n_selected = len(selections)
+    st.progress(min(n_selected / 5, 1.0), text=f"{n_selected} of 5 selected")
+
+    if st.button("Submit", type="primary"):
+        if n_selected != 5:
+            st.warning(f"Please select exactly 5 options (you selected {n_selected}).")
+            return None
+
+        correct = sum(1 for s in selections if s["is_real"])
+        false_positives = sum(1 for s in selections if not s["is_real"])
+        selected_real_ids = {s["task_id"] for s in selections}
+        false_negatives = sum(1 for t in real_tasks if t.id not in selected_real_ids)
+        mistakes = false_positives + false_negatives
+        accuracy = correct / 5.0
+
+        result = {
+            "correct": correct,
+            "false_positives": false_positives,
+            "false_negatives": false_negatives,
+            "mistakes": mistakes,
+            "accuracy": accuracy,
+            "validation_failed": mistakes >= 2,
+            "real_task_ids": [t.id for t in real_tasks],
+            "distractor_task_ids": [t.id for t in distractors],
+            "selected_task_ids": [s["task_id"] for s in selections],
+        }
+        return result
+    return None
+
+
+# ═══════════════════════════════════════════════════════════════
 # SCREEN 10 — DONE
 # ═══════════════════════════════════════════════════════════════
 
 def render_done():
-    """Thank-you screen."""
+    """Thank-you screen with completion code."""
+    ctrl = st.session_state.controller
+    study_type = st.session_state.get("experiment_params", None)
+    study_type = study_type.study_type if study_type else None
+
     st.balloons()
     st.header("🎉 Thank you!")
-    st.markdown(
-        "You have completed the study. Your data has been saved.\n\n"
-        "Please let the researcher know you are finished."
-    )
+    st.markdown("Your study is complete.")
+
+    # Show completion code for crowdsourcing (Prolific) participants
+    if study_type == "crowd":
+        pid = ctrl.participant_id
+        st.markdown("---")
+        st.markdown(
+            f'<div style="text-align:center; padding:24px; '
+            f'background:#1a2332; border-radius:12px; '
+            f'border:2px solid #58a6ff; margin:20px 0;">'
+            f'<div style="color:#888; font-size:0.8rem; text-transform:uppercase; '
+            f'letter-spacing:0.5px; margin-bottom:8px;">Your Study Is Complete</div>'
+            f'<div style="color:#ccc; font-size:0.95rem; margin-bottom:12px;">'
+            f'Please copy the Run ID below and paste it into Prolific to receive payment.</div>'
+            f'<div style="font-size:2.4rem; font-weight:700; color:#58a6ff; '
+            f'font-family:monospace; letter-spacing:2px; padding:12px 24px; '
+            f'background:#0d1117; border-radius:8px; display:inline-block;">'
+            f'{html_module.escape(pid)}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown("\n\nPlease let the researcher know you are finished.")

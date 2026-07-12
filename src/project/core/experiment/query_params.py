@@ -169,6 +169,8 @@ from core.config import (
     SCREEN_PRACTICE,
     SCREEN_TRIAL_INTRO,
     SCREEN_FINAL_SURVEY,
+    SCREEN_PROLIFIC_ID,
+    SCREEN_VALIDATION,
     study_skip_screens,
 )
 from core.experiment.tasks import TASK_CATALOG, TASK_BY_ID, TaskDefinition
@@ -184,6 +186,8 @@ SKIPPABLE_SCREENS = {
     SCREEN_PRACTICE,
     SCREEN_TRIAL_INTRO,
     SCREEN_FINAL_SURVEY,
+    SCREEN_PROLIFIC_ID,
+    SCREEN_VALIDATION,
 }
 
 
