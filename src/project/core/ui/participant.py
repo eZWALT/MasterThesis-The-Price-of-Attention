@@ -102,19 +102,19 @@ def init_session_state(params):
         else:
             log_dir = LOG_DIR
         pid = params.participant_id or str(uuid.uuid4())[:8]
-        marker_cfg = MarkerConfig(
-            url=params.marker_server_url,
-            timeout_s=2.0,
-        )
-        marker_client = MarkerClient(marker_cfg)
-        st.session_state.marker = marker_client
         st.session_state.logger = ExperimentLogger(
             log_dir=log_dir,
             flush_every_n=LOG_FLUSH_EVERY_N,
             flush_every_s=LOG_FLUSH_EVERY_S,
             participant_id=pid,
-            marker_client=marker_client,
+            marker_client=None,
         )
+        marker_client = MarkerClient(
+            MarkerConfig(url=params.marker_server_url, timeout_s=2.0),
+        )
+        marker_client.set_logger(st.session_state.logger)
+        st.session_state.marker = marker_client
+        st.session_state.logger._marker_client = marker_client
 
     if "controller" not in st.session_state:
         ctrl = ExperimentController(
