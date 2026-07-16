@@ -289,9 +289,15 @@ GOODBYE_MESSAGE: str = (
 )
 
 TASK_CONTEXT_WARNING: str = (
-    "Each conversation is independent! "
+    "🚨 Each conversation is independent! "
     "In different tasks, responses may be generated using different AI assistant models. "
     "Please evaluate each interaction separately."
+    "\n\n"
+    "💬 Interact naturally \u2014 engage with the assistant as you normally would. "
+    "Excessively short replies (e.g. spamming \"ok\"), copy-pasting, or other "
+    "artificial behaviour will be flagged."
+    "\n\n"
+    "🚫 Fraudulent or inattentive responses may result in withheld payment."
 )
 
 POST_INJECTION_AWARENESS_PROMPT: str = (
@@ -524,8 +530,7 @@ LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)
 
 # ── Marker server (EEG markers — optional, disabled when empty) ─
-MARKER_SERVER_URL: str = os.getenv("MARKER_SERVER_URL", "")
-MARKER_TIMEOUT_S: float = float(os.getenv("MARKER_TIMEOUT_S", "2.0"))
+LSL_MARKER_OUTLET: str = os.getenv("LSL_MARKER_OUTLET", "")
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
