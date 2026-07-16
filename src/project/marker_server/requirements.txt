@@ -1,7 +1,0 @@
-# Runtime: no hard dependencies — stdlib HTTP server.
-#
-# Optional — uncomment for LSL support:
-# pylsl>=1.16.1
-#
-# Optional — uncomment for PsychoPy parallel port TTL:
-# psychopy>=2024.2.0
