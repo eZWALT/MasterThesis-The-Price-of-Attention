@@ -1,16 +1,14 @@
 services:
   streamlit:
+    network_mode: host
     build: .
-    ports:
-      - "${STREAMLIT_PORT}:${STREAMLIT_PORT}"
-      - "${AD_CLICK_SERVER_PORT}:${AD_CLICK_SERVER_PORT}"
     env_file:
       - .env
     environment:
-      - API_URL=http://host.docker.internal:${OLLAMA_PORT}/v1/chat/completions
+      - API_URL=http://localhost:${OLLAMA_PORT}/v1/chat/completions
       - DEFAULT_MODEL=${OLLAMA_MODEL}
       - LLM_BACKEND=ollama
-      - OLLAMA_API_BASE=http://host.docker.internal:${OLLAMA_PORT}
+      - OLLAMA_API_BASE=http://localhost:${OLLAMA_PORT}
       - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-16384}
       - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
       - LLM_THINK=${LLM_THINK:-false}
@@ -18,8 +16,6 @@ services:
     volumes:
       - .:/app
       - hf_cache:/app/.hf_cache
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
 volumes:
   hf_cache:
