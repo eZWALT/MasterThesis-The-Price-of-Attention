@@ -59,7 +59,6 @@ from core.config import (
 from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
 from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, TASK_BY_ID, score_ocean, get_ocean_items
-from core.modalities.eeg import marker
 from core.ui.screens import (
     render_consent,
     render_prolific_id,
@@ -694,7 +693,7 @@ def run_participant_mode(params):
 
     elif scr == SCREEN_INSTRUCTIONS:
         if render_instructions():
-            marker("screen:instructions")
+            st.session_state.logger.log("screen_instructions", {}, ad_mode="session", conversation_id=ctrl.participant_id, source="system")
             ctrl.advance()
             st.rerun()
 
