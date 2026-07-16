@@ -1,14 +1,11 @@
 """
 LSL marker emitter — log-adherent, single-outlet.
 
-Pushes every event name from ExperimentLogger.log() directly to LSL.
+Pushes every marker event from ExperimentLogger.log() to LSL.
 Outlet name comes from env LSL_MARKER_OUTLET (default: experiment_lab_pilot).
 
 Usage:
-    from core.modalities.eeg import marker, eeg_turn_hook
-
-    marker("session:start")                      # direct call
-    logger._marker_client = lsl_sender()         # auto-hook via logger.log()
+    logger._marker_client = lsl_sender()         # hooks into logger.log()
 
 Requires: pylsl (pip install pylsl).  If pylsl is unavailable all
 calls are silently ignored — safe to call unconditionally.
@@ -17,7 +14,6 @@ calls are silently ignored — safe to call unconditionally.
 from __future__ import annotations
 
 import os
-from typing import Any
 
 from core.log import logger as log
 
@@ -69,22 +65,11 @@ def lsl_sender() -> object:
         logger._marker_client = lsl_sender()
         # now every logger.log(event, ...) also pushes to LSL
     """
+    _get_outlet()  # eager init — stream visible on network now
+
     class _Sender:
         @staticmethod
-        def send(event: str, **kwargs: Any) -> None:
+        def send(event: str, **kwargs) -> None:
             marker(event)
 
-        @staticmethod
-        def set_logger(_logger: Any) -> None:
-            pass
-
     return _Sender()
-
-
-# ── Modality hook (registered with ConversationManager) ─────────────────────
-
-def eeg_turn_hook(turn: int, ad_injected: bool, ad: Any) -> None:
-    """Called after each LLM turn — emits turn and ad_injected markers."""
-    marker(f"turn:{turn}")
-    if ad_injected:
-        marker(f"ad_injected:{turn}")
