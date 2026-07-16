@@ -626,12 +626,6 @@ def render_baseline() -> bool:
     unsafe_allow_html=True,
     )
 
-    # Camera icon
-    st.markdown(
-        "<div style='text-align:center; font-size:3em; padding:10px 0 0 0;'>📷</div>",
-        unsafe_allow_html=True,
-    )
-
     # Timer fragment (auto-refreshes every second)
     @st.fragment(run_every=1)
     def _baseline_timer() -> None:
