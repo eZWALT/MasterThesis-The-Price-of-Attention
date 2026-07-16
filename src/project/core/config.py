@@ -218,11 +218,11 @@ FINISH_BUTTON_VISIBLE_FROM_TURN: int = int(os.getenv("FINISH_BUTTON_VISIBLE_FROM
 AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every turn for dev=flow
 
 BASELINE_DURATION_SECONDS: int = int(os.getenv("BASELINE_DURATION_SECONDS", "30"))
-BASELINE_TITLE: str = "Eye-Tracking Baseline"
+BASELINE_TITLE: str = "Baseline Period"
 BASELINE_INSTRUCTION: str = (
-    "Please **look directly at your camera** and try to keep your head still.\n\n"
-    "Relax and breathe normally — this helps us calibrate the eye tracker. "
-    "Recording will take about **{duration_label}**."
+    "Please **sit still, relax, and clear your mind**.\n\n"
+    "Breathe normally and try to remain as still as possible. "
+    "This will take about **{duration_label}**."
 )
 BASELINE_COMPLETE_MESSAGE: str = "✓ Baseline recording complete."
 BASELINE_CONTINUE_LABEL: str = "Continue"
