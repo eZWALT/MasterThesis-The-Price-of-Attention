@@ -150,6 +150,7 @@ from typing import List, Optional
 import streamlit as st
 
 from core.config import (
+    LSL_MARKER_OUTLET,
     AD_MODES,
     DEFAULT_MODEL,
     DEFAULT_STUDY_TYPE,
@@ -171,7 +172,6 @@ from core.config import (
     SCREEN_FINAL_SURVEY,
     SCREEN_PROLIFIC_ID,
     SCREEN_VALIDATION,
-    MARKER_SERVER_URL,
     study_skip_screens,
 )
 from core.experiment.tasks import TASK_CATALOG, TASK_BY_ID, TaskDefinition
@@ -188,8 +188,7 @@ SKIPPABLE_SCREENS = {
     SCREEN_TRIAL_INTRO,
     SCREEN_FINAL_SURVEY,
     SCREEN_PROLIFIC_ID,
-    SCREEN_VALIDATION,
-    MARKER_SERVER_URL,
+    SCREEN_VALIDATION
 }
 
 
@@ -247,7 +246,7 @@ class ExperimentParams:
     use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
     dry_run: bool = False                   # ?dry_run=1 → mock LLM + mock ads, zero cost
     webcam_enabled: bool = False
-    marker_server_url: str = ""            # ?webcam=1 → enable session-wide webcam recording
+    lsl_outlet_name: str = ""            # LSL outlet name (e.g. "experiment_lab_pilot") for EEG markers
 
     def apply_study_defaults(self, explicitly_set: set) -> None:
         """
@@ -442,12 +441,12 @@ def parse_query_params() -> ExperimentParams:
     if webcam_raw in ("1", "true", "yes"):
         params.webcam_enabled = True
 
-    # ── Marker server URL (optional, EEG markers) ────────────────
-    marker_raw = p.get("marker_url", "").strip()
-    if marker_raw:
-        params.marker_server_url = marker_raw
+    # ── LSL marker outlet ─────────────────────────────────────
+    lsl_raw = p.get("lsl", "").strip()
+    if lsl_raw:
+        params.lsl_outlet_name = lsl_raw
     else:
-        params.marker_server_url = MARKER_SERVER_URL
+        params.lsl_outlet_name = LSL_MARKER_OUTLET
 
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:
