@@ -344,6 +344,11 @@ class ConversationManager:
         self.messages.append({"role": "user", "content": user_input})
         current_turn = self.turn_count
         self.logger.log(
+            "user_starts_typing",
+            {"time_to_reply_ms": time_to_reply_ms},
+            turn=current_turn,
+        )
+        self.logger.log(
             "user_message",
             compact_event_data(
                 {
@@ -549,6 +554,11 @@ class ConversationManager:
         # 2 — user message
         self.messages.append({"role": "user", "content": user_input})
         current_turn = self.turn_count
+        self.logger.log(
+            "user_starts_typing",
+            {"time_to_reply_ms": time_to_reply_ms},
+            turn=current_turn,
+        )
         self.logger.log(
             "user_message",
             compact_event_data(

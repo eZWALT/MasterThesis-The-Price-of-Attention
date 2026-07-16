@@ -899,7 +899,7 @@ def run_participant_mode(params):
             ctrl.condition_surveys.append(result)
             st.session_state.logger.log(
                 "post_condition_survey_submitted",
-                {"condition": ctrl.condition_number, "responses": result},
+                {"condition": ctrl.current_condition_config["condition"], "responses": result},
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
             ctrl.advance()
