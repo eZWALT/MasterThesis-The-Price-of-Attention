@@ -3,13 +3,11 @@ Multimodal integration package.
 
 Submodules
 ----------
-eeg/         : EEG stream reading, marker emission, preprocessing stubs
+eeg/         : LSL marker emission (log-adherent, single-outlet)
 eye_tracking/: Eye-tracking stream reading, AOI fixation stubs
 sync         : Cross-modality timestamp synchronisation
 
-Integration points (to wire up in participant.py):
-  - Call modalities.sync.record_reference() at session start
-  - Call modalities.eeg.markers.send() at every ctrl.advance() transition
-  - Call modalities.eeg.markers.send() when an ad is injected
-  - Call modalities.eye_tracking.stream.start() at baseline screen
+The EEG module is auto-wired into ExperimentLogger.log() via
+logger._marker_client — every structured log event is also pushed
+to the LSL outlet defined by LSL_MARKER_OUTLET env var.
 """

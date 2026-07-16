@@ -219,13 +219,6 @@ class ExperimentLogger:
         """Read-only access to in-memory entries."""
         return list(self._entries)
 
-    def _log_internal(self, event: str, data: Any) -> None:
-        """Log without forwarding to marker client (used by MarkerClient self-logging)."""
-        marker_client = self._marker_client
-        self._marker_client = None
-        self.log(event, data)
-        self._marker_client = marker_client
-
     @property
     def log_path(self) -> Path:
         """Path to the current JSONL log file."""
