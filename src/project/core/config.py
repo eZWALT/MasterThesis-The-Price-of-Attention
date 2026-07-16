@@ -220,9 +220,9 @@ AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every tur
 BASELINE_DURATION_SECONDS: int = int(os.getenv("BASELINE_DURATION_SECONDS", "30"))
 BASELINE_TITLE: str = "Baseline Period"
 BASELINE_INSTRUCTION: str = (
-    "Please **sit still, relax, and clear your mind**.\n\n"
+    "Please sit still, relax, and clear your mind.\n\n"
     "Breathe normally and try to remain as still as possible. "
-    "This will take about **{duration_label}**."
+    "This will take about {duration_label}."
 )
 BASELINE_COMPLETE_MESSAGE: str = "✓ Baseline recording complete."
 BASELINE_CONTINUE_LABEL: str = "Continue"
