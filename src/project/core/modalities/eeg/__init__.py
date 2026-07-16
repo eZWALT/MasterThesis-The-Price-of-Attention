@@ -66,6 +66,7 @@ def lsl_sender() -> object:
         # now every logger.log(event, ...) also pushes to LSL
     """
     _get_outlet()  # eager init — stream visible on network now
+    marker("dummy_start")  # first marker so recording software can confirm the stream
 
     class _Sender:
         @staticmethod
