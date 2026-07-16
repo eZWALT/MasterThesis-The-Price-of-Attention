@@ -689,6 +689,7 @@ class ConversationManager:
                 source="system",
                 turn=current_turn,
             )
+            self.logger.log("ad_inserted", {"turn": current_turn}, turn=current_turn)
 
         # 5 — LLM call (streaming)
         system_msg = {"role": "system", "content": self._system_prompt}
