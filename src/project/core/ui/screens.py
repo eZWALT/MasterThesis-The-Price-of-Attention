@@ -640,6 +640,12 @@ def render_baseline() -> bool:
                 unsafe_allow_html=True,
             )
         else:
+            if not st.session_state.get("_baseline_end_fired", False):
+                st.session_state._baseline_end_fired = True
+                _logger = st.session_state.get("logger")
+                if _logger is not None:
+                    _logger.log("baseline_end", {},
+                        ad_mode="session", conversation_id=_logger.participant_id, source="system")
             st.success(BASELINE_COMPLETE_MESSAGE)
             if st.button(BASELINE_CONTINUE_LABEL, type="primary", key="baseline_continue"):
                 clear_baseline_session_state()
@@ -653,6 +659,41 @@ def render_baseline() -> bool:
 # ═══════════════════════════════════════════════════════════════
 # SCREEN 5 — PRACTICE
 # ═══════════════════════════════════════════════════════════════
+
+def _render_write_trigger(manager: ConversationManager) -> str | None:
+    """Two-phase start-writing trigger (opt-in: ?start_typing=1).
+
+    Phase 1 — button: user clicks to indicate they started composing.
+        Fires user_starts_typing marker.
+    Phase 2 — chat_input: user types their message normally.
+        Returns the message string, or None if not submitted.
+
+    When ?start_typing=1 is NOT set, behaves as plain chat_input
+    (no marker fired).
+    """
+    params = st.session_state.get("experiment_params")
+    if params is None or not getattr(params, "start_typing_marker", False):
+        return st.chat_input("Send a message...")
+
+    if st.session_state.get("_writing_started", False):
+        return st.chat_input("Send a message...")
+    if st.button(
+        "Write a response",
+        key="_start_writing",
+        use_container_width=True,
+        type="primary",
+    ):
+        st.session_state._writing_started = True
+        next_turn = manager.turn_count + 1
+        if hasattr(manager, "logger") and manager.logger is not None:
+            manager.logger.log(
+                f"turn_{next_turn}_write",
+                {"turn": next_turn},
+                turn=next_turn,
+            )
+        st.rerun()
+    return None
+
 
 def render_practice(manager: ConversationManager) -> bool:
     """
@@ -869,7 +910,8 @@ def render_trial_chat(
         if st.button("Done", type="primary", use_container_width=True):
             return True
     else:
-        if user_input := st.chat_input("Send a message..."):
+        user_input = _render_write_trigger(manager)
+        if user_input:
             if not user_input.strip():
                 st.warning("Please enter a message before sending.")
             else:
@@ -877,6 +919,7 @@ def render_trial_chat(
                     st.markdown(user_input.strip())
                 with st.chat_message("assistant"):
                     st.write_stream(manager.process_user_message_stream(user_input.strip()))
+                st.session_state._writing_started = False
                 st.rerun()
 
     return False
@@ -1048,12 +1091,14 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
             st.divider()
             if st.button("Done", type="primary", use_container_width=True):
                 return True
-        if user_input := st.chat_input("Send a message..."):
+        user_input = _render_write_trigger(manager)
+        if user_input:
             if user_input.strip():
                 with st.chat_message("user"):
                     st.markdown(user_input.strip())
                 with st.chat_message("assistant"):
                     st.write_stream(manager.process_user_message_stream(user_input.strip()))
+                st.session_state._writing_started = False
                 st.rerun()
 
     return False
@@ -1207,7 +1252,8 @@ def render_condition_chat(
         if st.button("Done", type="primary", use_container_width=True):
             return True
     else:
-        if user_input := st.chat_input("Send a message..."):
+        user_input = _render_write_trigger(manager)
+        if user_input:
             if not user_input.strip():
                 st.warning("Please enter a message before sending.")
             else:
@@ -1215,6 +1261,7 @@ def render_condition_chat(
                     st.markdown(user_input.strip())
                 with st.chat_message("assistant"):
                     st.write_stream(manager.process_user_message_stream(user_input.strip()))
+                st.session_state._writing_started = False
                 st.rerun()
 
     return False

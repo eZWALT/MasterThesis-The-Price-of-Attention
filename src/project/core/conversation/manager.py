@@ -468,6 +468,11 @@ class ConversationManager:
                 source="system",
                 turn=current_turn,
             )
+            self.logger.log(
+                "ad_inserted",
+                {"turn": current_turn},
+                turn=current_turn,
+            )
 
         # 5 — LLM call (timed)
         llm_t0 = time.perf_counter()
@@ -494,6 +499,11 @@ class ConversationManager:
             self.ad_mode,
             self.conversation_id,
             source="model",
+            turn=current_turn,
+        )
+        self.logger.log(
+            f"turn_{current_turn}_read",
+            {"turn": current_turn},
             turn=current_turn,
         )
 
@@ -719,6 +729,11 @@ class ConversationManager:
             self.ad_mode,
             self.conversation_id,
             source="model",
+            turn=current_turn,
+        )
+        self.logger.log(
+            f"turn_{current_turn}_read",
+            {"turn": current_turn},
             turn=current_turn,
         )
 

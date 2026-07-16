@@ -685,11 +685,9 @@ def run_participant_mode(params):
     elif scr == SCREEN_BASELINE:
         if "baseline_started" not in st.session_state:
             st.session_state.baseline_started = True
-            st.session_state.logger.log("baseline_started", {},
+            st.session_state.logger.log("baseline_start", {},
                 ad_mode="session", conversation_id=ctrl.participant_id, source="system")
         if render_baseline():
-            st.session_state.logger.log("baseline_completed", {},
-                ad_mode="session", conversation_id=ctrl.participant_id, source="system")
             del st.session_state.baseline_started
             ctrl.advance()
             st.rerun()
@@ -702,8 +700,12 @@ def run_participant_mode(params):
 
     elif scr == SCREEN_WARMUP_CHAT:
         mgr = _get_or_create_warmup_manager()
+        if "_warmup_started" not in st.session_state:
+            st.session_state._warmup_started = True
+            st.session_state.logger.log("warmup_start", {},
+                ad_mode="session", conversation_id=ctrl.participant_id, source="system")
         if render_warmup_chat(mgr):
-            marker("screen:warmup_chat")
+            st.session_state.logger.log("warmup_finish", {}, ad_mode="session", conversation_id=ctrl.participant_id, source="system")
             st.session_state.warmup_manager = None
             ctrl.advance()
             st.rerun()
@@ -726,7 +728,7 @@ def run_participant_mode(params):
                 from core.retrieval import count_items_by_categories
                 pool_size = count_items_by_categories(task.relevant_categories)
                 st.session_state.logger.log(
-                    "condition_started",
+                    "condition_start",
                     {
                         "condition": cfg["condition"],
                         "ad_mode": cfg["ad_mode"],
@@ -826,7 +828,7 @@ def run_participant_mode(params):
                 from core.retrieval import count_items_by_categories
                 pool_size = count_items_by_categories(task.relevant_categories)
                 st.session_state.logger.log(
-                    "condition_complete",
+                    "condition_end",
                     {
                         **_condition_summary_for_log(condition_record),
                         "relevant_categories": task.relevant_categories,
