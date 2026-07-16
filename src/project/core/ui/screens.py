@@ -1002,14 +1002,24 @@ def render_final_survey() -> Optional[dict]:
 
 def render_instructions() -> bool:
     """Brief task explanation before warm-up."""
+    from core.config import TASK_CONTEXT_WARNING
+    import html as html_module
     st.header("About This Study")
     st.markdown(
         "You will chat with an AI assistant across several "
         "short conversations. Each conversation will present you with "
         "a different task.\n\n"
         "After each conversation, you will answer a few brief statements "
-        "about your experience.\n\n"
-        "Take your time and interact naturally with the assistant."
+        "about your experience."
+    )
+    st.markdown(f'''
+    <div style="
+        background:#1a1a0e; border-radius:10px; padding:12px 16px; margin:12px 0 16px 0;
+        border-left:4px solid #ffd700; font-size:0.85rem; color:#e0d080; line-height:1.5;
+    ">
+        {html_module.escape(TASK_CONTEXT_WARNING)}
+    </div>''',
+    unsafe_allow_html=True,
     )
     return st.button("Begin", type="primary")
 
