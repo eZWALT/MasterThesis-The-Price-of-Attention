@@ -97,16 +97,15 @@ class TestModalityHooks:
 
 @pytest.mark.unit
 class TestEEGHook:
-    def test_eeg_hook_callable(self):
-        from core.modalities.eeg import eeg_turn_hook
-        assert callable(eeg_turn_hook)
+    def test_lsl_sender_returns_object_with_send(self):
+        from core.modalities.eeg import lsl_sender
+        sender = lsl_sender(); assert hasattr(sender, "send") and callable(sender.send)
 
-    def test_eeg_hook_no_crash_without_pylsl(self):
+    def test_lsl_sender_send_no_crash(self):
         """Hook runs gracefully when pylsl is not installed."""
-        from core.modalities.eeg import eeg_turn_hook
-        # Should not raise — just skip marker emission
-        eeg_turn_hook(turn=1, ad_injected=False, ad=None)
-        eeg_turn_hook(turn=2, ad_injected=True, ad=MagicMock(metadata={"source": "test"}))
+        from core.modalities.eeg import lsl_sender
+        sender = lsl_sender(); sender.send("baseline_start")
+        sender.send("turn_1_write")
 
     def test_marker_no_crash(self):
         """marker() is a no-op when LSL is unavailable."""
