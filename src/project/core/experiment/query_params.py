@@ -247,6 +247,7 @@ class ExperimentParams:
     dry_run: bool = False                   # ?dry_run=1 → mock LLM + mock ads, zero cost
     webcam_enabled: bool = False
     lsl_outlet_name: str = ""            # LSL outlet name (e.g. "experiment_lab_pilot") for EEG markers
+    start_typing_marker: bool = False    # ?start_typing=1  → two-phase start-writing trigger
 
     def apply_study_defaults(self, explicitly_set: set) -> None:
         """
@@ -440,6 +441,10 @@ def parse_query_params() -> ExperimentParams:
     webcam_raw = p.get("webcam", "").strip().lower()
     if webcam_raw in ("1", "true", "yes"):
         params.webcam_enabled = True
+
+    # ── Start-typing marker ──────────────────────────────────
+    typing_raw = p.get("start_typing", "").strip().lower()
+    params.start_typing_marker = typing_raw in ("1", "true", "yes")
 
     # ── LSL marker outlet ─────────────────────────────────────
     lsl_raw = p.get("lsl", "").strip()
