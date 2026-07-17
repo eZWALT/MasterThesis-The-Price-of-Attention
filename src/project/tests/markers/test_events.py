@@ -55,9 +55,29 @@ class TestLSLSender:
             sender = lsl_sender()
             sender.send("baseline_start")
             sender.send("turn_1_write")
-            assert calls == ["baseline_start", "turn_1_write"]
+            assert calls == ["dummy_start", "baseline_start", "turn_1_write"]
         finally:
             eeg_mod.marker = original_marker
+
+    def test_lsl_sender_whitelist_filters(self):
+        from core.modalities.eeg import lsl_sender, marker
+
+        import core.modalities.eeg as eeg_mod
+        original = eeg_mod.marker
+        calls = []
+        eeg_mod.marker = lambda label: calls.append(label)
+
+        try:
+            sender = lsl_sender()
+            sender.send("baseline_start")     # whitelisted
+            sender.send("turn_3_read")         # whitelisted (pattern)
+            sender.send("user_message")        # filtered
+            sender.send("intent_classified")   # filtered
+            sender.send("retrieval")           # filtered
+            sender.send("ad_inserted")         # filtered (ad_inserted stripped)
+            assert calls == ["dummy_start", "baseline_start", "turn_3_read"]
+        finally:
+            eeg_mod.marker = original
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -105,6 +125,9 @@ EXPECTED_EVENTS = {
     "attention_shift",
     "trial_end",
     "session_reset",
+    # Post-task questionnaires
+    "post_task_questionnaire_end",
+    "experiment_end",
     # Eye-tracking
     "eyetracking_recording_started",
     "eyetracking_video_saved",
@@ -164,7 +187,8 @@ class TestEventNameInventory:
 
         # Verify our key events are found
         for key in ["baseline_start", "baseline_end", "warmup_start", "warmup_finish",
-                     "condition_start", "condition_end", "ad_inserted"]:
+                     "condition_start", "condition_end", "condition_conclusion_submitted",
+                     "post_task_questionnaire_end", "experiment_end"]:
             assert key in found, f"Event {key!r} not found in any .log() call"
 
     def test_logger_event_names_are_snake_case(self):
@@ -319,10 +343,12 @@ class TestLoggerToLSLPath:
         # Log each of our target events
         for event in ["baseline_start", "baseline_end", "warmup_start",
                        "warmup_finish", "condition_start", "condition_end",
-                       "ad_inserted"]:
+                       "ad_inserted", "condition_conclusion_submitted",
+                       "post_task_questionnaire_end", "experiment_end"]:
             log.log(event, {"turn": 0})
 
         for event in ["baseline_start", "baseline_end", "warmup_start",
                        "warmup_finish", "condition_start", "condition_end",
-                       "ad_inserted"]:
+                       "ad_inserted", "condition_conclusion_submitted",
+                       "post_task_questionnaire_end", "experiment_end"]:
             assert event in sent_events, f"{event} was not sent to marker client"
