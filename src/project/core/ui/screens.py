@@ -673,7 +673,16 @@ def _render_write_trigger(manager: ConversationManager) -> str | None:
     """
     params = st.session_state.get("experiment_params")
     if params is None or not getattr(params, "start_typing_marker", False):
-        return st.chat_input("Send a message...")
+        user_input = st.chat_input("Send a message...")
+        if user_input:
+            next_turn = manager.turn_count + 1
+            if hasattr(manager, "logger") and manager.logger is not None:
+                manager.logger.log(
+                    f"turn_{next_turn}_write",
+                    {"turn": next_turn},
+                    turn=next_turn,
+                )
+        return user_input
 
     if st.session_state.get("_writing_started", False):
         return st.chat_input("Send a message...")
