@@ -8,7 +8,7 @@ Design: mini event-sourcing system.
   - Every event carries full context for independent queryability
 
 Output: one JSONL file per experiment run at:
-    logs/{experiment_id}/events.jsonl
+    logs/{experiment_id}/{experiment_id}_events.jsonl
 
 Paper reference: Section 6.5 — Multimodal Logging System.
 """
@@ -111,7 +111,7 @@ class ExperimentLogger:
         self._log_dir.mkdir(parents=True, exist_ok=True)
         # Ensure host user can clean up log dirs created by Docker root.
         self._log_dir.chmod(0o777)
-        self._log_path = self._log_dir / "events.jsonl"
+        self._log_path = self._log_dir / f"{self.experiment_id}_events.jsonl"
 
         # Background writer thread (daemon — dies with main)
         self._writer_thread = threading.Thread(
@@ -286,7 +286,7 @@ class ExperimentLogger:
         Unlike the live append file (which may have partial writes from
         crashes), this produces a validated export.
         """
-        out_path = Path(path) if path else (self._log_dir / "export.jsonl")
+        out_path = Path(path) if path else (self._log_dir / f"{self.experiment_id}_export.jsonl")
         with open(out_path, "w", encoding="utf-8") as f:
             for entry in self._entries:
                 f.write(json.dumps(asdict(entry), default=str) + "\n")
