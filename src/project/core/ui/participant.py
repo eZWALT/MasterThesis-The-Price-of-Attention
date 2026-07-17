@@ -358,6 +358,7 @@ def export_session_data(ctrl: ExperimentController):
         ad_mode="session",
         conversation_id=ctrl.participant_id,
     )
+    logger.log("experiment_end", {}, ad_mode="session", conversation_id=ctrl.participant_id, source="system")
     logger.export_jsonl()
 
 
@@ -903,6 +904,7 @@ def run_participant_mode(params):
                 {"condition": ctrl.current_condition_config["condition"], "responses": result},
                 ad_mode="session", conversation_id=ctrl.participant_id, source="user",
             )
+            st.session_state.logger.log("post_task_questionnaire_end", {}, ad_mode="session", conversation_id=ctrl.participant_id, source="system")
             ctrl.advance()
             st.rerun()
 

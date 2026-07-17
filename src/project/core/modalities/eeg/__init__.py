@@ -1,7 +1,7 @@
 """
 LSL marker emitter — log-adherent, single-outlet.
 
-Pushes every marker event from ExperimentLogger.log() to LSL.
+Pushes a whitelisted subset of marker events from ExperimentLogger.log() to LSL.
 Outlet name comes from env LSL_MARKER_OUTLET (default: experiment_lab_pilot).
 
 Usage:
@@ -14,8 +14,36 @@ calls are silently ignored — safe to call unconditionally.
 from __future__ import annotations
 
 import os
+import re
 
 from core.log import logger as log
+
+
+# ── LSL whitelist ────────────────────────────────────────────────────────────
+# Only these events are pushed to LSL. Everything else goes to the JSON log
+# but is filtered out here to keep the EEG marker stream clean.
+
+_LSL_EVENTS: frozenset[str] = frozenset({
+    "baseline_start",
+    "baseline_end",
+    "warmup_start",
+    "warmup_finish",
+    "ad_injected",
+    "condition_conclusion_submitted",       # post_task_questionnaire_start
+    "post_task_questionnaire_end",
+    "experiment_end",
+})
+
+_TURN_READ_RE = re.compile(r"^turn_\d+_read$")
+_TURN_WRITE_RE = re.compile(r"^turn_\d+_write$")
+
+
+def _allow_lsl(event: str) -> bool:
+    if event in _LSL_EVENTS:
+        return True
+    if _TURN_READ_RE.match(event) or _TURN_WRITE_RE.match(event):
+        return True
+    return False
 
 
 # ── LSL Outlet (lazy singleton) ──────────────────────────────────────────────
@@ -61,16 +89,15 @@ def marker(label: str) -> None:
 def lsl_sender() -> object:
     """Return a duck-typed sender compatible with ExperimentLogger._marker_client.
 
-    Usage:
-        logger._marker_client = lsl_sender()
-        # now every logger.log(event, ...) also pushes to LSL
+    Only events in the LSL whitelist (see _LSL_EVENTS) are pushed to the outlet.
     """
-    _get_outlet()  # eager init — stream visible on network now
-    marker("dummy_start")  # first marker so recording software can confirm the stream
+    _get_outlet()
+    marker("dummy_start")
 
     class _Sender:
         @staticmethod
         def send(event: str, **kwargs) -> None:
-            marker(event)
+            if _allow_lsl(event):
+                marker(event)
 
     return _Sender()
