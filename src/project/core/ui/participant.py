@@ -243,6 +243,7 @@ def _get_or_create_warmup_manager() -> ConversationManager:
             ad_turns=[],
             use_rag=True,
             dry_run=getattr(experiment_params, "dry_run", False),
+            log_turn_markers=False,
         )
         st.session_state.warmup_manager = mgr
     return mgr

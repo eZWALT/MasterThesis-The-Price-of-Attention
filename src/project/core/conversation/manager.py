@@ -112,6 +112,7 @@ class ConversationManager:
         force_ad: bool = False,
         use_rag: Optional[bool] = None,
         dry_run: bool = False,
+        log_turn_markers: bool = True,
     ):
         self.ad_mode = ad_mode
         self.model = model
@@ -119,6 +120,7 @@ class ConversationManager:
         self.max_tokens = max_tokens
         self.task = task
         self.dry_run = dry_run
+        self._log_turn_markers = log_turn_markers
         self.llm = llm_client or LLMClient(mock=dry_run)
         self.logger = logger or ExperimentLogger(log_dir=LOG_DIR)
         self.min_turns = min_turns
@@ -501,11 +503,12 @@ class ConversationManager:
             source="model",
             turn=current_turn,
         )
-        self.logger.log(
-            f"turn_{current_turn}_read",
-            {"turn": current_turn},
-            turn=current_turn,
-        )
+        if self._log_turn_markers:
+            self.logger.log(
+                f"turn_{current_turn}_read",
+                {"turn": current_turn},
+                turn=current_turn,
+            )
 
         # 7 — record ad injection turn (display handled via InjectionResult, not chat append)
         if inject_ad and retrieval and retrieval.primary:
@@ -732,11 +735,12 @@ class ConversationManager:
             source="model",
             turn=current_turn,
         )
-        self.logger.log(
-            f"turn_{current_turn}_read",
-            {"turn": current_turn},
-            turn=current_turn,
-        )
+        if self._log_turn_markers:
+            self.logger.log(
+                f"turn_{current_turn}_read",
+                {"turn": current_turn},
+                turn=current_turn,
+            )
 
         # 7 — record ad injection turn
         if inject_ad and retrieval and retrieval.primary:

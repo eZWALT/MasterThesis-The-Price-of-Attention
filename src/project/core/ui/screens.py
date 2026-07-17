@@ -1100,14 +1100,13 @@ def render_warmup_chat(manager: ConversationManager) -> bool:
             st.divider()
             if st.button("Done", type="primary", use_container_width=True):
                 return True
-        user_input = _render_write_trigger(manager)
+        user_input = st.chat_input("Send a message...")
         if user_input:
             if user_input.strip():
                 with st.chat_message("user"):
                     st.markdown(user_input.strip())
                 with st.chat_message("assistant"):
                     st.write_stream(manager.process_user_message_stream(user_input.strip()))
-                st.session_state._writing_started = False
                 st.rerun()
 
     return False
