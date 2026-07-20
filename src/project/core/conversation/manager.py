@@ -142,6 +142,7 @@ class ConversationManager:
         self.turn_metrics: List[TurnMetrics] = []
         self.ad_turns_actual: List[int] = []          # turns where ads were actually injected
         self.ads_by_turn: Dict[int, List[Ad]] = {}    # candidates shown per injection turn
+        self._ad_displayed_logged: bool = False       # guard for ad_displayed LSL marker
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
         self._ad_awareness_override: List[Dict[str, str]] = []  # persistent after ad injection
@@ -481,6 +482,10 @@ class ConversationManager:
         assistant_reply = self._call_llm(injection.system_overrides)
         llm_latency_ms = (time.perf_counter() - llm_t0) * 1000.0
 
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run and not self._ad_displayed_logged:
+            self._ad_displayed_logged = True
+            self.logger.log("ad_displayed", {"turn": current_turn}, turn=current_turn)
+
         # 6 — record assistant reply
         self.messages.append({"role": "assistant", "content": assistant_reply})
         self._last_assistant_ts = time.perf_counter()
@@ -704,6 +709,9 @@ class ConversationManager:
         try:
             for chunk in self.llm.chat_stream(msgs, self.model, self.temperature, self.max_tokens):
                 assistant_reply_parts.append(chunk)
+                if inject_ad and not self._ad_displayed_logged:
+                    self._ad_displayed_logged = True
+                    self.logger.log("ad_displayed", {"turn": current_turn}, turn=current_turn)
                 yield chunk
         except RuntimeError as e:
             error_text = f"⚠️ {e}"
