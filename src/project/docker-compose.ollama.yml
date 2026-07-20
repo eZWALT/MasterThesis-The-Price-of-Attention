@@ -2,6 +2,7 @@ services:
   streamlit:
     network_mode: host
     build: .
+    user: "${UID:-1017}"
     env_file:
       - .env
     environment:
