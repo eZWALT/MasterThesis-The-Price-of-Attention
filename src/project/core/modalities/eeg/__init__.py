@@ -32,6 +32,8 @@ _LSL_EVENTS: frozenset[str] = frozenset({
     "condition_conclusion_submitted",       # post_task_questionnaire_start
     "post_task_questionnaire_end",
     "experiment_end",
+    "condition_start",
+    "ad_displayed",
 })
 
 _TURN_READ_RE = re.compile(r"^turn_\d+_read$")
