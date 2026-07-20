@@ -1,7 +1,8 @@
+import sys
 import pyxdf
 import numpy as np
 
-file_path = "sub-P007_ses-S001_task-Default_run-001_eeg.xdf"
+file_path = sys.argv[1] if len(sys.argv) > 1 else "sub-P007_ses-S001_task-Default_run-001_eeg.xdf"
 
 streams, header = pyxdf.load_xdf(file_path)
 
