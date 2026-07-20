@@ -1,5 +1,6 @@
 FROM python:3.13-slim
 
+RUN groupadd -g 1018 wtroi && useradd -u 1017 -g 1018 -m wtroi
 WORKDIR /app
 
 COPY requirements.txt ./
