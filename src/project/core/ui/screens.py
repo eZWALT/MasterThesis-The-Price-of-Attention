@@ -318,6 +318,7 @@ def render_prolific_id() -> Optional[str]:
         "Please enter your Prolific Worker ID.",
         key="prolific_worker_id",
         placeholder="e.g. 5a3b1c2d",
+        max_chars=256,
     )
     if st.button("Continue", type="primary"):
         if not worker_id.strip():
@@ -1025,7 +1026,7 @@ def render_final_survey() -> Optional[dict]:
 
     st.divider()
     st.subheader("Debrief")
-    open_text = st.text_area(FINAL_OPEN_ENDED_PROMPT, key="final_open_ended")
+    open_text = st.text_area(FINAL_OPEN_ENDED_PROMPT, key="final_open_ended", max_chars=256)
     responses["open_ended"] = open_text
 
     if all_answered and st.button("Submit", type="primary"):
@@ -1131,6 +1132,7 @@ def render_first_impression() -> Optional[dict]:
     text = st.text_area(
         "1. Please describe your first impression of the system after your initial interaction in one sentence.",
         key="first_impression_text",
+        max_chars=256,
     )
 
     sentiment = st.radio(
@@ -1310,6 +1312,7 @@ def render_condition_conclusion(
         height=250,
         placeholder="Describe what information you found, what you decided, or what you learned...",
         key=f"condition_conclusion_{condition_number}",
+        max_chars=256,
     )
 
     if st.button("Submit findings", type="primary"):
@@ -1437,6 +1440,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
                 elab = st.text_area(
                     item["elaboration"],
                     key=f"pcs_pers_txt_{condition_number}_{item['id']}",
+                    max_chars=256,
                 )
                 responses[f"{item['id']}_text"] = elab
             else:
@@ -1460,6 +1464,7 @@ def render_post_condition_survey(condition_number: int) -> Optional[dict]:
                 elab = st.text_area(
                     item["elaboration"],
                     key=f"pcs_pers_open_txt_{condition_number}_{item['id']}",
+                    max_chars=256,
                 )
                 responses[f"{item['id']}_text"] = elab
             else:
@@ -1748,6 +1753,7 @@ def render_ads_recall() -> Optional[dict]:
         text_val = st.text_area(
             item["text"],
             key=f"recall_{cond_id}_{item['id']}",
+            max_chars=256,
         )
         responses[f"{cond_id}_{item['id']}"] = text_val
         if not text_val.strip():
@@ -1783,7 +1789,7 @@ def render_demographics_end() -> Optional[dict]:
 
     for item in DEMOGRAPHICS_TEXT:
         if SHOW_OPTIONAL_QUESTIONS:
-            value = st.text_input(item["text"], key=f"demo_end_{item['id']}")
+            value = st.text_input(item["text"], key=f"demo_end_{item['id']}", max_chars=256)
             responses[item["id"]] = value
         else:
             responses[item["id"]] = ""
@@ -1816,6 +1822,7 @@ def render_deception_disclosure() -> Optional[dict]:
     withdraw = st.text_input(
         'Type "Withdraw" below if you would like to withdraw from this study. Otherwise, leave this blank and continue.',
         key="deception_withdraw",
+        max_chars=256,
     )
 
     if st.button("Continue", type="primary"):

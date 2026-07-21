@@ -40,7 +40,7 @@ from core.ui.participant import _render_dev_ad_controls, _sync_dev_overrides
 def render_dev_sidebar():
     with st.sidebar:
         st.markdown("## ⚙️ Developer Settings")
-        model = st.text_input("Model", value=DEFAULT_MODEL)
+        model = st.text_input("Model", value=DEFAULT_MODEL, max_chars=256)
         temperature = st.slider(
             "Temperature",
             min_value=TEMPERATURE_RANGE[0],
