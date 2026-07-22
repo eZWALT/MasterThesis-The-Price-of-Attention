@@ -787,7 +787,7 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
         with col3:
             st.metric("Type", session["study"])
 
-        if st.button(f"🔍 Load {label} Session", key=f"load_{label}", use_container_width=True):
+        if st.session_state.get(f"loaded_session_{label}") != session["folder"]:
             with st.spinner("Loading events..."):
                 events = load_events(session["path"])
                 export_rows = []
@@ -800,6 +800,7 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
                                 pass
                 st.session_state["events"] = events
                 st.session_state["export_rows"] = export_rows
+                st.session_state[f"loaded_session_{label}"] = session["folder"]
                 st.session_state["session_loaded"] = session["folder"]
                 st.rerun()
 
