@@ -20,7 +20,7 @@ def discover_sessions(base):
             continue
         fp = events[0]
         count = sum(1 for _ in open(fp))
-        study, pid, worker = "?", "?", ""
+        study, pid, worker, start_ts = "?", "?", "", ""
         with open(fp) as f:
             for line in f:
                 ev = json.loads(line)
@@ -29,6 +29,7 @@ def discover_sessions(base):
                     data = ev.get("data", {})
                     study = data.get("study_type", "?")
                     pid = data.get("participant_id", "?")
+                    start_ts = ev.get("timestamp", "")
                 elif evt == "worker_id_set":
                     worker = ev.get("data", {}).get("worker_id", "")
         sessions.append({
@@ -39,6 +40,7 @@ def discover_sessions(base):
             "study": study,
             "pid": pid,
             "worker": worker,
+            "start_ts": start_ts,
             "mtime": datetime.fromtimestamp(fp.stat().st_mtime),
         })
     sessions.sort(key=lambda s: s["folder"], reverse=True)
@@ -863,7 +865,7 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
             st.info(f"No sessions found in {label}.")
             continue
 
-        col1, col2, col3 = st.columns([2, 1, 1])
+        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
         with col1:
             session_options = {
                     (f"{s['folder']} ({s['events']} evts, {s['study']}, {s['pid']}"
@@ -881,6 +883,17 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
             st.metric("Events", session["events"])
         with col3:
             st.metric("Type", session["study"])
+        with col4:
+            ts = session.get("start_ts", "")
+            if ts:
+                try:
+                    dt = datetime.fromisoformat(ts)
+                    hour_str = dt.strftime("%H:%M")
+                except Exception:
+                    hour_str = "?"
+            else:
+                hour_str = "?"
+            st.metric("Start", hour_str)
 
         if st.session_state.get(f"loaded_session_{label}") != session["folder"]:
             with st.spinner("Loading events..."):
