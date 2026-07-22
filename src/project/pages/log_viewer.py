@@ -114,9 +114,11 @@ def compute_session_metrics(events):
     cond_times = {}
     cond_ad_modes = {}
     cond_order = []
+    cond_names = []
     survey_responses = []
-    cond_start_by_trial = {}
-    survey_cond_idx = 0
+    cond_start_by_key = {}
+    cond_seq = 0
+    cond_seq_for_survey = 0
 
     for ev in events:
         evt = ev.get("event", "")
@@ -134,13 +136,19 @@ def compute_session_metrics(events):
             msg_lens.append(len(data.get("content", "")))
         elif evt in ("condition_start", "condition_started"):
             cid = data.get("condition", "")
-            am = data.get("ad_mode", "")
-            cond_start_by_trial[trial] = {"name": cid, "ts": ts}
+            am = ev.get("ad_mode") or data.get("ad_mode", "")
+            key = (trial, am)
+            if key not in cond_start_by_key:
+                cond_start_by_key[key] = []
+            cond_start_by_key[key].append({"name": cid, "ts": ts, "trial": trial, "ad_mode": am})
             cond_ad_modes[cid] = am
             cond_order.append(cid)
+            cond_names.append(cid)
         elif evt in ("condition_end", "condition_complete"):
-            if trial in cond_start_by_trial:
-                info = cond_start_by_trial[trial]
+            am = ev.get("ad_mode") or data.get("ad_mode", "")
+            key = (trial, am)
+            if key in cond_start_by_key and cond_start_by_key[key]:
+                info = cond_start_by_key[key].pop(0)
                 cid = info["name"]
                 try:
                     dur = (datetime.fromisoformat(ts) - datetime.fromisoformat(info["ts"])).total_seconds()
@@ -149,10 +157,12 @@ def compute_session_metrics(events):
                     pass
         elif evt == "post_condition_survey_submitted":
             cond_name = ""
-            if survey_cond_idx < len(cond_order):
-                cond_name = cond_order[survey_cond_idx]
-            survey_responses.append({"condition": cond_name, "ad_mode": cond_ad_modes.get(cond_name, ""), "responses": data.get("responses", {})})
-            survey_cond_idx += 1
+            cond_am = ""
+            if cond_seq_for_survey < len(cond_names):
+                cond_name = cond_names[cond_seq_for_survey]
+                cond_am = cond_ad_modes.get(cond_name, "")
+            survey_responses.append({"condition": cond_name, "ad_mode": cond_am, "responses": data.get("responses", {})})
+            cond_seq_for_survey += 1
 
     total_time = None
     if start_ts and end_ts:
@@ -164,6 +174,8 @@ def compute_session_metrics(events):
     return {
         "avg_ttr": sum(ttrs) / len(ttrs) if ttrs else 0,
         "avg_msg_len": sum(msg_lens) / len(msg_lens) if msg_lens else 0,
+        "min_ttr": min(ttrs) if ttrs else 0,
+        "short_msg_pct": sum(1 for l in msg_lens if l < 10) / len(msg_lens) * 100 if msg_lens else 0,
         "total_time_sec": total_time or 0,
         "user_msg_count": len(ttrs),
         "condition_times": cond_times,
@@ -254,7 +266,7 @@ def compute_discriminative_signals(session, global_stats):
         signals.append({"name": "Condition Duration Variance", "severity": "good",
                        "detail": "Insufficient data — fewer than 2 conditions"})
 
-    # 5. Survey Response Consistency
+    # 5. Survey Response Consistency (per-survey straightlining)
     responses = session["survey_responses"]
     if responses:
         all_ratings = []
@@ -281,9 +293,9 @@ def compute_discriminative_signals(session, global_stats):
 
     # 6. Ad-Ratings Consistency
     if len(responses) >= 2:
-        ad_scores = {}
+        ad_by_mode = {}
         for r in responses:
-            ad_mode = r.get("ad_mode", r.get("condition", ""))
+            am = r.get("ad_mode", r.get("condition", ""))
             ratings = []
             for k, v in r["responses"].items():
                 try:
@@ -291,14 +303,18 @@ def compute_discriminative_signals(session, global_stats):
                 except (ValueError, TypeError):
                     pass
             if ratings:
-                ad_scores[ad_mode] = sum(ratings) / len(ratings)
-        no_ads_avg = None
-        ads_avg = None
-        for am, avg in ad_scores.items():
+                if am not in ad_by_mode:
+                    ad_by_mode[am] = []
+                ad_by_mode[am].append(sum(ratings) / len(ratings))
+        no_ads_vals = []
+        ads_vals = []
+        for am, avgs in ad_by_mode.items():
             if am == "" or "no_" in am.lower():
-                no_ads_avg = avg
+                no_ads_vals.extend(avgs)
             elif am:
-                ads_avg = avg
+                ads_vals.extend(avgs)
+        no_ads_avg = sum(no_ads_vals) / len(no_ads_vals) if no_ads_vals else None
+        ads_avg = sum(ads_vals) / len(ads_vals) if ads_vals else None
         if no_ads_avg is not None and ads_avg is not None:
             if no_ads_avg > ads_avg:
                 signals.append({"name": "Ad-Ratings Consistency", "severity": "bad",
@@ -311,10 +327,83 @@ def compute_discriminative_signals(session, global_stats):
                                "detail": "Both conditions seem rated identically (" + f"{no_ads_avg:.1f}" + "/7) — unusual"})
         else:
             signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
-                           "detail": "Could not identify ads vs no-ads conditions (ad_modes: " + str(list(ad_scores.keys())) + ")"})
+                           "detail": "Could not identify ads vs no-ads conditions to compare"})
     else:
         signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
                        "detail": "Insufficient survey data from multiple conditions"})
+
+    # 7. Minimum Time-to-Reply
+    min_t = session.get("min_ttr", 0)
+    if min_t > 0:
+        if min_t < 2:
+            signals.append({"name": "Min Time-to-Reply", "severity": "bad",
+                           "detail": f"Fastest reply in {min_t:.1f}s — seems unnaturally fast, may indicate automated or copy-pasted responses"})
+        elif min_t < 5:
+            signals.append({"name": "Min Time-to-Reply", "severity": "warn",
+                           "detail": f"Fastest reply in {min_t:.1f}s — seems quick, may indicate pre-written answers"})
+        elif min_t < 10:
+            signals.append({"name": "Min Time-to-Reply", "severity": "good",
+                           "detail": f"Fastest reply in {min_t:.1f}s — seems reasonable"})
+        else:
+            signals.append({"name": "Min Time-to-Reply", "severity": "good",
+                           "detail": f"Fastest reply in {min_t:.1f}s — seems relaxed"})
+    else:
+        signals.append({"name": "Min Time-to-Reply", "severity": "good",
+                       "detail": "No TTR data available"})
+
+    # 8. Short Message Ratio
+    short_pct = session.get("short_msg_pct", 0)
+    if short_pct > 0:
+        if short_pct > 50:
+            signals.append({"name": "Short Message Ratio", "severity": "bad",
+                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems disengaged or non-responsive"})
+        elif short_pct > 20:
+            signals.append({"name": "Short Message Ratio", "severity": "warn",
+                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems mildly disengaged"})
+        elif short_pct > 5:
+            signals.append({"name": "Short Message Ratio", "severity": "good",
+                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems normal"})
+        else:
+            signals.append({"name": "Short Message Ratio", "severity": "good",
+                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems engaged"})
+    else:
+        signals.append({"name": "Short Message Ratio", "severity": "good",
+                       "detail": "No message data available"})
+
+    # 9. Cross-Condition Rating Consistency
+    if len(responses) >= 2:
+        question_values = {}
+        for r in responses:
+            for k, v in r["responses"].items():
+                try:
+                    val = int(v)
+                except (ValueError, TypeError):
+                    continue
+                if k not in question_values:
+                    question_values[k] = []
+                question_values[k].append(val)
+        identical_across_all = []
+        for q, vals in question_values.items():
+            if len(vals) >= 2 and len(set(vals)) == 1:
+                identical_across_all.append(q)
+        if identical_across_all:
+            n_identical = len(identical_across_all)
+            n_total = len(question_values)
+            if n_identical == n_total:
+                signals.append({"name": "Cross-Condition Rating Consistency", "severity": "bad",
+                               "detail": f"Every single rating ({n_identical}/{n_total}) is identical across conditions — seems like not discriminating between conditions at all"})
+            elif n_identical > n_total * 0.5:
+                signals.append({"name": "Cross-Condition Rating Consistency", "severity": "warn",
+                               "detail": f"{n_identical}/{n_total} questions have identical ratings across conditions — may indicate not discriminating"})
+            else:
+                signals.append({"name": "Cross-Condition Rating Consistency", "severity": "good",
+                               "detail": f"Only {n_identical}/{n_total} questions have identical ratings across conditions — seems discriminating"})
+        else:
+            signals.append({"name": "Cross-Condition Rating Consistency", "severity": "good",
+                           "detail": "Ratings seem to vary across conditions — seems discriminating"})
+    else:
+        signals.append({"name": "Cross-Condition Rating Consistency", "severity": "good",
+                       "detail": "Insufficient data for cross-condition comparison"})
 
     return signals
 
