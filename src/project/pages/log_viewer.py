@@ -20,15 +20,17 @@ def discover_sessions(base):
             continue
         fp = events[0]
         count = sum(1 for _ in open(fp))
-        study, pid = "?", "?"
+        study, pid, worker = "?", "?", ""
         with open(fp) as f:
             for line in f:
                 ev = json.loads(line)
-                if ev.get("event") == "session_started":
+                evt = ev.get("event", "")
+                if evt == "session_started":
                     data = ev.get("data", {})
                     study = data.get("study_type", "?")
                     pid = data.get("participant_id", "?")
-                    break
+                elif evt == "worker_id_set":
+                    worker = ev.get("data", {}).get("worker_id", "")
         sessions.append({
             "folder": d.name,
             "path": fp,
@@ -36,6 +38,7 @@ def discover_sessions(base):
             "events": count,
             "study": study,
             "pid": pid,
+            "worker": worker,
             "mtime": datetime.fromtimestamp(fp.stat().st_mtime),
         })
     sessions.sort(key=lambda s: s["folder"], reverse=True)
@@ -353,22 +356,18 @@ def compute_discriminative_signals(session, global_stats):
 
     # 8. Short Message Ratio
     short_pct = session.get("short_msg_pct", 0)
-    if short_pct > 0:
-        if short_pct > 50:
-            signals.append({"name": "Short Message Ratio", "severity": "bad",
-                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems disengaged or non-responsive"})
-        elif short_pct > 20:
-            signals.append({"name": "Short Message Ratio", "severity": "warn",
-                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems mildly disengaged"})
-        elif short_pct > 5:
-            signals.append({"name": "Short Message Ratio", "severity": "good",
-                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems normal"})
-        else:
-            signals.append({"name": "Short Message Ratio", "severity": "good",
-                           "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems engaged"})
-    else:
+    if session.get("user_msg_count", 0) == 0:
         signals.append({"name": "Short Message Ratio", "severity": "good",
                        "detail": "No message data available"})
+    elif short_pct > 50:
+        signals.append({"name": "Short Message Ratio", "severity": "bad",
+                       "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems disengaged or non-responsive"})
+    elif short_pct > 20:
+        signals.append({"name": "Short Message Ratio", "severity": "warn",
+                       "detail": f"{short_pct:.0f}% of messages are under 10 chars — seems mildly disengaged"})
+    else:
+        signals.append({"name": "Short Message Ratio", "severity": "good",
+                       "detail": f"{short_pct:.0f}% of messages are under 10 chars — " + ("all messages seem substantial" if short_pct == 0 else "seems normal")})
 
     # 9. Cross-Condition Rating Consistency
     if len(responses) >= 2:
@@ -867,7 +866,8 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
         col1, col2, col3 = st.columns([2, 1, 1])
         with col1:
             session_options = {
-                    f"{s['folder']} ({s['events']} evts, {s['study']}, {s['pid']})": s
+                    (f"{s['folder']} ({s['events']} evts, {s['study']}, {s['pid']}"
+                     + (f", worker={s['worker']}" if s.get('worker') else "")): s
                     for s in sessions
                 }
             selected_label = st.selectbox(
@@ -902,6 +902,19 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
 if "events" in st.session_state and st.session_state["events"]:
     st.divider()
     st.subheader(f"📋 Session: {st.session_state.get('session_loaded', '')}")
+
+    # Find worker ID from session events if available
+    wid = ""
+    for ev in st.session_state["events"]:
+        if ev.get("event") == "worker_id_set":
+            wid = ev.get("data", {}).get("worker_id", "")
+            break
+    if wid:
+        st.markdown(f"""
+        <div style="background:#1a3a2a; border:2px solid #00e676; border-radius:10px; padding:8px 16px; margin-bottom:12px;">
+            <span style="color:#00e676; font-weight:700; font-size:18px;">👥 Prolific Worker: {wid}</span>
+        </div>
+        """, unsafe_allow_html=True)
 
     with st.spinner("Computing quality signals..."):
         if "global_stats" not in st.session_state:
