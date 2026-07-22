@@ -1,0 +1,507 @@
+import streamlit as st
+import json
+import glob
+from pathlib import Path
+from datetime import datetime
+
+st.set_page_config(page_title="Log Viewer — Flow Replay", layout="wide")
+
+LOG_DIR = Path("/home/wtroi/MasterThesis-RAG-RecSys/src/project/logs/production")
+LOG_DIR_DEV = Path("/home/wtroi/MasterThesis-RAG-RecSys/src/project/logs/development")
+
+def discover_sessions(base):
+    sessions = []
+    for d in sorted(base.iterdir()):
+        if not d.is_dir():
+            continue
+        events = list(d.glob("*_events.jsonl"))
+        export = list(d.glob("*_export.jsonl"))
+        if not events:
+            continue
+        fp = events[0]
+        count = sum(1 for _ in open(fp))
+        study, pid = "?", "?"
+        with open(fp) as f:
+            for line in f:
+                ev = json.loads(line)
+                if ev.get("event") == "session_started":
+                    data = ev.get("data", {})
+                    study = data.get("study_type", "?")
+                    pid = data.get("participant_id", "?")
+                    break
+        sessions.append({
+            "folder": d.name,
+            "path": fp,
+            "export": export[0] if export else None,
+            "events": count,
+            "study": study,
+            "pid": pid,
+            "mtime": datetime.fromtimestamp(fp.stat().st_mtime),
+        })
+    sessions.sort(key=lambda s: s["folder"], reverse=True)
+    return sessions
+
+def load_events(path):
+    rows = []
+    with open(path) as f:
+        for line in f:
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                pass
+    return rows
+
+def render_timeline(events, export_rows):
+    turns_data = {}
+    conditions = []
+    current_trial = 0
+    condition_order = []
+    ad_mode_order = []
+
+    for ev in events:
+        evt = ev.get("event", "")
+        data = ev.get("data", {})
+        turn = ev.get("turn", 0)
+        trial = ev.get("trial_index", 0)
+        ad_mode = ev.get("ad_mode", "")
+        ts = ev.get("timestamp", "")
+        source = ev.get("source", "")
+
+        if evt == "condition_start" or evt == "condition_started":
+            cid = data.get("condition", "")
+            am = data.get("ad_mode", "")
+            task = data.get("task_title", data.get("task_id", ""))
+            condition_order.append((cid, am, task, trial))
+            ad_mode_order.append(am)
+
+        if evt == "user_message":
+            content = data.get("content", "")
+            t = data.get("time_to_reply_ms")
+            key = (trial, turn)
+            if key not in turns_data:
+                turns_data[key] = {"user": "", "assistant": "", "trial": trial, "turn": turn}
+            turns_data[key]["user"] = content
+            turns_data[key]["user_ts"] = ts
+            if t:
+                turns_data[key]["time_to_reply"] = t / 1000.0
+
+        if evt == "assistant_reply":
+            content = data.get("content", "")
+            key = (trial, turn)
+            if key not in turns_data:
+                turns_data[key] = {"user": "", "assistant": "", "trial": trial, "turn": turn}
+            turns_data[key]["assistant"] = content
+            turns_data[key]["assistant_ts"] = ts
+
+        if evt == "condition_start" or evt == "condition_started":
+            current_trial = trial
+        if evt == "condition_end" or evt == "condition_complete":
+            conditions.append({
+                "event": evt,
+                "data": data,
+                "trial": trial,
+                "ad_mode": ad_mode,
+                "ts": ts,
+            })
+
+    ad_modes_used = sorted(set(am for am in ad_mode_order if am and am != "session"))
+
+    st.markdown("""
+    <style>
+    .tl-container { max-width: 1000px; margin: 0 auto; }
+    .tl-arrow { text-align: center; color: #aaa; font-size: 28px; margin: -4px 0; }
+    .tl-card { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 20px; margin: 8px 0; }
+    .tl-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .tl-card-icon { font-size: 24px; width: 36px; text-align: center; }
+    .tl-card-title { font-size: 16px; font-weight: 600; color: #e0e0e0; }
+    .tl-card-subtitle { font-size: 12px; color: #888; }
+    .user-bubble { background: #2b5278; border-radius: 18px 18px 4px 18px; padding: 12px 18px; margin: 8px 0 8px 40px; max-width: 85%; color: #e0e0e0; }
+    .assistant-bubble { background: #333; border-radius: 18px 18px 18px 4px; padding: 12px 18px; margin: 8px 40px 8px 0; max-width: 85%; color: #ccc; }
+    .bubble-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+    .ad-banner { background: #3a2a1a; border: 1px solid #665533; border-radius: 8px; padding: 12px 16px; margin: 8px 0; }
+    .ad-title { color: #ffcc66; font-weight: 600; font-size: 14px; }
+    .ad-text { color: #ccc; font-size: 13px; margin-top: 4px; }
+    .survey-item { background: #252525; border-left: 3px solid #4a9eff; padding: 8px 12px; margin: 6px 0; border-radius: 4px; }
+    .survey-q { color: #aaa; font-size: 12px; margin-bottom: 2px; }
+    .survey-a { color: #e0e0e0; font-size: 14px; }
+    .info-box { background: #1a2a3a; border-left: 3px solid #4a9eff; padding: 10px 16px; margin: 8px 0; border-radius: 4px; font-size: 13px; color: #bbb; }
+    .condition-label { background: #2a1a3a; border-left: 3px solid #a04aff; padding: 8px 12px; margin: 4px 0; border-radius: 4px; }
+    .condition-label-text { color: #cc99ff; font-weight: 600; font-size: 14px; }
+    .chat-container { margin: 8px 0; }
+    .section-divider { border: none; border-top: 1px solid #333; margin: 16px 0; }
+    .marker-tag { display: inline-block; background: #4a4a2a; color: #dddd88; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="tl-container">', unsafe_allow_html=True)
+
+    # Pre-process: build ordered list of timeline items
+    timeline_items = []
+    session_idx = 0
+    last_event = None
+
+    for ev in events:
+        evt = ev.get("event", "")
+        data = ev.get("data", {})
+        turn = ev.get("turn", 0)
+        trial = ev.get("trial_index", 0)
+        ad_mode = ev.get("ad_mode", "")
+        ts = ev.get("timestamp", "")
+        source = ev.get("source", "")
+
+        if evt == "session_started":
+            study = data.get("study_type", "?")
+            pid = data.get("participant_id", "?")
+            conditions_list = data.get("conditions", [])
+            cond_str = ", ".join([c.get("condition", "") + "(" + c.get("ad_mode", "") + ")" for c in conditions_list])
+            timeline_items.append(("session_started", {
+                "study": study, "pid": pid, "conditions": cond_str, "ts": ts
+            }))
+
+        elif evt == "experiment_config":
+            llm = data.get("llm", {})
+            ret = data.get("retrieval", {})
+            ver = data.get("version", "?")
+            timeline_items.append(("experiment_config", {
+                "model": llm.get("model", "?"), "temp": llm.get("temperature", "?"),
+                "embed": ret.get("embedding_model", "?"), "rerank": ret.get("reranker_model", "?"),
+                "ver": ver,
+            }))
+
+        elif evt == "consent_granted":
+            timeline_items.append(("consent", {"ts": ts}))
+
+        elif evt == "screen_skipped":
+            screen = data.get("screen", "")
+            timeline_items.append(("screen_skipped", {"screen": screen, "ts": ts}))
+
+        elif evt in ("demographics_post_submitted",):
+            timeline_items.append(("demographics", {"data": data, "ts": ts}))
+
+        elif evt in ("ocean_submitted",):
+            scores = data.get("scores", {})
+            timeline_items.append(("ocean", {"scores": scores, "ts": ts}))
+
+        elif evt in ("baseline_start", "baseline_end"):
+            timeline_items.append((evt, {"ts": ts}))
+
+        elif evt in ("warmup_start", "warmup_finish"):
+            timeline_items.append((evt, {"ts": ts}))
+
+        elif evt == "conversation_started":
+            intent = data.get("initial_intent", "")
+            task_id = data.get("task_id", "")
+            timeline_items.append(("conversation_started", {
+                "intent": intent, "task_id": task_id, "trial": trial, "ts": ts
+            }))
+
+        elif evt == "user_message":
+            content = data.get("content", "")
+            ttr = data.get("time_to_reply_ms")
+            timeline_items.append(("user_message", {
+                "content": content, "turn": turn, "trial": trial,
+                "ttr": ttr / 1000.0 if ttr else None, "ts": ts
+            }))
+
+        elif evt == "assistant_reply":
+            content = data.get("content", "")
+            timeline_items.append(("assistant_reply", {
+                "content": content, "turn": turn, "trial": trial, "ts": ts
+            }))
+
+        elif evt == "condition_start" or evt == "condition_started":
+            cid = data.get("condition", "")
+            am = data.get("ad_mode", "")
+            task = data.get("task_title", data.get("task_id", ""))
+            timeline_items.append(("condition_start", {
+                "condition": cid, "ad_mode": am, "task": task,
+                "trial": trial, "ts": ts, "data": data
+            }))
+
+        elif evt in ("ad_injected", "ad_inserted", "ad_displayed"):
+            if evt == "ad_injected":
+                ad_title = data.get("ad_title", "")
+                ad_text = data.get("ad_text", "")
+                ad_id = data.get("ad_id", "")
+                timeline_items.append(("ad_injected", {
+                    "title": ad_title, "text": ad_text, "id": ad_id,
+                    "turn": turn, "trial": trial, "ts": ts
+                }))
+
+        elif evt == "retrieval":
+            query = data.get("query", "")
+            ad_title = data.get("ad_title", "")
+            timeline_items.append(("retrieval", {
+                "query": query, "ad_title": ad_title, "turn": turn, "trial": trial, "ts": ts
+            }))
+
+        elif evt == "intent_classified":
+            label = data.get("intent_label", "")
+            timeline_items.append(("intent_classified", {
+                "label": label, "turn": turn, "trial": trial, "ts": ts
+            }))
+
+        elif evt in ("turn_1_write", "turn_2_write", "turn_3_write", "turn_4_write"):
+            tnum = int(evt.split("_")[1])
+            timeline_items.append(("turn_write", {"turn": tnum, "trial": trial, "ts": ts}))
+
+        elif evt in ("turn_1_read", "turn_2_read", "turn_3_read", "turn_4_read"):
+            tnum = int(evt.split("_")[1])
+            timeline_items.append(("turn_read", {"turn": tnum, "trial": trial, "ts": ts}))
+
+        elif evt == "conversation_completed":
+            timeline_items.append(("conversation_completed", {
+                "data": data, "trial": trial, "ts": ts
+            }))
+
+        elif evt == "condition_conclusion_submitted":
+            conclusion = data.get("conclusion", "")
+            timeline_items.append(("conclusion", {"text": conclusion, "trial": trial, "ts": ts}))
+
+        elif evt == "post_condition_survey_submitted":
+            responses = data.get("responses", {})
+            timeline_items.append(("post_condition_survey", {
+                "responses": responses, "trial": trial, "ts": ts
+            }))
+
+        elif evt == "condition_end" or evt == "condition_complete":
+            timeline_items.append(("condition_end", {
+                "data": data, "trial": trial, "ts": ts
+            }))
+
+        elif evt == "trial_end":
+            timeline_items.append(("trial_end", {"data": data, "trial": trial, "ts": ts}))
+
+        elif evt == "ads_recall_submitted":
+            recall = data.get("block_late_recall_reaction", "")
+            timeline_items.append(("ads_recall", {"text": recall, "ts": ts}))
+
+        elif evt == "deception_disclosure_submitted":
+            withdrew = data.get("withdrew", False)
+            timeline_items.append(("deception_disclosure", {"withdrew": withdrew, "ts": ts}))
+
+        elif evt in ("session_complete", "experiment_end"):
+            timeline_items.append(("session_end", {"event": evt, "data": data, "ts": ts}))
+
+        elif evt == "marker_sent":
+            timeline_items.append(("marker_sent", {"ts": ts, "trial": trial, "turn": turn}))
+
+        elif evt == "user_starts_typing":
+            pass  # skip for visual flow
+
+    # Render timeline
+    timeline_items.sort(key=lambda x: x[1].get("ts", ""))
+
+    def arrow():
+        st.markdown('<div class="tl-arrow">▼</div>', unsafe_allow_html=True)
+
+    def card(icon, title, subtitle, content_html, extra_class=""):
+        st.markdown(f'''
+        <div class="tl-card {extra_class}">
+            <div class="tl-card-header">
+                <div class="tl-card-icon">{icon}</div>
+                <div>
+                    <div class="tl-card-title">{title}</div>
+                    <div class="tl-card-subtitle">{subtitle}</div>
+                </div>
+            </div>
+            {content_html}
+        </div>
+        ''', unsafe_allow_html=True)
+
+    for i, (evt, info) in enumerate(timeline_items):
+        if evt == "session_started":
+            card("🚀", "Session Started", info.get("ts", ""),
+                 f'<div class="info-box">Study: <b>{info["study"]}</b> | '
+                 f'Participant: <b>{info["pid"]}</b><br>'
+                 f'Conditions: {info["conditions"]}</div>')
+
+        elif evt == "experiment_config":
+            card("⚙️", "Experiment Config", info.get("ts", ""),
+                 f'<div class="info-box">Model: <b>{info["model"]}</b> (temp={info["temp"]})<br>'
+                 f'Embedding: <b>{info["embed"]}</b><br>'
+                 f'Reranker: <b>{info["rerank"]}</b><br>'
+                 f'Version: {info["ver"]}</div>')
+
+        elif evt == "consent":
+            card("📝", "Consent Granted", info.get("ts", ""), "")
+
+        elif evt == "screen_skipped":
+            card("⏭️", f'Screen Skipped: {info["screen"]}', info.get("ts", ""), "")
+
+        elif evt == "demographics":
+            items = "".join(f'<div class="survey-item"><div class="survey-q">{k.replace("demo_","").replace("_"," ").title()}</div>'
+                           f'<div class="survey-a">{v}</div></div>'
+                           for k, v in info["data"].items() if v)
+            card("👤", "Demographics Survey", info.get("ts", ""), items)
+
+        elif evt == "ocean":
+            scores = info["scores"]
+            score_line = " | ".join([f"<b>{k}</b>: {v}" for k, v in scores.items()])
+            card("🧠", "OCEAN Personality", info.get("ts", ""),
+                 f'<div class="info-box">{score_line}</div>')
+
+        elif evt == "baseline_start":
+            card("📊", "EEG Baseline Recording Started", info.get("ts", ""),
+                 '<div class="info-box">Recording resting-state EEG baseline...</div>')
+
+        elif evt == "baseline_end":
+            card("✅", "EEG Baseline Recording Ended", info.get("ts", ""), "")
+
+        elif evt == "warmup_start":
+            card("🔥", "Warmup Chat Started", info.get("ts", ""),
+                 '<div class="info-box">Participant can chat freely to get comfortable with the system.</div>')
+
+        elif evt == "warmup_finish":
+            card("✅", "Warmup Finished", info.get("ts", ""), "")
+
+        elif evt == "conversation_started":
+            card("💬", f"Conversation Started (Trial {info['trial']})", info.get("ts", ""),
+                 f'<div class="info-box">Intent: <b>{info["intent"]}</b> | Task: <b>{info["task_id"]}</b></div>')
+
+        elif evt == "condition_start":
+            cond = info["condition"]
+            am = info["ad_mode"]
+            task = info["task"]
+            card("🎯", f"Condition: {cond} ({am})", info.get("ts", ""),
+                 f'<div class="info-box">Task: <b>{task}</b><br>Ad Mode: <b>{am}</b><br>Trial: {info["trial"]}</div>')
+
+        elif evt == "user_message":
+            arrow()
+            content = info["content"]
+            ttr = info.get("ttr")
+            ttr_str = f" ({ttr:.1f}s)" if ttr else ""
+            st.markdown(
+                f'<div class="user-bubble">'
+                f'<div class="bubble-label">User (Turn {info["turn"]}){ttr_str}</div>'
+                f'{content}</div>',
+                unsafe_allow_html=True)
+
+        elif evt == "assistant_reply":
+            content = info["content"]
+            if len(content) > 500:
+                content = content[:500] + "..."
+            st.markdown(
+                f'<div class="assistant-bubble">'
+                f'<div class="bubble-label">Assistant (Turn {info["turn"]})</div>'
+                f'{content}</div>',
+                unsafe_allow_html=True)
+
+        elif evt == "ad_injected":
+            card("📢", f"Ad Injected (Turn {info['turn']})", info.get("ts", ""),
+                 f'<div class="ad-banner"><div class="ad-title">{info["title"]}</div>'
+                 f'<div class="ad-text">{info["text"][:200]}</div></div>')
+
+        elif evt == "retrieval":
+            card("🔍", f"Retrieval (Turn {info['turn']})", info.get("ts", ""),
+                 f'<div class="info-box">Query: <b>{info["query"][:150]}</b><br>'
+                 f'Ad Retrieved: {info["ad_title"][:100]}</div>')
+
+        elif evt == "intent_classified":
+            card("🏷️", f"Intent: {info['label']}", info.get("ts", ""), "")
+
+        elif evt == "turn_write":
+            pass  # implicit from user_message
+
+        elif evt == "turn_read":
+            pass  # implicit from assistant_reply
+
+        elif evt == "conversation_completed":
+            card("✅", f"Conversation Completed (Trial {info['trial']})", info.get("ts", ""),
+                 "")
+
+        elif evt == "conclusion":
+            card("✍️", f"Condition Conclusion (Trial {info['trial']})", info.get("ts", ""),
+                 f'<div class="info-box">{info["text"][:500]}</div>')
+
+        elif evt == "post_condition_survey":
+            responses = info["responses"]
+            items = "".join(
+                f'<div class="survey-item"><div class="survey-q">{k}</div>'
+                f'<div class="survey-a"><b>{v}</b>/7</div></div>'
+                for k, v in responses.items()
+            )
+            card("📋", f"Post-Condition Survey (Trial {info['trial']})", info.get("ts", ""), items)
+
+        elif evt == "condition_end":
+            card("🏁", f"Condition End (Trial {info['trial']})", info.get("ts", ""), "")
+
+        elif evt == "trial_end":
+            d = info["data"]
+            stats = d.get("avg_time_to_reply_ms", 0)
+            n_turns = d.get("n_turns", 0)
+            cont_rate = d.get("continuation_rate_overall", 0)
+            card("📊", f"Trial {info['trial']} Summary", info.get("ts", ""),
+                 f'<div class="info-box">Turns: <b>{n_turns}</b> | '
+                 f'Avg reply: <b>{stats/1000:.1f}s</b> | '
+                 f'Continuation: <b>{cont_rate*100:.0f}%</b></div>')
+
+        elif evt == "ads_recall":
+            card("🛒", "Ad Recall Survey", info.get("ts", ""),
+                 f'<div class="info-box">{info["text"][:300]}</div>')
+
+        elif evt == "deception_disclosure":
+            status = "❌ Withdrew" if info["withdrew"] else "✅ Stayed"
+            card("🔓", f"Deception Disclosure — {status}", info.get("ts", ""), "")
+
+        elif evt == "session_end":
+            card("🏆", "Session Complete!" if info["event"] == "session_complete" else "Experiment End",
+                 info.get("ts", ""), "")
+
+        elif evt == "marker_sent":
+            st.markdown(f'<span class="marker-tag">🔴 LSL Marker (Trial {info["trial"]}, Turn {info["turn"]})</span>',
+                        unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
+st.title("🔍 Session Log Viewer — Flow Replay")
+st.caption("Browse production/development sessions and replay the participant's journey step by step.")
+
+tab_prod, tab_dev = st.tabs(["📀 Production", "🔧 Development"])
+
+for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DIR_DEV, "Development")]:
+    with tab:
+        sessions = discover_sessions(base_dir)
+        if not sessions:
+            st.info(f"No sessions found in {label}.")
+            continue
+
+        col1, col2, col3 = st.columns([2, 1, 1])
+        with col1:
+            session_options = {
+                    f"{s['folder']} ({s['events']} evts, {s['study']}, {s['pid']})": s
+                    for s in sessions
+                }
+            selected_label = st.selectbox(
+                    f"Select {label} session:",
+                    options=list(session_options.keys()),
+                    key=f"sel_{label}",
+                )
+            session = session_options[selected_label]
+
+        with col2:
+            st.metric("Events", session["events"])
+        with col3:
+            st.metric("Type", session["study"])
+
+        if st.button(f"🔍 Load {label} Session", key=f"load_{label}", use_container_width=True):
+            with st.spinner("Loading events..."):
+                events = load_events(session["path"])
+                export_rows = []
+                if session["export"]:
+                    with open(session["export"]) as f:
+                        for line in f:
+                            try:
+                                export_rows.append(json.loads(line))
+                            except json.JSONDecodeError:
+                                pass
+                st.session_state["events"] = events
+                st.session_state["export_rows"] = export_rows
+                st.session_state["session_loaded"] = session["folder"]
+                st.rerun()
+
+if "events" in st.session_state and st.session_state["events"]:
+    st.divider()
+    st.subheader(f"📋 Session: {st.session_state.get('session_loaded', '')}")
+    render_timeline(st.session_state["events"], st.session_state.get("export_rows", []))
