@@ -112,15 +112,17 @@ def compute_session_metrics(events):
     start_ts = None
     end_ts = None
     cond_times = {}
-    cond_start = {}
     cond_ad_modes = {}
+    cond_order = []
     survey_responses = []
-    condition_order = []
+    cond_start_by_trial = {}
+    survey_cond_idx = 0
 
     for ev in events:
         evt = ev.get("event", "")
         data = ev.get("data", {})
         ts = ev.get("timestamp", "")
+        trial = ev.get("trial_index", 0)
         if evt == "session_started":
             start_ts = ts
         elif evt in ("session_complete", "experiment_end"):
@@ -133,19 +135,24 @@ def compute_session_metrics(events):
         elif evt in ("condition_start", "condition_started"):
             cid = data.get("condition", "")
             am = data.get("ad_mode", "")
-            cond_start[cid] = ts
+            cond_start_by_trial[trial] = {"name": cid, "ts": ts}
             cond_ad_modes[cid] = am
-            condition_order.append(cid)
+            cond_order.append(cid)
         elif evt in ("condition_end", "condition_complete"):
-            cid = data.get("condition", "")
-            if cid in cond_start and cond_start[cid] and ts:
+            if trial in cond_start_by_trial:
+                info = cond_start_by_trial[trial]
+                cid = info["name"]
                 try:
-                    dur = (datetime.fromisoformat(ts) - datetime.fromisoformat(cond_start[cid])).total_seconds()
+                    dur = (datetime.fromisoformat(ts) - datetime.fromisoformat(info["ts"])).total_seconds()
                     cond_times[cid] = dur
                 except Exception:
                     pass
         elif evt == "post_condition_survey_submitted":
-            survey_responses.append({"condition": ev.get("ad_mode", ""), "responses": data.get("responses", {})})
+            cond_name = ""
+            if survey_cond_idx < len(cond_order):
+                cond_name = cond_order[survey_cond_idx]
+            survey_responses.append({"condition": cond_name, "ad_mode": cond_ad_modes.get(cond_name, ""), "responses": data.get("responses", {})})
+            survey_cond_idx += 1
 
     total_time = None
     if start_ts and end_ts:
@@ -161,7 +168,7 @@ def compute_session_metrics(events):
         "user_msg_count": len(ttrs),
         "condition_times": cond_times,
         "condition_ad_modes": cond_ad_modes,
-        "condition_order": condition_order,
+        "condition_order": cond_order,
         "survey_responses": survey_responses,
     }
 
@@ -276,7 +283,7 @@ def compute_discriminative_signals(session, global_stats):
     if len(responses) >= 2:
         ad_scores = {}
         for r in responses:
-            cond_name = r.get("condition", "")
+            ad_mode = r.get("ad_mode", r.get("condition", ""))
             ratings = []
             for k, v in r["responses"].items():
                 try:
@@ -284,14 +291,13 @@ def compute_discriminative_signals(session, global_stats):
                 except (ValueError, TypeError):
                     pass
             if ratings:
-                ad_scores[cond_name] = sum(ratings) / len(ratings)
+                ad_scores[ad_mode] = sum(ratings) / len(ratings)
         no_ads_avg = None
         ads_avg = None
-        for cond, avg in ad_scores.items():
-            cl = cond.lower()
-            if "no_ads" in cl or "noads" in cl or "no-" in cl:
+        for am, avg in ad_scores.items():
+            if am == "" or "no_" in am.lower():
                 no_ads_avg = avg
-            elif "ads" in cl or "with_ads" in cl or "with-" in cl:
+            elif am:
                 ads_avg = avg
         if no_ads_avg is not None and ads_avg is not None:
             if no_ads_avg > ads_avg:
@@ -305,7 +311,7 @@ def compute_discriminative_signals(session, global_stats):
                                "detail": "Both conditions seem rated identically (" + f"{no_ads_avg:.1f}" + "/7) — unusual"})
         else:
             signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
-                           "detail": "Could not identify ads vs no-ads conditions to compare"})
+                           "detail": "Could not identify ads vs no-ads conditions (ad_modes: " + str(list(ad_scores.keys())) + ")"})
     else:
         signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
                        "detail": "Insufficient survey data from multiple conditions"})
