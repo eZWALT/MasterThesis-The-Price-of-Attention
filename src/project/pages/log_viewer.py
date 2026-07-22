@@ -124,6 +124,7 @@ def compute_session_metrics(events):
     cond_start_by_key = {}
     cond_seq = 0
     cond_seq_for_survey = 0
+    validation = None
 
     for ev in events:
         evt = ev.get("event", "")
@@ -168,6 +169,14 @@ def compute_session_metrics(events):
                 cond_am = cond_ad_modes.get(cond_name, "")
             survey_responses.append({"condition": cond_name, "ad_mode": cond_am, "responses": data.get("responses", {})})
             cond_seq_for_survey += 1
+        elif evt == "validation_submitted":
+            d = ev.get("data", {})
+            validation = {
+                "correct": d.get("correct", 0),
+                "mistakes": d.get("mistakes", 0),
+                "accuracy": d.get("accuracy", 0),
+                "failed": d.get("validation_failed", True),
+            }
 
     total_time = None
     if start_ts and end_ts:
@@ -187,6 +196,7 @@ def compute_session_metrics(events):
         "condition_ad_modes": cond_ad_modes,
         "condition_order": cond_order,
         "survey_responses": survey_responses,
+        "validation": validation,
     }
 
 
@@ -405,6 +415,29 @@ def compute_discriminative_signals(session, global_stats):
     else:
         signals.append({"name": "Cross-Condition Rating Consistency", "severity": "good",
                        "detail": "Insufficient data for cross-condition comparison"})
+
+    # 10. Validation Score (attention check)
+    val = session.get("validation")
+    if val and val.get("accuracy", 0) > 0:
+        acc = val["accuracy"]
+        correct = val.get("correct", 0)
+        mistakes = val.get("mistakes", 0)
+        failed = val.get("failed", False)
+        if acc < 0.6:
+            signals.append({"name": "Validation Score", "severity": "bad",
+                           "detail": f"{correct}/5 correct ({acc*100:.0f}%) — seems failed, may indicate inattention"})
+        elif acc < 0.8:
+            signals.append({"name": "Validation Score", "severity": "warn",
+                           "detail": f"{correct}/5 correct ({acc*100:.0f}%) — seems low, may indicate partial inattention"})
+        elif acc < 1.0:
+            signals.append({"name": "Validation Score", "severity": "good",
+                           "detail": f"{correct}/5 correct ({acc*100:.0f}%) — seems acceptable"})
+        else:
+            signals.append({"name": "Validation Score", "severity": "good",
+                           "detail": f"5/5 correct (100%) — seems attentive"})
+    else:
+        signals.append({"name": "Validation Score", "severity": "good",
+                       "detail": "No validation data — may have been skipped in protocol"})
 
     return signals
 
