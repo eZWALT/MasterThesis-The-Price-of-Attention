@@ -169,52 +169,65 @@ def compute_session_metrics(events):
 def compute_discriminative_signals(session, global_stats):
     signals = []
 
+    # 1. Avg Time-to-Reply
     if session["avg_ttr"] > 0 and global_stats["global_avg_ttr"] > 0:
         ratio = session["avg_ttr"] / global_stats["global_avg_ttr"]
         ttr_str = f"{session['avg_ttr']:.1f}s vs global {global_stats['global_avg_ttr']:.1f}s"
         if ratio < 0.3:
             signals.append({"name": "Avg Time-to-Reply", "severity": "bad",
-                           "detail": ttr_str + " | suspiciously fast, likely speedrunning"})
+                           "detail": ttr_str + " | seems suspiciously fast — may indicate speedrunning"})
         elif ratio < 0.7:
             signals.append({"name": "Avg Time-to-Reply", "severity": "warn",
-                           "detail": ttr_str + " | faster than average"})
+                           "detail": ttr_str + " | seems faster than average — may indicate rushing"})
         elif ratio > 2.0:
             signals.append({"name": "Avg Time-to-Reply", "severity": "warn",
-                           "detail": ttr_str + " | very slow, possible distraction"})
+                           "detail": ttr_str + " | seems very slow — possible distraction or multitasking"})
         else:
             signals.append({"name": "Avg Time-to-Reply", "severity": "good",
-                           "detail": ttr_str + " | within normal range"})
+                           "detail": ttr_str + " | seems within normal range"})
+    else:
+        signals.append({"name": "Avg Time-to-Reply", "severity": "good",
+                       "detail": "Insufficient data to compare"})
 
+    # 2. Avg Message Length
     if session["avg_msg_len"] > 0 and global_stats["global_avg_msg_len"] > 0:
         ratio = session["avg_msg_len"] / global_stats["global_avg_msg_len"]
         if ratio < 0.3:
             signals.append({"name": "Avg Message Length", "severity": "bad",
-                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | very short replies, not engaging"})
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | seems very short — may indicate low engagement"})
         elif ratio < 0.7:
             signals.append({"name": "Avg Message Length", "severity": "warn",
-                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | shorter than average"})
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | seems shorter than average"})
         elif ratio > 2.0:
             signals.append({"name": "Avg Message Length", "severity": "warn",
-                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | very verbose"})
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | seems very verbose"})
         else:
             signals.append({"name": "Avg Message Length", "severity": "good",
-                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | normal range"})
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | seems within normal range"})
+    else:
+        signals.append({"name": "Avg Message Length", "severity": "good",
+                       "detail": "Insufficient data to compare"})
 
+    # 3. Total Experiment Time
     if session["total_time_sec"] > 0 and global_stats["global_avg_total_time"] > 0:
         ratio = session["total_time_sec"] / global_stats["global_avg_total_time"]
         if ratio < 0.3:
             signals.append({"name": "Total Experiment Time", "severity": "bad",
-                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | extremely short, likely speedrun"})
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | seems extremely short — may indicate speedrun"})
         elif ratio < 0.7:
             signals.append({"name": "Total Experiment Time", "severity": "warn",
-                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | shorter than average"})
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | seems shorter than average"})
         elif ratio > 2.0:
             signals.append({"name": "Total Experiment Time", "severity": "warn",
-                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | very long session"})
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | seems very long"})
         else:
             signals.append({"name": "Total Experiment Time", "severity": "good",
-                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | normal range"})
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | seems within normal range"})
+    else:
+        signals.append({"name": "Total Experiment Time", "severity": "good",
+                       "detail": "Insufficient data to compare"})
 
+    # 4. Condition Duration Variance
     cond_times = session["condition_times"]
     if len(cond_times) >= 2:
         times = list(cond_times.values())
@@ -222,14 +235,19 @@ def compute_discriminative_signals(session, global_stats):
             ratio = max(times) / min(times)
             if ratio < 1.1:
                 signals.append({"name": "Condition Duration Variance", "severity": "bad",
-                               "detail": f"All conditions nearly identical ({min(times)/60:.1f}-{max(times)/60:.1f}min) | suspicious, no variation"})
+                               "detail": "All conditions seem nearly identical (" + f"{min(times)/60:.1f}-{max(times)/60:.1f}min" + ") — may indicate rushing through conditions"})
             elif ratio < 1.5:
                 signals.append({"name": "Condition Duration Variance", "severity": "warn",
-                               "detail": f"Low variation across conditions ({min(times)/60:.1f}-{max(times)/60:.1f}min)"})
+                               "detail": "Low variation across conditions (" + f"{min(times)/60:.1f}-{max(times)/60:.1f}min" + ") — may indicate similar effort"})
             else:
+                sig_detail = "Seems healthy: " + ", ".join(f"{c}: {t/60:.1f}min" for c, t in cond_times.items())
                 signals.append({"name": "Condition Duration Variance", "severity": "good",
-                               "detail": f"Healthy variation: {', '.join(f'{c}: {t/60:.1f}min' for c, t in cond_times.items())}"})
+                               "detail": sig_detail})
+    else:
+        signals.append({"name": "Condition Duration Variance", "severity": "good",
+                       "detail": "Insufficient data — fewer than 2 conditions"})
 
+    # 5. Survey Response Consistency
     responses = session["survey_responses"]
     if responses:
         all_ratings = []
@@ -243,14 +261,18 @@ def compute_discriminative_signals(session, global_stats):
             distinct = len(set(all_ratings))
             if distinct == 1:
                 signals.append({"name": "Survey Response Consistency", "severity": "bad",
-                               "detail": f"All survey responses identical ({all_ratings[0]}/7) | straightlining, likely inattentive"})
+                               "detail": "All survey responses are identical (" + f"{all_ratings[0]}" + "/7) — may indicate straightlining / inattention"})
             elif distinct <= 2:
                 signals.append({"name": "Survey Response Consistency", "severity": "warn",
-                               "detail": f"Very low variance | only {distinct} distinct values used across all surveys"})
+                               "detail": "Seems very low variance — only " + f"{distinct}" + " distinct values used across all surveys"})
             else:
                 signals.append({"name": "Survey Response Consistency", "severity": "good",
-                               "detail": f"Healthy variance | {distinct} distinct values used across surveys"})
+                               "detail": "Seems healthy — " + f"{distinct}" + " distinct values used across surveys"})
+    else:
+        signals.append({"name": "Survey Response Consistency", "severity": "good",
+                       "detail": "No survey data available"})
 
+    # 6. Ad-Ratings Consistency
     if len(responses) >= 2:
         ad_scores = {}
         for r in responses:
@@ -274,13 +296,19 @@ def compute_discriminative_signals(session, global_stats):
         if no_ads_avg is not None and ads_avg is not None:
             if no_ads_avg > ads_avg:
                 signals.append({"name": "Ad-Ratings Consistency", "severity": "bad",
-                               "detail": f"No-Ads rated HIGHER ({no_ads_avg:.1f}/7) than Ads ({ads_avg:.1f}/7) | data quality concern"})
+                               "detail": "No-Ads seems rated HIGHER (" + f"{no_ads_avg:.1f}" + "/7) than Ads (" + f"{ads_avg:.1f}" + "/7) — may indicate data quality issue"})
             elif no_ads_avg < ads_avg:
                 signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
-                               "detail": f"Ads rated higher ({ads_avg:.1f}/7) than No-Ads ({no_ads_avg:.1f}/7) | expected pattern"})
+                               "detail": "Ads seems rated higher (" + f"{ads_avg:.1f}" + "/7) than No-Ads (" + f"{no_ads_avg:.1f}" + "/7) — expected pattern"})
             else:
                 signals.append({"name": "Ad-Ratings Consistency", "severity": "warn",
-                               "detail": f"Both conditions rated identically ({no_ads_avg:.1f}/7) | unusual"})
+                               "detail": "Both conditions seem rated identically (" + f"{no_ads_avg:.1f}" + "/7) — unusual"})
+        else:
+            signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
+                           "detail": "Could not identify ads vs no-ads conditions to compare"})
+    else:
+        signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
+                       "detail": "Insufficient survey data from multiple conditions"})
 
     return signals
 
