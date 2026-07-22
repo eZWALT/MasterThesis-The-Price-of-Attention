@@ -51,6 +51,280 @@ def load_events(path):
                 pass
     return rows
 
+
+
+
+def compute_global_stats(log_dir):
+    sessions = discover_sessions(log_dir)
+    all_ttrs = []
+    all_msg_lens = []
+    all_totals = []
+    all_survey_responses = []
+    session_count = 0
+
+    for s in sessions:
+        events = load_events(s["path"])
+        ttrs = []
+        msg_lens = []
+        start_ts = None
+        end_ts = None
+        survey_responses = []
+
+        for ev in events:
+            evt = ev.get("event", "")
+            data = ev.get("data", {})
+            ts = ev.get("timestamp", "")
+            if evt == "session_started":
+                start_ts = ts
+            elif evt in ("session_complete", "experiment_end"):
+                end_ts = ts
+            elif evt == "user_message":
+                t = data.get("time_to_reply_ms")
+                if t:
+                    ttrs.append(t / 1000.0)
+                msg_lens.append(len(data.get("content", "")))
+            elif evt == "post_condition_survey_submitted":
+                survey_responses.append(data.get("responses", {}))
+
+        all_ttrs.extend(ttrs)
+        all_msg_lens.extend(msg_lens)
+        if start_ts and end_ts:
+            try:
+                total = (datetime.fromisoformat(end_ts) - datetime.fromisoformat(start_ts)).total_seconds()
+                all_totals.append(total)
+            except Exception:
+                pass
+        all_survey_responses.extend(survey_responses)
+        session_count += 1
+
+    return {
+        "global_avg_ttr": sum(all_ttrs) / len(all_ttrs) if all_ttrs else 5.0,
+        "global_avg_msg_len": sum(all_msg_lens) / len(all_msg_lens) if all_msg_lens else 50,
+        "global_avg_total_time": sum(all_totals) / len(all_totals) if all_totals else 900,
+        "n_sessions": session_count,
+        "all_survey_responses": all_survey_responses,
+    }
+
+
+def compute_session_metrics(events):
+    ttrs = []
+    msg_lens = []
+    start_ts = None
+    end_ts = None
+    cond_times = {}
+    cond_start = {}
+    cond_ad_modes = {}
+    survey_responses = []
+    condition_order = []
+
+    for ev in events:
+        evt = ev.get("event", "")
+        data = ev.get("data", {})
+        ts = ev.get("timestamp", "")
+        if evt == "session_started":
+            start_ts = ts
+        elif evt in ("session_complete", "experiment_end"):
+            end_ts = ts
+        elif evt == "user_message":
+            t = data.get("time_to_reply_ms")
+            if t:
+                ttrs.append(t / 1000.0)
+            msg_lens.append(len(data.get("content", "")))
+        elif evt in ("condition_start", "condition_started"):
+            cid = data.get("condition", "")
+            am = data.get("ad_mode", "")
+            cond_start[cid] = ts
+            cond_ad_modes[cid] = am
+            condition_order.append(cid)
+        elif evt in ("condition_end", "condition_complete"):
+            cid = data.get("condition", "")
+            if cid in cond_start and cond_start[cid] and ts:
+                try:
+                    dur = (datetime.fromisoformat(ts) - datetime.fromisoformat(cond_start[cid])).total_seconds()
+                    cond_times[cid] = dur
+                except Exception:
+                    pass
+        elif evt == "post_condition_survey_submitted":
+            survey_responses.append({"condition": ev.get("ad_mode", ""), "responses": data.get("responses", {})})
+
+    total_time = None
+    if start_ts and end_ts:
+        try:
+            total_time = (datetime.fromisoformat(end_ts) - datetime.fromisoformat(start_ts)).total_seconds()
+        except Exception:
+            pass
+
+    return {
+        "avg_ttr": sum(ttrs) / len(ttrs) if ttrs else 0,
+        "avg_msg_len": sum(msg_lens) / len(msg_lens) if msg_lens else 0,
+        "total_time_sec": total_time or 0,
+        "user_msg_count": len(ttrs),
+        "condition_times": cond_times,
+        "condition_ad_modes": cond_ad_modes,
+        "condition_order": condition_order,
+        "survey_responses": survey_responses,
+    }
+
+
+def compute_discriminative_signals(session, global_stats):
+    signals = []
+
+    if session["avg_ttr"] > 0 and global_stats["global_avg_ttr"] > 0:
+        ratio = session["avg_ttr"] / global_stats["global_avg_ttr"]
+        ttr_str = f"{session['avg_ttr']:.1f}s vs global {global_stats['global_avg_ttr']:.1f}s"
+        if ratio < 0.3:
+            signals.append({"name": "Avg Time-to-Reply", "severity": "bad",
+                           "detail": ttr_str + " | suspiciously fast, likely speedrunning"})
+        elif ratio < 0.7:
+            signals.append({"name": "Avg Time-to-Reply", "severity": "warn",
+                           "detail": ttr_str + " | faster than average"})
+        elif ratio > 2.0:
+            signals.append({"name": "Avg Time-to-Reply", "severity": "warn",
+                           "detail": ttr_str + " | very slow, possible distraction"})
+        else:
+            signals.append({"name": "Avg Time-to-Reply", "severity": "good",
+                           "detail": ttr_str + " | within normal range"})
+
+    if session["avg_msg_len"] > 0 and global_stats["global_avg_msg_len"] > 0:
+        ratio = session["avg_msg_len"] / global_stats["global_avg_msg_len"]
+        if ratio < 0.3:
+            signals.append({"name": "Avg Message Length", "severity": "bad",
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | very short replies, not engaging"})
+        elif ratio < 0.7:
+            signals.append({"name": "Avg Message Length", "severity": "warn",
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | shorter than average"})
+        elif ratio > 2.0:
+            signals.append({"name": "Avg Message Length", "severity": "warn",
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | very verbose"})
+        else:
+            signals.append({"name": "Avg Message Length", "severity": "good",
+                           "detail": f"{session['avg_msg_len']:.0f} chars vs global {global_stats['global_avg_msg_len']:.0f} | normal range"})
+
+    if session["total_time_sec"] > 0 and global_stats["global_avg_total_time"] > 0:
+        ratio = session["total_time_sec"] / global_stats["global_avg_total_time"]
+        if ratio < 0.3:
+            signals.append({"name": "Total Experiment Time", "severity": "bad",
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | extremely short, likely speedrun"})
+        elif ratio < 0.7:
+            signals.append({"name": "Total Experiment Time", "severity": "warn",
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | shorter than average"})
+        elif ratio > 2.0:
+            signals.append({"name": "Total Experiment Time", "severity": "warn",
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | very long session"})
+        else:
+            signals.append({"name": "Total Experiment Time", "severity": "good",
+                           "detail": f"{session['total_time_sec']/60:.1f}min vs global {global_stats['global_avg_total_time']/60:.1f}min | normal range"})
+
+    cond_times = session["condition_times"]
+    if len(cond_times) >= 2:
+        times = list(cond_times.values())
+        if max(times) > 0 and min(times) > 0:
+            ratio = max(times) / min(times)
+            if ratio < 1.1:
+                signals.append({"name": "Condition Duration Variance", "severity": "bad",
+                               "detail": f"All conditions nearly identical ({min(times)/60:.1f}-{max(times)/60:.1f}min) | suspicious, no variation"})
+            elif ratio < 1.5:
+                signals.append({"name": "Condition Duration Variance", "severity": "warn",
+                               "detail": f"Low variation across conditions ({min(times)/60:.1f}-{max(times)/60:.1f}min)"})
+            else:
+                signals.append({"name": "Condition Duration Variance", "severity": "good",
+                               "detail": f"Healthy variation: {', '.join(f'{c}: {t/60:.1f}min' for c, t in cond_times.items())}"})
+
+    responses = session["survey_responses"]
+    if responses:
+        all_ratings = []
+        for r in responses:
+            for k, v in r["responses"].items():
+                try:
+                    all_ratings.append(int(v))
+                except (ValueError, TypeError):
+                    pass
+        if all_ratings:
+            distinct = len(set(all_ratings))
+            if distinct == 1:
+                signals.append({"name": "Survey Response Consistency", "severity": "bad",
+                               "detail": f"All survey responses identical ({all_ratings[0]}/7) | straightlining, likely inattentive"})
+            elif distinct <= 2:
+                signals.append({"name": "Survey Response Consistency", "severity": "warn",
+                               "detail": f"Very low variance | only {distinct} distinct values used across all surveys"})
+            else:
+                signals.append({"name": "Survey Response Consistency", "severity": "good",
+                               "detail": f"Healthy variance | {distinct} distinct values used across surveys"})
+
+    if len(responses) >= 2:
+        ad_scores = {}
+        for r in responses:
+            cond_name = r.get("condition", "")
+            ratings = []
+            for k, v in r["responses"].items():
+                try:
+                    ratings.append(int(v))
+                except (ValueError, TypeError):
+                    pass
+            if ratings:
+                ad_scores[cond_name] = sum(ratings) / len(ratings)
+        no_ads_avg = None
+        ads_avg = None
+        for cond, avg in ad_scores.items():
+            cl = cond.lower()
+            if "no_ads" in cl or "noads" in cl or "no-" in cl:
+                no_ads_avg = avg
+            elif "ads" in cl or "with_ads" in cl or "with-" in cl:
+                ads_avg = avg
+        if no_ads_avg is not None and ads_avg is not None:
+            if no_ads_avg > ads_avg:
+                signals.append({"name": "Ad-Ratings Consistency", "severity": "bad",
+                               "detail": f"No-Ads rated HIGHER ({no_ads_avg:.1f}/7) than Ads ({ads_avg:.1f}/7) | data quality concern"})
+            elif no_ads_avg < ads_avg:
+                signals.append({"name": "Ad-Ratings Consistency", "severity": "good",
+                               "detail": f"Ads rated higher ({ads_avg:.1f}/7) than No-Ads ({no_ads_avg:.1f}/7) | expected pattern"})
+            else:
+                signals.append({"name": "Ad-Ratings Consistency", "severity": "warn",
+                               "detail": f"Both conditions rated identically ({no_ads_avg:.1f}/7) | unusual"})
+
+    return signals
+
+
+def render_signals_dashboard(signals):
+    severity_color = {"bad": "#ff1744", "warn": "#ffab00", "good": "#00e676"}
+
+    bad_count = sum(1 for s in signals if s["severity"] == "bad")
+    warn_count = sum(1 for s in signals if s["severity"] == "warn")
+
+    if bad_count > 0:
+        overall = "bad"
+        overall_label = f"\U000026a0 {bad_count} Critical Issue{'s' if bad_count > 1 else ''} Detected"
+    elif warn_count > 2:
+        overall = "warn"
+        overall_label = f"\U000026a1 {warn_count} Warning Signs"
+    else:
+        overall = "good"
+        overall_label = "\u2705 All Signals Normal"
+
+    oc = severity_color[overall]
+
+    st.markdown(f"""
+    <div style="border:3px solid {oc}; border-radius:16px; padding:0; margin:0 0 20px 0; background:#1a1a1a;">
+        <div style="background:{oc}; color:#000; padding:14px 24px; border-radius:13px 13px 0 0; font-size:22px; font-weight:800; text-align:center;">
+            {overall_label}
+        </div>
+        <div style="padding:12px 16px;">
+    """, unsafe_allow_html=True)
+
+    cols = st.columns(3)
+    for i, sig in enumerate(signals):
+        c = severity_color[sig["severity"]]
+        icon = {"bad": "\U0001f534", "warn": "\U0001f7e1", "good": "\U0001f7e2"}[sig["severity"]]
+        with cols[i % 3]:
+            st.markdown(f"""
+            <div style="background:#252525; border-left:5px solid {c}; border-radius:8px; padding:12px 14px; margin:6px 0;">
+                <div style="color:{c}; font-weight:700; font-size:15px;">{icon} {sig['name']}</div>
+                <div style="color:#ccc; font-size:13px; margin-top:4px;">{sig['detail']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
+
 def render_timeline(events, export_rows):
     turns_data = {}
     conditions = []
@@ -504,4 +778,19 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
 if "events" in st.session_state and st.session_state["events"]:
     st.divider()
     st.subheader(f"📋 Session: {st.session_state.get('session_loaded', '')}")
+
+    with st.spinner("Computing quality signals..."):
+        if "global_stats" not in st.session_state:
+            st.session_state["global_stats"] = compute_global_stats(LOG_DIR)
+        session_metrics = compute_session_metrics(st.session_state["events"])
+        signals = compute_discriminative_signals(session_metrics, st.session_state["global_stats"])
+        render_signals_dashboard(signals)
+        with st.expander("Session Metrics Details"):
+            gs = st.session_state["global_stats"]
+            st.markdown(f"**Global stats** (based on {gs['n_sessions']} sessions): "
+                        f"avg TTR={gs['global_avg_ttr']:.1f}s, "
+                        f"avg msg len={gs['global_avg_msg_len']:.0f} chars, "
+                        f"avg total time={gs['global_avg_total_time']/60:.1f}min")
+            st.json(session_metrics)
+
     render_timeline(st.session_state["events"], st.session_state.get("export_rows", []))
