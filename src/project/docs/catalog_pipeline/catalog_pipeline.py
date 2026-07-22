@@ -52,9 +52,7 @@ CARD = {
     "color": "#B9C2CB",
     "penwidth": "1.0",
 }
-# each card holds an icon plus a 3-line label (operation + resulting artifact),
-# sized so the icon/label group fills the card without the gaps that plagued
-# the original vertical version
+# title + 1–2 detail lines: enough for thesis clarity without the old wall of text
 M = {"width": "2.0", "height": "1.15"}
 
 with Diagram(
@@ -69,26 +67,26 @@ with Diagram(
 ):
 
     with Cluster("Source Dataset", graph_attr=cluster_attr("#E8F0FE", "#A5B8D6")):
-        hf = Custom("HuggingFace Dataset\nmilistu/AMAZON-Products-2023\n117,243 products",
+        hf = Custom("HuggingFace\nmilistu/AMAZON-Products-2023\n117,243 products",
                      os.path.join(RES, "hf.png"), **M, **IMG, **CARD)
 
     with Cluster("Catalog Construction", graph_attr=cluster_attr("#F0F4E8", "#B8C8A0")):
-        filt = Custom("Filter & Remap Fields\nmeta_* categories only\n→ unified item schema",
+        filt = Custom("Filter & Remap\nmeta_* categories",
                        os.path.join(RES, "filter.png"), **M, **IMG, **CARD)
-        dedup = Custom("Deduplicate by item_id\n→ amazon.jsonl\n117,243 items",
+        dedup = Custom("Deduplicate\nby item_id",
                         os.path.join(RES, "dedup.png"), **M, **IMG, **CARD)
         filt >> Edge() >> dedup
 
     with Cluster("Catalog Serialization", graph_attr=cluster_attr("#FDF6E3", "#D8C48F")):
-        merge = Custom("Merge Catalogs\n+ synthetic sources\n→ catalog.jsonl · 117,343 items",
+        merge = Custom("Merge Catalogs\n+ synthetic sources",
                         os.path.join(RES, "merge.png"), **M, **IMG, **CARD)
 
     with Cluster("Embedding Pipeline", graph_attr=cluster_attr("#E8F5E9", "#8FBF92")):
-        embed = Custom("Qwen3-Embedding-0.6B\n1536 dimensions\nbfloat16",
+        embed = Custom("Qwen3 Embedding\n0.6B · 1536-d",
                         os.path.join(RES, "neural.png"), **M, **IMG, **CARD)
 
     with Cluster("Vector Database", graph_attr=cluster_attr("#F3EEF9", "#B0A4CC")):
-        faiss = Custom("faiss.IndexFlatIP\n(inner product)\n→ faiss.index · 459 MB",
+        faiss = Custom("FAISS Index\nFlatIP · 459 MB",
                         os.path.join(RES, "meta.png"), **M, **IMG, **CARD)
 
     hf >> Edge() >> filt
