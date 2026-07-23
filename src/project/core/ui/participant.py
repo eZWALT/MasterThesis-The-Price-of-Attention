@@ -104,10 +104,7 @@ def init_session_state(params):
         from core.modalities.eeg import lsl_sender
         st.session_state.logger._marker_client = lsl_sender()
         if params.study_type == STUDY_TYPE_LAB:
-            import os as _os
-            if not _os.environ.get("LSL_MARKER_OUTLET", "").strip():
-                st.error("Lab sessions require LSL_MARKER_OUTLET env var")
-                st.stop()
+            log.info("Lab session — LSL markers enabled")
 
     if "controller" not in st.session_state:
         ctrl = ExperimentController(

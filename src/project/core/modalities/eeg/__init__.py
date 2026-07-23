@@ -2,7 +2,7 @@
 LSL marker emitter — log-adherent, single-outlet.
 
 Pushes a whitelisted subset of marker events from ExperimentLogger.log() to LSL.
-Outlet name comes from env LSL_MARKER_OUTLET (default: experiment_lab_pilot).
+Outlet name: experiment_lab_pilot (hardcoded).
 
 Usage:
     logger._marker_client = lsl_sender()         # hooks into logger.log()
@@ -57,7 +57,7 @@ def _get_outlet():
     global _outlet
     if _outlet is not None:
         return _outlet
-    name = os.environ.get("LSL_MARKER_OUTLET", "experiment_lab_pilot").strip()
+    name = "experiment_lab_pilot"
     try:
         from pylsl import StreamInfo, StreamOutlet
         info = StreamInfo(
