@@ -4,7 +4,7 @@
 
 set -e
 
-BASE_DIR="$(cd "$(dirname "$0")/production" && pwd)"
+BASE_DIR="$(cd "$(dirname "$0")/../src/project/logs/production" && pwd)"
 
 # Total counter (only used in the summary print, not in arithmetic comparison)
 total_logs=0

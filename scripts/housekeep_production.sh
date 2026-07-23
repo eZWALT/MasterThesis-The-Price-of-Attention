@@ -5,7 +5,7 @@
 
 set -e
 
-BASE_DIR="$(cd "$(dirname "$0")/production" && pwd)"
+BASE_DIR="$(cd "$(dirname "$0")/../src/project/logs/production" && pwd)"
 EXEC=false
 if [[ "${1:-}" == "--exec" ]]; then
     EXEC=true
@@ -37,7 +37,7 @@ for d in "$BASE_DIR"/exp_*/; do
         continue
     fi
     count=$(wc -l < "$events_file")
-    if [[ "$count" -le 2 ]]; then
+    if [[ "$count" -le 6 ]]; then
         if $EXEC; then
             echo "  DELETING  $folder  ($count events)"
             rm -rf "$d"
