@@ -530,7 +530,6 @@ LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)
 
 # ── Marker server (EEG markers — optional, disabled when empty) ─
-LSL_MARKER_OUTLET: str = ""
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐

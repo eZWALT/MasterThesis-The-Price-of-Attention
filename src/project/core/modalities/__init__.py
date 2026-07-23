@@ -9,5 +9,5 @@ sync         : Cross-modality timestamp synchronisation
 
 The EEG module is auto-wired into ExperimentLogger.log() via
 logger._marker_client — every structured log event is also pushed
-to the LSL outlet defined by LSL_MARKER_OUTLET env var.
+to the LSL outlet.
 """

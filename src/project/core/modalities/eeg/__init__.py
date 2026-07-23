@@ -13,7 +13,6 @@ calls are silently ignored — safe to call unconditionally.
 
 from __future__ import annotations
 
-import os
 import re
 
 from core.log import logger as log
