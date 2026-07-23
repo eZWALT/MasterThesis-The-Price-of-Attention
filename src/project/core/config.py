@@ -79,6 +79,9 @@ INLINE_INJECTION_PROMPT = (
     "{products_block}"
 )
 
+# Alias used by injectors (legacy name, kept for compatibility).
+INLINE_INJECTION_PROMPT = INLINE_AD_SYSTEM_PROMPT
+
 # ── 2.3  Conversation context summarizer (Stage 0a, pre-retrieval) ────────
 #         Compresses chat history → one-sentence user-intent.
 #         Placeholder: {history}  (newline-separated "Role: content" lines)
@@ -188,7 +191,6 @@ STUDY_DEFAULTS: dict[str, dict] = {
         "turns_max":   4,
     },
 }
-
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  4.  EXPERIMENT DESIGN                                                  │
@@ -528,9 +530,6 @@ LOG_DIR_DEV: str          = "logs/development"                        # base dir
 LOG_FLUSH_EVERY_N: int    = 25                                    # flush buffer every N events
 LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer timer (seconds)
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)
-
-# ── Marker server (EEG markers — optional, disabled when empty) ─
-
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  11. EXPERIMENT SCREENS  (sequential flow)                              │
