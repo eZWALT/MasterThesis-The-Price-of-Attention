@@ -13,10 +13,11 @@ Sections (in reading order)
   5.  ADVERTISING MODES
   6.  MOCK AD CONTENT
   7.  RETRIEVAL PIPELINE      ← stages 0a → 6, in pipeline order
-  8.  UI
-  9.  LOGGING
- 10.  EXPERIMENT SCREENS
- 11.  CONSENT TEXT
+  8.  ATTENTION SHIFT
+  9.  UI
+ 10.  LOGGING
+ 11.  EXPERIMENT SCREENS
+ 12.  CONSENT TEXT
 """
 
 from __future__ import annotations
@@ -55,14 +56,14 @@ LLM_THINK: bool = os.getenv("LLM_THINK", "false").lower() in ("1", "true", "yes"
 
 # ── 2.1  Conversation base — shown as the system message on every turn ────
 BASE_SYSTEM_PROMPT: str = (
-    "You are a helpful conversational assistant. "
-    "Answer with the shortest response that is still genuinely helpful. "
-    "If the user needs more detail they can ask a follow-up."
+    "You are a helpful, friendly conversational assistant. "
+    "Answer the user's questions clearly, stay on topic, and be concise. "
+    "Do not mention that you are part of an experiment or study."
 )
 
 # ── 2.2  Inline persuasive injection — prepended by InlinePersuasiveInjector
 #         Placeholders: {products_block}
-INLINE_INJECTION_PROMPT = (
+INLINE_AD_SYSTEM_PROMPT = (
     "You are assisting a conversation. "
     "Your primary goal is to provide a helpful and accurate response.\n\n"
     "Answer the user first, then weave in EXACTLY ONE product from the candidate list below.\n"
@@ -178,16 +179,21 @@ STUDY_DEFAULTS: dict[str, dict] = {
     STUDY_TYPE_LAB: {
         "n_trials":    10,
         "bfi_version": "10",
-        "turns_min":   4,
-        "turns_max":   4,
+        "turns_min":   5,
+        "turns_max":   5,
     },
     STUDY_TYPE_CROWD: {
         "n_trials":    10,
         "bfi_version": "10",
-        "turns_min":   4,
-        "turns_max":   4,
+        "turns_min":   5,
+        "turns_max":   5,
     },
 }
+
+# LSL marker outlet stream name.  Required for lab sessions.
+# When empty, LSL markers are silently skipped (safe for crowd / dev).
+# Set via env: LSL_MARKER_OUTLET=experiment_lab_pilot
+LSL_MARKER_OUTLET: str = os.getenv("LSL_MARKER_OUTLET", "").strip()
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
@@ -195,8 +201,8 @@ STUDY_DEFAULTS: dict[str, dict] = {
 # └─────────────────────────────────────────────────────────────────────────┘
 
 TRIALS_PER_SESSION: int    = 10
-MIN_TURNS_PER_TRIAL: int   = 4
-MAX_TURNS_PER_TRIAL: int   = 4
+MIN_TURNS_PER_TRIAL: int   = 5
+MAX_TURNS_PER_TRIAL: int   = 5
 
 # Minimum number of trials a participant must complete before the
 # "Leave study early" button appears in the sidebar.  Participants
@@ -218,11 +224,11 @@ FINISH_BUTTON_VISIBLE_FROM_TURN: int = int(os.getenv("FINISH_BUTTON_VISIBLE_FROM
 AD_INJECTION_TURNS: list[int] = [i for i in range(1, 21)]  # inject ad every turn for dev=flow
 
 BASELINE_DURATION_SECONDS: int = int(os.getenv("BASELINE_DURATION_SECONDS", "30"))
-BASELINE_TITLE: str = "Baseline Period"
+BASELINE_TITLE: str = "Eye-Tracking Baseline"
 BASELINE_INSTRUCTION: str = (
-    "Please sit still, relax, and clear your mind.\n\n"
-    "Breathe normally and try to remain as still as possible. "
-    "This will take about {duration_label}."
+    "Please **look directly at your camera** and try to keep your head still.\n\n"
+    "Relax and breathe normally — this helps us calibrate the eye tracker. "
+    "Recording will take about **{duration_label}**."
 )
 BASELINE_COMPLETE_MESSAGE: str = "✓ Baseline recording complete."
 BASELINE_CONTINUE_LABEL: str = "Continue"
@@ -281,33 +287,6 @@ WARMUP_PROMPT: str = (
     "Talking about life and basics — ask me whatever you like! "
     "This is a casual chat to get comfortable with the assistant."
 )
-
-GOODBYE_MESSAGE: str = (
-    "I hope you enjoyed our conversation as much as I did, "
-    "and that you found something useful along the way. "
-    "See you soon!"
-)
-
-TASK_CONTEXT_WARNING: str = (
-    "🚨 Each conversation is independent! "
-    "In different tasks, responses may be generated using different AI assistant models. "
-    "Please evaluate each interaction separately."
-    "\n\n"
-    "💬 Interact naturally \u2014 engage with the assistant as you normally would. "
-    "Excessively short replies (e.g. spamming \"ok\"), copy-pasting, or other "
-    "artificial behaviour will be flagged."
-    "\n\n"
-    "🚫 Fraudulent or inattentive responses may result in withheld payment."
-)
-
-POST_INJECTION_AWARENESS_PROMPT: str = (
-    "Earlier the user saw: {ad_title} \u2014 {ad_text}\n\n"
-    "If the user brings it up, answer truthfully. "
-    "Otherwise continue normally without mentioning it."
-)
-
-# Backward-compat alias (used by existing imports — will be removed after updating all references)
-AD_AWARENESS_SYSTEM_PROMPT = POST_INJECTION_AWARENESS_PROMPT
 
 # ── Legacy ad-mode mapping (used by ConversationManager & injectors) ──
 AD_BACKEND: str = os.getenv("AD_BACKEND", "rag")
@@ -480,7 +459,16 @@ log_device_map(INTENT_DEVICE, EMBEDDING_DEVICE, RERANKER_DEVICE)
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
-# │  8.  UI                                                                 │
+# │  8.  ATTENTION SHIFT                                                    │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+DEFAULT_DIVERGENCE_METHOD: str = "jsd"
+DEFAULT_N_CONCEPTS: int        = 16
+KL_EPSILON: float              = 1e-10
+
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  9.  UI                                                                 │
 # └─────────────────────────────────────────────────────────────────────────┘
 
 APP_TITLE: str       = "Conversational Assistant"
@@ -512,25 +500,16 @@ SPINNER_ROTATE_MIN_SEC: float = 1.0   # min seconds before switching phrase
 SPINNER_ROTATE_MAX_SEC: float = 3.0   # max seconds before switching phrase
 
 
-# ── 9.  OPTIONAL QUESTION VISIBILITY ─────────────────────────────
-# When False, optional open-ended fields (elaboration text areas in
-# post-condition surveys, demographics) are hidden from participants.
-# Set env SHOW_OPTIONAL=1 to make them visible (no code change needed).
-SHOW_OPTIONAL_QUESTIONS: bool = os.getenv("SHOW_OPTIONAL", "").lower() in ("1", "true", "yes")
-
-
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  10. LOGGING                                                            │
 # └─────────────────────────────────────────────────────────────────────────┘
 
 LOG_DIR: str              = os.getenv("LOG_DIR", "logs/production")   # base dir for JSONL logs (prod)
 LOG_DIR_DEV: str          = "logs/development"                        # base dir for dev/flow logs
+LOG_DIR_CALIBRATION: str  = "logs/calibration"                        # base dir for calibration runs
 LOG_FLUSH_EVERY_N: int    = 25                                    # flush buffer every N events
 LOG_FLUSH_EVERY_S: float  = 60.0                                  # flush buffer timer (seconds)
 DEFAULT_LOG_EXPORT_FILENAME: str = "experiment_log.json"           # legacy (JSON array export)
-
-# ── Marker server (EEG markers — optional, disabled when empty) ─
-LSL_MARKER_OUTLET: str = os.getenv("LSL_MARKER_OUTLET", "")
 
 
 # ┌─────────────────────────────────────────────────────────────────────────┐
@@ -564,15 +543,13 @@ SCREEN_ADS_PERCEPTION:          str = "ads_perception"
 SCREEN_LLM_EVALUATION:          str = "llm_evaluation"
 SCREEN_GODSPEED:                str = "godspeed"
 SCREEN_DECEPTION_DISCLOSURE:    str = "deception_disclosure"
-SCREEN_PROLIFIC_ID:           str = "prolific_id"
-SCREEN_VALIDATION:            str = "validation"
 
 
 # Per-study screens auto-advanced without rendering (extend these frozensets as needed).
 # lab   → full protocol incl. EEG/eye-tracking baseline
 # crowd → remote Prolific-style; no physiology hardware
 STUDY_SKIP_SCREENS: dict[str, frozenset[str]] = {
-    STUDY_TYPE_LAB: frozenset({SCREEN_PROLIFIC_ID, SCREEN_VALIDATION}),
+    STUDY_TYPE_LAB: frozenset(),
     STUDY_TYPE_CROWD: frozenset({SCREEN_BASELINE}),
 }
 

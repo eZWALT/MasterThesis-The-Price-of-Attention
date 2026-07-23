@@ -1,51 +1,49 @@
 """
-LSL marker emitter — log-adherent, single-outlet.
+EEG integration — Lab Stream Layer (LSL) markers for time-locking.
 
-Pushes a whitelisted subset of marker events from ExperimentLogger.log() to LSL.
-Outlet name comes from env LSL_MARKER_OUTLET (default: experiment_lab_pilot).
+Marker protocol
+---------------
+All markers are plain strings pushed as a single-channel sample.
+Naming convention:  `domain:value[:sub_value]`
 
-Usage:
-    logger._marker_client = lsl_sender()         # hooks into logger.log()
+  session:start
+  session:end
 
-Requires: pylsl (pip install pylsl).  If pylsl is unavailable all
-calls are silently ignored — safe to call unconditionally.
+  screen:{screen_name}             — entering a screen
+
+  condition:{id}:start
+  condition:{id}:end
+  condition:{id}:ad_mode:{mode}
+
+  baseline:start
+  baseline:end
+
+  turn:{n}                         — after assistant reply at turn n
+  ad_injected:{n}                  — ad injection at turn n
+
+  survey:{type}:submitted
+
+Usage from participant.py:
+    from core.modalities.eeg import marker
+
+    marker("screen:consent")
+    marker("condition:inline_early:start")
+    marker("survey:ocean:submitted")
+
+Requires:
+  - pylsl (pip install pylsl)
+  - LSL_MARKER_OUTLET env var set (e.g. LSL_MARKER_OUTLET=experiment_lab_pilot)
+
+If either is missing all calls are silently ignored — safe to call unconditionally.
 """
 
 from __future__ import annotations
 
-import os
-import re
+import time
+from typing import Any, Optional
 
-from core.log import logger as log
-
-
-# ── LSL whitelist ────────────────────────────────────────────────────────────
-# Only these events are pushed to LSL. Everything else goes to the JSON log
-# but is filtered out here to keep the EEG marker stream clean.
-
-_LSL_EVENTS: frozenset[str] = frozenset({
-    "baseline_start",
-    "baseline_end",
-    "warmup_start",
-    "warmup_finish",
-    "ad_injected",
-    "condition_conclusion_submitted",       # post_task_questionnaire_start
-    "post_task_questionnaire_end",
-    "experiment_end",
-    "condition_start",
-    "ad_displayed",
-})
-
-_TURN_READ_RE = re.compile(r"^turn_\d+_read$")
-_TURN_WRITE_RE = re.compile(r"^turn_\d+_write$")
-
-
-def _allow_lsl(event: str) -> bool:
-    if event in _LSL_EVENTS:
-        return True
-    if _TURN_READ_RE.match(event) or _TURN_WRITE_RE.match(event):
-        return True
-    return False
+from core.config import LSL_MARKER_OUTLET
+from core.log import logger
 
 
 # ── LSL Outlet (lazy singleton) ──────────────────────────────────────────────
@@ -54,27 +52,36 @@ _outlet = None
 
 
 def _get_outlet():
+    """Lazy-init LSL outlet.
+
+    Returns None (markers silently skipped) when:
+      - ``LSL_MARKER_OUTLET`` env var is empty / unset
+      - ``pylsl`` is not installed
+      - LSL stream creation fails
+    """
     global _outlet
     if _outlet is not None:
         return _outlet
-    name = os.environ.get("LSL_MARKER_OUTLET", "experiment_lab_pilot").strip()
+
+    if not LSL_MARKER_OUTLET:
+        return None
+
     try:
         from pylsl import StreamInfo, StreamOutlet
         info = StreamInfo(
-            name=name,
+            name="ExperimentMarkers",
             type="Markers",
             channel_count=1,
-            nominal_srate=0,
-            channel_format="string",
-            source_id="rag-recsys-experiment-lab",
+            nominal_srate=0,  # irregular rate
+            source_id=LSL_MARKER_OUTLET,
         )
         _outlet = StreamOutlet(info)
-        log.info("[LSL] outlet created: {}", name)
+        logger.info("[EEG] LSL marker outlet created (source_id=%s)", LSL_MARKER_OUTLET)
     except ImportError:
-        log.warning("[LSL] pylsl not installed — markers disabled")
+        logger.warning("[EEG] pylsl not installed — markers disabled")
         _outlet = None
     except Exception as e:
-        log.warning("[LSL] outlet creation failed: {}", e)
+        logger.warning("[EEG] LSL outlet creation failed: {}", e)
         _outlet = None
     return _outlet
 
@@ -82,24 +89,63 @@ def _get_outlet():
 # ── Core marker emission ─────────────────────────────────────────────────────
 
 def marker(label: str) -> None:
-    """Push a string marker to LSL."""
+    """Push a single string marker to LSL.
+
+    Idempotent, non-blocking, best-effort.  Safe to call even when
+    pylsl is not installed — returns silently.
+    """
     outlet = _get_outlet()
     if outlet:
         outlet.push_sample([label])
 
 
-def lsl_sender() -> object:
-    """Return a duck-typed sender compatible with ExperimentLogger._marker_client.
+# ── Convenience helpers ──────────────────────────────────────────────────────
 
-    Only events in the LSL whitelist (see _LSL_EVENTS) are pushed to the outlet.
+def screen_marker(screen_name: str) -> None:
+    """Send a screen-entry marker (e.g. 'screen:consent')."""
+    marker(f"screen:{screen_name}")
+
+
+def condition_marker(condition_id: str, action: str, ad_mode: str = "") -> None:
+    """Send a condition lifecycle marker.
+
+    action: "start" | "end"
     """
-    _get_outlet()
-    marker("dummy_start")
+    marker(f"condition:{condition_id}:{action}")
+    if ad_mode:
+        marker(f"condition:{condition_id}:ad_mode:{ad_mode}")
 
-    class _Sender:
-        @staticmethod
-        def send(event: str, **kwargs) -> None:
-            if _allow_lsl(event):
-                marker(event)
 
-    return _Sender()
+def survey_marker(survey_type: str) -> None:
+    """Send a survey-submission marker (e.g. 'survey:ocean:submitted')."""
+    marker(f"survey:{survey_type}:submitted")
+
+
+def session_marker(action: str) -> None:
+    """Send a session lifecycle marker.
+
+    action: "start" | "end"
+    """
+    marker(f"session:{action}")
+
+
+def baseline_marker(action: str) -> None:
+    """Send a baseline lifecycle marker.
+
+    action: "start" | "end"
+    """
+    marker(f"baseline:{action}")
+
+
+# ── Modality hook (registered with ConversationManager) ─────────────────────
+
+def eeg_turn_hook(turn: int, ad_injected: bool, ad: Any) -> None:
+    """
+    Called in thread pool after each LLM turn.
+
+    Emits LSL markers that EEG recording software (BrainVision, OpenBCI,
+    etc.) can time-lock to neural data for epoch extraction.
+    """
+    marker(f"turn:{turn}")
+    if ad_injected:
+        marker(f"ad_injected:{turn}")
