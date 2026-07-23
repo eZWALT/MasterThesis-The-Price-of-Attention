@@ -88,7 +88,7 @@ from core.ui.screens import (
 def init_session_state(params):
     """Ensure every expected key exists in st.session_state."""
     if "logger" not in st.session_state:
-        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S
+        from core.config import LOG_DIR, LOG_DIR_DEV, LOG_FLUSH_EVERY_N, LOG_FLUSH_EVERY_S, STUDY_TYPE_LAB
         if params.dev_mode or params.flow_test:
             log_dir = LOG_DIR_DEV
         else:
@@ -103,6 +103,7 @@ def init_session_state(params):
         )
         from core.modalities.eeg import lsl_sender
         st.session_state.logger._marker_client = lsl_sender()
+    if "controller" not in st.session_state:
         ctrl = ExperimentController(
             participant_id=st.session_state.logger.participant_id,
             tasks=params.tasks,

@@ -245,7 +245,6 @@ class ExperimentParams:
     use_rag: Optional[bool] = None          # ?rag=0 → force mock  |  ?rag=1 → force RAG
     dry_run: bool = False                   # ?dry_run=1 → mock LLM + mock ads, zero cost
     webcam_enabled: bool = False
-    lsl_outlet_name: str = ""            # LSL outlet name (e.g. "experiment_lab_pilot") for EEG markers
     start_typing_marker: bool = False    # ?start_typing=1  → two-phase start-writing trigger
 
     def apply_study_defaults(self, explicitly_set: set) -> None:
@@ -444,15 +443,6 @@ def parse_query_params() -> ExperimentParams:
     # ── Start-typing marker ──────────────────────────────────
     typing_raw = p.get("start_typing", "").strip().lower()
     params.start_typing_marker = typing_raw in ("1", "true", "yes")
-
-    # ── LSL marker outlet ─────────────────────────────────────
-    # Hardcoded: study=lab → "experiment_lab_pilot", otherwise empty.
-    # Override via URL: ?lsl=<name>
-    lsl_raw = p.get("lsl", "").strip()
-    if lsl_raw:
-        params.lsl_outlet_name = lsl_raw
-    elif params.study_type == "lab":
-        params.lsl_outlet_name = "experiment_lab_pilot"
 
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:
