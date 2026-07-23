@@ -5,7 +5,7 @@ Owns the multi-turn conversation state and orchestrates the
 per-turn pipeline:
 
     user message → system prompt → (ad overrides) → LLM call
-    → assistant reply → post-response ad injection → intent tracking
+    → assistant reply → post-response ad injection → attention shift
 
 Design principles (from paper §6.1):
   - A *fixed* base system prompt ensures cross-participant consistency.
@@ -22,7 +22,7 @@ from __future__ import annotations
 import hashlib
 import time
 import uuid
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, Future
 from datetime import datetime
 from typing import List, Dict, Optional, Callable, Any, Generator
 from dataclasses import dataclass
@@ -37,6 +37,11 @@ from core.config import (
 )
 from core.ad_injection import get_ad, get_injector
 from core.ad_injection.models import Ad, AdRetrievalResult, InjectionResult
+from core.attention_shift import (
+    compute_attention_shift,
+    AttentionShiftResult,
+    AttentionEstimator,
+)
 from core.logger.payload import build_retrieval_log_data, compact_event_data
 from core.logger import ExperimentLogger
 from core.experiment.tasks import TaskDefinition
@@ -56,6 +61,7 @@ class TurnMetrics:
     ad_injected: bool                        # was an ad injected this turn?
     ad_title: Optional[str] = None           # ad title if injected
     ad_relevance_score: Optional[float] = None  # retrieval relevance score
+    attention_divergence: Optional[float] = None  # attention shift KL
     time_to_reply_ms: Optional[float] = None  # user delay since last assistant msg (set by UI)
     intent_label: str = ""                   # ThradBERT intent classification for this turn
     continued: bool = True                   # did the user send another message after this turn?
@@ -69,12 +75,13 @@ class TurnResult:
     turn_number: int = 0
     can_end: bool = False
     must_end: bool = False
+    attention_shift: Optional[AttentionShiftResult] = None
     error: Optional[str] = None
 
 
 # ── Shared thread pool for CPU-bound post-turn work ───────────
-# Used for BERT intent classification and future modality processing
-# (EEG markers, eye-tracking AOI, etc.).
+# Used for BERT intent classification, attention shift, and future
+# modality processing (EEG markers, eye-tracking AOI, etc.).
 # Daemon threads — die with main. Max 4 workers for CPU tasks.
 _CPU_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="turn-cpu")
 
@@ -94,6 +101,7 @@ class ConversationManager:
     task : optional task definition for this trial.
     llm_client : LLM backend client instance.
     logger : experiment logger instance.
+    attention_estimator : optional custom estimator for P(Z|C).
     """
 
     def __init__(
@@ -105,6 +113,7 @@ class ConversationManager:
         task: Optional[TaskDefinition] = None,
         llm_client: LLMClient | None = None,
         logger: ExperimentLogger | None = None,
+        attention_estimator: AttentionEstimator | None = None,
         min_turns: int = MIN_TURNS_PER_TRIAL,
         max_turns: int = MAX_TURNS_PER_TRIAL,
         finish_from: int | None = None,
@@ -112,7 +121,6 @@ class ConversationManager:
         force_ad: bool = False,
         use_rag: Optional[bool] = None,
         dry_run: bool = False,
-        log_turn_markers: bool = True,
     ):
         self.ad_mode = ad_mode
         self.model = model
@@ -120,9 +128,9 @@ class ConversationManager:
         self.max_tokens = max_tokens
         self.task = task
         self.dry_run = dry_run
-        self._log_turn_markers = log_turn_markers
         self.llm = llm_client or LLMClient(mock=dry_run)
         self.logger = logger or ExperimentLogger(log_dir=LOG_DIR)
+        self.attention_estimator = attention_estimator
         self.min_turns = min_turns
         self.max_turns = max_turns
         self.finish_from: int = finish_from if finish_from is not None else FINISH_BUTTON_VISIBLE_FROM_TURN
@@ -142,12 +150,8 @@ class ConversationManager:
         self.turn_metrics: List[TurnMetrics] = []
         self.ad_turns_actual: List[int] = []          # turns where ads were actually injected
         self.ads_by_turn: Dict[int, List[Ad]] = {}    # candidates shown per injection turn
-        self._ad_displayed_logged: bool = False       # guard for ad_displayed LSL marker
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
-        self._ad_awareness_override: List[Dict[str, str]] = []  # persistent after ad injection
-        # Snapshot of injected ad + pipeline info at injection time (for ad recall survey).
-        self._injected_ad_info: Optional[Dict[str, Any]] = None
         # ── Intent tracking (ThradBERT, paper §RQ3) ──────────
         # initial_intent: classified from task prompt at conversation start
         # per-turn intent: classified each turn from compact context
@@ -179,15 +183,6 @@ class ConversationManager:
         """Active ad backend override (mock/rag), or None for config default."""
         return self._ad_backend
 
-    @property
-    def injected_ad_info(self) -> dict | None:
-        """Snapshot of the injected ad + pipeline info (set at injection turn).
-
-        Returns None if no ad has been injected yet.  Used by participant.py
-        to build the ad_info dict for the recall survey at condition end.
-        """
-        return self._injected_ad_info
-
     # ── Modality Registration ─────────────────────────────────
 
     def register_modality_hook(self, hook: Callable[[int, bool, Any], None]) -> None:
@@ -195,7 +190,7 @@ class ConversationManager:
         Register a callback for parallel post-turn processing.
 
         Hooks run in the CPU thread pool AFTER the LLM reply is ready,
-        in parallel with intent classification.
+        in parallel with attention shift and intent classification.
 
         Signature: hook(turn: int, ad_injected: bool, ad: Ad | None)
 
@@ -321,11 +316,13 @@ class ConversationManager:
         Steps:
           1. Enforce turn limit
           2. Record user message
-          3. Determine ad injection
-          4. Call LLM (system prompt + ad overrides + conversation)
-          5. Record assistant reply
-          6. Post-response injection (in-chat ads)
-          7. Fire modality hooks
+          3. Snapshot C_pre
+          4. Determine ad injection
+          5. Call LLM (system prompt + ad overrides + conversation)
+          6. Record assistant reply
+          7. Post-response injection (in-chat ads)
+          8. Snapshot C_post
+          9. Compute attention shift
         """
         # 1 — enforce limit
         if self.must_end:
@@ -347,11 +344,6 @@ class ConversationManager:
         self.messages.append({"role": "user", "content": user_input})
         current_turn = self.turn_count
         self.logger.log(
-            "user_starts_typing",
-            {"time_to_reply_ms": time_to_reply_ms},
-            turn=current_turn,
-        )
-        self.logger.log(
             "user_message",
             compact_event_data(
                 {
@@ -367,7 +359,10 @@ class ConversationManager:
             turn=current_turn,
         )
 
-        # 3 — intent (ThradBERT) before retrieval so JSONL retrieval rows carry intent_label
+        # 3 — pre-ad snapshot
+        C_pre = list(self.messages)
+
+        # 3b — intent (ThradBERT) before retrieval so JSONL retrieval rows carry intent_label
         turn_intent = self._classify_turn_intent(user_input)
         self.intent_history.append(turn_intent)
         self.logger.log(
@@ -422,34 +417,6 @@ class ConversationManager:
         )
         self.last_injection = injection
 
-        # 4a.1 — persist ad awareness for all subsequent turns
-        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
-            from core.config import POST_INJECTION_AWARENESS_PROMPT as AD_AWARENESS_SYSTEM_PROMPT
-            awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
-                ad_title=retrieval.primary.title,
-                ad_text=retrieval.primary.text[:300],
-            )
-            self._ad_awareness_override = [
-                {"role": "system", "content": awareness}
-            ]
-            # Snapshot ad content + pipeline info for ad recall survey
-            self._injected_ad_info = {
-                "title": retrieval.primary.title,
-                "text": retrieval.primary.text,
-                "cta": retrieval.primary.cta,
-                "question": retrieval.primary.question,
-                "source_item_id": retrieval.primary.source_item_id,
-                "relevance_score": retrieval.primary.relevance_score,
-                "ad_mode": self.ad_mode,
-                "ad_turn": current_turn,
-                "query": user_input,
-                "intent_label": turn_intent,
-                "retrieval_backend": self._ad_backend or "default",
-                "retrieval_latency_ms": round(retrieval_latency_ms, 1),
-                "candidate_count": len(retrieval.ads) if retrieval.ads else 0,
-                "candidate_titles": [a.title for a in retrieval.ads] if retrieval.ads else [],
-            }
-
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
@@ -471,20 +438,11 @@ class ConversationManager:
                 source="system",
                 turn=current_turn,
             )
-            self.logger.log(
-                "ad_inserted",
-                {"turn": current_turn},
-                turn=current_turn,
-            )
 
         # 5 — LLM call (timed)
         llm_t0 = time.perf_counter()
         assistant_reply = self._call_llm(injection.system_overrides)
         llm_latency_ms = (time.perf_counter() - llm_t0) * 1000.0
-
-        if inject_ad and retrieval and retrieval.primary and not self.dry_run and not self._ad_displayed_logged:
-            self._ad_displayed_logged = True
-            self.logger.log("ad_displayed", {"turn": current_turn}, turn=current_turn)
 
         # 6 — record assistant reply
         self.messages.append({"role": "assistant", "content": assistant_reply})
@@ -508,23 +466,40 @@ class ConversationManager:
             source="model",
             turn=current_turn,
         )
-        if self._log_turn_markers:
-            self.logger.log(
-                f"turn_{current_turn}_read",
-                {"turn": current_turn},
-                turn=current_turn,
-            )
 
         # 7 — record ad injection turn (display handled via InjectionResult, not chat append)
         if inject_ad and retrieval and retrieval.primary:
             self.ad_turns_actual.append(current_turn)
             self.ads_by_turn[current_turn] = list(retrieval.ads)
 
-        # 8 — fire modality hooks in parallel (non-blocking, best-effort)
+        # 8 — post-ad snapshot
+        C_post = list(self.messages)
+
+        # 9 — PARALLEL: attention shift (CPU-bound; non-blocking for Streamlit)
+        shift_future: Future = _CPU_POOL.submit(
+            compute_attention_shift, C_pre, C_post, self.attention_estimator
+        )
+        # Fire modality hooks in parallel (non-blocking, best-effort)
         for hook in self._modality_hooks:
             _CPU_POOL.submit(hook, current_turn, inject_ad, retrieval.primary if retrieval else None)
 
-        # 9 — record per-turn metrics for offline analysis
+        # Collect parallel results
+        shift = shift_future.result()
+
+        # Log attention shift (after result is ready)
+        self.logger.log(
+            "attention_shift",
+            compact_event_data(
+                {"divergence": shift.divergence, "method": shift.method},
+                turn=current_turn,
+            ),
+            self.ad_mode,
+            self.conversation_id,
+            source="system",
+            turn=current_turn,
+        )
+
+        # 11 — record per-turn metrics for offline analysis
         metrics = TurnMetrics(
             turn=current_turn,
             user_msg_len=len(user_input),
@@ -533,6 +508,7 @@ class ConversationManager:
             ad_injected=inject_ad and bool(retrieval and retrieval.has_ads),
             ad_title=retrieval.primary.title if (inject_ad and retrieval and retrieval.primary) else None,
             ad_relevance_score=retrieval.primary.relevance_score if (inject_ad and retrieval and retrieval.primary) else None,
+            attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
             intent_label=turn_intent,
             continued=True,
@@ -545,6 +521,7 @@ class ConversationManager:
             turn_number=current_turn,
             can_end=self.can_end,
             must_end=self.must_end,
+            attention_shift=shift,
         )
 
     def process_user_message_stream(self, user_input: str) -> Generator[str, None, None]:
@@ -553,7 +530,7 @@ class ConversationManager:
 
         Yields tokens as the LLM generates them.  After the generator
         exhausts, self.messages contains the new assistant reply and
-        all post-processing (intent tracking, metrics, logging) has
+        all post-processing (attention shift, metrics, logging) has
         been completed.
 
         Callers must iterate the generator to drive the pipeline
@@ -573,11 +550,6 @@ class ConversationManager:
         self.messages.append({"role": "user", "content": user_input})
         current_turn = self.turn_count
         self.logger.log(
-            "user_starts_typing",
-            {"time_to_reply_ms": time_to_reply_ms},
-            turn=current_turn,
-        )
-        self.logger.log(
             "user_message",
             compact_event_data(
                 {
@@ -593,7 +565,10 @@ class ConversationManager:
             turn=current_turn,
         )
 
-        # 3 — intent classification
+        # 3 — pre-ad snapshot
+        C_pre = list(self.messages)
+
+        # 3b — intent classification
         turn_intent = self._classify_turn_intent(user_input)
         self.intent_history.append(turn_intent)
         self.logger.log(
@@ -648,34 +623,6 @@ class ConversationManager:
         )
         self.last_injection = injection
 
-        # 4a.1 — persist ad awareness for all subsequent turns
-        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
-            from core.config import POST_INJECTION_AWARENESS_PROMPT as AD_AWARENESS_SYSTEM_PROMPT
-            awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
-                ad_title=retrieval.primary.title,
-                ad_text=retrieval.primary.text[:300],
-            )
-            self._ad_awareness_override = [
-                {"role": "system", "content": awareness}
-            ]
-            # Snapshot ad content + pipeline info for ad recall survey
-            self._injected_ad_info = {
-                "title": retrieval.primary.title,
-                "text": retrieval.primary.text,
-                "cta": retrieval.primary.cta,
-                "question": retrieval.primary.question,
-                "source_item_id": retrieval.primary.source_item_id,
-                "relevance_score": retrieval.primary.relevance_score,
-                "ad_mode": self.ad_mode,
-                "ad_turn": current_turn,
-                "query": user_input,
-                "intent_label": turn_intent,
-                "retrieval_backend": self._ad_backend or "default",
-                "retrieval_latency_ms": round(retrieval_latency_ms, 1),
-                "candidate_count": len(retrieval.ads) if retrieval.ads else 0,
-                "candidate_titles": [a.title for a in retrieval.ads] if retrieval.ads else [],
-            }
-
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
@@ -697,21 +644,16 @@ class ConversationManager:
                 source="system",
                 turn=current_turn,
             )
-            self.logger.log("ad_inserted", {"turn": current_turn}, turn=current_turn)
 
         # 5 — LLM call (streaming)
         system_msg = {"role": "system", "content": self._system_prompt}
-        all_overrides = list(injection.system_overrides) + list(self._ad_awareness_override)
-        msgs = [system_msg] + all_overrides + list(self.messages)
+        msgs = [system_msg] + injection.system_overrides + list(self.messages)
 
         llm_t0 = time.perf_counter()
         assistant_reply_parts: list[str] = []
         try:
             for chunk in self.llm.chat_stream(msgs, self.model, self.temperature, self.max_tokens):
                 assistant_reply_parts.append(chunk)
-                if inject_ad and not self._ad_displayed_logged:
-                    self._ad_displayed_logged = True
-                    self.logger.log("ad_displayed", {"turn": current_turn}, turn=current_turn)
                 yield chunk
         except RuntimeError as e:
             error_text = f"⚠️ {e}"
@@ -743,21 +685,35 @@ class ConversationManager:
             source="model",
             turn=current_turn,
         )
-        if self._log_turn_markers:
-            self.logger.log(
-                f"turn_{current_turn}_read",
-                {"turn": current_turn},
-                turn=current_turn,
-            )
 
         # 7 — record ad injection turn
         if inject_ad and retrieval and retrieval.primary:
             self.ad_turns_actual.append(current_turn)
             self.ads_by_turn[current_turn] = list(retrieval.ads)
 
-        # 8 — fire modality hooks in parallel (non-blocking, best-effort)
+        # 8 — post-ad snapshot
+        C_post = list(self.messages)
+
+        # 9 — attention shift (CPU-bound)
+        shift_future: Future = _CPU_POOL.submit(
+            compute_attention_shift, C_pre, C_post, self.attention_estimator
+        )
         for hook in self._modality_hooks:
             _CPU_POOL.submit(hook, current_turn, inject_ad, retrieval.primary if retrieval else None)
+
+        shift = shift_future.result()
+
+        self.logger.log(
+            "attention_shift",
+            compact_event_data(
+                {"divergence": shift.divergence, "method": shift.method},
+                turn=current_turn,
+            ),
+            self.ad_mode,
+            self.conversation_id,
+            source="system",
+            turn=current_turn,
+        )
 
         metrics = TurnMetrics(
             turn=current_turn,
@@ -767,6 +723,7 @@ class ConversationManager:
             ad_injected=inject_ad and bool(retrieval and retrieval.has_ads),
             ad_title=retrieval.primary.title if (inject_ad and retrieval and retrieval.primary) else None,
             ad_relevance_score=retrieval.primary.relevance_score if (inject_ad and retrieval and retrieval.primary) else None,
+            attention_divergence=shift.divergence if shift else None,
             time_to_reply_ms=round(time_to_reply_ms, 1) if time_to_reply_ms is not None else None,
             intent_label=turn_intent,
             continued=True,
@@ -840,8 +797,6 @@ class ConversationManager:
         self.last_retrieval = None
         self.last_injection = InjectionResult()
         self.last_retrieval_ad_mode = None
-        self._ad_awareness_override = []
-        self._injected_ad_info = None
 
     def apply_ad_mode(self, ad_mode: str) -> None:
         """Switch injection style (dev flow); clears stale ads if the mode changed."""
@@ -862,11 +817,10 @@ class ConversationManager:
         """
         Build the full message list and call the LLM.
 
-        Order: system prompt → ad overrides → persistent ad awareness → conversation history.
+        Order: system prompt → ad overrides → conversation history.
         """
         system_msg = {"role": "system", "content": self._system_prompt}
-        all_overrides = list(system_overrides) + list(self._ad_awareness_override)
-        msgs = [system_msg] + all_overrides + list(self.messages)
+        msgs = [system_msg] + system_overrides + list(self.messages)
         try:
             return self.llm.chat(msgs, self.model, self.temperature, self.max_tokens)
         except RuntimeError as e:

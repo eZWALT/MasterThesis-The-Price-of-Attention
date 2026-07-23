@@ -19,17 +19,13 @@ import re
 from core.log import logger as log
 
 
-# ── LSL whitelist ────────────────────────────────────────────────────────────
-# Only these events are pushed to LSL. Everything else goes to the JSON log
-# but is filtered out here to keep the EEG marker stream clean.
-
 _LSL_EVENTS: frozenset[str] = frozenset({
     "baseline_start",
     "baseline_end",
     "warmup_start",
     "warmup_finish",
     "ad_injected",
-    "condition_conclusion_submitted",       # post_task_questionnaire_start
+    "condition_conclusion_submitted",
     "post_task_questionnaire_end",
     "experiment_end",
     "condition_start",
@@ -47,8 +43,6 @@ def _allow_lsl(event: str) -> bool:
         return True
     return False
 
-
-# ── LSL Outlet (lazy singleton) ──────────────────────────────────────────────
 
 _outlet = None
 
@@ -79,20 +73,35 @@ def _get_outlet():
     return _outlet
 
 
-# ── Core marker emission ─────────────────────────────────────────────────────
-
 def marker(label: str) -> None:
-    """Push a string marker to LSL."""
     outlet = _get_outlet()
     if outlet:
         outlet.push_sample([label])
 
 
-def lsl_sender() -> object:
-    """Return a duck-typed sender compatible with ExperimentLogger._marker_client.
+def screen_marker(screen_name: str) -> None:
+    marker(f"screen:{screen_name}")
 
-    Only events in the LSL whitelist (see _LSL_EVENTS) are pushed to the outlet.
-    """
+
+def condition_marker(condition_id: str, action: str, ad_mode: str = "") -> None:
+    marker(f"condition:{condition_id}:{action}")
+    if ad_mode:
+        marker(f"condition:{condition_id}:ad_mode:{ad_mode}")
+
+
+def survey_marker(survey_type: str) -> None:
+    marker(f"survey:{survey_type}:submitted")
+
+
+def session_marker(action: str) -> None:
+    marker(f"session:{action}")
+
+
+def baseline_marker(action: str) -> None:
+    marker(f"baseline:{action}")
+
+
+def lsl_sender() -> object:
     _get_outlet()
     marker("dummy_start")
 
