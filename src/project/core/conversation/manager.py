@@ -73,8 +73,8 @@ class TurnResult:
 
 
 # ── Shared thread pool for CPU-bound post-turn work ───────────
-# Used for BERT intent classification, attention shift, and future
-# modality processing (EEG markers, eye-tracking AOI, etc.).
+# Used for BERT intent classification and future modality processing
+# (EEG markers, eye-tracking AOI, etc.).
 # Daemon threads — die with main. Max 4 workers for CPU tasks.
 _CPU_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="turn-cpu")
 
@@ -112,6 +112,7 @@ class ConversationManager:
         force_ad: bool = False,
         use_rag: Optional[bool] = None,
         dry_run: bool = False,
+        log_turn_markers: bool = True,
     ):
         self.ad_mode = ad_mode
         self.model = model
@@ -119,6 +120,7 @@ class ConversationManager:
         self.max_tokens = max_tokens
         self.task = task
         self.dry_run = dry_run
+        self._log_turn_markers = log_turn_markers
         self.llm = llm_client or LLMClient(mock=dry_run)
         self.logger = logger or ExperimentLogger(log_dir=LOG_DIR)
         self.min_turns = min_turns
@@ -142,6 +144,9 @@ class ConversationManager:
         self.ads_by_turn: Dict[int, List[Ad]] = {}    # candidates shown per injection turn
         self.trial_start_ts: str = datetime.now().isoformat()
         self._last_assistant_ts: Optional[float] = None  # perf_counter of last assistant reply
+        self._ad_awareness_override: List[Dict[str, str]] = []  # persistent after ad injection
+        # Snapshot of injected ad + pipeline info at injection time (for ad recall survey).
+        self._injected_ad_info: Optional[Dict[str, Any]] = None
         # ── Intent tracking (ThradBERT, paper §RQ3) ──────────
         # initial_intent: classified from task prompt at conversation start
         # per-turn intent: classified each turn from compact context
@@ -173,6 +178,15 @@ class ConversationManager:
         """Active ad backend override (mock/rag), or None for config default."""
         return self._ad_backend
 
+    @property
+    def injected_ad_info(self) -> dict | None:
+        """Snapshot of the injected ad + pipeline info (set at injection turn).
+
+        Returns None if no ad has been injected yet.  Used by participant.py
+        to build the ad_info dict for the recall survey at condition end.
+        """
+        return self._injected_ad_info
+
     # ── Modality Registration ─────────────────────────────────
 
     def register_modality_hook(self, hook: Callable[[int, bool, Any], None]) -> None:
@@ -180,7 +194,7 @@ class ConversationManager:
         Register a callback for parallel post-turn processing.
 
         Hooks run in the CPU thread pool AFTER the LLM reply is ready,
-        in parallel with attention shift and intent classification.
+        in parallel with intent classification.
 
         Signature: hook(turn: int, ad_injected: bool, ad: Ad | None)
 
@@ -310,6 +324,7 @@ class ConversationManager:
           4. Call LLM (system prompt + ad overrides + conversation)
           5. Record assistant reply
           6. Post-response injection (in-chat ads)
+          7. Fire modality hooks
         """
         # 1 — enforce limit
         if self.must_end:
@@ -401,6 +416,34 @@ class ConversationManager:
         )
         self.last_injection = injection
 
+        # 4a.1 — persist ad awareness for all subsequent turns
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
+            from core.config import AD_AWARENESS_SYSTEM_PROMPT
+            awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
+                ad_title=retrieval.primary.title,
+                ad_text=retrieval.primary.text[:300],
+            )
+            self._ad_awareness_override = [
+                {"role": "system", "content": awareness}
+            ]
+            # Snapshot ad content + pipeline info for ad recall survey
+            self._injected_ad_info = {
+                "title": retrieval.primary.title,
+                "text": retrieval.primary.text,
+                "cta": retrieval.primary.cta,
+                "question": retrieval.primary.question,
+                "source_item_id": retrieval.primary.source_item_id,
+                "relevance_score": retrieval.primary.relevance_score,
+                "ad_mode": self.ad_mode,
+                "ad_turn": current_turn,
+                "query": user_input,
+                "intent_label": turn_intent,
+                "retrieval_backend": self._ad_backend or "default",
+                "retrieval_latency_ms": round(retrieval_latency_ms, 1),
+                "candidate_count": len(retrieval.ads) if retrieval.ads else 0,
+                "candidate_titles": [a.title for a in retrieval.ads] if retrieval.ads else [],
+            }
+
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
@@ -489,7 +532,7 @@ class ConversationManager:
 
         Yields tokens as the LLM generates them.  After the generator
         exhausts, self.messages contains the new assistant reply and
-        all post-processing (metrics, logging) has
+        all post-processing (intent tracking, metrics, logging) has
         been completed.
 
         Callers must iterate the generator to drive the pipeline
@@ -579,6 +622,34 @@ class ConversationManager:
         )
         self.last_injection = injection
 
+        # 4a.1 — persist ad awareness for all subsequent turns
+        if inject_ad and retrieval and retrieval.primary and not self.dry_run:
+            from core.config import AD_AWARENESS_SYSTEM_PROMPT
+            awareness = AD_AWARENESS_SYSTEM_PROMPT.format(
+                ad_title=retrieval.primary.title,
+                ad_text=retrieval.primary.text[:300],
+            )
+            self._ad_awareness_override = [
+                {"role": "system", "content": awareness}
+            ]
+            # Snapshot ad content + pipeline info for ad recall survey
+            self._injected_ad_info = {
+                "title": retrieval.primary.title,
+                "text": retrieval.primary.text,
+                "cta": retrieval.primary.cta,
+                "question": retrieval.primary.question,
+                "source_item_id": retrieval.primary.source_item_id,
+                "relevance_score": retrieval.primary.relevance_score,
+                "ad_mode": self.ad_mode,
+                "ad_turn": current_turn,
+                "query": user_input,
+                "intent_label": turn_intent,
+                "retrieval_backend": self._ad_backend or "default",
+                "retrieval_latency_ms": round(retrieval_latency_ms, 1),
+                "candidate_count": len(retrieval.ads) if retrieval.ads else 0,
+                "candidate_titles": [a.title for a in retrieval.ads] if retrieval.ads else [],
+            }
+
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
@@ -603,7 +674,8 @@ class ConversationManager:
 
         # 5 — LLM call (streaming)
         system_msg = {"role": "system", "content": self._system_prompt}
-        msgs = [system_msg] + injection.system_overrides + list(self.messages)
+        all_overrides = list(injection.system_overrides) + list(self._ad_awareness_override)
+        msgs = [system_msg] + all_overrides + list(self.messages)
 
         llm_t0 = time.perf_counter()
         assistant_reply_parts: list[str] = []
@@ -732,6 +804,8 @@ class ConversationManager:
         self.last_retrieval = None
         self.last_injection = InjectionResult()
         self.last_retrieval_ad_mode = None
+        self._ad_awareness_override = []
+        self._injected_ad_info = None
 
     def apply_ad_mode(self, ad_mode: str) -> None:
         """Switch injection style (dev flow); clears stale ads if the mode changed."""
@@ -752,10 +826,11 @@ class ConversationManager:
         """
         Build the full message list and call the LLM.
 
-        Order: system prompt → ad overrides → conversation history.
+        Order: system prompt → ad overrides → persistent ad awareness → conversation history.
         """
         system_msg = {"role": "system", "content": self._system_prompt}
-        msgs = [system_msg] + system_overrides + list(self.messages)
+        all_overrides = list(system_overrides) + list(self._ad_awareness_override)
+        msgs = [system_msg] + all_overrides + list(self.messages)
         try:
             return self.llm.chat(msgs, self.model, self.temperature, self.max_tokens)
         except RuntimeError as e:
