@@ -79,8 +79,6 @@ INLINE_INJECTION_PROMPT = (
     "{products_block}"
 )
 
-# Alias used by injectors (legacy name, kept for compatibility).
-INLINE_INJECTION_PROMPT = INLINE_AD_SYSTEM_PROMPT
 
 # ── 2.3  Conversation context summarizer (Stage 0a, pre-retrieval) ────────
 #         Compresses chat history → one-sentence user-intent.
