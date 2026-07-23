@@ -150,7 +150,6 @@ from typing import List, Optional
 import streamlit as st
 
 from core.config import (
-    LSL_MARKER_OUTLET,
     AD_MODES,
     DEFAULT_MODEL,
     DEFAULT_STUDY_TYPE,
@@ -447,11 +446,13 @@ def parse_query_params() -> ExperimentParams:
     params.start_typing_marker = typing_raw in ("1", "true", "yes")
 
     # ── LSL marker outlet ─────────────────────────────────────
+    # Hardcoded: study=lab → "experiment_lab_pilot", otherwise empty.
+    # Override via URL: ?lsl=<name>
     lsl_raw = p.get("lsl", "").strip()
     if lsl_raw:
         params.lsl_outlet_name = lsl_raw
-    else:
-        params.lsl_outlet_name = LSL_MARKER_OUTLET
+    elif params.study_type == "lab":
+        params.lsl_outlet_name = "experiment_lab_pilot"
 
     # ── Dev-only overrides (silently ignored outside dev mode) ────────────
     if params.dev_mode or params.flow_test:
