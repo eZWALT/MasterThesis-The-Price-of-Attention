@@ -30,11 +30,8 @@ Usage from participant.py:
     marker("condition:inline_early:start")
     marker("survey:ocean:submitted")
 
-Requires:
-  - pylsl (pip install pylsl)
-  - LSL_MARKER_OUTLET env var set (e.g. LSL_MARKER_OUTLET=experiment_lab_pilot)
-
-If either is missing all calls are silently ignored — safe to call unconditionally.
+Requires: pylsl (pip install pylsl).  If pylsl is unavailable all
+calls are silently ignored — safe to call unconditionally.
 """
 
 from __future__ import annotations
@@ -42,30 +39,32 @@ from __future__ import annotations
 import time
 from typing import Any, Optional
 
-from core.config import LSL_MARKER_OUTLET
 from core.log import logger
 
 
 # ── LSL Outlet (lazy singleton) ──────────────────────────────────────────────
 
 _outlet = None
+_enabled = False
+
+
+def enable() -> None:
+    """Enable LSL markers for lab sessions.  No-op in crowd mode."""
+    global _enabled
+    _enabled = True
+
+
+def disable() -> None:
+    """Disable LSL markers (default)."""
+    global _enabled
+    _enabled = False
 
 
 def _get_outlet():
-    """Lazy-init LSL outlet.
-
-    Returns None (markers silently skipped) when:
-      - ``LSL_MARKER_OUTLET`` env var is empty / unset
-      - ``pylsl`` is not installed
-      - LSL stream creation fails
-    """
+    """Lazy-init LSL outlet. Returns None if pylsl unavailable."""
     global _outlet
     if _outlet is not None:
         return _outlet
-
-    if not LSL_MARKER_OUTLET:
-        return None
-
     try:
         from pylsl import StreamInfo, StreamOutlet
         info = StreamInfo(
@@ -73,10 +72,10 @@ def _get_outlet():
             type="Markers",
             channel_count=1,
             nominal_srate=0,  # irregular rate
-            source_id=LSL_MARKER_OUTLET,
+            source_id="rag-recsys-experiment",
         )
         _outlet = StreamOutlet(info)
-        logger.info("[EEG] LSL marker outlet created (source_id=%s)", LSL_MARKER_OUTLET)
+        logger.info("[EEG] LSL marker outlet created: ExperimentMarkers")
     except ImportError:
         logger.warning("[EEG] pylsl not installed — markers disabled")
         _outlet = None
@@ -94,6 +93,8 @@ def marker(label: str) -> None:
     Idempotent, non-blocking, best-effort.  Safe to call even when
     pylsl is not installed — returns silently.
     """
+    if not _enabled:
+        return
     outlet = _get_outlet()
     if outlet:
         outlet.push_sample([label])

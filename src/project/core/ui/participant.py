@@ -51,7 +51,6 @@ from core.config import (
     CATALOG_PATH,
     STUDY_TYPE_CROWD,
     STUDY_TYPE_LAB,
-    LSL_MARKER_OUTLET,
     MOCK_AD_TITLE,
     MOCK_AD_TEXT,
     MOCK_AD_CTA,
@@ -60,6 +59,7 @@ from core.conversation import ConversationManager
 from core.logger import ExperimentLogger
 from core.experiment import ExperimentController, TaskDefinition, TASK_CATALOG, TASK_BY_ID, score_ocean, get_ocean_items
 from core.modalities.eeg import (
+    enable as eeg_enable,
     screen_marker,
     condition_marker,
     survey_marker,
@@ -130,12 +130,8 @@ def init_session_state(params):
             st.session_state.logger.experiment_id,
             st.session_state.logger.run_id,
         )
-        if params.study_type == STUDY_TYPE_LAB and not LSL_MARKER_OUTLET:
-            log.warning(
-                "Lab session but LSL_MARKER_OUTLET is not set — "
-                "EEG markers will be SILENTLY DROPPED. "
-                "Set LSL_MARKER_OUTLET in .env (e.g. LSL_MARKER_OUTLET=experiment_lab_pilot)."
-            )
+        if params.study_type == STUDY_TYPE_LAB:
+            eeg_enable()
         session_marker("start")
         st.session_state.logger.log(
             "session_started",

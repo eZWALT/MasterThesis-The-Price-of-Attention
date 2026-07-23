@@ -190,12 +190,6 @@ STUDY_DEFAULTS: dict[str, dict] = {
     },
 }
 
-# LSL marker outlet stream name.  Required for lab sessions.
-# When empty, LSL markers are silently skipped (safe for crowd / dev).
-# Set via env: LSL_MARKER_OUTLET=experiment_lab_pilot
-LSL_MARKER_OUTLET: str = os.getenv("LSL_MARKER_OUTLET", "").strip()
-
-
 # ┌─────────────────────────────────────────────────────────────────────────┐
 # │  4.  EXPERIMENT DESIGN                                                  │
 # └─────────────────────────────────────────────────────────────────────────┘
