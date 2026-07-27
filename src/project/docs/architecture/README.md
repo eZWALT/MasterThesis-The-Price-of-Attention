@@ -4,8 +4,13 @@ Two figures, both generated with the [diagrams](https://diagrams.mingrammer.com/
 (a Graphviz wrapper) and sharing one visual language: rounded colored clusters, white
 icon "cards", muted slate-gray arrows, orthogonal routing.
 
-- **`architecture.png`** (from `arch.py`) — the experiment platform: participant/EEG
-  setup, lab laptop (Browser + LabRecorder), and the Atlas server's GPU/CPU layout.
+- **`architecture.png`** (from `arch.py`) — the experiment platform: the two study arms
+  (in-person lab, remote crowdsourced), the `192.168.1.0/24` lab subnet as a dashed
+  boundary, and the Atlas server's CPU/GPU layout. Reading order is left-to-right along
+  the request path: browser → Docker (Streamlit) → GPU model services. Docker sits
+  immediately right of the laptop so no HTTP edge has to cross a GPU cluster, and ports
+  live in node labels (`:7777`, `:7780`, `:16580`) rather than on the arrows, which keeps
+  the two parallel browser edges label-free and unambiguous.
 - **`catalog_pipeline.png`** (from `catalog_pipeline.py`) — the offline catalog
   preprocessing pipeline: HuggingFace source → filter/remap → dedup → merge → embed →
   FAISS index. Laid out left-to-right (`direction="LR"`) since it's a strictly
