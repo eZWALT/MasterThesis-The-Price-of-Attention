@@ -273,6 +273,15 @@ def _render_turn_ads(
             turn=turn,
             ad=primary,
         )
+        if hasattr(manager, "logger") and manager.logger is not None:
+            manager.logger.log(
+                "ad_displayed",
+                {"ad_id": primary.source_item_id if primary else None, "ad_turn": turn},
+                ad_mode,
+                manager.conversation_id,
+                source="system",
+                turn=turn,
+            )
 
 
 def _render_explicit_ad_banner(payload: dict) -> None:
@@ -678,6 +687,7 @@ def _render_write_trigger(manager: ConversationManager) -> str | None:
         if user_input:
             next_turn = manager.turn_count + 1
             if hasattr(manager, "logger") and manager.logger is not None:
+                manager.logger.log("user_starts_typing", {"turn": next_turn}, turn=next_turn)
                 manager.logger.log(
                     f"turn_{next_turn}_write",
                     {"turn": next_turn},
@@ -696,6 +706,7 @@ def _render_write_trigger(manager: ConversationManager) -> str | None:
         st.session_state._writing_started = True
         next_turn = manager.turn_count + 1
         if hasattr(manager, "logger") and manager.logger is not None:
+            manager.logger.log("user_starts_typing", {"turn": next_turn}, turn=next_turn)
             manager.logger.log(
                 f"turn_{next_turn}_write",
                 {"turn": next_turn},

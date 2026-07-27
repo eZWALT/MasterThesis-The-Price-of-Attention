@@ -361,6 +361,13 @@ class ConversationManager:
             turn=current_turn,
         )
 
+        if self._log_turn_markers:
+            self.logger.log(
+                f"turn_{current_turn}_read",
+                {"turn": current_turn},
+                turn=current_turn,
+            )
+
         # 3 — intent (ThradBERT) before retrieval so JSONL retrieval rows carry intent_label
         turn_intent = self._classify_turn_intent(user_input)
         self.intent_history.append(turn_intent)
@@ -447,6 +454,14 @@ class ConversationManager:
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
+            self.logger.log(
+                "ad_inserted",
+                {"ad_id": retrieval.primary.source_item_id, "ad_position": "inline" if self.ad_mode == "inline_persuasive" else "block"},
+                self.ad_mode,
+                self.conversation_id,
+                source="system",
+                turn=current_turn,
+            )
             self.logger.log(
                 "ad_injected",
                 compact_event_data(
@@ -567,6 +582,13 @@ class ConversationManager:
             turn=current_turn,
         )
 
+        if self._log_turn_markers:
+            self.logger.log(
+                f"turn_{current_turn}_read",
+                {"turn": current_turn},
+                turn=current_turn,
+            )
+
         # 3 — intent classification
         turn_intent = self._classify_turn_intent(user_input)
         self.intent_history.append(turn_intent)
@@ -653,6 +675,14 @@ class ConversationManager:
         # 4b — log ad_injected event (which ad was actually shown)
         if inject_ad and retrieval and retrieval.primary and not self.dry_run:
             _position = "inline" if self.ad_mode == "inline_persuasive" else "block"
+            self.logger.log(
+                "ad_inserted",
+                {"ad_id": retrieval.primary.source_item_id, "ad_position": "inline" if self.ad_mode == "inline_persuasive" else "block"},
+                self.ad_mode,
+                self.conversation_id,
+                source="system",
+                turn=current_turn,
+            )
             self.logger.log(
                 "ad_injected",
                 compact_event_data(
