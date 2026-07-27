@@ -62,7 +62,18 @@ The flow figures are generated from what `core/experiment/controller.py` actuall
 `_PRE_CONDITION_SCREENS`, the `_CONDITION_SCREENS` block repeated once per entry in
 `condition_plan`, then `_POST_CONDITION_SCREENS`. Arm differences are exactly
 `STUDY_SKIP_SCREENS` in `core/config.py` (lab skips `prolific_id` + `validation`, crowd
-skips `baseline`). Figure labels are shortened, so the mapping is:
+skips `baseline`). The four phase panels are the code's three stages with the post-condition
+screens split in two — `Measures` (recall, BFI-10, demographics) and `Close-Out` (validation,
+debrief, done) — because six screens in one column tower over the other phases. The split is
+presentational only; the controller has no such boundary.
+
+Everything that holds for the whole session is in the figure title (EEG/LSL recording for the
+lab arm, own-browser for crowd) or in a phase title (`counterbalanced order`), so the only
+box that is not a screen is the conditions legend, which sits inside the phase it describes.
+The lab `Close-Out` panel carries a card-sized invisible node so its box matches the other
+three despite holding one screen fewer.
+
+Figure labels are shortened, so the mapping is:
 
 | Figure label | `SCREEN_*` id | Arm |
 | --- | --- | --- |
@@ -86,8 +97,8 @@ Counts in the detail lines were read off the code, not the docstrings:
 | Figure label | Source | Note |
 | --- | --- | --- |
 | 4 turns, at most 1 ad | `MIN/MAX_TURNS_PER_TRIAL`, `CONDITION_TIMING` | `no_ads` shows none, hence "≤ 1" |
-| 22 Likert items · 3 sections | `POST_CONDITION_LLM_ITEMS` (15) + `_PERSONALITY_LIKERT` (3) + `_PERSONALITY_OPEN` (2) + `_BEHAVIOUR_ITEMS` (2) | all 7-pt; the open items are rated *and* elaborated |
-| 4 steps · 2 Likert + open text | `RECALL_ITEMS` (2) + `RECALL_OPEN_ENDED` (1), one step per ad condition | the `render_ads_recall` docstring still claims 7 Likert — it is stale |
+| 22 Likert · 3 sections | `POST_CONDITION_LLM_ITEMS` (15) + `_PERSONALITY_LIKERT` (3) + `_PERSONALITY_OPEN` (2) + `_BEHAVIOUR_ITEMS` (2) | all 7-pt; the open items are rated *and* elaborated |
+| 4 steps · 2 Likert + text | `RECALL_ITEMS` (2) + `RECALL_OPEN_ENDED` (1), one step per ad condition | the `render_ads_recall` docstring still claims 7 Likert — it is stale |
 | 10 items · 5-pt | `BFI10_ITEMS`, `OCEAN_SCALE_MIN/MAX` | `bfi_version` defaults to `"10"` |
 | pick 5 of 10 tasks | `render_validation_questions` | 5 real + 5 distractors |
 
