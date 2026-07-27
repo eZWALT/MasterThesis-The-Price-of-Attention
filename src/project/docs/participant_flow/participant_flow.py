@@ -98,10 +98,15 @@ def edge(**kw):
 
 
 def note(lines):
-    # Helvetica only: graphviz sizes labels from built-in Helvetica metrics, so
-    # any other family (Courier, DejaVu Sans Mono) lays out at the wrong width
-    # and left-justified text spills over the cluster border.
+    # \l left-justifies each line, which only lands inside the box because FONT
+    # is measured as it is drawn — see the comment on FONT
     return Node("".join(f"{l}\\l" for l in lines), **NOTE, width="2.3")
+
+
+def note_attr(bg="#FBFAFE", border="#9C93C8"):
+    # annotation, so: dashed, tight to its text, and a title one step below the
+    # phase titles in the hierarchy
+    return cluster_attr(bg, border, dashed=True, margin="9", fontsize="10.5")
 
 
 def build(study, filename):
@@ -144,8 +149,7 @@ def build(study, filename):
 
         # the three phase columns have very different heights; these notes carry
         # the design facts a methods reader needs and fill the space that leaves
-        with Cluster("Conditions",
-                     graph_attr=cluster_attr("#FBFAFE", "#9C93C8", dashed=True, margin="9", fontsize="10.5")):
+        with Cluster("Conditions", graph_attr=note_attr()):
             legend = note([
                 "NO — no ads",
                 "IN-EA — inline ad · turn 2",
@@ -154,8 +158,7 @@ def build(study, filename):
                 "BL-LA — ad block · turn 4",
             ])
 
-        with Cluster("Counterbalancing",
-                     graph_attr=cluster_attr("#FBFAFE", "#9C93C8", dashed=True, margin="9", fontsize="10.5")):
+        with Cluster("Counterbalancing", graph_attr=note_attr()):
             counter = note([
                 "Tasks: Latin-square rotation by",
                 "cb_group (or participant-id hash)",
@@ -165,17 +168,16 @@ def build(study, filename):
 
         # neutral, unlike the two purple notes: logging is session-wide, not
         # a property of the condition block
-        with Cluster("Logging",
-                     graph_attr=cluster_attr("#FAFBFC", "#A9B4BF", dashed=True, margin="9", fontsize="10.5")):
+        with Cluster("Logging", graph_attr=note_attr("#FAFBFC", "#A9B4BF")):
             logging_note = note([
                 "One JSON line per event, append-",
                 "only and crash-safe, written to",
                 "logs/<run>/<run>_events.jsonl",
             ])
 
-        with Cluster("Recording", graph_attr=cluster_attr(
+        with Cluster("Recording", graph_attr=note_attr(
                 "#FAFCFE" if lab else "#FEFAFC",
-                "#8FB8D8" if lab else "#D3A0B8", dashed=True, margin="9", fontsize="10.5")):
+                "#8FB8D8" if lab else "#D3A0B8")):
             rec = note(
                 ["32-ch EEG and event markers",
                  "stream over LSL to LabRecorder",
