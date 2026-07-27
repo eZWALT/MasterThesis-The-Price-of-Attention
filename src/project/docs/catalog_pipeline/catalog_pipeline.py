@@ -4,6 +4,13 @@ from diagrams.custom import Custom
 
 RES = os.path.join(os.path.dirname(__file__), "resources")
 
+# Named so pango resolves the same face graphviz measures with; the built-in
+# PostScript names are measured from hardcoded metrics but drawn in whatever
+# pango substitutes, which mixes typefaces across the figure.
+FONT = "Nimbus Sans"
+FONT_BOLD = "Nimbus Sans Bold"
+
+
 # Same visual language as the main architecture diagram (arch.py), so the two
 # figures read as one consistent visual system in the thesis.
 graph_attr = {
@@ -13,20 +20,20 @@ graph_attr = {
     "pad": "0.5",
     "nodesep": "0.5",
     "ranksep": "0.8",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "splines": "ortho",
     "labelloc": "t",
 }
 
 node_attr = {
     "fontsize": "10",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "labelloc": "b",
 }
 
 cluster_base = {
     "fontsize": "12",
-    "fontname": "Helvetica-Bold",
+    "fontname": FONT_BOLD,
     "style": "rounded",
     "margin": "14",
     "labeljust": "l",
@@ -37,12 +44,18 @@ def cluster_attr(bg, border):
 
 edge_attr = {
     "fontsize": "10",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "fontcolor": "#444444",
     "color": "#6B7A8A",
     "penwidth": "1.2",
     "arrowsize": "0.8",
 }
+
+def edge(**kw):
+    """Edge instances stamp library defaults over edge_attr, including the
+    font, so every edge is built here instead."""
+    return Edge(fontname=FONT, **kw)
+
 
 IMG = {"imagescale": "false", "imagepos": "tc"}
 CARD = {
@@ -53,7 +66,7 @@ CARD = {
     "penwidth": "1.0",
 }
 # title + 1–2 detail lines: enough for thesis clarity without the old wall of text
-M = {"width": "2.0", "height": "1.15"}
+M = {"width": "2.25", "height": "1.15"}
 
 with Diagram(
     "Offline Catalog Preprocessing Pipeline",
@@ -63,7 +76,7 @@ with Diagram(
     node_attr=node_attr,
     edge_attr=edge_attr,
     filename=os.path.join(os.path.dirname(__file__), "catalog_pipeline"),
-    outformat="png",
+    outformat=["png", "pdf"],
 ):
 
     with Cluster("Source Dataset", graph_attr=cluster_attr("#E8F0FE", "#A5B8D6")):
@@ -75,7 +88,7 @@ with Diagram(
                        os.path.join(RES, "filter.png"), **M, **IMG, **CARD)
         dedup = Custom("Deduplicate\nby item_id",
                         os.path.join(RES, "dedup.png"), **M, **IMG, **CARD)
-        filt >> Edge() >> dedup
+        filt >> edge() >> dedup
 
     with Cluster("Catalog Serialization", graph_attr=cluster_attr("#FDF6E3", "#D8C48F")):
         merge = Custom("Merge Catalogs\n+ synthetic sources",
@@ -89,7 +102,7 @@ with Diagram(
         faiss = Custom("FAISS Index\nFlatIP · 459 MB",
                         os.path.join(RES, "meta.png"), **M, **IMG, **CARD)
 
-    hf >> Edge() >> filt
-    dedup >> Edge() >> merge
-    merge >> Edge() >> embed
-    embed >> Edge() >> faiss
+    hf >> edge() >> filt
+    dedup >> edge() >> merge
+    merge >> edge() >> embed
+    embed >> edge() >> faiss

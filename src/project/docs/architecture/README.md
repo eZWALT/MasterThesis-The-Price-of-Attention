@@ -27,11 +27,34 @@ icon "cards", muted slate-gray arrows, orthogonal routing.
 
 ```bash
 pip install diagrams
-sudo apt-get install graphviz   # provides the `dot` binary diagrams depends on
-python3 arch.py                 # writes architecture.png in this folder
-python3 participant_flow.py     # writes flow_lab.png + flow_crowd.png
-python3 catalog_pipeline.py     # writes catalog_pipeline.png in this folder
+sudo apt-get install graphviz           # provides the `dot` binary diagrams depends on
+sudo apt-get install fonts-urw-base35   # provides Nimbus Sans (see below)
+python3 arch.py                 # architecture.png + .pdf
+python3 participant_flow.py     # flow_lab.png/.pdf + flow_crowd.png/.pdf
+python3 catalog_pipeline.py     # catalog_pipeline.png + .pdf
 ```
+
+Each script writes a PNG and a PDF. Use the PDF in LaTeX so the figures stay sharp at any
+scale; the PNG is for previewing.
+
+## Fonts
+
+All three scripts set `FONT = "Nimbus Sans"` rather than `"Helvetica"`. Graphviz measures
+the built-in PostScript families (Helvetica, Courier) from hardcoded metrics but *draws*
+whatever pango substitutes, so labels were being laid out to Helvetica widths and rendered
+in DejaVu Sans — which made left-justified text spill past its box. Naming an installed
+family makes measurement and rendering agree. Two related traps, both worked around in the
+scripts and worth knowing before editing them:
+
+- `Edge` and `Node` instances stamp the library's own defaults (`fontname="Sans-Serif"`,
+  `fixedsize="true"`, `height="1.9"`) *over* the graph-level `edge_attr`/`node_attr`. Edges
+  are therefore built through a local `edge()` helper that re-applies the font, and
+  text-only note boxes set `fixedsize="false"` so they size to their label.
+- Cards are fixed-size on purpose (uniform boxes), so a label longer than the card width
+  will overflow silently rather than growing the box. Check any new label visually.
+
+To match a thesis body font instead, change `FONT`/`FONT_BOLD` to any installed family
+(`fc-list : family`) — nothing else needs touching.
 
 ## Flow figures ↔ code
 
@@ -58,10 +81,15 @@ skips `baseline`). Figure labels are shortened, so the mapping is:
 | Debrief | `deception_disclosure` | both |
 | Done | `done` | both |
 
-Counts in the detail lines come from the same sources: 4 turns per conversation
-(`MIN/MAX_TURNS_PER_TRIAL`), one ad at turn 2 or 4 (`CONDITION_TIMING`), 20 post-condition
-items (`POST_CONDITION_*` lists), 4 recall steps (one per ad condition), BFI-10
-(`OCEAN_ITEMS`), and 5-of-10 task recognition (`render_validation_questions`).
+Counts in the detail lines were read off the code, not the docstrings:
+
+| Figure label | Source | Note |
+| --- | --- | --- |
+| 4 turns, at most 1 ad | `MIN/MAX_TURNS_PER_TRIAL`, `CONDITION_TIMING` | `no_ads` shows none, hence "≤ 1" |
+| 22 Likert items · 3 sections | `POST_CONDITION_LLM_ITEMS` (15) + `_PERSONALITY_LIKERT` (3) + `_PERSONALITY_OPEN` (2) + `_BEHAVIOUR_ITEMS` (2) | all 7-pt; the open items are rated *and* elaborated |
+| 4 steps · 2 Likert + open text | `RECALL_ITEMS` (2) + `RECALL_OPEN_ENDED` (1), one step per ad condition | the `render_ads_recall` docstring still claims 7 Likert — it is stale |
+| 10 items · 5-pt | `BFI10_ITEMS`, `OCEAN_SCALE_MIN/MAX` | `bfi_version` defaults to `"10"` |
+| pick 5 of 10 tasks | `render_validation_questions` | 5 real + 5 distractors |
 
 ## Layout
 

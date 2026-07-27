@@ -11,6 +11,12 @@ from diagrams import Diagram, Cluster, Edge, Node
 from diagrams.custom import Custom
 
 RES = os.path.join(os.path.dirname(__file__), "resources")
+
+# Named so pango resolves the same face graphviz measures with: the built-in
+# PostScript names (Helvetica, Courier) are measured from hardcoded metrics but
+# drawn in whatever pango substitutes, which shifts every label slightly.
+FONT = "Nimbus Sans"
+FONT_BOLD = "Nimbus Sans Bold"
 OUT = os.path.dirname(__file__)
 
 graph_attr = {
@@ -20,27 +26,28 @@ graph_attr = {
     "pad": "0.5",
     "nodesep": "0.5",
     "ranksep": "0.55",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "splines": "ortho",
     "labelloc": "t",
 }
 
-node_attr = {"fontsize": "10", "fontname": "Helvetica", "labelloc": "b"}
+node_attr = {"fontsize": "10", "fontname": FONT, "labelloc": "b"}
 
 cluster_base = {
     "fontsize": "12",
-    "fontname": "Helvetica-Bold",
+    "fontname": FONT_BOLD,
     "margin": "14",
     "labeljust": "l",
 }
 
-def cluster_attr(bg, border, dashed=False):
+def cluster_attr(bg, border, dashed=False, margin="14", fontsize="12"):
     style = "rounded,dashed" if dashed else "rounded"
-    return dict(cluster_base, bgcolor=bg, pencolor=border, style=style)
+    return dict(cluster_base, bgcolor=bg, pencolor=border, style=style,
+                margin=margin, fontsize=fontsize)
 
 edge_attr = {
     "fontsize": "10",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "fontcolor": "#444444",
     "color": "#6B7A8A",
     "penwidth": "1.2",
@@ -70,9 +77,11 @@ NOTE = {
     "penwidth": "0",
     "labelloc": "c",
     "fontsize": "9",
-    "margin": "0.10,0.06",
-    # the library defaults every node to 1.9in tall to fit an icon; text-only
-    # notes must shrink back to their label
+    "margin": "0.12,0.09",
+    # the library fixes every node at 1.9in square to hold an icon; text-only
+    # notes must instead be sized by their own label, or the text overflows
+    # both the node and the cluster drawn around it
+    "fixedsize": "false",
     "height": "0.1",
 }
 
@@ -82,12 +91,17 @@ def screen(title, detail, icon, card=CARD):
                   **BOX, **IMG, **card)
 
 
-def note(lines, mono=False):
-    label = "".join(f"{l}\\l" for l in lines)
-    attrs = dict(NOTE, width="2.3")
-    if mono:
-        attrs["fontname"] = "DejaVu Sans Mono"
-    return Node(label, **attrs)
+def edge(**kw):
+    # Edge instances stamp the library's own defaults over the graph-level
+    # edge_attr, so the font has to be repeated here or labels fall back
+    return Edge(fontname=FONT, **kw)
+
+
+def note(lines):
+    # Helvetica only: graphviz sizes labels from built-in Helvetica metrics, so
+    # any other family (Courier, DejaVu Sans Mono) lays out at the wrong width
+    # and left-justified text spills over the cluster border.
+    return Node("".join(f"{l}\\l" for l in lines), **NOTE, width="2.3")
 
 
 def build(study, filename):
@@ -103,7 +117,7 @@ def build(study, filename):
         node_attr=node_attr,
         edge_attr=edge_attr,
         filename=os.path.join(OUT, filename),
-        outformat="png",
+        outformat=["png", "pdf"],
     ):
         # ranks the first screen of each phase together, so each phase becomes a
         # column instead of one 12-screen vertical strip
@@ -123,53 +137,76 @@ def build(study, filename):
             # row, so the repeat arrow closes the loop instead of running the
             # full height of the phase. Declared right-to-left because dot
             # orders same-rank siblings in reverse declaration order here.
-            survey = screen("Questionnaire", "20 items · 7-pt Likert", "survey")
+            survey = screen("Questionnaire", "22 Likert items · 3 sections", "survey")
             brief = screen("Task Briefing", "task prompt + warning", "brief")
             findings = screen("Findings", "free text ≤ 256 chars", "findings")
-            chat = screen("Conversation", "4 turns · 1 ad at turn 2 or 4", "chat")
+            chat = screen("Conversation", "4 turns · ≤ 1 ad (turn 2 or 4)", "chat")
 
-        with Cluster("Conditions (shuffled per participant)",
-                     graph_attr=cluster_attr("#FBFAFE", "#9C93C8", dashed=True)):
+        # the three phase columns have very different heights; these notes carry
+        # the design facts a methods reader needs and fill the space that leaves
+        with Cluster("Conditions",
+                     graph_attr=cluster_attr("#FBFAFE", "#9C93C8", dashed=True, margin="9", fontsize="10.5")):
             legend = note([
-                "NO             no ads",
-                "IN-EA / IN-LA  inline ad  · turn 2 / 4",
-                "BL-EA / BL-LA  ad block   · turn 2 / 4",
-            ], mono=True)
+                "NO — no ads",
+                "IN-EA — inline ad · turn 2",
+                "IN-LA — inline ad · turn 4",
+                "BL-EA — ad block · turn 2",
+                "BL-LA — ad block · turn 4",
+            ])
+
+        with Cluster("Counterbalancing",
+                     graph_attr=cluster_attr("#FBFAFE", "#9C93C8", dashed=True, margin="9", fontsize="10.5")):
+            counter = note([
+                "Tasks: Latin-square rotation by",
+                "cb_group (or participant-id hash)",
+                "Conditions: shuffled independently,",
+                "then zipped with the task order",
+            ])
+
+        # neutral, unlike the two purple notes: logging is session-wide, not
+        # a property of the condition block
+        with Cluster("Logging",
+                     graph_attr=cluster_attr("#FAFBFC", "#A9B4BF", dashed=True, margin="9", fontsize="10.5")):
+            logging_note = note([
+                "One JSON line per event, append-",
+                "only and crash-safe, written to",
+                "logs/<run>/<run>_events.jsonl",
+            ])
 
         with Cluster("Recording", graph_attr=cluster_attr(
                 "#FAFCFE" if lab else "#FEFAFC",
-                "#8FB8D8" if lab else "#D3A0B8", dashed=True)):
+                "#8FB8D8" if lab else "#D3A0B8", dashed=True, margin="9", fontsize="10.5")):
             rec = note(
-                ["EEG 32 ch + event markers stream",
-                 "over LSL to LabRecorder for the",
-                 "whole session"] if lab else
+                ["32-ch EEG and event markers",
+                 "stream over LSL to LabRecorder",
+                 "for the whole session"] if lab else
                 ["No physiological recording —",
                  "browser-only session on the",
                  "participant's own laptop"])
 
         with Cluster("3 · Wrap-Up", graph_attr=cluster_attr("#EEF6EE", "#8FBF92")):
-            recall = screen("Ad Recall", "4 steps · 7 Likert + text", "recall")
+            recall = screen("Ad Recall", "4 steps · 2 Likert + open text", "recall")
             bfi = screen("BFI-10", "10 items · 5-pt", "bfi")
             demog = screen("Demographics", "all fields optional", "demog")
             validate = (screen("Validation", "pick 5 of 10 tasks", "validate", CROWD_CARD)
                         if not lab else None)
-            debrief = screen("Debrief", "deception disclosure", "debrief")
+            debrief = screen("Debrief", "disclosure + withdraw option", "debrief")
             done = screen("Done",
                           "notify researcher" if lab else "Run ID → Prolific",
                           "done")
 
         for h in (consent, brief, recall):
-            anchor >> Edge(style="invis") >> h
+            anchor >> edge(style="invis") >> h
 
         consent >> gate >> warmup
         # phase transitions start a new column, so they must not add a rank
-        warmup >> Edge(constraint="false") >> brief
+        warmup >> edge(constraint="false") >> brief
         brief >> chat                                    # left column, downward
-        survey >> Edge(style="invis") >> findings         # right column
-        chat >> Edge(constraint="false") >> findings      # bottom row, rightward
-        findings >> Edge(constraint="false") >> survey    # right column, upward
-        survey >> Edge(xlabel="× 5", constraint="false") >> brief
-        survey >> Edge(constraint="false") >> recall
+        survey >> edge(style="invis") >> findings         # right column
+        chat >> edge(constraint="false") >> findings      # bottom row, rightward
+        findings >> edge(constraint="false") >> survey    # right column, upward
+        survey >> edge(xlabel="× 5", constraint="false") >> brief
+        survey >> edge(constraint="false") >> recall
         recall >> bfi >> demog
         tail = demog
         if validate is not None:
@@ -177,9 +214,12 @@ def build(study, filename):
             tail = validate
         tail >> debrief >> done
 
-        # park the two side notes in the space each phase leaves free
-        chat >> Edge(style="invis") >> legend
-        warmup >> Edge(style="invis") >> rec
+        # park the side notes in the space the two shorter phases leave free,
+        # filling down to the depth of the wrap-up column
+        chat >> edge(style="invis") >> legend
+        legend >> edge(style="invis") >> counter
+        warmup >> edge(style="invis") >> rec
+        rec >> edge(style="invis") >> logging_note
 
 
 build("lab", "flow_lab")

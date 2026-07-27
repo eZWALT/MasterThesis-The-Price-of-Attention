@@ -5,6 +5,13 @@ from diagrams.onprem.client import User
 
 RES = os.path.join(os.path.dirname(__file__), "resources")
 
+# Named so pango resolves the same face graphviz measures with; the built-in
+# PostScript names are measured from hardcoded metrics but drawn in whatever
+# pango substitutes, which mixes typefaces across the figure.
+FONT = "Nimbus Sans"
+FONT_BOLD = "Nimbus Sans Bold"
+
+
 graph_attr = {
     "fontsize": "22",
     "bgcolor": "white",
@@ -12,20 +19,20 @@ graph_attr = {
     "pad": "0.5",
     "nodesep": "0.7",
     "ranksep": "1.2",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "splines": "ortho",
     "labelloc": "t",
 }
 
 node_attr = {
     "fontsize": "10",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "labelloc": "b",
 }
 
 cluster_base = {
     "fontsize": "12",
-    "fontname": "Helvetica-Bold",
+    "fontname": FONT_BOLD,
     "margin": "14",
     "labeljust": "l",
 }
@@ -36,12 +43,18 @@ def cluster_attr(bg, border, dashed=False):
 
 edge_attr = {
     "fontsize": "10",
-    "fontname": "Helvetica",
+    "fontname": FONT,
     "fontcolor": "#444444",
     "color": "#6B7A8A",
     "penwidth": "1.2",
     "arrowsize": "0.8",
 }
+
+def edge(**kw):
+    """Edge instances stamp library defaults over edge_attr, including the
+    font, so every edge is built here instead."""
+    return Edge(fontname=FONT, **kw)
+
 
 IMG = {"imagescale": "false", "imagepos": "tc"}
 # software components render as white "cards" so edges attach to a visible border
@@ -74,7 +87,7 @@ with Diagram(
     node_attr=node_attr,
     edge_attr=edge_attr,
     filename=os.path.join(os.path.dirname(__file__), "architecture"),
-    outformat="png",
+    outformat=["png", "pdf"],
 ):
 
     # ── the two study arms, drawn symmetrically ──────────────────────────
@@ -108,10 +121,10 @@ with Diagram(
                 faiss = Custom("FAISS Vector DB\n(ANN index)", os.path.join(RES, "meta.png"), **L, **IMG, **CARD)
                 # grid layout (faiss/click left column, main/writer right) doubles
                 # as the real data flow
-                faiss >> Edge(style="invis") >> main
-                main >> Edge(constraint="false") >> faiss
-                click >> Edge(style="invis") >> writer
-                main >> Edge(constraint="false") >> writer
+                faiss >> edge(style="invis") >> main
+                main >> edge(constraint="false") >> faiss
+                click >> edge(style="invis") >> writer
+                main >> edge(constraint="false") >> writer
 
             # the wrapper carries no information of its own, but it is what makes
             # dot keep GPU 0 above GPU 1 instead of packing them by size
@@ -133,28 +146,28 @@ with Diagram(
             main >> rerank
 
     # ── lab arm: EEG stays local to the laptop, app traffic on the LAN ───
-    lab_participant >> Edge(xlabel="wears") >> eeg
-    eeg >> Edge(style="dashed", color="#CC3333",
+    lab_participant >> edge(xlabel="wears") >> eeg
+    eeg >> edge(style="dashed", color="#CC3333",
                 taillabel="LSL EEG Stream", labelfontsize="10",
-                labelfontcolor="#CC3333", labelfontname="Helvetica",
+                labelfontcolor="#CC3333", labelfontname=FONT,
                 labeldistance="3.2", labelangle="25") >> labrec
-    lab_participant >> Edge() >> browser
+    lab_participant >> edge() >> browser
     # keep the whole server a rank right of the laptop so the LAN box reads
     # left-to-right instead of stacking the two hosts vertically. Docker is the
     # first thing right of the laptop, so no browser edge crosses a GPU box.
-    browser >> Edge(style="invis") >> click
-    browser >> Edge() >> main
-    browser >> Edge(constraint="false") >> click
-    main >> Edge(style="dashed", color="#CC3333",
+    browser >> edge(style="invis") >> click
+    browser >> edge() >> main
+    browser >> edge(constraint="false") >> click
+    main >> edge(style="dashed", color="#CC3333",
                  taillabel="LSL Markers :16580", labelfontsize="10",
-                 labelfontcolor="#CC3333", labelfontname="Helvetica",
+                 labelfontcolor="#CC3333", labelfontname=FONT,
                  labeldistance="5.5", labelangle="18",
                  constraint="false") >> labrec
 
     # ── crowd arm: never touches the lab laptop; enters via port-forward ─
     # invisible: pins the crowd arm to the same starting rank as the lab arm
     # so the two setups line up symmetrically on the left edge
-    crowd_participant >> Edge(style="invis") >> eeg
-    crowd_participant >> Edge() >> crowd_browser
-    crowd_browser >> Edge() >> inet
-    inet >> Edge(xlabel="DDNS port-forward") >> main
+    crowd_participant >> edge(style="invis") >> eeg
+    crowd_participant >> edge() >> crowd_browser
+    crowd_browser >> edge() >> inet
+    inet >> edge(xlabel="DDNS port-forward") >> main
