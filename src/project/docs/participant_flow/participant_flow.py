@@ -177,7 +177,7 @@ def build(study, filename):
             validate = (screen("Validation", "pick 5 of 10 tasks", "validate", CROWD_CARD)
                         if not lab else None)
             debrief = screen("Debrief", "disclosure + opt-out", "debrief")
-            done = screen("Done", "" if lab else "completion code for Prolific", "done")
+            done = screen("Done", "", "done")
             filler = (Node("", shape="box", style="invis", **BOX) if lab else None)
 
         head = validate if validate is not None else debrief
