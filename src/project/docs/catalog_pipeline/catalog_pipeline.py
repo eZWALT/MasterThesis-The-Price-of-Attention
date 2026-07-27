@@ -65,7 +65,7 @@ CARD = {
     "color": "#B9C2CB",
     "penwidth": "1.0",
 }
-# title + 1–2 detail lines: enough for thesis clarity without the old wall of text
+# title + 1-2 detail lines: enough for thesis clarity without the old wall of text
 M = {"width": "2.25", "height": "1.15"}
 
 with Diagram(

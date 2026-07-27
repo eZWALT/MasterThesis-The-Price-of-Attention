@@ -92,8 +92,8 @@ NOTE = {
 
 
 def screen(title, detail, icon, card=CARD):
-    return Custom(f"{title}\n{detail}", os.path.join(RES, f"{icon}.png"),
-                  **BOX, **IMG, **card)
+    label = f"{title}\n{detail}" if detail else title
+    return Custom(label, os.path.join(RES, f"{icon}.png"), **BOX, **IMG, **card)
 
 
 def edge(**kw):
@@ -102,10 +102,10 @@ def edge(**kw):
     return Edge(fontname=FONT, **kw)
 
 
-def note(lines, width="2.3"):
+def note(lines, width="2.3", **kw):
     # \l left-justifies each line so the list starts under the cluster title
     # rather than drifting away from it
-    return Node("".join(f"{l}\\l" for l in lines), **NOTE, width=width)
+    return Node("".join(f"{l}\\l" for l in lines), **{**NOTE, **kw}, width=width)
 
 
 def note_attr():
@@ -118,9 +118,8 @@ def build(study, filename):
     lab = study == "lab"
     # session-wide facts belong to the whole figure, so they sit in the title
     # rather than in a box that has to float somewhere
-    title = ("Lab Participant Flow — in-person, 32-ch EEG + LSL markers throughout"
-             if lab else
-             "Crowd Participant Flow — remote, participant's own browser")
+    title = ("Lab Participant Flow (in-person, 32-ch EEG + LSL markers)" if lab
+             else "Crowd Participant Flow (remote, own browser)")
 
     with Diagram(
         title,
@@ -137,9 +136,9 @@ def build(study, filename):
         anchor = Node("", shape="point", style="invis", width="0.01", height="0.01")
 
         with Cluster("1 · Onboarding", graph_attr=cluster_attr("#EAF4FB", "#8FB8D8")):
-            consent = screen("Consent", "ethics + data notice", "consent")
+            consent = screen("Consent", "", "consent")
             if lab:
-                gate = screen("Baseline", "30 s rest · webcam + EEG", "eye", LAB_CARD)
+                gate = screen("Baseline", "30 s rest & EEG calibration", "eye", LAB_CARD)
             else:
                 gate = screen("Prolific ID", "worker ID entry", "id", CROWD_CARD)
             warmup = screen("Warm-Up Chat", "2 turns · no ads", "warmup")
@@ -157,26 +156,28 @@ def build(study, filename):
 
             # the one annotation left, and it describes this phase, so it lives
             # inside it spanning both columns instead of floating beside them
+            # the five names are compositional, so the box decodes the parts in
+            # two columns rather than listing five near-identical strings
             with Cluster("Conditions", graph_attr=note_attr()):
-                legend = note([
-                    "NO — no ads   ·   IN-EA — inline ad, turn 2   ·   IN-LA — inline ad, turn 4",
-                    "BL-EA — ad block, turn 2   ·   BL-LA — ad block, turn 4",
-                ], width="3.8")
+                col = dict(width="1.8", labelloc="t", height="0.42")
+                fmt = note(["NO: no ads (control)",
+                            "IN: inline ad inside the reply",
+                            "BL: ad block above the reply"], **col)
+                when = note(["EA: ad early, at turn 2",
+                             "LA: ad late, at turn 4"], **col)
 
         # split in two so no phase towers over the others: the post-condition
         # screens are measures first, then the close-out sequence
         with Cluster("3 · Measures", graph_attr=cluster_attr("#EEF6EE", "#8FBF92")):
             recall = screen("Ad Recall", "4 steps · 2 Likert + text", "recall")
             bfi = screen("BFI-10", "10 items · 5-pt", "bfi")
-            demog = screen("Demographics", "all fields optional", "demog")
+            demog = screen("Demographics", "", "demog")
 
         with Cluster("4 · Close-Out", graph_attr=cluster_attr("#EEF6EE", "#8FBF92")):
             validate = (screen("Validation", "pick 5 of 10 tasks", "validate", CROWD_CARD)
                         if not lab else None)
             debrief = screen("Debrief", "disclosure + opt-out", "debrief")
-            done = screen("Done",
-                          "notify researcher" if lab else "Run ID → Prolific",
-                          "done")
+            done = screen("Done", "" if lab else "completion code for Prolific", "done")
             filler = (Node("", shape="box", style="invis", **BOX) if lab else None)
 
         head = validate if validate is not None else debrief
@@ -204,9 +205,9 @@ def build(study, filename):
             # this phase box the same height as the other three
             done >> edge(style="invis") >> filler
 
-        # pulled from both columns of the cycle so it centres under them
-        chat >> edge(style="invis") >> legend
-        findings >> edge(style="invis") >> legend
+        # one legend column under each column of the cycle
+        chat >> edge(style="invis") >> fmt
+        findings >> edge(style="invis") >> when
 
 
 build("lab", "flow_lab")

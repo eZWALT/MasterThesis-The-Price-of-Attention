@@ -105,16 +105,16 @@ with Diagram(
                   width="1.8", height="1.05", **IMG, **NET)
 
     # ── everything on the lab subnet, incl. the server itself ────────────
-    with Cluster("Lab LAN — 192.168.1.0/24", graph_attr=cluster_attr("#FCFDFF", "#7F9DC0", dashed=True)):
+    with Cluster("Lab LAN (192.168.1.0/24)", graph_attr=cluster_attr("#FCFDFF", "#7F9DC0", dashed=True)):
 
         with Cluster("Lab Laptop", graph_attr=cluster_attr("#FDF6E3", "#D8C48F")):
             labrec = Custom("LabRecorder", os.path.join(RES, "recording.png"),
                             width="1.6", height="1.0", **IMG, **CARD)
             browser = Custom("Browser", os.path.join(RES, "firefox.png"), **S, **IMG, **CARD)
 
-        with Cluster("Atlas Server (2x A100) — 192.168.1.17",
+        with Cluster("Atlas Server (2x A100, 192.168.1.17)",
                      graph_attr=cluster_attr("#F2F0FA", "#9C93C8")):
-            with Cluster("CPU — Docker", graph_attr=cluster_attr("#F7F9FA", "#AAAAAA")):
+            with Cluster("CPU (Docker)", graph_attr=cluster_attr("#F7F9FA", "#AAAAAA")):
                 main = Custom("Main: Streamlit + RAG\n(:7777)", os.path.join(RES, "python.png"), **M, **IMG, **CARD)
                 writer = Custom("Writer: Logger + LSL", os.path.join(RES, "python.png"), **M, **IMG, **CARD)
                 click = Custom("HTTP: Ad Click (:7780)", os.path.join(RES, "python.png"), **M, **IMG, **CARD)
@@ -129,11 +129,11 @@ with Diagram(
             # the wrapper carries no information of its own, but it is what makes
             # dot keep GPU 0 above GPU 1 instead of packing them by size
             with Cluster("GPU Workers", graph_attr=cluster_attr("#F7FBF7", "#B9D4BA", dashed=True)):
-                with Cluster("GPU 0 — LLM", graph_attr=cluster_attr("#E8F5E9", "#8FBF92")):
+                with Cluster("GPU 0 (LLM)", graph_attr=cluster_attr("#E8F5E9", "#8FBF92")):
                     ollama = Custom("Ollama\n(qwen3.6:35b)", os.path.join(RES, "ollama.png"),
                                     **L, **IMG, **CARD)
 
-                with Cluster("GPU 1 — Retrieval", graph_attr=cluster_attr("#E8F5E9", "#8FBF92")):
+                with Cluster("GPU 1 (Retrieval)", graph_attr=cluster_attr("#E8F5E9", "#8FBF92")):
                     embed = Custom("Dense Embedding\n(Qwen3 0.6B)", os.path.join(RES, "neural.png"),
                                    **L, **IMG, **CARD)
                     rerank = Custom("Cross-Encoder\n(bge-reranker-v2-m3)", os.path.join(RES, "neural.png"),

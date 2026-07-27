@@ -4,19 +4,19 @@ Two figures, both generated with the [diagrams](https://diagrams.mingrammer.com/
 (a Graphviz wrapper) and sharing one visual language: rounded colored clusters, white
 icon "cards", muted slate-gray arrows, orthogonal routing.
 
-- **`architecture.png`** (from `arch.py`) — the experiment platform: the two study arms
+- **`architecture.png`** (from `arch.py`) shows the experiment platform: the two study arms
   (in-person lab, remote crowdsourced), the `192.168.1.0/24` lab subnet as a dashed
   boundary, and the Atlas server's CPU/GPU layout. Reading order is left-to-right along
   the request path: browser → Docker (Streamlit) → GPU model services. Docker sits
   immediately right of the laptop so no HTTP edge has to cross a GPU cluster, and ports
   live in node labels (`:7777`, `:7780`, `:16580`) rather than on the arrows, which keeps
   the two parallel browser edges label-free and unambiguous.
-- **`flow_lab.png` / `flow_crowd.png`** (both from `participant_flow.py`) — the screens a
+- **`flow_lab.png` / `flow_crowd.png`** (both from `participant_flow.py`) show the screens a
   participant walks through, one figure per study arm. Three phase columns instead of one
   tall strip; the repeated condition block is drawn as a 2×2 cycle so the repeat arrow is a
   short hop rather than a full-height return sweep. Screens that exist in only one arm are
   outlined in that arm's colour (lab blue, crowd pink), matching `architecture.png`.
-- **`catalog_pipeline.png`** (from `catalog_pipeline.py`) — the offline catalog
+- **`catalog_pipeline.png`** (from `catalog_pipeline.py`) shows the offline catalog
   preprocessing pipeline: HuggingFace source → filter/remap → dedup → merge → embed →
   FAISS index. Laid out left-to-right (`direction="LR"`) since it's a strictly
   sequential pipeline; each card names its operation plus the resulting artifact
@@ -42,7 +42,7 @@ scale; the PNG is for previewing.
 All three scripts set `FONT = "Nimbus Sans"` rather than `"Helvetica"`. Graphviz measures
 the built-in PostScript families (Helvetica, Courier) from hardcoded metrics but *draws*
 whatever pango substitutes, so labels were being laid out to Helvetica widths and rendered
-in DejaVu Sans — which made left-justified text spill past its box. Naming an installed
+in DejaVu Sans, which made left-justified text spill past its box. Naming an installed
 family makes measurement and rendering agree. Two related traps, both worked around in the
 scripts and worth knowing before editing them:
 
@@ -54,7 +54,7 @@ scripts and worth knowing before editing them:
   will overflow silently rather than growing the box. Check any new label visually.
 
 To match a thesis body font instead, change `FONT`/`FONT_BOLD` to any installed family
-(`fc-list : family`) — nothing else needs touching.
+(`fc-list : family`); nothing else needs touching.
 
 ## Flow figures ↔ code
 
@@ -63,8 +63,8 @@ The flow figures are generated from what `core/experiment/controller.py` actuall
 `condition_plan`, then `_POST_CONDITION_SCREENS`. Arm differences are exactly
 `STUDY_SKIP_SCREENS` in `core/config.py` (lab skips `prolific_id` + `validation`, crowd
 skips `baseline`). The four phase panels are the code's three stages with the post-condition
-screens split in two — `Measures` (recall, BFI-10, demographics) and `Close-Out` (validation,
-debrief, done) — because six screens in one column tower over the other phases. The split is
+screens split in two, `Measures` (recall, BFI-10, demographics) and `Close-Out` (validation,
+debrief, done), because six screens in one column tower over the other phases. The split is
 presentational only; the controller has no such boundary.
 
 Everything that holds for the whole session is in the figure title (EEG/LSL recording for the
@@ -98,18 +98,18 @@ Counts in the detail lines were read off the code, not the docstrings:
 | --- | --- | --- |
 | 4 turns, at most 1 ad | `MIN/MAX_TURNS_PER_TRIAL`, `CONDITION_TIMING` | `no_ads` shows none, hence "≤ 1" |
 | 22 Likert · 3 sections | `POST_CONDITION_LLM_ITEMS` (15) + `_PERSONALITY_LIKERT` (3) + `_PERSONALITY_OPEN` (2) + `_BEHAVIOUR_ITEMS` (2) | all 7-pt; the open items are rated *and* elaborated |
-| 4 steps · 2 Likert + text | `RECALL_ITEMS` (2) + `RECALL_OPEN_ENDED` (1), one step per ad condition | the `render_ads_recall` docstring still claims 7 Likert — it is stale |
+| 4 steps · 2 Likert + text | `RECALL_ITEMS` (2) + `RECALL_OPEN_ENDED` (1), one step per ad condition | the `render_ads_recall` docstring still claims 7 Likert, which is stale |
 | 10 items · 5-pt | `BFI10_ITEMS`, `OCEAN_SCALE_MIN/MAX` | `bfi_version` defaults to `"10"` |
 | pick 5 of 10 tasks | `render_validation_questions` | 5 real + 5 distractors |
 
 ## Layout
 
-- `resources/` — icons used by both diagrams (Firefox, Ollama, neural network, EEG
+- `resources/` holds the icons used by both diagrams (Firefox, Ollama, neural network, EEG
   headset, LabRecorder, Meta/FAISS, Python, HuggingFace, funnel/filter, merge,
   dedup/stack). Each is pre-processed (cropped/centered/resized onto a square
   transparent canvas) so `imagepos=tc` + `labelloc=b` renders icon-on-top,
   label-below with no overlap, at a consistent visual size across both diagrams.
-- `arch.py` / `catalog_pipeline.py` — each is the single source of truth for its
+- `arch.py` / `catalog_pipeline.py`: each is the single source of truth for its
   diagram; edit the style dicts at the top (`graph_attr`, `node_attr`,
   `cluster_attr`, `IMG`/`CARD`/size presets) rather than per-node attributes, to
   keep the look consistent if new nodes are added.
