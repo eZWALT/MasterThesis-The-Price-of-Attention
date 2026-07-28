@@ -1,3 +1,4 @@
+import os
 import re
 import streamlit as st
 import json
@@ -8,8 +9,17 @@ from zoneinfo import ZoneInfo
 
 st.set_page_config(page_title="Log Viewer — Flow Replay", layout="wide")
 
-LOG_DIR = Path("/home/wtroi/MasterThesis-RAG-RecSys/src/project/logs/production")
-LOG_DIR_DEV = Path("/home/wtroi/MasterThesis-RAG-RecSys/src/project/logs/development")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
+def _resolve(path_str):
+    """Match config.LOG_DIR semantics: relative paths hang off the project root."""
+    path = Path(path_str)
+    return path if path.is_absolute() else PROJECT_ROOT / path
+
+
+LOG_DIR = _resolve(os.getenv("LOG_DIR", "logs/production"))
+LOG_DIR_DEV = PROJECT_ROOT / "logs/development"
 
 def discover_sessions(base):
     sessions = []

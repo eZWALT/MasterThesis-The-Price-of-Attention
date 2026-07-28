@@ -25,6 +25,15 @@ else
     exit 1
 fi
 
+# ── Stamp the repo VERSION into logs, including from inside containers ────────
+# The Docker build context is this directory, so the image cannot see the
+# repository root; pass the version through the environment instead.
+VERSION_FILE="${SCRIPT_DIR}/../../VERSION"
+if [[ -f "${VERSION_FILE}" ]]; then
+    export APP_VERSION="$(tr -d '[:space:]' < "${VERSION_FILE}")"
+    echo "[launch.sh] version: ${APP_VERSION}"
+fi
+
 # ── Defaults ──────────────────────────────────────────────────────────────────
 MODE="ollama"
 

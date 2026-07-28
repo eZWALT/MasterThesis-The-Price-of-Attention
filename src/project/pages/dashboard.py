@@ -24,7 +24,11 @@ st.title("📊 Experiment Dashboard")
 
 # ── Config ────────────────────────────────────────────────────
 
-LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))  # search parent to find both production/ and development/
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+# Search the parent of production/ and development/ so both show up.
+_log_dir = Path(os.getenv("LOG_DIR", "logs"))
+LOG_DIR = _log_dir if _log_dir.is_absolute() else PROJECT_ROOT / _log_dir
 
 # ── Helpers ───────────────────────────────────────────────────
 

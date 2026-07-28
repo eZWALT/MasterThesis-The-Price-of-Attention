@@ -14,6 +14,7 @@ services:
       - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:--1}
       - LLM_THINK=${LLM_THINK:-false}
       - HF_HOME=/app/.hf_cache
+      - APP_VERSION=${APP_VERSION:-}
     volumes:
       - .:/app
       - hf_cache:/app/.hf_cache

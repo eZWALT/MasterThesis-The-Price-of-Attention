@@ -23,6 +23,12 @@ faiss-cpu==1.13.2
 scikit-learn==1.8.0
 rank-bm25==0.2.2
 
+# ── Analysis / dashboards ────────────────────────────────────────────────────
+# Needed by pages/dashboard.py, experiments/compare.py, experiments/plot_dists.py
+# and scripts/pilot/. The participant app itself does not import these.
+pandas==3.0.2
+matplotlib==3.11.0
+
 # ── Dev / Testing ────────────────────────────────────────────────────────────
 pytest>=8.0
 

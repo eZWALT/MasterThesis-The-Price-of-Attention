@@ -45,6 +45,7 @@ services:
       - DEFAULT_MODEL=${VLLM_MODEL}
       - LLM_BACKEND=openai
       - HF_HOME=/app/.hf_cache
+      - APP_VERSION=${APP_VERSION:-}
     volumes:
       - .:/app
       - hf_cache:/app/.hf_cache

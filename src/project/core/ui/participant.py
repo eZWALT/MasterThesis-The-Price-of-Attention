@@ -9,8 +9,8 @@ import uuid
 import random
 import streamlit as st
 from loguru import logger as log
-from pathlib import Path
 
+from core.version import get_version
 from core.config import (
     DEFAULT_MODEL,
     DEFAULT_TEMPERATURE,
@@ -139,11 +139,7 @@ def init_session_state(params):
         )
 
         # Log experiment config snapshot for self-describing logs
-        try:
-            _ver = Path(__file__).resolve().parents[4] / "VERSION"
-            _version = _ver.read_text().strip() if _ver.exists() else "unknown"
-        except Exception:
-            _version = "unknown"
+        _version = get_version()
 
         _active_pipeline_stages = []
         if USE_CONTEXT_SUMMARY:
