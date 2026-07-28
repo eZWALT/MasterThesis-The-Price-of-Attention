@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Sync the local Overleaf mirrors that live under docs/overleaf.
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mirror_root="$repo_root/docs/overleaf"
+projects=(thesis presentation publication)
+
+usage() {
+    cat <<'EOF'
+Usage:
+  overleaf-sync                 Pull all three Overleaf projects safely.
+  overleaf-sync status          Show the Git status of all projects.
+  overleaf-sync pull [project]  Pull one project or all projects.
+  overleaf-sync push <project>  Push one named project's committed changes.
+
+Projects: thesis, presentation, publication
+EOF
+}
+
+is_project() {
+    local project="$1"
+    for known in "${projects[@]}"; do
+        [[ "$known" == "$project" ]] && return 0
+    done
+    return 1
+}
+
+run_for() {
+    local action="$1"
+    local project="$2"
+    local path="$mirror_root/$project"
+
+    if [[ ! -d "$path/.git" ]]; then
+        printf 'Missing Overleaf mirror: %s\n' "$path" >&2
+        return 1
+    fi
+
+    printf '\n== %s ==\n' "$project"
+    case "$action" in
+        pull) git -C "$path" pull --ff-only ;;
+        status) git -C "$path" status --short --branch ;;
+        push) git -C "$path" push origin main ;;
+    esac
+}
+
+action="${1:-pull}"
+project="${2:-}"
+
+case "$action" in
+    pull|status)
+        if [[ -n "$project" ]]; then
+            is_project "$project" || { usage >&2; exit 2; }
+            run_for "$action" "$project"
+        else
+            for project in "${projects[@]}"; do
+                run_for "$action" "$project"
+            done
+        fi
+        ;;
+    push)
+        [[ -n "$project" ]] && is_project "$project" || { usage >&2; exit 2; }
+        run_for push "$project"
+        ;;
+    -h|--help|help)
+        usage
+        ;;
+    *)
+        usage >&2
+        exit 2
+        ;;
+esac
