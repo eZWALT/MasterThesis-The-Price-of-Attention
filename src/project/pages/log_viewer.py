@@ -1,8 +1,10 @@
+import re
 import streamlit as st
 import json
 import glob
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 st.set_page_config(page_title="Log Viewer — Flow Replay", layout="wide")
 
@@ -898,35 +900,63 @@ for tab, base_dir, label in [(tab_prod, LOG_DIR, "Production"), (tab_dev, LOG_DI
             st.info(f"No sessions found in {label}.")
             continue
 
-        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-        with col1:
-            session_options = {
-                    (f"{s['folder']} ({s['events']} evts, {s['study']}, {s['pid']}"
-                     + (f", worker={s['worker']}" if s.get('worker') else "")): s
-                    for s in sessions
-                }
-            selected_label = st.selectbox(
-                    f"Select {label} session:",
-                    options=list(session_options.keys()),
-                    key=f"sel_{label}",
-                )
-            session = session_options[selected_label]
+        worker_ids = sorted({s['worker'] for s in sessions if s.get('worker')})
 
-        with col2:
-            st.metric("Events", session["events"])
-        with col3:
+        session_options = {}
+        for s in sessions:
+            short = re.sub(r'_[a-f0-9]{8,}$', '', s['folder'])
+            wid = s.get('worker', '')
+            display = f"{short} ({s['events']} evts, {wid})" if wid else f"{short} ({s['events']} evts)"
+            session_options[display] = s
+
+        sel_worker = st.session_state.get(f"worker_{label}", "")
+        if sel_worker:
+            filtered_options = {k: v for k, v in session_options.items()
+                               if v.get('worker', '') == sel_worker}
+        else:
+            filtered_options = session_options
+        resolved = st.session_state.get(f"sel_{label}", None)
+        if resolved not in filtered_options:
+            resolved = next(iter(filtered_options))
+        session = session_options[resolved]
+
+        mcols = st.columns(3)
+        with mcols[0]:
             st.metric("Type", session["study"])
-        with col4:
+        with mcols[1]:
+            st.metric("Events", session["events"])
+        with mcols[2]:
             ts = session.get("start_ts", "")
             if ts:
                 try:
                     dt = datetime.fromisoformat(ts)
-                    hour_str = dt.strftime("%H:%M")
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    utc_s = dt.strftime("%H:%M")
+                    cet_dt = dt.astimezone(ZoneInfo("Europe/Madrid"))
+                    cet_s = cet_dt.strftime("%H:%M")
+                    cet_abbr = cet_dt.strftime("%Z")
+                    hour_str = f"{utc_s} UTC / {cet_s} {cet_abbr}"
                 except Exception:
                     hour_str = "?"
             else:
                 hour_str = "?"
             st.metric("Start", hour_str)
+
+        pick_sub1, pick_sub2 = st.columns([1, 3])
+        with pick_sub1:
+            worker_opts = [""] + worker_ids
+            worker_labels = ["All workers"] + worker_ids
+            sel_worker = st.selectbox(
+                "Worker ID", options=worker_opts,
+                format_func=lambda x: "All workers" if x == "" else x,
+                key=f"worker_{label}",
+            )
+        with pick_sub2:
+            selected_label = st.selectbox(
+                "Session", options=list(filtered_options.keys()),
+                key=f"sel_{label}",
+            )
 
         if st.session_state.get(f"loaded_session_{label}") != session["folder"]:
             with st.spinner("Loading events..."):
