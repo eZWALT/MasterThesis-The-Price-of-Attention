@@ -1,79 +1,112 @@
-# Workflow A* — Experimental Protocol
+# Experimental Protocol (Workflow B)
 
-## Overview
+Five-condition within-subject design measuring how ad **format** and **timing**
+affect trust, intrusiveness, and behaviour in an LLM shopping assistant. The
+consent screen quotes 30–60 minutes per session.
 
-5-condition within-subject design evaluating advertisement format and timing
-in an LLM-powered shopping assistant.  Each participant completes the full
-protocol in ~45–60 minutes.
+Implemented by `core/experiment/controller.py`; all constants live in
+`core/config.py`.
 
-## 5 Conditions
+---
 
-| # | Condition | Ad Format | Timing Window | Injector |
-|---|-----------|-----------|---------------|----------|
-| 1 | `no_ads` | None | Never | — |
-| 2 | `inline_early` | Inline (woven into LLM reply) | Turn 1–2 | `inline_persuasive` |
-| 3 | `inline_late` | Inline (woven into LLM reply) | Turn 3–5 | `inline_persuasive` |
-| 4 | `block_early` | Block (banner above input) | Turn 1–2 | `explicit_ad_block` |
-| 5 | `block_late` | Block (banner above input) | Turn 3–5 | `explicit_ad_block` |
+## Conditions
 
-Each ad condition injects **exactly 1 ad** at a randomly chosen turn within its
-window.  The `no_ads` condition never injects.
+| Condition | Label | Ad format | Injector | Ad turn |
+|---|---|---|---|---|
+| `no_ads` | NO | none (control) | — | — |
+| `inline_early` | IN-EA | woven into the reply | `inline_persuasive` | 2 |
+| `inline_late` | IN-LA | woven into the reply | `inline_persuasive` | 4 |
+| `block_early` | BL-EA | labelled block above the reply | `explicit_ad_block` | 2 |
+| `block_late` | BL-LA | labelled block above the reply | `explicit_ad_block` | 4 |
 
-## Participant Flow
+Each ad condition injects **exactly one ad**; `no_ads` never injects. The
+product is retrieved live from the catalog and filtered to the categories
+declared by that trial's task.
 
+## Screen sequence
+
+```text
+consent → [baseline | prolific_id] → warmup_chat
+  → [ condition_intro → condition_chat → condition_conclusion
+      → post_condition_survey ] × 5
+  → ads_recall_interpretation → ocean → demographics
+  → [validation] → deception_disclosure → done
 ```
-consent → demographics → instructions → warmup_chat
-→ [condition_intro → condition_chat → condition_conclusion → post_condition_survey] × 5
-→ ocean (BFI-10) → vals → global_evaluation → done
-```
 
-### Screen Details
+Both arms run the same state machine and differ only by skipped screens
+(`STUDY_SKIP_SCREENS`):
 
-| Step | Screen | Duration | Data Collected |
-|------|--------|----------|----------------|
-| 0 | `consent` | 1 min | Agreement |
-| 1 | `demographics` | 1 min | Age, gender, AI experience |
-| 2 | `instructions` | 30 s | — |
-| 3 | `warmup_chat` | 2–5 min | 5-turn chat, no ads |
-| 4 | `first_impression` | 1 min | Free-text, reuse intent, sentiment |
-| 5–9 | `condition_intro` | 30 s each | — |
-| 5–9 | `condition_chat` | 3–5 min each | 5-turn chat, ad injected per timing |
-| 5–9 | `post_condition_survey` | 1 min each | Trust, usefulness, satisfaction (Likert 1–7) |
-| 10 | `ocean` | 2 min | BFI-10 personality (5 traits) |
-| 11 | `vals` | 2 min | Lifestyle segmentation (8 items) |
-| 12 | `global_evaluation` | 2 min | Overall trust, usefulness, awareness, disruption, reuse intent, open-ended |
+| Arm | Extra screens | Skipped |
+|---|---|---|
+| `lab` | 30 s eye-tracking/EEG baseline | `prolific_id`, `validation` |
+| `crowd` | Prolific ID entry, task-recognition validation | `baseline` |
+
+![Crowd participant flow](participant_flow/flow_crowd.png)
+
+### What each screen collects
+
+| Screen | Content |
+|---|---|
+| `consent` | Study information and agreement |
+| `baseline` | 30 s rest for EEG/eye-tracking calibration (lab) |
+| `prolific_id` | Worker ID, logged as `worker_id_set` (crowd) |
+| `warmup_chat` | 2-turn casual chat, no ads, not logged as a condition |
+| `condition_intro` | Task briefing plus the independent-conversation warning |
+| `condition_chat` | 4-turn conversation; at most one ad |
+| `condition_conclusion` | Free-text findings, ≤ 256 characters |
+| `post_condition_survey` | 22 rated items on a 7-point scale, three sections |
+| `ads_recall_interpretation` | One step per ad condition (4 steps): the ad is shown again, then 2 rated items and one open response |
+| `ocean` | BFI-10, 10 items, 5-point |
+| `demographics` | 2 free-text and 4 select items |
+| `validation` | Pick the 5 tasks actually completed out of 10; ≥ 2 mistakes flags the session (crowd) |
+| `deception_disclosure` | Debrief, disclosure, and opt-out |
+
+The post-condition questionnaire combines 15 assistant-evaluation items, 3
+personality-related Likert items, 2 items that are both rated and elaborated in
+free text, and 2 behavioural items.
 
 ## Counterbalancing
 
-- **Condition order**: Latin-square rotation keyed by `?cb=N` or
-  `hash(participant_id)` to ensure each condition appears equally often
-  in each ordinal position.
-- **Task–condition pairing**: Tasks 1–5 from `TASK_CATALOG` are shuffled
-  together with conditions if `?seed=N` is set, otherwise conditions rotate
-  while tasks stay in catalog order.
+- **Tasks.** The first five entries of `TASK_CATALOG` are rotated Latin-square
+  style. The row is `?cb=N` when given, otherwise `hash(participant_id)`.
+- **Conditions.** Shuffled independently, then zipped with the rotated tasks, so
+  condition and task are not confounded across participants.
+- **Reproducibility.** `?seed=N` makes the condition shuffle and the ad-turn draw
+  deterministic. The realised assignment does not need reconstructing: the whole
+  condition plan is written into the `session_started` event.
 
-## Configuration
+## Turn structure
 
-All constants live in `core/config.py` (Section 5):
+Conversations are fixed at 4 user turns (`MIN_TURNS_PER_TRIAL` and
+`MAX_TURNS_PER_TRIAL`). The "I've finished" button appears from the turn given
+by `FINISH_BUTTON_VISIBLE_FROM_TURN`, which defaults to the minimum. A
+participant who has completed at least `EXIT_N_TRIALS` (5) conditions can leave
+early from the sidebar and still contribute a usable session.
 
-- `CONDITIONS` — list of 5 condition keys
-- `CONDITION_LABELS` — human-readable names
-- `CONDITION_AD_MODE` — maps condition → injector key
-- `CONDITION_TIMING` — maps condition → `(min_turn, max_turn)` or `None`
+## Logged data
 
-## Data Model
+Per session, in JSONL:
 
-Per-participant JSONL log contains:
+- `session_started` — participant, study type, and the full condition plan
+- `experiment_config` — build version, LLM settings, active retrieval stages
+- `condition_start` / `condition_end` — condition, ad mode, planned ad turn
+- `user_message`, `assistant_reply`, `intent_classified`, `retrieval`
+- `ad_injected`, `ad_displayed`, `ad_clicked`
+- `turn_N_read` / `turn_N_write` — reading and writing onsets for time-locking
+- `condition_conclusion_submitted`, `post_condition_survey_submitted`
+- `ads_recall_submitted`, `ocean_submitted`, `demographics_post_submitted`,
+  `validation_submitted`, `deception_disclosure_submitted`
+- `session_complete` — the aggregated session record
 
-- `session_started` — participant_id, study_type, full condition_plan
-- Per-condition events (identical to existing trial logging)
-- `condition_complete` — condition_id, ad_mode, ad_turn, turns, metrics
-- `post_condition_survey_submitted` — trust, usefulness, satisfaction
-- `session_complete` — demographics, first_impression, ocean_scores,
-  condition_summaries, condition_surveys, global_evaluation
+See the [platform README](../README.md#logging) for file layout, and
+[`lsl_marker_protocol.md`](lsl_marker_protocol.md) for the EEG marker stream.
 
-## Dev Mode
+## Dev modes
 
-- `?dev=true` — free-form chat with condition selector, ad controls, task picker
-- `?dev=flow` — participant flow with skip buttons, condition override,
-  ad override, debug panels
+| URL | Purpose |
+|---|---|
+| `?dev=true` | Free-form chat with condition, ad, and task selectors |
+| `?dev=flow` | The participant flow plus skip buttons, overrides, debug panels |
+| `?dev=flow&dry_run=1` | Same, with the LLM and retrieval mocked |
+
+Full parameter reference: [`query_guide.md`](query_guide.md).

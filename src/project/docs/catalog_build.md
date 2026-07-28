@@ -1,15 +1,20 @@
 # Catalog Build
 
-Rebuild the Amazon product catalog JSONL + FAISS index from scratch.
+Rebuilds the product catalog and the FAISS index that the ad-retrieval pipeline
+searches. Run this once per machine; the artifacts are large and git-ignored.
+
+![Catalog pipeline](catalog_pipeline/catalog_pipeline.png)
 
 ## Prerequisites
 
-Run from the repo root with `datasets`, `faiss`, `sentence-transformers`, `rank-bm25`, `loguru` installed.
+Run from `src/project` with the project requirements installed (`datasets`,
+`faiss-cpu`, `sentence-transformers`, `rank-bm25`, `loguru`). Embedding 100k+
+items is much faster with a GPU visible.
 
 ## Command
 
 ```bash
-python src/project/scripts/prepare_amazon_catalog.py \
+python scripts/prepare_amazon_catalog.py \
   --force-ingest --build-index --streaming \
   --category \
     meta_Amazon_Fashion meta_Appliances meta_Arts_Crafts_and_Sewing meta_Automotive \
@@ -23,14 +28,30 @@ python src/project/scripts/prepare_amazon_catalog.py \
     meta_Unknown meta_Video_Games
 ```
 
+Useful flags: `--max-items N` to cap items per category while testing,
+`--append` to add categories to an existing catalog, `--catalog-dir` and
+`--index-path` to relocate the outputs.
+
 ## Output
 
-- `data/catalogs/amazon.jsonl` — raw per-category items (117k+ rows)
-- `data/catalogs/catalog.jsonl` — merged deduplicated catalog
-- `data/faiss.index` — FAISS IndexFlatIP built from catalog item embeddings
+| Artifact | Contents |
+|---|---|
+| `data/catalogs/amazon.jsonl` | Raw per-category items as ingested |
+| `data/catalogs/catalog.jsonl` | Merged, normalised, deduplicated catalog (~117k items) |
+| `data/faiss.index` | `IndexFlatIP` over the catalog embeddings |
 
-## Category Filtering at Retrieval Time
+Expect a few hundred MB per file. Because `catalog.jsonl` is already normalised,
+keep `CATALOG_ADAPTER=generic`; the `amazon` adapter is only for raw Amazon
+JSONL with `parent_asin` fields.
 
-Each `TaskDefinition` in `core/experiment/tasks.py` has a `relevant_categories` field listing allowed `meta_*` categories. At runtime, the `HybridRefiner` filters FAISS candidates to only those whose `metadata.filename` matches the current task's categories.
+## Category filtering at retrieval time
 
-The `pool_size` field in logged events (`condition_started`, `condition_conclusion_submitted`, `condition_complete`, `conversation_completed`) shows how many catalog items match the task's categories.
+Each `TaskDefinition` in `core/experiment/tasks.py` declares
+`relevant_categories`. At runtime the `HybridRefiner` keeps only candidates
+whose `metadata.filename` matches the current task's categories, so a gardening
+task cannot surface laptops.
+
+The `pool_size` field logged on `condition_started`,
+`condition_conclusion_submitted`, `condition_complete`, and
+`conversation_completed` records how many catalog items were eligible for that
+task — worth checking when a condition produces weak ads.
