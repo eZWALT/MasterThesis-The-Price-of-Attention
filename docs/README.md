@@ -7,6 +7,7 @@ that belong to this repository.
 
 ```text
 docs/
+├── data-analysis-foundation.canvas.tsx  # analysis goals and statistical foundation
 ├── overleaf/       # local Git clones; ignored by the parent repository
 │   ├── thesis/
 │   ├── presentation/
@@ -16,6 +17,13 @@ docs/
     ├── presentation/
     └── publication/
 ```
+
+## Research artifacts
+
+`data-analysis-foundation.canvas.tsx` preserves the study's behavioral,
+self-report, and EEG analysis foundation. It records the canonical five
+conditions, primary outcomes and contrasts, mixed-model structure, EEG
+feasibility gates, exclusion strategy, and preregistration sequence.
 
 ## Overleaf mirrors
 
