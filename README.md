@@ -47,13 +47,16 @@ counterbalanced per participant. Full screen-by-screen protocol:
 
 ## Quick start
 
+**Requirements:** 1x NVIDIA GPU with >=24 GB VRAM (e.g. A100 40 GB).
+
 ```bash
 cd src/project
 cp .env.example .env
+# Edit .env -- set OLLAMA_BIN to the path of your ollama binary
 ./launch.sh --host
 ```
 
-Then open <http://localhost:7777>. To click through the whole study without a
+Then open http://localhost:7777. To click through the whole study without a
 GPU, use `?dev=flow&dry_run=1`. Setup details, backends, and cluster deployment
 live in the [platform README](src/project/README.md).
 
