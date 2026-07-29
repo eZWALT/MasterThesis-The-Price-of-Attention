@@ -1,6 +1,6 @@
 # Conversational Advertising in LLM Assistants
 
-[![Status](https://img.shields.io/badge/status-data%20collection-brightgreen)](#project-status)
+[![Status](https://img.shields.io/badge/status-data%20analysis-brightgreen)](#project-status)
 [![Version](https://img.shields.io/badge/version-2.2.0-blue)](VERSION)
 [![Python](https://img.shields.io/badge/python-3.11%E2%80%933.13-blue)](src/project/requirements.txt)
 [![License](https://img.shields.io/badge/license-Apache--2.0-lightgrey)](src/project/LICENSE)
@@ -104,9 +104,7 @@ Read-only Overleaf views of the write-up:
 
 ## Project status
 
-Pilot data collection is active. Lab and crowd sessions are being recorded and
-promoted into `logs/tracked/`; the analysis pipeline and thesis chapters are the
-remaining work.
+Data analysis + paper writing in progress. Collection is complete.
 
 ## Versioning
 
