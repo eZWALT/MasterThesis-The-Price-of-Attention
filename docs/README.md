@@ -8,6 +8,8 @@ that belong to this repository.
 ```text
 docs/
 ├── data-analysis-foundation.canvas.tsx  # analysis goals and statistical foundation
+├── context/        # dated handover notes on project state and settled decisions
+├── generated/      # AI-assisted planning and feasibility notes
 ├── overleaf/       # local Git clones; ignored by the parent repository
 │   ├── thesis/
 │   ├── presentation/
@@ -18,12 +20,22 @@ docs/
     └── publication/
 ```
 
+## Start here
+
+`context/` holds dated handover documents describing where the study stands, which
+design and analysis decisions are settled, which logging eras exist in the session
+data, and what is still blocked. Read the most recent one before picking up work.
+
 ## Research artifacts
 
 `data-analysis-foundation.canvas.tsx` preserves the study's behavioral,
 self-report, and EEG analysis foundation. It records the canonical five
 conditions, primary outcomes and contrasts, mixed-model structure, EEG
 feasibility gates, exclusion strategy, and preregistration sequence.
+
+`generated/` contains the analysis-planning notes that back those decisions,
+including the model feasibility comparison and the EEG feasibility and timing
+reconstruction plan. They are working notes rather than results.
 
 ## Overleaf mirrors
 
