@@ -8,7 +8,6 @@ that belong to this repository.
 ```text
 docs/
 ├── data-analysis-foundation.canvas.tsx  # analysis goals and statistical foundation
-├── context/        # dated handover notes on project state and settled decisions
 ├── generated/      # AI-assisted planning and feasibility notes
 ├── overleaf/       # local Git clones; ignored by the parent repository
 │   ├── thesis/
@@ -22,9 +21,10 @@ docs/
 
 ## Start here
 
-`context/` holds dated handover documents describing where the study stands, which
-design and analysis decisions are settled, which logging eras exist in the session
-data, and what is still blocked. Read the most recent one before picking up work.
+Project handover documents now live in `../.agents/context/`. They describe where
+the study stands, which design and analysis decisions are settled, which logging
+eras exist in the session data, and what is still blocked. Read the most recent
+relevant document before picking up work.
 
 ## Research artifacts
 
