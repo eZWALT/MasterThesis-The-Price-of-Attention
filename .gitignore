@@ -222,3 +222,4 @@ session-ses_*.md
 # Local Overleaf Git mirrors — each has its own Git history and remote.
 /docs/overleaf/*
 !/docs/overleaf/.gitkeep
+/scripts/cognitive-mllm
