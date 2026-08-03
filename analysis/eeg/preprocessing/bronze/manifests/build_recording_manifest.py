@@ -37,15 +37,6 @@ LSL_EVENTS = {
 TURN_EVENT_RE = re.compile(r"^turn_\d+_(?:read|write)$")
 SUBJECT_RE = re.compile(r"lab_subject_(\d+)")
 XDF_SUBJECT_RE = re.compile(r"sub-P(\d+)", re.IGNORECASE)
-REVIEW_COLUMNS = (
-    "mapping_correct",
-    "corrected_mapping",
-    "health_correct",
-    "corrected_health",
-    "include_sustained_eeg",
-    "include_event_locked_eeg",
-    "reviewer_notes",
-)
 
 
 @dataclass
@@ -670,7 +661,12 @@ def write_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
             if key not in fieldnames:
                 fieldnames.append(key)
     with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -717,27 +713,29 @@ def concise_evidence(row: dict[str, Any]) -> str:
     return f"{duration}; {marker_text}"
 
 
-def suggested_action(row: dict[str, Any]) -> str:
+def pipeline_disposition(row: dict[str, Any]) -> str:
     status = str(row.get("initial_health_guess", ""))
-    actions = {
-        "healthy": "Confirm mapping; approve for preprocessing",
+    dispositions = {
+        "healthy": "Use mapped recording in Silver preprocessing",
         "healthy_with_duplicate_markers": (
-            "Confirm mapping; deduplicate markers before preprocessing"
+            "Use Silver canonical markers; retain raw extras in Bronze"
         ),
-        "folder_mismatch": "Confirm or reject proposed cross-folder mapping",
-        "partial_reconstructable": "Confirm mapping; reconstruct missing marker",
-        "marker_mismatch": "Manual marker/timestamp investigation",
+        "folder_mismatch": "Resolve mapping before Silver preprocessing",
+        "partial_reconstructable": (
+            "Use governed Silver reconstruction and event eligibility"
+        ),
+        "marker_mismatch": "Resolve marker/timestamp mismatch before use",
         "partial_recording": "Locate full recording or exclude",
-        "wrong_protocol": "Confirm exclusion from lab EEG arm",
-        "missing_xdf": "Locate recording or confirm missing",
+        "wrong_protocol": "Retain in Bronze; exclude from lab EEG arm",
+        "missing_xdf": "Locate recording or record as unavailable",
         "unreadable": "Repair/re-export XDF or exclude",
-        "unmapped": "Identify recording manually",
+        "unmapped": "Identify recording before use",
     }
-    return actions.get(status, "Manual review")
+    return dispositions.get(status, "Investigate before use")
 
 
-def build_review_rows(evidence_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    review_rows: list[dict[str, Any]] = []
+def build_summary_rows(evidence_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    summary_rows: list[dict[str, Any]] = []
     for row in evidence_rows:
         xdf_path = str(row.get("xdf_path", ""))
         if "_old" in Path(xdf_path).name:
@@ -746,7 +744,7 @@ def build_review_rows(evidence_rows: list[dict[str, Any]]) -> list[dict[str, Any
         log_subject = str(row.get("initial_log_subject_guess", ""))
         subject_label = folder_subject or log_subject
         xdf_name = Path(xdf_path).name if xdf_path else "(missing)"
-        review_rows.append(
+        summary_rows.append(
             {
                 "subject_and_xdf": f"{subject_label} — {xdf_name}",
                 "proposed_log_mapping": log_subject,
@@ -754,39 +752,22 @@ def build_review_rows(evidence_rows: list[dict[str, Any]]) -> list[dict[str, Any
                 "initial_status": row.get("initial_health_guess", ""),
                 "evidence": concise_evidence(row),
                 "main_issue": row.get("initial_guess_reason", ""),
-                "suggested_action": suggested_action(row),
-                "mapping_correct": "",
-                "corrected_mapping": "",
-                "health_correct": "",
-                "corrected_health": "",
-                "include_sustained_eeg": "",
-                "include_event_locked_eeg": "",
-                "reviewer_notes": "",
+                "pipeline_disposition": pipeline_disposition(row),
             }
         )
-    review_rows.sort(key=subject_number_from_row)
-    return review_rows
+    summary_rows.sort(key=subject_number_from_row)
+    return summary_rows
 
 
-def write_review_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
-    previous_reviews: dict[str, dict[str, str]] = {}
-    if output_path.exists():
-        with output_path.open(newline="", encoding="utf-8") as handle:
-            for old_row in csv.DictReader(handle):
-                key = old_row.get("subject_and_xdf", "")
-                if key:
-                    previous_reviews[key] = {
-                        column: old_row.get(column, "") for column in REVIEW_COLUMNS
-                    }
-    for row in rows:
-        key = str(row.get("subject_and_xdf", ""))
-        if key in previous_reviews:
-            row.update(previous_reviews[key])
-
+def write_summary_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = list(rows[0]) if rows else []
     with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -801,17 +782,23 @@ def main() -> None:
     parser.add_argument(
         "--xdf-root",
         type=Path,
-        default=Path("src/project/logs/xdf"),
+        default=Path("src/project/logs/xdf/bronze"),
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("analysis/eeg/manifests/eeg_recording_manifest.csv"),
+        default=Path(
+            "analysis/eeg/preprocessing/bronze/manifests/"
+            "eeg_recording_manifest.csv"
+        ),
     )
     parser.add_argument(
         "--evidence-output",
         type=Path,
-        default=Path("analysis/eeg/manifests/eeg_recording_evidence.csv"),
+        default=Path(
+            "analysis/eeg/preprocessing/bronze/manifests/"
+            "eeg_recording_evidence.csv"
+        ),
     )
     args = parser.parse_args()
 
@@ -819,12 +806,12 @@ def main() -> None:
     xdf_paths = sorted(args.xdf_root.rglob("*.xdf"))
     recordings = [load_xdf(path) for path in xdf_paths]
     evidence_rows = build_rows(logs, recordings)
-    review_rows = build_review_rows(evidence_rows)
+    summary_rows = build_summary_rows(evidence_rows)
     write_csv(evidence_rows, args.evidence_output)
-    write_review_csv(review_rows, args.output)
+    write_summary_csv(summary_rows, args.output)
 
-    health_counts = Counter(row["initial_status"] for row in review_rows)
-    print(f"Wrote {len(review_rows)} review rows to {args.output}")
+    health_counts = Counter(row["initial_status"] for row in summary_rows)
+    print(f"Wrote {len(summary_rows)} summary rows to {args.output}")
     print(f"Wrote {len(evidence_rows)} evidence rows to {args.evidence_output}")
     for status, count in sorted(health_counts.items()):
         print(f"  {status}: {count}")

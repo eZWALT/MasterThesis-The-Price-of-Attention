@@ -1,9 +1,9 @@
-# EEG recording manifest review
+# EEG recording manifests
 
-Two files are generated from production lab JSONL logs and the XDF files under
-`src/project/logs/xdf/`:
+Two files are generated from production lab JSONL logs and immutable XDF files
+under `src/project/logs/xdf/bronze/`:
 
-- `eeg_recording_manifest.csv` is the short human-review sheet. It has one row
+- `eeg_recording_manifest.csv` is the concise recording summary. It has one row
   per current recording or missing participant and omits superseded `_old` files.
 - `eeg_recording_evidence.csv` is the dense machine-audit table. Use it only
   when the short evidence summary is insufficient.
@@ -11,24 +11,12 @@ Two files are generated from production lab JSONL logs and the XDF files under
 Regenerate it from the repository root:
 
 ```bash
-python analysis/eeg/manifests/build_recording_manifest.py
+python analysis/eeg/preprocessing/bronze/manifests/build_recording_manifest.py
 ```
 
-The generator recalculates evidence and initial guesses while preserving entries
-in the seven review columns of the short manifest.
-
-## Columns to fill manually
-
-- `mapping_correct`: `yes`, `no`, or `uncertain`.
-- `corrected_mapping`: fill only when the proposed mapping is wrong.
-- `health_correct`: `yes`, `no`, or `uncertain`.
-- `corrected_health`: fill only when the initial status is wrong.
-- `include_sustained_eeg`: `yes`, `no`, or `pending`.
-- `include_event_locked_eeg`: `yes`, `no`, or `pending`.
-- `reviewer_notes`: correction evidence or relevant lab notes.
-
-Normally, review only `eeg_recording_manifest.csv`. Do not edit
-`eeg_recording_evidence.csv` by hand; correct its derivation in the generator.
+The manifest has no human-annotation columns. Do not edit either generated CSV
+by hand; correct its derivation in the generator or encode downstream protocol
+and signal eligibility in the corresponding Silver/Gold manifests.
 
 ## Initial health labels
 
@@ -49,7 +37,7 @@ Normally, review only `eeg_recording_manifest.csv`. Do not edit
 The marker matching compares the complete pattern of same-labelled JSONL and XDF
 events using a duplicate-tolerant participant-specific clock fit. A tiny residual
 is strong mapping evidence, but it does not by itself prove that all EEG samples
-cover all required events. Use the EEG-span columns and manual lab notes before
-approving a recording.
+cover all required events. Final event and signal eligibility is governed by the
+Silver canonical marker, acquisition, and quality-control outputs.
 
 Folder and filename subject numbers are treated as guesses, never ground truth.
