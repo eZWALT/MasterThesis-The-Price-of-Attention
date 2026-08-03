@@ -360,322 +360,363 @@ def build() -> plt.Figure:
         color=COLORS["muted"],
     )
 
-    # 1 · Recording inventory
+    # 1 · Source ingestion
     band(
         ax,
         1,
-        "Inputs and recording match",
+        "Ingestion / Landing: collect recordings and experiment logs",
         5,
-        127,
+        132,
         110,
-        25,
+        20,
         face=COLORS["blue_bg"],
         edge=COLORS["blue_border"],
     )
     card(
         ax,
         8,
-        132,
+        136,
         29,
-        "XDF recording",
+        "EEG recording",
         ("32 channel EEG · markers",),
+        height=10,
         icon="eeg-headset.png",
         border=COLORS["blue_border"],
     )
     card(
         ax,
         43,
-        132,
+        136,
         29,
         "Experiment log",
         ("source clock events",),
+        height=10,
         icon="recording.png",
         border=COLORS["blue_border"],
     )
     card(
         ax,
         78,
-        132,
+        136,
         34,
-        "Recording match",
+        "Link files to participant",
         ("participant ↔ experiment ↔ XDF",),
+        height=10,
         border=COLORS["blue_border"],
     )
-    elbow_arrow(
-        ax,
-        ((22.5, 132), (22.5, 129), (82, 129), (82, 132)),
-    )
-    arrow(ax, (72, 133.2), (78, 133.2))
+    arrow(ax, (37, 141), (43, 141))
+    arrow(ax, (72, 141), (78, 141))
 
-    # 2 · Synchronization and marker validation
+    # 2 · Immutable landing layer
     band(
         ax,
         2,
-        "Marker recovery and event timing",
+        "Bronze: preserve and verify raw files",
         5,
-        94,
+        104,
         110,
-        29,
+        24,
         face=COLORS["purple_bg"],
         edge=COLORS["purple_border"],
     )
     card(
         ax,
         8,
-        103,
-        34,
-        "Match log and EEG events",
+        110,
+        23,
+        "Raw XDF + logs",
         (),
         border=COLORS["purple_border"],
-        title_size=9.3,
+        title_size=8.5,
     )
     card(
         ax,
-        48,
-        103,
-        39,
-        "Recover event timeline",
+        34,
+        110,
+        23,
+        "Verify file integrity",
+        (),
+        border=COLORS["purple_border"],
+        title_size=8.3,
+    )
+    card(
+        ax,
+        60,
+        110,
+        23,
+        "Link XDF to log",
         (),
         border=COLORS["purple_border"],
     )
-    gate(ax, 101, 109.5, "Event timing\nreliable?")
-    failure(ax, 88, 95.0, 26, "NO · repair or\nlimit analysis")
-    arrow(ax, (87, 108.5), (91.7, 109.2))
-    arrow(ax, (42, 108.5), (48, 108.5))
+    card(
+        ax,
+        86,
+        110,
+        26,
+        "Audit raw markers",
+        (),
+        border=COLORS["purple_border"],
+        title_size=8.3,
+    )
+    arrow(ax, (31, 115.5), (34, 115.5))
+    arrow(ax, (57, 115.5), (60, 115.5))
+    arrow(ax, (83, 115.5), (86, 115.5))
     arrow(
         ax,
-        (101, 103.5),
-        (101, 102.0),
-        label="NO",
-        color=COLORS["exclude"],
-        label_offset=(3, 0),
+        (95, 136),
+        (95, 128),
+        label="LAND",
+        label_offset=(4.2, 0),
+        color="#536F86",
+        linewidth=1.7,
     )
 
-    # 3 · Signal preprocessing
+    # 3 · Audited and cleaned derivatives
     band(
         ax,
         3,
-        "EEG cleaning",
+        "Silver: align event timing and clean EEG",
         5,
-        62,
+        55,
         110,
-        28,
+        45,
         face=COLORS["green_bg"],
         edge=COLORS["green_border"],
     )
     card(
         ax,
         8,
-        70,
+        80,
         23,
-        "Import EEG",
+        "Align event clocks",
         (),
-        border=COLORS["green_border"],
-        title_size=9.2,
+        border=COLORS["purple_border"],
+        title_size=8.2,
     )
     card(
         ax,
         35,
-        70,
+        80,
         23,
-        "Clean signal",
+        "Create event timeline",
         (),
-        border=COLORS["green_border"],
+        border=COLORS["purple_border"],
+        title_size=8.2,
     )
     card(
         ax,
         62,
-        70,
-        25,
-        "Remove artifacts",
+        80,
+        23,
+        "Estimate missing times",
         (),
-        border=COLORS["green_border"],
+        border=COLORS["purple_border"],
+        title_size=8.1,
     )
-    gate(ax, 101, 77.5, "EEG usable?")
-    failure(ax, 88, 63.0, 26, "NO · exclude with\nrecorded reason")
-    arrow(ax, (31, 75.5), (35, 75.5))
-    arrow(ax, (58, 75.5), (62, 75.5))
-    arrow(ax, (87, 75.5), (92.0, 77.0))
+    gate(ax, 101, 85.5, "Event timing\nvalid?")
+    arrow(ax, (31, 85.5), (35, 85.5))
+    arrow(ax, (58, 85.5), (62, 85.5))
+    arrow(ax, (85, 85.5), (91.5, 85.5))
     arrow(
         ax,
-        (101, 71.5),
-        (101, 70.0),
+        (110.5, 85.5),
+        (114, 85.5),
         label="NO",
         color=COLORS["exclude"],
-        label_offset=(3, 0),
+        label_offset=(0, 2),
     )
 
-    # 4 · Analysis windows and features
+    card(
+        ax,
+        8,
+        61,
+        23,
+        "Convert XDF to MNE",
+        (),
+        border=COLORS["green_border"],
+        title_size=8.0,
+    )
+    card(
+        ax,
+        35,
+        61,
+        23,
+        "Filter + rereference",
+        (),
+        border=COLORS["green_border"],
+        title_size=8.4,
+    )
+    card(
+        ax,
+        62,
+        61,
+        23,
+        "Flag EEG artifacts",
+        (),
+        border=COLORS["green_border"],
+        title_size=9.0,
+    )
+    gate(ax, 101, 66.5, "Signal usable?")
+    arrow(ax, (31, 66.5), (35, 66.5))
+    arrow(ax, (58, 66.5), (62, 66.5))
+    arrow(ax, (85, 66.5), (92, 66.5))
+    arrow(
+        ax,
+        (110.5, 66.5),
+        (114, 66.5),
+        label="NO",
+        color=COLORS["exclude"],
+        label_offset=(0, 2),
+    )
+    elbow_arrow(
+        ax,
+        ((101, 79.5), (101, 75), (19.5, 75), (19.5, 72)),
+        label="YES",
+        label_at=(96, 75),
+        color="#536F86",
+        linewidth=1.5,
+    )
+    arrow(
+        ax,
+        (95, 110),
+        (95, 100),
+        label="DERIVE",
+        label_offset=(4.2, 0),
+        color="#536F86",
+        linewidth=1.7,
+    )
+
+    # 4 · Analysis-ready measurements
     band(
         ax,
         4,
-        "Create EEG measurements",
+        "Gold: create analysis ready EEG features",
         5,
-        27,
+        25,
         110,
-        31,
+        26,
         face=COLORS["gold_bg"],
         edge=COLORS["gold_border"],
     )
     card(
         ax,
         8,
-        37,
-        30,
+        30.5,
+        25,
         "Condition windows",
         (),
         border=COLORS["green_border"],
         title_color="#3F7143",
-    )
-    card(
-        ax,
-        42,
-        37,
-        30,
-        "Compute EEG measures",
-        (),
-        border=COLORS["gold_border"],
         title_size=9.0,
     )
     gate(
         ax,
-        84,
-        47,
+        48,
+        35.5,
         "Ad timing\nreliable?",
         width=18,
         height=11,
     )
     card(
         ax,
-        94,
-        33,
-        18,
-        "Before and after\nad windows",
+        62,
+        36.5,
+        21,
+        "Build ad windows",
         (),
-        height=10,
+        height=8,
         border=COLORS["conditional"],
         title_color=COLORS["conditional"],
         title_size=8.5,
     )
-    rounded(
+    card(
         ax,
-        94,
-        48.5,
-        18,
-        6.5,
-        face="#FFF9F4",
-        edge=COLORS["conditional"],
-        radius=1.0,
-        linewidth=1.0,
-        zorder=3,
+        62,
+        26.5,
+        21,
+        "Condition only",
+        (),
+        height=8,
+        border=COLORS["conditional"],
+        title_color=COLORS["conditional"],
+        title_size=8.5,
     )
-    ax.text(
-        103,
-        51.75,
-        "NO · use condition\nwindows only",
-        ha="center",
-        va="center",
-        fontsize=8.5,
-        fontweight="bold",
-        color=COLORS["conditional"],
-        zorder=5,
+    card(
+        ax,
+        89,
+        30.5,
+        23,
+        "EEG feature table",
+        (),
+        border=COLORS["gold_border"],
+        title_size=8.8,
     )
-    arrow(ax, (93, 47), (94, 51.5), color=COLORS["conditional"])
+    arrow(ax, (33, 35.5), (39, 35.5))
     arrow(
         ax,
-        (90, 42.8),
-        (94, 38),
+        (55, 39.5),
+        (62, 40.5),
         label="YES",
         color=COLORS["conditional"],
-        label_offset=(1.2, 1.2),
+        label_offset=(0, 1.5),
     )
+    arrow(
+        ax,
+        (55, 31.5),
+        (62, 30.5),
+        label="NO",
+        color=COLORS["conditional"],
+        label_offset=(0, -1.5),
+    )
+    arrow(ax, (83, 40.5), (89, 37.5), color=COLORS["conditional"])
+    arrow(ax, (83, 30.5), (89, 33.5), color=COLORS["conditional"])
 
-    # 5 · Outputs and inference
+    # 5 · Inference and communication
     band(
         ax,
         5,
-        "Analysis outputs",
+        "Analysis: compare conditions and report findings",
         5,
-        3,
+        2,
         110,
-        20,
+        19,
         face=COLORS["grey_bg"],
         edge=COLORS["grey_border"],
     )
     card(
         ax,
         8,
-        7,
-        30,
-        "EEG feature table",
-        (),
-        border=COLORS["grey_border"],
-    )
-    card(
-        ax,
+        5,
         45,
-        7,
-        30,
-        "Statistical comparisons",
+        "Compare conditions",
         (),
+        height=8,
         border=COLORS["grey_border"],
         title_size=9.1,
     )
     card(
         ax,
-        82,
-        7,
-        30,
+        67,
+        5,
+        45,
         "Results and figures",
         (),
+        height=8,
         border=COLORS["grey_border"],
     )
-    arrow(ax, (38, 12.5), (45, 12.5))
-    arrow(ax, (75, 12.5), (82, 12.5))
-
-    # Stage transitions and explicit success paths. Margin routing avoids labels
-    # and cards, while the numbered bands preserve the reading order.
-    arrow(
+    arrow(ax, (53, 9), (67, 9))
+    elbow_arrow(
         ax,
-        (95, 132),
-        (95, 123),
-        label="CHECK",
-        label_offset=(4.5, 0),
+        ((100.5, 30.5), (100.5, 23), (2, 23), (2, 9), (8, 9)),
         color="#536F86",
         linewidth=1.7,
     )
     elbow_arrow(
         ax,
-        ((110.5, 109.5), (117, 109.5), (117, 88), (113, 88)),
-        label="YES · aligned",
-        label_at=(106.5, 92.5),
+        ((110.5, 66.5), (117, 66.5), (117, 49), (112, 49)),
+        label="YES",
+        label_at=(110, 53),
         color="#536F86",
-        linewidth=1.7,
-    )
-    elbow_arrow(
-        ax,
-        ((110.5, 77.5), (117, 77.5), (117, 56), (113, 56)),
-        label="YES · continue",
-        label_at=(106.5, 60.5),
-        color="#536F86",
-        linewidth=1.7,
-    )
-
-    # Both condition windows and valid ad windows feed the same measurement step.
-    arrow(ax, (38, 42.5), (42, 42.5))
-    arrow(
-        ax,
-        (94, 38),
-        (72, 42.5),
-        color=COLORS["conditional"],
-        connection="arc3,rad=-0.12",
-    )
-    arrow(
-        ax,
-        (57, 37),
-        (38, 18),
-        color="#536F86",
-        connection="arc3,rad=-0.08",
         linewidth=1.7,
     )
     return fig
@@ -691,6 +732,12 @@ def main() -> None:
             facecolor="white",
         )
     plt.close(figure)
+    svg_path = HERE / "eeg_pipeline.svg"
+    svg_path.write_text(
+        "\n".join(line.rstrip() for line in svg_path.read_text().splitlines())
+        + "\n",
+        encoding="utf-8",
+    )
 
 
 if __name__ == "__main__":
