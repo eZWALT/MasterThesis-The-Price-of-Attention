@@ -131,7 +131,7 @@ time:
 
 | Document | Contains |
 |---|---|
-| `docs/generated/data-analysis-foundation.md` | Research questions, outcomes, contrasts, model structure, exclusions, preregistration order |
+| `.agents/context/data-analysis/2026-07-28-data-analysis-foundation.md` | Research questions, outcomes, contrasts, model structure, exclusions, preregistration order |
 | `docs/generated/model-feasibility.md` | Which models the sample supports and which were rejected, with the comparison that produced the ranking |
 | `docs/generated/eeg-analysis-plan.md` | Feasible EEG uses by tier, the marker audit, and the offline timing-reconstruction procedure |
 | `docs/generated/related-code-chatbot-ads.md` | Review of the *Ads that Talk Back* code release and what transfers to this study |

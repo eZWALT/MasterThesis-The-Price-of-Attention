@@ -2,7 +2,7 @@
 
 Behavioural, self-report, and EEG analysis goals for the implemented
 conversational advertising study. Decisions recorded 28 July 2026. The interactive
-version is `data-analysis-foundation.canvas.tsx` in this folder.
+version is `docs/data-analysis-foundation.canvas.tsx`.
 
 ## Core position
 

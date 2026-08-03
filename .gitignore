@@ -218,6 +218,7 @@ src/project/data/catalogs/amazon*.jsonl
 src/project/data/catalogs/amazon*session-ses_*.md
 session-ses_*.md
 # Production logs — ignored by default, track specific ones with git add -f or use logs/tracked/
+src/project/logs/xdf/
 
 # Local Overleaf Git mirrors — each has its own Git history and remote.
 /docs/overleaf/*
