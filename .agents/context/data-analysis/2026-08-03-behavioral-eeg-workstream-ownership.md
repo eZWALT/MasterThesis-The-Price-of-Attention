@@ -205,6 +205,7 @@ manifests.
 ## Related durable documents
 
 - `.agents/context/data-analysis/2026-07-28-data-analysis-foundation.md`
+- `.agents/context/data-analysis/eeg/2026-08-03-independent-xdf-recording-audit.md`
 - `docs/generated/eeg-analysis-plan.md`
 - `docs/generated/model-feasibility.md`
 - `docs/generated/related-code-chatbot-ads.md`
