@@ -1,0 +1,45 @@
+{
+  "policy_version": "candidate_v1",
+  "status": "requires_visual_validation",
+  "input": {
+    "montage": "standard_1020",
+    "source_unit": "microvolts",
+    "mne_unit": "volts",
+    "nominal_sampling_rate_hz": 500.0,
+    "online_reference": "unknown",
+    "operator_recalled_ground": "Fpz",
+    "reference_hypothesis": "FCz"
+  },
+  "filtering": {
+    "notch_hz": [50.0],
+    "highpass_hz": 0.5,
+    "lowpass_hz": 40.0
+  },
+  "bad_channel_review": {
+    "near_flat_robust_std_uv_below": 0.5,
+    "extreme_robust_std_uv_above": 150.0,
+    "low_correlation_below": 0.4,
+    "flat_fraction_above": 0.01,
+    "extreme_amplitude_requires_low_correlation": true,
+    "ocular_proxy_channels": ["Fp1", "Fp2"],
+    "automatic_recording_exclusion": false,
+    "manual_recording_review_bad_channel_fraction_above": 0.2
+  },
+  "rereferencing": {
+    "method": "average",
+    "exclude_marked_bad_channels": true
+  },
+  "interpolation": {
+    "method": "spline",
+    "description": "Spherical spline interpolation for EEG channels.",
+    "reset_bad_labels": false
+  },
+  "ica": {
+    "enabled": false,
+    "reason": "No dedicated EOG channels; validate component selection using Fp1 and Fp2 before enabling."
+  },
+  "epoch_rejection": {
+    "status": "not_frozen",
+    "reason": "Requires cleaned-window distributions and visual review."
+  }
+}

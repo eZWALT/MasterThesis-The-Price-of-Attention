@@ -33,10 +33,11 @@ matplotlib==3.11.0
 pytest>=8.0
 
 # Optional: uncomment when multimodal integration is active
-# mne==1.9.0              # EEG preprocessing
 # brainflow==6.1.0        # BrainFlow LSL stream
 # tobii-research==1.11.2  # Tobii eye-tracking SDK
 
 # ── Webcam / EEG ──────────────────────────────────────────────────────────────
 opencv-python-headless>=4.9.0
 pylsl>=1.16.0
+pyxdf==1.17.5
+mne==1.12.1
