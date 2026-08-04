@@ -31,10 +31,21 @@ def validate(
     windows_path: Path,
     epochs_path: Path,
     responses_path: Path,
+    *,
+    expected_ica_applied: bool = False,
 ) -> dict[str, Any]:
     windows = read_csv(windows_path)
     epochs = read_csv(epochs_path)
     responses = read_csv(responses_path)
+    expected_ica_value = "yes" if expected_ica_applied else "no"
+    observed_ica = {
+        row["ica_applied"] for row in [*epochs, *responses]
+    }
+    if observed_ica != {expected_ica_value}:
+        raise ValueError(
+            f"Expected ica_applied={expected_ica_value}, "
+            f"found {sorted(observed_ica)}"
+        )
     if len(windows) != 216 or len(epochs) != 216 or len(responses) != 108:
         raise ValueError(
             "Expected 216 windows/epochs and 108 response pairs, got "
@@ -117,7 +128,7 @@ def validate(
         "maximum_combined_timing_uncertainty_s": max(uncertainty),
         "duplicate_key_count": 0,
         "non_finite_feature_count": 0,
-        "ica_applied": False,
+        "ica_applied": expected_ica_applied,
         "artifact_policy_status": responses[0]["artifact_policy_status"],
     }
 
@@ -128,8 +139,18 @@ def main() -> None:
     parser.add_argument("--epochs", type=Path, default=DEFAULT_EPOCHS)
     parser.add_argument("--responses", type=Path, default=DEFAULT_RESPONSES)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--expected-ica-applied",
+        choices=("yes", "no"),
+        default="no",
+    )
     args = parser.parse_args()
-    report = validate(args.windows, args.epochs, args.responses)
+    report = validate(
+        args.windows,
+        args.epochs,
+        args.responses,
+        expected_ica_applied=args.expected_ica_applied == "yes",
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2)

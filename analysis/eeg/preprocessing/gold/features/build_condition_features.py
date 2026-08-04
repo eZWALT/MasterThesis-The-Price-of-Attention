@@ -290,6 +290,7 @@ def epoch_row(
     data_v: np.ndarray,
     channel_names: list[str],
     epoch_rejection: dict[str, Any],
+    ica_applied: bool,
 ) -> dict[str, Any]:
     row: dict[str, Any] = {
         "subject_id": window["subject_id"],
@@ -310,7 +311,7 @@ def epoch_row(
             if window["window_type"] == "baseline"
             else "not_applicable"
         ),
-        "ica_applied": "no",
+        "ica_applied": "yes" if ica_applied else "no",
         "artifact_policy_status": epoch_rejection["status"],
         "max_peak_to_peak_threshold_uv": epoch_rejection[
             "max_peak_to_peak_uv"
@@ -382,7 +383,7 @@ def summarize_window(
         "primary_analysis_eligible": "yes" if window_eligible else "no",
         "exclusion_reason": "" if window_eligible else "insufficient_clean_epochs",
         "artifact_policy_status": epoch_rejection["status"],
-        "ica_applied": "no",
+        "ica_applied": first["ica_applied"],
         "max_peak_to_peak_uv_p50": percentile(
             [float(row["max_peak_to_peak_uv"]) for row in rows], 0.5
         ),
@@ -461,7 +462,7 @@ def build(
         subject_windows = windows_by_subject[subject_id]
         first = subject_windows[0]
         print(f"{subject_id}: loading and cleaning", flush=True)
-        raw, _ = clean_recording(
+        raw, cleaning_report = clean_recording(
             subject_id=subject_id,
             xdf_path=REPOSITORY_ROOT / first["source_xdf"],
             canonical_markers_path=(
@@ -495,6 +496,7 @@ def build(
                         data_v=data_v,
                         channel_names=raw.ch_names,
                         epoch_rejection=epoch_rejection,
+                        ica_applied=cleaning_report.ica_applied,
                     )
                 )
             print(

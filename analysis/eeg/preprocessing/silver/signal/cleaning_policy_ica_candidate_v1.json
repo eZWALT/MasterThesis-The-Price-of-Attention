@@ -1,0 +1,90 @@
+{
+  "policy_version": "ica_candidate_v1",
+  "status": "requires_ica_visual_validation",
+  "input": {
+    "montage": "standard_1020",
+    "source_unit": "microvolts",
+    "mne_unit": "volts",
+    "nominal_sampling_rate_hz": 500.0,
+    "online_reference": "Cz",
+    "online_reference_status": "reported_by_lab_2026-08-04",
+    "ground": "Fpz",
+    "ground_status": "reported_by_lab_2026-08-04",
+    "reference_export_note": "Cz is also present as a dynamic XDF data channel; verify BrainVision/actiCHamp reference export handling if available."
+  },
+  "filtering": {
+    "notch_hz": [50.0],
+    "highpass_hz": 0.5,
+    "lowpass_hz": 40.0
+  },
+  "bad_channel_review": {
+    "near_flat_robust_std_uv_below": 0.5,
+    "extreme_robust_std_uv_above": 150.0,
+    "low_correlation_below": 0.4,
+    "flat_fraction_above": 0.01,
+    "extreme_amplitude_requires_low_correlation": true,
+    "ocular_proxy_channels": ["Fp1", "Fp2"],
+    "automatic_recording_exclusion": false,
+    "manual_recording_review_bad_channel_fraction_above": 0.2,
+    "subject_specific_interpolation": {
+      "lab_subject_1": ["P4"],
+      "lab_subject_9": ["P4"],
+      "lab_subject_10": ["C4"]
+    },
+    "subject_specific_evidence": {
+      "lab_subject_1:P4": "Worst channel in all 93 epochs above 1000 uV peak-to-peak; failure concentrated in the final two condition windows.",
+      "lab_subject_9:P4": "Worst channel in 8 of 10 epochs above 750 uV peak-to-peak; contamination includes five of seven baseline epochs and the third condition window.",
+      "lab_subject_10:C4": "Worst channel in 258 of 264 epochs above 1000 uV peak-to-peak; failure persists across the final three condition windows."
+    }
+  },
+  "rereferencing": {
+    "method": "average",
+    "exclude_marked_bad_channels": true
+  },
+  "interpolation": {
+    "method": "spline",
+    "description": "Spherical spline interpolation for EEG channels.",
+    "reset_bad_labels": false
+  },
+  "ica": {
+    "enabled": true,
+    "status": "candidate_requires_human_signoff",
+    "method": "fastica",
+    "random_state": 97,
+    "max_iter": 1000,
+    "fit_highpass_hz": 1.0,
+    "fit_lowpass_hz": 40.0,
+    "fit_decim": 5,
+    "pca_explained_variance": 0.99,
+    "ocular_proxy_channels": ["Fp1", "Fp2"],
+    "proxy_correlation_abs_min": 0.35,
+    "frontal_dominance_min": 1.5,
+    "maximum_excluded_components": 3,
+    "frontal_channels": [
+      "Fp1",
+      "Fp2",
+      "F3",
+      "F4",
+      "F7",
+      "F8",
+      "F9",
+      "F10",
+      "Fz",
+      "FC1",
+      "FC2"
+    ],
+    "model_directory": "src/project/logs/xdf/silver/ica/candidate_v1/models",
+    "report_directory": "src/project/logs/xdf/silver/ica/candidate_v1/reports",
+    "figure_directory": "src/project/logs/xdf/silver/ica/candidate_v1/figures",
+    "selection_rule": "Exclude at most three components meeting both absolute Fp1/Fp2 source correlation >= 0.35 and frontal topography dominance >= 1.5. Human visual review remains mandatory."
+  },
+  "epoch_rejection": {
+    "status": "frozen_v3",
+    "max_peak_to_peak_uv": 1050.0,
+    "reject_near_flat_channels": true,
+    "minimum_retained_fraction": 0.8,
+    "minimum_retained_epochs": 5,
+    "window_aggregation": "median",
+    "reason": "Use the same 1050 uV epoch contract as the no-ICA primary branch so the ICA comparison isolates component removal."
+  }
+}

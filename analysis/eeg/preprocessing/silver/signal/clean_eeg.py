@@ -15,6 +15,7 @@ from xdf_to_mne import load_xdf_as_mne
 
 
 HERE = Path(__file__).resolve().parent
+REPOSITORY_ROOT = HERE.parents[4]
 DEFAULT_POLICY = HERE / "cleaning_policy.json"
 
 
@@ -30,6 +31,8 @@ class CleaningReport:
     rereference: str
     interpolated_channels: tuple[str, ...]
     ica_applied: bool
+    ica_component_count: int
+    ica_excluded_components: tuple[int, ...]
     output_channel_count: int
     output_sample_count: int
 
@@ -39,6 +42,7 @@ def load_policy(path: Path = DEFAULT_POLICY) -> dict[str, Any]:
         policy = json.load(handle)
     if policy.get("status") not in {
         "requires_visual_validation",
+        "requires_ica_visual_validation",
         "frozen",
     }:
         raise ValueError(f"Unsupported cleaning policy status: {policy.get('status')}")
@@ -114,6 +118,17 @@ def clean_recording(
             verbose=False,
         )
 
+    ica_application = None
+    if bool(policy.get("ica", {}).get("enabled", False)):
+        from ica_cleaning import apply_saved_ica
+
+        raw, ica_application = apply_saved_ica(
+            raw=raw,
+            subject_id=subject_id,
+            policy=policy,
+            repository_root=REPOSITORY_ROOT,
+        )
+
     report = CleaningReport(
         subject_id=subject_id,
         policy_version=str(policy["policy_version"]),
@@ -124,7 +139,17 @@ def clean_recording(
         lowpass_hz=float(filtering["lowpass_hz"]),
         rereference=str(policy["rereferencing"]["method"]),
         interpolated_channels=tuple(bad_channels),
-        ica_applied=False,
+        ica_applied=ica_application is not None,
+        ica_component_count=(
+            ica_application.fitted_component_count
+            if ica_application is not None
+            else 0
+        ),
+        ica_excluded_components=(
+            ica_application.excluded_components
+            if ica_application is not None
+            else ()
+        ),
         output_channel_count=int(len(raw.ch_names)),
         output_sample_count=int(raw.n_times),
     )

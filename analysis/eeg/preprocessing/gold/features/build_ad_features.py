@@ -45,6 +45,7 @@ def feature_row(
     sfreq: float,
     channel_names: list[str],
     epoch_rejection: dict[str, Any],
+    ica_applied: bool,
 ) -> dict[str, Any]:
     quality = quality_features(data_v, channel_names)
     rejection_reasons: list[str] = []
@@ -81,7 +82,7 @@ def feature_row(
         "duration_s": window["duration_s"],
         "sampling_rate_hz": f"{sfreq:.6f}",
         "channel_count": len(channel_names),
-        "ica_applied": "no",
+        "ica_applied": "yes" if ica_applied else "no",
         "artifact_policy_status": epoch_rejection["status"],
         "max_peak_to_peak_threshold_uv": epoch_rejection[
             "max_peak_to_peak_uv"
@@ -138,7 +139,7 @@ def response_row(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "primary_analysis_eligible": "yes" if eligible else "no",
         "exclusion_reason": "" if eligible else "gross_artifact_in_pair",
         "artifact_policy_status": pre["artifact_policy_status"],
-        "ica_applied": "no",
+        "ica_applied": pre["ica_applied"],
     }
     for feature in SUMMARY_FEATURES:
         pre_value = float(pre[feature])
@@ -181,7 +182,7 @@ def build(
         subject_windows = grouped_subjects[subject_id]
         source = subject_windows[0]
         print(f"{subject_id}: cleaning ad-analysis windows", flush=True)
-        raw, _ = clean_recording(
+        raw, cleaning_report = clean_recording(
             subject_id=subject_id,
             xdf_path=REPOSITORY_ROOT / source["source_xdf"],
             canonical_markers_path=(
@@ -208,6 +209,7 @@ def build(
                     sfreq=sfreq,
                     channel_names=raw.ch_names,
                     epoch_rejection=epoch_rejection,
+                    ica_applied=cleaning_report.ica_applied,
                 )
             )
 

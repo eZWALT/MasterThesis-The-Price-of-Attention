@@ -124,11 +124,21 @@ def validate(
     summary_path: Path,
     *,
     require_full_cohort: bool = True,
+    expected_ica_applied: bool = False,
 ) -> dict[str, Any]:
     epochs = read_csv(epochs_path)
     summaries = read_csv(summary_path)
     if not epochs or not summaries:
         raise ValueError("Feature tables must not be empty")
+    expected_ica_value = "yes" if expected_ica_applied else "no"
+    observed_ica = {
+        row["ica_applied"] for row in [*epochs, *summaries]
+    }
+    if observed_ica != {expected_ica_value}:
+        raise ValueError(
+            f"Expected ica_applied={expected_ica_value}, "
+            f"found {sorted(observed_ica)}"
+        )
 
     subjects = sorted({row["subject_id"] for row in summaries})
     if (
@@ -245,7 +255,7 @@ def validate(
         "ineligible_window_count": len(ineligible_windows),
         "duplicate_epoch_key_count": 0,
         "non_finite_feature_count": 0,
-        "ica_applied": False,
+        "ica_applied": expected_ica_applied,
         "artifact_policy_status": summaries[0]["artifact_policy_status"],
         "baseline_eye_state": "uncontrolled_mostly_open",
         "quality_distributions": quality_distributions,
@@ -270,11 +280,17 @@ def main() -> None:
         action="store_true",
         help="Validate selected-subject test outputs without requiring 18 subjects.",
     )
+    parser.add_argument(
+        "--expected-ica-applied",
+        choices=("yes", "no"),
+        default="no",
+    )
     args = parser.parse_args()
     report = validate(
         args.epochs,
         args.summary,
         require_full_cohort=not args.allow_subset,
+        expected_ica_applied=args.expected_ica_applied == "yes",
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as handle:
