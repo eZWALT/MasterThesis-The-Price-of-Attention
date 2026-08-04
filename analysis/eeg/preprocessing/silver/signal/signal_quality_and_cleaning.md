@@ -24,7 +24,7 @@ Generated evidence:
 - `src/project/logs/xdf/silver/audits/eeg_channel_quality.csv`
 - `src/project/logs/xdf/silver/audits/eeg_recording_quality.csv`
 
-## Candidate deterministic cleaning
+## Deterministic cleaning
 
 `cleaning_policy.json` currently specifies:
 
@@ -34,15 +34,36 @@ Generated evidence:
 4. average rereference excluding marked bad channels;
 5. spherical-spline interpolation of marked channels.
 
-The implementation was executed successfully on subject 8, including
-interpolation of `F10`.
+Generated epochs retain the observed 500 Hz sampling rate. Their Nyquist
+frequency is therefore 250 Hz, safely above the 40 Hz low-pass cutoff
+(6.25-fold margin). The aggregate soundness validator checks this from the
+generated epoch rows rather than relying only on nominal metadata.
+
+Full-window epoch evidence added three recording-specific interpolations:
+subject 1 `P4`, subject 9 `P4`, and subject 10 `C4`. Subject 8 `F10` remains
+interpolated from the condition-blind channel audit. These decisions are stored
+in the generated policy rather than human annotation columns.
+
+The primary gross-artifact rule is 1,050 µV peak-to-peak (`frozen_v3`), with no
+near-flat channels, a minimum retained fraction of 80%, and at least five
+retained epochs per condition window. It was selected after observing Subject
+14's 1,042.56 µV no-ad epoch and is therefore explicitly post-review. The
+1,000 µV `frozen_v1` and 1,500 µV `frozen_v2` rules remain mandatory
+sensitivities. Current Gold outputs use no ICA.
+
+`validate_cleaning_visual.py` generates the validation pack under
+`src/project/logs/xdf/silver/validation/cleaning_visual/`. Representative notch
+and average-reference checks pass. All four interpolated channels fall below
+1,000 µV in their worst inspected segment and correlate with neighboring
+signals after repair (`r=0.688` to `0.991`). Human visual signoff remains
+pending.
 
 ## Not yet frozen
 
-- Online acquisition reference remains unconfirmed.
-- ICA is disabled until component selection using `Fp1/Fp2` is visually
-  validated; there are no dedicated EOG channels.
-- Epoch-level amplitude and retention thresholds require distributions from the
-  actual condition/ad windows.
-- The current channel audit samples the complete recording evenly but does not
-  replace full-window QC after epoch construction.
+- Laboratory feedback reports `Cz` online reference and `Fpz` ground; average
+  rereferencing remains the offline policy.
+- Implement ICA with 99% PCA explained variance on a separate branch.
+- Validate component selection using `Fp1/Fp2` ocular proxies, topography,
+  spectra, time courses, and visual review.
+- ICA/no-ICA sensitivity validation is required before selecting the final
+  primary cleaning branch.

@@ -1,5 +1,5 @@
 {
-  "policy_version": "candidate_v5",
+  "policy_version": "candidate_v3",
   "status": "requires_visual_validation",
   "input": {
     "montage": "standard_1020",
@@ -10,7 +10,7 @@
     "online_reference_status": "reported_by_lab_2026-08-04",
     "ground": "Fpz",
     "ground_status": "reported_by_lab_2026-08-04",
-    "reference_export_note": "Cz is also present as a dynamic XDF data channel; verify BrainVision/actiCHamp reference export handling if the acquisition workspace becomes available."
+    "reference_export_note": "Cz is also present as a dynamic XDF data channel; verify BrainVision/actiCHamp reference export handling if available."
   },
   "filtering": {
     "notch_hz": [50.0],
@@ -48,27 +48,15 @@
   },
   "ica": {
     "enabled": false,
-    "status": "implementation_and_validation_required",
-    "pca_explained_variance": 0.99,
-    "expected_component_range": [10, 20],
-    "ocular_proxy_channels": ["Fp1", "Fp2"],
-    "component_selection_evidence": [
-      "Fp1/Fp2 correlation",
-      "component topography",
-      "component time course",
-      "component spectrum",
-      "visual validation"
-    ],
-    "no_ica_sensitivity_required": true,
-    "reason": "Lab feedback prioritizes ICA and uses 99% PCA explained variance. Fp1/Fp2 are frontal EEG ocular proxies, not dedicated EOG channels; component exclusion still requires explicit multi-source evidence before ICA can replace the current no-ICA primary dataset."
+    "reason": "No dedicated EOG channels; validate component selection using Fp1 and Fp2 before enabling."
   },
   "epoch_rejection": {
-    "status": "frozen_v3",
-    "max_peak_to_peak_uv": 1050.0,
+    "status": "frozen_v2",
+    "max_peak_to_peak_uv": 1500.0,
     "reject_near_flat_channels": true,
     "minimum_retained_fraction": 0.8,
     "minimum_retained_epochs": 5,
     "window_aggregation": "median",
-    "reason": "Primary threshold selected as 1050 uV after observing subject 14's 1042.56 uV no-ad post epoch. This participant-retention-driven, post-review choice retains that pair while rejecting more of the gross-artifact tail than frozen_v2 at 1500 uV. Both 1000 uV frozen_v1 and 1500 uV frozen_v2 remain mandatory sensitivity policies."
+    "reason": "Archived permissive sensitivity policy selected after reviewing the complete condition and ad epoch quality distributions. It retains every ad pre/post pair including subject 14."
   }
 }

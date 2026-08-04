@@ -7,7 +7,47 @@ Data remains under `src/project/logs/xdf/`:
 
 - Bronze: immutable source XDF files and hash inventory;
 - Silver: canonical markers, conversion evidence, cleaning and quality control;
-- Gold: eligible windows and future feature tables.
+- Gold: eligible windows and analysis-shaped feature tables.
+
+## Run the current pipeline
+
+From the repository root:
+
+```bash
+python analysis/eeg/preprocessing/run_pipeline.py
+```
+
+Run the archived 1,000 µV `frozen_v1` and 1,500 µV `frozen_v2` sensitivity
+analyses without replacing the 1,050 µV `frozen_v3` primary outputs:
+
+```bash
+python analysis/eeg/preprocessing/run_threshold_sensitivity.py
+```
+
+Sensitivity features and statistics are written under versioned
+`sensitivity/frozen_v1/` and `sensitivity/frozen_v2/` directories.
+
+After generating the separate Silver visual pack and the threshold sensitivity
+branch, aggregate all machine-checkable evidence with:
+
+```bash
+python analysis/eeg/preprocessing/run_pipeline.py --stage validation
+```
+
+Preview without executing:
+
+```bash
+python analysis/eeg/preprocessing/run_pipeline.py --dry-run
+```
+
+Run one stage:
+
+```bash
+python analysis/eeg/preprocessing/run_pipeline.py --stage silver-markers
+```
+
+The runner is fail-fast and never moves raw XDF files. New recordings must be
+landed separately with the ingestion command and an explicit `--apply`.
 
 ## Pipeline order
 
@@ -36,19 +76,52 @@ python analysis/eeg/preprocessing/silver/markers/verify_recovery_invariants.py
 ```bash
 python analysis/eeg/preprocessing/silver/signal/audit_xdf_mne.py
 python analysis/eeg/preprocessing/silver/signal/audit_signal_quality.py
+python analysis/eeg/preprocessing/silver/signal/validate_cleaning_visual.py
 ```
 
-`silver/signal/cleaning_policy.json` remains a candidate policy until visual
-artifact validation and epoch-retention thresholds are frozen.
+`silver/signal/cleaning_policy.json` freezes the artifact and retention policy.
+The visual command generates filtering and interpolation figures plus
+machine-checkable evidence. Human visual signoff remains required before
+publication.
 
 ### 4. Window contracts
 
 ```bash
 python analysis/eeg/preprocessing/gold/windows/build_condition_windows.py
 python analysis/eeg/preprocessing/gold/windows/build_ad_visibility.py
+python analysis/eeg/preprocessing/gold/windows/build_ad_windows.py
 ```
 
-### 5. Pipeline diagram
+### 5. Spectral feature datasets
+
+```bash
+python analysis/eeg/preprocessing/gold/features/build_condition_features.py
+python analysis/eeg/preprocessing/gold/features/validate_condition_features.py
+python analysis/eeg/preprocessing/gold/features/build_ad_features.py
+python analysis/eeg/preprocessing/gold/features/validate_ad_features.py
+```
+
+This creates condition and ad response features, including Fz theta, posterior
+alpha, FAA, band power, engagement, provenance, and retained-signal evidence.
+
+### 6. Initial statistical tables
+
+```bash
+python analysis/eeg/statistics/build_condition_contrasts.py
+python analysis/eeg/statistics/build_ad_contrasts.py
+```
+
+### 7. Publication analysis workspace
+
+```bash
+python analysis/eeg/analysis/run_publication_analysis.py
+python analysis/eeg/analysis/execute_notebook.py
+```
+
+This generates the analysis-facing tables, publication figures, twenty-gate
+report, and executable notebook without mutating preprocessing outputs.
+
+### 8. Pipeline diagram
 
 ```bash
 python src/project/docs/eeg_pipeline/eeg_pipeline.py
@@ -59,7 +132,9 @@ living inside the executable preprocessing package.
 
 ## Current gate
 
-Recording identity, marker recovery, XDF-to-MNE conversion, and timing-window
-construction are validated for the 18 laboratory recordings. Final Gold EEG
-features remain blocked on Silver visual cleaning validation and artifact/epoch
-retention rules.
+Condition and ad response datasets are executable for all 18 laboratory
+recordings. Objective cleaning checks pass. Remaining publication gates are
+human visual signoff, implementation of the 99%-variance ICA branch, and
+interpretation/sensitivity decisions for the uncontrolled baseline and
+estimated inline onset. Laboratory feedback identifies `Cz` as online reference
+and `Fpz` as ground; average rereferencing remains the offline policy.

@@ -21,6 +21,8 @@ python analysis/eeg/preprocessing/silver/signal/audit_xdf_mne.py
 python analysis/eeg/preprocessing/silver/signal/audit_signal_quality.py
 ```
 
-The current acquisition facts and unresolved reference question are recorded in
-`acquisition_contract.md`. Signal-quality findings and the candidate cleaning
-policy are documented in `signal_quality_and_cleaning.md`.
+The current acquisition facts, laboratory-reported `Cz` reference/`Fpz` ground,
+and XDF export caveat are recorded in `acquisition_contract.md`. Signal-quality
+findings, recording-specific channel repairs, ICA plan, and the frozen
+condition-epoch artifact policy are documented in
+`signal_quality_and_cleaning.md`.

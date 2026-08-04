@@ -1,7 +1,7 @@
 # EEG acquisition contract
 
-Status: montage technically validated; ground provisionally identified;
-acquisition reference awaiting confirmation.
+Status: montage technically validated; ground and online reference reported by
+the laboratory on 2026-08-04.
 
 ## Established from all 19 current XDF recordings
 
@@ -30,19 +30,20 @@ Oz, O2, P10, P8, P4, CP2, CP6, T8, C4, Cz, FC2, FC6, F10, F8, F4, Fp2`
 ## Ground and acquisition-reference decision
 
 XDF does not declare the physical acquisition reference or ground electrode.
+Human laboratory feedback establishes:
 
-- Ground: the study operator recalls `Fpz`. This is consistent with `Fpz` being
-  absent from the recorded channel list, but still needs confirmation from the
-  acquisition setup.
-- Reference: unknown. The absence of `FCz` is consistent with a common actiCHamp
-  setup using FCz as the online reference, but this remains a hypothesis.
+- ground: `Fpz`, with no recorded data values;
+- online reference: `Cz`;
+- offline policy: common-average rereferencing after bad-channel handling.
 
-Confirm from the BrainVision Recorder workspace, cap setup sheet, or the person
-who mounted the cap:
-
-1. Was FCz the online reference?
-2. Was Fpz the ground electrode?
-3. Was the same setup used for all participants?
+`Fpz` is absent from the XDF data channels, as expected for the ground. `Cz` is
+present as a dynamic XDF data channel rather than a zero-valued reference-only
+trace. This does not negate the laboratory report, because amplifier/export
+handling may reconstruct or retain a labelled reference channel, but the exact
+BrainVision/actiCHamp handling should be checked from the acquisition workspace
+if it becomes available.
 
 Average rereferencing during preprocessing is a separate transformation and does
-not answer what reference was used during acquisition.
+not change the historical fact that acquisition was referenced online to `Cz`.
+It is retained because it reduces dependence on a single reference electrode
+and supports the current sensor-level spectral analyses.

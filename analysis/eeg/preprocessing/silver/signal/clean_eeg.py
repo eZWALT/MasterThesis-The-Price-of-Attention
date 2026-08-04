@@ -79,7 +79,15 @@ def clean_recording(
         montage_name=policy["input"]["montage"],
         acquisition_reference=policy["input"]["online_reference"],
     )
-    bad_channels = reviewed_bad_channels(channel_qc_path, subject_id)
+    audited_bad_channels = reviewed_bad_channels(channel_qc_path, subject_id)
+    subject_specific = policy["bad_channel_review"].get(
+        "subject_specific_interpolation",
+        {},
+    )
+    bad_channels = sorted(
+        set(audited_bad_channels)
+        | set(subject_specific.get(subject_id, []))
+    )
     unknown = sorted(set(bad_channels) - set(raw.ch_names))
     if unknown:
         raise ValueError(f"QC contains unknown channels for {subject_id}: {unknown}")

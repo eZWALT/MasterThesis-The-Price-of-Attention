@@ -94,6 +94,6 @@ with an error rather than silently reducing the cohort.
 
 ## Gold layer
 
-Gold currently contains provisional condition and ad-timing contracts. Final EEG
-feature tables remain blocked until the Silver artifact policy and epoch
-retention criteria are frozen.
+Gold contains validated condition and ad-response feature datasets. Marker
+timing remains provenance-aware, and estimated inline visual onsets retain their
+calibrated uncertainty rather than being treated as exact ERP events.
