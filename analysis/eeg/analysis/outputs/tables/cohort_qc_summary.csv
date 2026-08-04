@@ -1,0 +1,13 @@
+metric,value
+audited_recordings,19
+wrong_protocol_exclusions,1
+participants,18
+condition_windows,108
+condition_epochs,9468
+retained_condition_epochs,9438
+retained_condition_fraction,0.9968314321926489
+ad_response_pairs,108
+eligible_ad_response_pairs,108
+maximum_ad_timing_uncertainty_s,0.433055
+artifact_policy,frozen_v3_1050_uv
+ica_applied,no

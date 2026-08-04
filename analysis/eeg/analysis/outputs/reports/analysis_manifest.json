@@ -1,0 +1,149 @@
+{
+  "analysis_version": "initial_publication_v1",
+  "status": "initial_publication_scaffold_ready_human_gates_pending",
+  "analysis_unit": "participant",
+  "primary_policy": "frozen_v3_1050_uv",
+  "alpha": 0.05,
+  "multiplicity": {
+    "condition": "Holm across three primary contrasts separately per feature",
+    "ad_response": "Holm across four primary ad-versus-control contrasts separately per feature",
+    "global_primary_sensitivity": "Additional Holm sensitivity across all primary-feature tests within each analysis"
+  },
+  "inputs": {
+    "condition_features": {
+      "path": "src/project/logs/xdf/gold/features/condition_features.csv",
+      "sha256": "2f967e35ecf48df95b5eb4146cf1c172dcbdba4e4a1a0e47285304628808a275"
+    },
+    "condition_epochs": {
+      "path": "src/project/logs/xdf/gold/features/condition_epoch_features.csv",
+      "sha256": "6b73763fe21afae298e46dc87628c0cdda19e9d7e1d6e7aab153c5f8931accf9"
+    },
+    "ad_responses": {
+      "path": "src/project/logs/xdf/gold/features/ad_response_features.csv",
+      "sha256": "438e91940df32ab1d1298c447034149a932bef4296f4d39766da611ae89db7a2"
+    },
+    "condition_validation": {
+      "path": "src/project/logs/xdf/gold/features/condition_feature_validation.json",
+      "sha256": "a07699bcbb16da83c1db3839cf01ebe69d3c37e5091fb8ad0a5ea21687fe401d"
+    },
+    "ad_validation": {
+      "path": "src/project/logs/xdf/gold/features/ad_feature_validation.json",
+      "sha256": "ac2abab4f482e3668144c514bbdfa8c17a5bef614b3f0d697b5dad783cd59625"
+    },
+    "engagement_validation": {
+      "path": "src/project/logs/xdf/gold/features/engagement_feature_validation.json",
+      "sha256": "d6eb72d66c473c83f04d2445f466c9535e4911d575ce1f2b2ff94bb80cf1fce7"
+    },
+    "soundness_validation": {
+      "path": "src/project/logs/xdf/gold/validation/preprocessing_soundness.json",
+      "sha256": "8450e176af84a7c9d0e02eb94d12331d4bc01782d7d23a4ee8edf2c31fe8d524"
+    },
+    "condition_tests": {
+      "path": "analysis/eeg/statistics/outputs/eeg_condition_contrasts.csv",
+      "sha256": "f09529420194b8c8df9b001d26b4d6320d79c17448dd10c11f1b8fc8226e04ae"
+    },
+    "condition_scores": {
+      "path": "analysis/eeg/statistics/outputs/eeg_condition_contrast_scores.csv",
+      "sha256": "7efe386770799dcb6fff9a1ac940412dbd6177fd2fa02e159b3e1658d4c8df4c"
+    },
+    "ad_tests": {
+      "path": "analysis/eeg/statistics/outputs/eeg_ad_response_contrasts.csv",
+      "sha256": "edec086379faa42d5385145baa61c8fbc0fa01a03a80f1fc9c5ed38452cd12c8"
+    },
+    "ad_scores": {
+      "path": "analysis/eeg/statistics/outputs/eeg_ad_response_contrast_scores.csv",
+      "sha256": "427dfdd3e7912e0586b800422779f978154cbed4bd03d040c1f4f84252058f31"
+    },
+    "threshold_comparison": {
+      "path": "analysis/eeg/statistics/outputs/threshold_sensitivity_comparison.json",
+      "sha256": "b9b455ba1268b2e7ba570c8e19a0f3b184a96f651bc310f59b5a64ad65b1fe75"
+    },
+    "condition_tests_1000": {
+      "path": "analysis/eeg/statistics/outputs/sensitivity/frozen_v1/eeg_condition_contrasts.csv",
+      "sha256": "74584e62c3caa0c2a072fefc27fcefa9970cf83fa35ab4d9edb648cd24041b18"
+    },
+    "condition_tests_1500": {
+      "path": "analysis/eeg/statistics/outputs/sensitivity/frozen_v2/eeg_condition_contrasts.csv",
+      "sha256": "8ddd573a32e7b3ceff7cdd6efbc5d4a2d91a4d4ca5133204c5274da64b4f96f2"
+    },
+    "ad_tests_1000": {
+      "path": "analysis/eeg/statistics/outputs/sensitivity/frozen_v1/eeg_ad_response_contrasts.csv",
+      "sha256": "81f71794c69c06284ccbd9fd4fd79bbe0d133377714a523663259711647b5ff7"
+    },
+    "ad_tests_1500": {
+      "path": "analysis/eeg/statistics/outputs/sensitivity/frozen_v2/eeg_ad_response_contrasts.csv",
+      "sha256": "edec086379faa42d5385145baa61c8fbc0fa01a03a80f1fc9c5ed38452cd12c8"
+    },
+    "frozen_v1_1000_uv": {
+      "path": "analysis/eeg/preprocessing/silver/signal/cleaning_policy_frozen_v1.json",
+      "sha256": "f173e09b29403305a370a3d51d1b084a18fb070986e63c91d2d2233788f18a8f"
+    },
+    "frozen_v3_1050_uv": {
+      "path": "analysis/eeg/preprocessing/silver/signal/cleaning_policy.json",
+      "sha256": "0a25de1eb3a0b18c77d22b2fb524cb05238d69c3cf230a31fb3a7d12503b49e5"
+    },
+    "frozen_v2_1500_uv": {
+      "path": "analysis/eeg/preprocessing/silver/signal/cleaning_policy_frozen_v2.json",
+      "sha256": "a1c18367dddf8cf0a3a3bc0bdc3b159042aee1beffa8809486c2e8335dea1134"
+    }
+  },
+  "outputs": [
+    "outputs/tables/cohort_qc_summary.csv",
+    "outputs/tables/primary_condition_results.csv",
+    "outputs/tables/primary_ad_results.csv",
+    "outputs/tables/exploratory_engagement_results.csv",
+    "outputs/tables/assumption_influence_diagnostics.csv",
+    "outputs/tables/threshold_sensitivity_results.csv",
+    "outputs/tables/subject14_influence.csv",
+    "outputs/tables/ad_onset_provenance.csv",
+    "outputs/figures/figure_01_data_flow.png",
+    "outputs/figures/figure_01_data_flow.pdf",
+    "outputs/figures/figure_02_condition_primary_forest.png",
+    "outputs/figures/figure_02_condition_primary_forest.pdf",
+    "outputs/figures/figure_03_ad_primary_forest.png",
+    "outputs/figures/figure_03_ad_primary_forest.pdf",
+    "outputs/figures/figure_04_condition_profiles.png",
+    "outputs/figures/figure_04_condition_profiles.pdf",
+    "outputs/figures/figure_05_participant_distributions.png",
+    "outputs/figures/figure_05_participant_distributions.pdf",
+    "outputs/figures/figure_06_threshold_sensitivity.png",
+    "outputs/figures/figure_06_threshold_sensitivity.pdf",
+    "outputs/reports/quality_gates.json",
+    "outputs/reports/initial_results_summary.md"
+  ],
+  "quality_gates": {
+    "status": "pass",
+    "passed": 20,
+    "total": 20,
+    "checks": {
+      "01_soundness_machine_checks_pass": true,
+      "02_condition_validation_passes": true,
+      "03_ad_validation_passes": true,
+      "04_engagement_validation_passes": true,
+      "05_expected_18_participants": true,
+      "06_complete_condition_cells": true,
+      "07_complete_ad_reference_cells": true,
+      "08_no_duplicate_condition_keys": true,
+      "09_no_duplicate_ad_keys": true,
+      "10_primary_policy_is_frozen_v3": true,
+      "11_ica_is_disabled": true,
+      "12_primary_features_are_complete": true,
+      "13_primary_participant_scores_are_complete": true,
+      "14_holm_values_are_valid": true,
+      "15_confidence_intervals_contain_estimates": true,
+      "16_threshold_sensitivity_passes": true,
+      "17_confirmatory_directions_are_threshold_stable": true,
+      "18_no_baseline_rows_in_confirmatory_condition_tests": true,
+      "19_epoch_keys_are_unique": true,
+      "20_expected_artifacts_exist_and_are_nonempty": true
+    }
+  },
+  "human_gates": [
+    "Approve filtering and interpolation figures.",
+    "If available, verify Cz/Fpz handling against the acquisition workspace because Cz is also exported as a dynamic data channel.",
+    "Implement and validate the 99%-variance ICA branch, then compare it with the required no-ICA sensitivity.",
+    "Confirm engagement indices remain exploratory.",
+    "Implement and interpret the read-versus-write positive control before treating null condition effects as evidence of pipeline sensitivity.",
+    "Integrate behavioral covariates only after their data contract is frozen."
+  ]
+}

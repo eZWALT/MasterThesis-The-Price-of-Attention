@@ -1,0 +1,49 @@
+{
+  "analysis_version": "initial_publication_v1",
+  "alpha": 0.05,
+  "bootstrap_iterations": 10000,
+  "random_seed": 20260803,
+  "primary_features": {
+    "fz_theta_power_db_uv2": "Fz theta power (dB µV²)",
+    "posterior_alpha_power_db_uv2": "Posterior alpha power (dB µV²)"
+  },
+  "secondary_features": {
+    "theta_power_db_uv2": "Global theta power (dB µV²)",
+    "alpha_power_db_uv2": "Global alpha power (dB µV²)",
+    "beta_power_db_uv2": "Global beta power (dB µV²)",
+    "faa_log_f4_minus_f3": "Frontal alpha asymmetry (log F4 − log F3)"
+  },
+  "exploratory_features": {
+    "engagement_beta_over_alpha_theta": "Global β/(α+θ)",
+    "engagement_pope_frontocentral_beta_over_alpha_theta": "Frontocentral β/(α+θ)",
+    "engagement_kislov_central_beta16_24_over_alpha8_12": "Central β16–24/α8–12"
+  },
+  "condition_labels": {
+    "no_ads": "No ads",
+    "inline_early": "Inline early",
+    "inline_late": "Inline late",
+    "block_early": "Labelled block early",
+    "block_late": "Labelled block late"
+  },
+  "condition_contrast_labels": {
+    "any_ad_vs_no_ads": "Any ad − no ads",
+    "inline_vs_block": "Inline − labelled block",
+    "early_vs_late": "Early − late",
+    "format_x_timing": "Format × timing"
+  },
+  "ad_contrast_labels": {
+    "inline_early_vs_no_ad_early": "Inline early − matched no-ad",
+    "block_early_vs_no_ad_early": "Labelled block early − matched no-ad",
+    "inline_late_vs_no_ad_late": "Inline late − matched no-ad",
+    "block_late_vs_no_ad_late": "Labelled block late − matched no-ad",
+    "any_ad_vs_matched_no_ad": "Any ad − matched no-ad",
+    "inline_vs_block": "Inline − labelled block",
+    "early_vs_late": "Early − late",
+    "format_x_timing": "Format × timing"
+  },
+  "policy_labels": {
+    "frozen_v1_1000_uv": "1,000 µV sensitivity",
+    "frozen_v3_1050_uv": "1,050 µV primary",
+    "frozen_v2_1500_uv": "1,500 µV sensitivity"
+  }
+}

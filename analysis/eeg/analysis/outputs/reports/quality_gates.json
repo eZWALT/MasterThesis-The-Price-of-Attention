@@ -1,0 +1,27 @@
+{
+  "status": "pass",
+  "passed": 20,
+  "total": 20,
+  "checks": {
+    "01_soundness_machine_checks_pass": true,
+    "02_condition_validation_passes": true,
+    "03_ad_validation_passes": true,
+    "04_engagement_validation_passes": true,
+    "05_expected_18_participants": true,
+    "06_complete_condition_cells": true,
+    "07_complete_ad_reference_cells": true,
+    "08_no_duplicate_condition_keys": true,
+    "09_no_duplicate_ad_keys": true,
+    "10_primary_policy_is_frozen_v3": true,
+    "11_ica_is_disabled": true,
+    "12_primary_features_are_complete": true,
+    "13_primary_participant_scores_are_complete": true,
+    "14_holm_values_are_valid": true,
+    "15_confidence_intervals_contain_estimates": true,
+    "16_threshold_sensitivity_passes": true,
+    "17_confirmatory_directions_are_threshold_stable": true,
+    "18_no_baseline_rows_in_confirmatory_condition_tests": true,
+    "19_epoch_keys_are_unique": true,
+    "20_expected_artifacts_exist_and_are_nonempty": true
+  }
+}

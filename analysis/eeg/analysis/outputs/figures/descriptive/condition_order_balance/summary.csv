@@ -1,0 +1,26 @@
+condition_label,presentation_slot,n,label_text
+Implicit early,1,3,3
+Implicit early,2,7,7
+Implicit early,3,2,2
+Implicit early,4,3,3
+Implicit early,5,3,3
+Implicit late,1,4,4
+Implicit late,2,2,2
+Implicit late,3,6,6
+Implicit late,4,4,4
+Implicit late,5,2,2
+Explicit early,1,2,2
+Explicit early,2,4,4
+Explicit early,3,3,3
+Explicit early,4,4,4
+Explicit early,5,5,5
+Explicit late,1,4,4
+Explicit late,2,2,2
+Explicit late,3,2,2
+Explicit late,4,5,5
+Explicit late,5,5,5
+No ads,1,5,5
+No ads,2,3,3
+No ads,3,5,5
+No ads,4,2,2
+No ads,5,3,3

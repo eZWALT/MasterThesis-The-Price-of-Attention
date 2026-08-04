@@ -1,0 +1,6 @@
+condition,1,2,3,4,5
+Implicit early,3,7,2,3,3
+Implicit late,4,2,6,4,2
+Explicit early,2,4,3,4,5
+Explicit late,4,2,2,5,5
+No ads,5,3,5,2,3

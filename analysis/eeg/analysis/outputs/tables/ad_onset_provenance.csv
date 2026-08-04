@@ -1,0 +1,5 @@
+reference_kind,onset_estimator,onset_status,event_count,participant_count,maximum_timing_uncertainty_s,median_timing_uncertainty_s
+advertisement,block_reply_plus_median_lag,derived_validated,6,3,0.225765,0.225762
+advertisement,inline_injection_plus_median_lag,derived_validated,30,15,0.433055,0.433024
+advertisement,observed_ad_displayed,observed,36,15,6.7e-05,3.9e-05
+matched_no_ad_reply,log_projected_assistant_reply,derived_clock_aligned,36,18,6.7e-05,3.65e-05

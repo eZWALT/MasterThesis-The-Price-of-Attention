@@ -1,0 +1,11 @@
+condition,condition_label,Statistic,duration_s,label_text
+block_early,Explicit early,Mean,421.47503455555557,421
+block_late,Explicit late,Mean,388.15752433333336,388
+inline_early,Implicit early,Mean,426.4665823888888,426
+inline_late,Implicit late,Mean,435.2169846666667,435
+no_ads,No ads,Mean,415.7417722777778,416
+block_early,Explicit early,Median,398.27307900000005,398
+block_late,Explicit late,Median,368.0019225000001,368
+inline_early,Implicit early,Median,383.7965785,384
+inline_late,Implicit late,Median,409.63353200000006,410
+no_ads,No ads,Median,366.70623750000004,367
