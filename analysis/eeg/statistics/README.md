@@ -40,3 +40,15 @@ The runner also writes
 `analysis/eeg/statistics/outputs/threshold_sensitivity_comparison.json`, which
 checks confirmatory effect directions and corrected conclusions across policy
 versions.
+
+Run the candidate ocular-ICA branch and its participant-level comparison with:
+
+```bash
+python analysis/eeg/preprocessing/run_ica_sensitivity.py
+```
+
+Detailed differences are written to
+`outputs/ica_sensitivity_comparison.json`. The first run found stable corrected
+condition conclusions but six ICA-only corrected ad-response findings,
+concentrated in low-frequency contrasts. Treat those findings as unresolved
+until the ICA component packs receive human signoff.

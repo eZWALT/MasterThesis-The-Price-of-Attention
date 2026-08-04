@@ -27,6 +27,18 @@ python analysis/eeg/preprocessing/run_threshold_sensitivity.py
 Sensitivity features and statistics are written under versioned
 `sensitivity/frozen_v1/` and `sensitivity/frozen_v2/` directories.
 
+Fit the candidate 99%-variance ICA models, regenerate all current features, and
+compare participant-level conclusions against the no-ICA primary branch with:
+
+```bash
+python analysis/eeg/preprocessing/run_ica_sensitivity.py
+```
+
+The command writes only to versioned `ica/candidate_v1/` and
+`sensitivity/ica_candidate_v1/` directories. Reuse already fitted models with
+`--skip-model-fit`. ICA remains a sensitivity branch until its topographies and
+source/proxy traces receive human signoff.
+
 After generating the separate Silver visual pack and the threshold sensitivity
 branch, aggregate all machine-checkable evidence with:
 
@@ -77,12 +89,14 @@ python analysis/eeg/preprocessing/silver/markers/verify_recovery_invariants.py
 python analysis/eeg/preprocessing/silver/signal/audit_xdf_mne.py
 python analysis/eeg/preprocessing/silver/signal/audit_signal_quality.py
 python analysis/eeg/preprocessing/silver/signal/validate_cleaning_visual.py
+python analysis/eeg/preprocessing/silver/signal/fit_ica_cohort.py
 ```
 
 `silver/signal/cleaning_policy.json` freezes the artifact and retention policy.
 The visual command generates filtering and interpolation figures plus
-machine-checkable evidence. Human visual signoff remains required before
-publication.
+machine-checkable evidence. ICA fitting generates per-participant component
+selection plots, topographies, source/proxy traces, and machine-readable
+reports. Human visual signoff remains required before publication.
 
 ### 4. Window contracts
 
@@ -133,8 +147,9 @@ living inside the executable preprocessing package.
 ## Current gate
 
 Condition and ad response datasets are executable for all 18 laboratory
-recordings. Objective cleaning checks pass. Remaining publication gates are
-human visual signoff, implementation of the 99%-variance ICA branch, and
-interpretation/sensitivity decisions for the uncontrolled baseline and
-estimated inline onset. Laboratory feedback identifies `Cz` as online reference
-and `Fpz` as ground; average rereferencing remains the offline policy.
+recordings. Objective cleaning checks pass. The 99%-variance ICA branch is
+implemented and reproducible; automated component choices still require human
+visual signoff before it can replace the no-ICA primary branch. Other remaining
+publication gates are interpretation decisions for the uncontrolled baseline
+and estimated inline onset. Laboratory feedback identifies `Cz` as online
+reference and `Fpz` as ground; average rereferencing remains the offline policy.

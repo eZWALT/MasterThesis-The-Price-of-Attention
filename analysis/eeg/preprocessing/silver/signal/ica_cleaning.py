@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import mne
 import numpy as np
 from mne.preprocessing import ICA, read_ica
+from scipy.signal import welch
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,11 @@ def ica_paths(
             config["figure_directory"],
         )
         / f"{subject_id}-timecourses.png",
+        "spectrum_figure": _repository_path(
+            repository_root,
+            config["figure_directory"],
+        )
+        / f"{subject_id}-spectra.png",
     }
 
 
@@ -236,6 +242,52 @@ def _save_timecourse_figure(
     plt.close(figure)
 
 
+def _save_spectrum_figure(
+    *,
+    fit_raw: mne.io.BaseRaw,
+    sources: np.ndarray,
+    excluded: list[int],
+    ranking: np.ndarray,
+    path: Path,
+) -> None:
+    picks = excluded or [int(ranking[0])]
+    sampling_rate = float(fit_raw.info["sfreq"])
+    frequencies, power = welch(
+        sources[picks],
+        fs=sampling_rate,
+        nperseg=min(sources.shape[1], int(round(4.0 * sampling_rate))),
+        axis=1,
+    )
+    frequency_mask = (frequencies >= 1.0) & (frequencies <= 40.0)
+    figure, axis = plt.subplots(figsize=(8.0, 4.5))
+    for row_index, component_index in enumerate(picks):
+        axis.plot(
+            frequencies[frequency_mask],
+            10.0
+            * np.log10(
+                np.maximum(
+                    power[row_index, frequency_mask],
+                    np.finfo(float).tiny,
+                )
+            ),
+            linewidth=1.1,
+            label=f"IC {component_index}",
+        )
+    axis.set_xlabel("Frequency (Hz)")
+    axis.set_ylabel("Source PSD (dB/Hz)")
+    axis.set_title(
+        "Excluded ICA component spectra"
+        if excluded
+        else "Top ocular-score component spectrum; none excluded"
+    )
+    axis.grid(alpha=0.2)
+    axis.legend(loc="upper right")
+    figure.tight_layout()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(path, dpi=180, bbox_inches="tight")
+    plt.close(figure)
+
+
 def fit_candidate_ica(
     *,
     raw: mne.io.BaseRaw,
@@ -371,6 +423,13 @@ def fit_candidate_ica(
         ranking=ranking,
         proxy_channels=proxy_channels,
         path=paths["timecourse_figure"],
+    )
+    _save_spectrum_figure(
+        fit_raw=fit_raw,
+        sources=sources,
+        excluded=excluded,
+        ranking=ranking,
+        path=paths["spectrum_figure"],
     )
     return report
 

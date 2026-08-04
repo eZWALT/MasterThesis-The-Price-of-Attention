@@ -99,6 +99,14 @@ Passing these gates demonstrates internal consistency and reproducibility. It
 does not replace the remaining human signoff on cleaning figures, acquisition
 reference, ICA policy, or scientific interpretation.
 
+This workspace currently renders the frozen no-ICA primary branch. The
+implemented ICA sensitivity is generated separately with
+`analysis/eeg/preprocessing/run_ica_sensitivity.py`. Its first comparison
+preserved all corrected condition conclusions but produced six ICA-only
+corrected ad-response findings. Do not merge those findings into the
+publication notebook until component-level human review chooses the final
+cleaning branch.
+
 The era-aware read-versus-write positive control described in the analysis plan
 is not yet implemented. It requires additional marker-derived windows and is an
 interpretation gate, not one of the twenty checks of currently generated
