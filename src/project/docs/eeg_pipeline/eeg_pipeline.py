@@ -551,7 +551,7 @@ def build() -> plt.Figure:
         62,
         61,
         23,
-        "Flag EEG artifacts",
+        "Repair bad channels",
         (),
         border=COLORS["green_border"],
         title_size=9.0,
@@ -590,7 +590,7 @@ def build() -> plt.Figure:
     band(
         ax,
         4,
-        "Gold: create analysis ready EEG features",
+        "Gold: build analysis ready EEG datasets",
         5,
         25,
         110,
@@ -602,29 +602,20 @@ def build() -> plt.Figure:
         ax,
         8,
         30.5,
-        25,
+        23,
         "Condition windows",
         (),
         border=COLORS["green_border"],
         title_color="#3F7143",
         title_size=9.0,
     )
-    gate(
-        ax,
-        48,
-        35.5,
-        "Ad timing\nreliable?",
-        width=18,
-        height=11,
-    )
     card(
         ax,
-        62,
-        36.5,
-        21,
-        "Build ad windows",
+        35,
+        30.5,
+        23,
+        "Ad and no ad windows",
         (),
-        height=8,
         border=COLORS["conditional"],
         title_color=COLORS["conditional"],
         title_size=8.5,
@@ -632,13 +623,11 @@ def build() -> plt.Figure:
     card(
         ax,
         62,
-        26.5,
+        30.5,
         21,
-        "Condition only",
+        "Extract 4 s features",
         (),
-        height=8,
-        border=COLORS["conditional"],
-        title_color=COLORS["conditional"],
+        border=COLORS["gold_border"],
         title_size=8.5,
     )
     card(
@@ -646,30 +635,14 @@ def build() -> plt.Figure:
         89,
         30.5,
         23,
-        "EEG feature table",
+        "Validate datasets",
         (),
         border=COLORS["gold_border"],
         title_size=8.8,
     )
-    arrow(ax, (33, 35.5), (39, 35.5))
-    arrow(
-        ax,
-        (55, 39.5),
-        (62, 40.5),
-        label="YES",
-        color=COLORS["conditional"],
-        label_offset=(0, 1.5),
-    )
-    arrow(
-        ax,
-        (55, 31.5),
-        (62, 30.5),
-        label="NO",
-        color=COLORS["conditional"],
-        label_offset=(0, -1.5),
-    )
-    arrow(ax, (83, 40.5), (89, 37.5), color=COLORS["conditional"])
-    arrow(ax, (83, 30.5), (89, 33.5), color=COLORS["conditional"])
+    arrow(ax, (31, 35.5), (35, 35.5))
+    arrow(ax, (58, 35.5), (62, 35.5))
+    arrow(ax, (83, 35.5), (89, 35.5))
 
     # 5 · Inference and communication
     band(
@@ -687,8 +660,8 @@ def build() -> plt.Figure:
         ax,
         8,
         5,
-        45,
-        "Compare conditions",
+        30,
+        "Condition contrasts",
         (),
         height=8,
         border=COLORS["grey_border"],
@@ -696,15 +669,27 @@ def build() -> plt.Figure:
     )
     card(
         ax,
-        67,
-        5,
         45,
+        5,
+        30,
+        "Ad response contrasts",
+        (),
+        height=8,
+        border=COLORS["grey_border"],
+        title_size=9.1,
+    )
+    card(
+        ax,
+        82,
+        5,
+        30,
         "Results and figures",
         (),
         height=8,
         border=COLORS["grey_border"],
     )
-    arrow(ax, (53, 9), (67, 9))
+    arrow(ax, (38, 9), (45, 9))
+    arrow(ax, (75, 9), (82, 9))
     elbow_arrow(
         ax,
         ((100.5, 30.5), (100.5, 23), (2, 23), (2, 9), (8, 9)),

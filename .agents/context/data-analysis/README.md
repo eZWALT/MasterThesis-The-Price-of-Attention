@@ -8,6 +8,7 @@ The top level is reserved for documents that govern both analysis arms:
 
 - `2026-07-28-data-analysis-foundation.md`
 - `2026-08-03-behavioral-eeg-workstream-ownership.md`
+- `2026-08-04-final-month-north-star.md`
 
 ## Analysis arms
 

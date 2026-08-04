@@ -36,7 +36,8 @@ The code layout mirrors the stage gates:
 - `bronze/manifests/`: immutable inventory and recording-map evidence;
 - `silver/markers/`: canonical timing and reconstruction validation;
 - `silver/signal/`: XDF-to-MNE conversion, cleaning, and signal QC;
-- `gold/windows/`: condition and advertisement timing contracts.
+- `gold/windows/`: condition and advertisement timing contracts;
+- `gold/features/`: fixed-epoch spectral features and validation evidence.
 
 Raw marker-stream auditing is shown in Bronze because it describes source
 evidence. Event matching, canonicalization, and recovery remain in Silver
@@ -110,16 +111,28 @@ work.
 - Complete `standard_1020` montage for all 32 recorded channels.
 - Condition-blind signal QC using twelve distributed 30-second windows per
   recording.
-- Candidate deterministic cleaning: 50 Hz notch, 0.5–40 Hz band-pass, average
+- Deterministic cleaning: 50 Hz notch, 0.5–40 Hz band-pass, average
   reference, bad-channel marking, and spherical-spline interpolation.
-- Successful cleaning test for subject 8 with `F10` interpolation.
+- Condition-blind evidence interpolates subject 8 `F10`. Full-window evidence
+  additionally interpolates subject 1 `P4`, subject 9 `P4`, and subject 10
+  `C4`.
+- Primary `frozen_v3` gross-artifact rule: reject above 1,050 µV
+  peak-to-peak or for a near-flat channel; require at least 80% and five
+  retained epochs per window. Preserve 1,000 µV `frozen_v1` and 1,500 µV
+  `frozen_v2` as stricter and permissive sensitivity policies.
+- Visual validation pack for representative filtering and all four repaired
+  channels. Objective notch, rereference, amplitude, and spatial-correlation
+  checks pass.
+- ICA disabled for the first feature version. The laboratory now requests a
+  99%-PCA-variance ICA branch using `Fp1/Fp2` as ocular proxies, with explicit
+  visual component validation and no-ICA retained as sensitivity.
 
 ### Known signal findings
 
 - No near-flat or flatline channels were found.
 - No recording is currently automatically excluded by signal QC.
-- Subject 8 `F10` is the only current non-ocular channel flag. It is a candidate
-  for interpolation, not a participant exclusion.
+- Four localized channel failures are interpolated; no participant is excluded
+  by signal quality.
 - Low `Fp1/Fp2` correlation is treated as expected ocular activity and retained
   for ocular-component assessment.
 - Strong cohort-wide 50 Hz contamination requires notch filtering but is not a
@@ -127,21 +140,20 @@ work.
 
 ### Mandatory work remaining
 
-- Visually validate filtering, average rereferencing, and interpolation.
-- Decide and validate the ocular-artifact strategy. ICA is currently disabled
-  because there are no dedicated EOG channels.
-- Compute artifact distributions on actual condition and ad windows.
-- Freeze epoch rejection and minimum-retention thresholds.
-- Run post-cleaning channel, participant, and condition-cell QC.
+- Obtain human signoff on the generated filtering and interpolation figures.
+- Implement and visually validate the required ICA branch; record fitted and
+  removed components per participant and compare all primary conclusions with
+  the current no-ICA branch.
 - Change `cleaning_policy.json` from `requires_visual_validation` to `frozen`.
 
-The online acquisition reference remains unconfirmed; `FCz` is a hypothesis and
-`Fpz` is the operator-recalled ground. This uncertainty must remain explicit,
-but it does not prevent average-rereferenced sensor-level processing.
+Laboratory feedback identifies `Cz` as the online reference and `Fpz` as
+ground. Average rereferencing remains the offline policy. `Cz` is also exported
+as a dynamic XDF channel, so the acquisition workspace remains useful for
+verifying amplifier/export handling but is no longer a blocker.
 
 ## Gold
 
-### Implemented as provisional contracts
+### Implemented
 
 - Baseline and sustained condition-window manifests.
 - Five condition windows for every recording.
@@ -150,26 +162,57 @@ but it does not prevent average-rereferenced sensor-level processing.
 - 72 eligible laboratory ad events.
 - Leave-one-out p95 visual-onset error of 0.226 seconds for missing explicit
   block events and 0.433 seconds for missing inline events.
+- Native 4-second epoch feature extraction using Welch spectral estimates.
+- Delta, theta, alpha, beta, and gamma absolute and relative power.
+- Regional Fz theta and posterior alpha over `O1/Oz/O2/P3/Pz/P4`.
+- Standard log FAA, `ln(alpha F4) - ln(alpha F3)`.
+- Three exploratory engagement measures: global and frontocentral
+  `beta / (alpha + theta)`, plus the Kislov central 16–24 Hz beta / 8–12 Hz
+  alpha advertising ratio.
+- Participant-window medians, IQRs, and within-participant baseline
+  differences.
+- Cohort validation with 18 participants, 108 windows, and 9,468 complete
+  epochs.
+- Frozen primary condition policy retains 9,438 epochs (99.68%); every one of
+  108 windows passes retention, with a minimum window retention of 85.7%.
+- No duplicate keys, non-finite spectral values, or ineligible condition cells.
+- Frozen four-second ad windows around validated visual onset and matched no-ad
+  `assistant_reply` events at turns 2 and 4.
+- Ad response dataset with 216 pre/post epochs and 108 pairs: 72 advertisement
+  exposures and 36 matched no-ad replies.
+- All 216 ad epochs and 108 response pairs are retained; all ad and no-ad
+  conditions retain 18 participants.
+- Maximum combined ad-onset timing uncertainty is 0.433 seconds.
 
 These uncertainties support multi-second spectral windows, not ERP claims.
 
+The recorded baseline is used as the primary operational pre-task comparison,
+as requested, but its eye state was not controlled and was only recalled as
+mostly eyes open. Every baseline row is labelled
+`uncontrolled_mostly_open`. Confirmatory analyses must include a sensitivity
+model that excludes baseline-derived contrasts.
+
+The epoch table preserves all complete epochs and marks each as retained or
+rejected. Condition summaries use retained epochs only. Full-window evidence
+identified localized failures at subject 1 `P4`, subject 9 `P4`, and subject 10
+`C4`; interpolation reduced the condition p95 peak-to-peak amplitude to 428 µV
+before the frozen 1,050 µV primary gross-artifact rule was applied.
+
 ### Mandatory work remaining
 
-- Freeze pre-ad and post-ad spectral window definitions.
-- Construct matched no-ad pseudo-onsets.
-- Apply final Silver cleaning to every eligible window.
-- Divide sustained data into fixed-length analysis epochs.
-- Calculate retained duration and epoch counts per participant and condition.
-- Produce prespecified band-power, FAA, engagement, and related feature tables.
-- Freeze Gold schemas and provenance fields.
+- Treat all three engagement measures as exploratory unless an exact formula,
+  channel set, and band definition are preregistered.
+- Report the complete 1,000 µV `frozen_v1` and 1,500 µV `frozen_v2`
+  sensitivities beside the selected 1,050 µV `frozen_v3` primary analysis.
+- Preserve the 0.433-second inline-onset uncertainty in all interpretation.
 
-Gold currently contains timing/window metadata, not final cleaned EEG feature
-tables. Its existing contracts remain provisional until the Silver cleaning
-policy is frozen.
+Gold now contains analysis-ready condition and ad response datasets.
+Publication readiness still requires human signoff on filtering/interpolation
+and the prescribed baseline/no-ICA sensitivity analyses.
 
 ## Analysis outside Gold
 
-After Gold feature tables are frozen:
+The condition and advertisement tables now support:
 
 - fit baseline, no-ad, format, timing, and pre/post-ad EEG contrasts;
 - join EEG summaries to behavioural and personality tables;
@@ -180,8 +223,9 @@ After Gold feature tables are frozen:
 
 - Subject 4: not fixable as a laboratory EEG participant because the wrong
   protocol was run; exclude from primary laboratory inference.
-- Subject 8 `F10`: likely fixable by reviewed interpolation; participant remains
-  eligible pending epoch QC.
+- Subjects 1 `P4`, 8 `F10`, 9 `P4`, and 10 `C4`: localized failures repaired by
+  policy-governed interpolation; all participants and condition cells pass
+  retained-epoch QC.
 - Subject 19 missing `experiment_end`: resolved as metadata-only and irrelevant
   to analysis windows.
 - Duplicate markers: resolved by canonical selection while preserving raw
@@ -193,6 +237,7 @@ After Gold feature tables are frozen:
 
 ## Immediate left-to-right gate
 
-Ingestion and Bronze are closed for the current cohort. Work should now remain
-in Silver until visual cleaning validation, artifact rules, and epoch-retention
-criteria are frozen. Only then should final Gold EEG features be generated.
+The condition and advertisement paths are executable from Bronze through
+analysis-ready Gold datasets and initial participant-level contrast tables.
+The remaining left-to-right gate is human review of the cleaning validation
+figures before changing the Silver policy status to `frozen`.
