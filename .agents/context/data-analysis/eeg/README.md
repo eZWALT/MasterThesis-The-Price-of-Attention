@@ -23,8 +23,9 @@ pipelines, generated manifests, and participant-level outputs remain under
   integration boundary.
 - `2026-08-04-human-feedback-reference-ica-and-feature-candidates.md`
   records the Cz online reference, Fpz ground, average offline reference,
-  required 99%-variance ICA branch, engagement decision, and candidate
-  amplitude, entropy, PSD, asymmetry, and PLV features.
+  implemented 99%-variance ICA candidate branch and review boundary,
+  engagement decision, and candidate amplitude, entropy, PSD, asymmetry, and
+  PLV features.
 - `2026-08-04-eeg-preprocessing-how-it-works.md`
   is the durable Markdown companion to the interactive pipeline canvas. It
   records the exact executable trace, input/output array shapes, condition-blind

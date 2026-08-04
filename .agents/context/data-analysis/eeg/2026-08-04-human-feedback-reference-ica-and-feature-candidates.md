@@ -62,6 +62,92 @@ Implementation contract:
 Current datasets remain valid as the no-ICA branch. They are no longer the
 automatically accepted final cleaning choice.
 
+### Implemented candidate branch
+
+Implemented on 2026-08-04:
+
+- policy:
+  `analysis/eeg/preprocessing/silver/signal/cleaning_policy_ica_candidate_v1.json`;
+- cohort fitter:
+  `analysis/eeg/preprocessing/silver/signal/fit_ica_cohort.py`;
+- ICA implementation:
+  `analysis/eeg/preprocessing/silver/signal/ica_cleaning.py`;
+- full sensitivity runner:
+  `analysis/eeg/preprocessing/run_ica_sensitivity.py`;
+- conclusion comparison:
+  `analysis/eeg/statistics/compare_ica_sensitivity.py`.
+
+The implementation fits FastICA at 1–40 Hz with a fixed random seed after the
+same channel repair and average rereference used by the no-ICA branch. It uses
+`n_components=0.99`, fits on every fifth sample for computational efficiency,
+and applies the fitted decomposition to the 0.5–40 Hz cleaned data.
+
+Candidate exclusion is intentionally conservative and auditable. A component
+must satisfy both:
+
+1. maximum absolute source correlation with `Fp1` or `Fp2` of at least `0.35`;
+2. mean absolute frontal topography weight at least `1.5` times the all-channel
+   mean.
+
+At most three qualifying components are removed. The thresholds are engineering
+candidate rules, not literature-derived universal constants. They must not be
+retuned after examining preferred statistical outcomes.
+
+All 18 eligible recordings fit successfully. The 99% rule yielded 6–25
+components, median 19.5. The automatic rule selected 27 components across 17
+recordings; Subject 19 selected none. Per-recording JSON reports, component
+maps, selection plots, spectra, and source/proxy traces are written under
+`src/project/logs/xdf/silver/ica/candidate_v1/`.
+
+Initial machine and agent visual checks show strongly frontal maps and
+Fp1/Fp2-aligned source traces for the selected examples. This is evidence that
+the branch executes as intended, but it is not final human signoff. In
+particular, three-component removals in Subjects 11, 14, and 15 and the
+six-component decomposition in Subject 17 deserve focused review. Subject 19's
+no-removal decision should also be checked because frontal-looking components
+did not pass the joint correlation/topography rule.
+
+### First ICA versus no-ICA comparison
+
+The full ICA branch completed for all 18 participants without changing primary
+files. Machine validation passed for condition features, ad-response features,
+and all three engagement indices.
+
+Retention remained stable:
+
+- condition epochs: `0.9968` no ICA versus `0.9980` ICA;
+- ad epochs: `1.0000` in both branches;
+- eligible ad-response pairs: `1.0000` in both branches.
+
+Condition-level conclusions were comparatively stable:
+
+- contrast mean-difference correlation: `0.906`;
+- effect-direction agreement: `0.891`;
+- corrected significance agreement: `1.000`;
+- no corrected condition test changed significance status.
+
+Ad-response conclusions were more sensitive:
+
+- contrast mean-difference correlation: `0.716`;
+- effect-direction agreement: `0.828`;
+- corrected significance agreement: `0.906`;
+- six corrected tests changed from non-significant without ICA to significant
+  with ICA.
+
+Five of those six changes concern the early block-ad versus matched early
+no-ad contrast: alpha relative power, beta relative power, delta absolute and
+relative power, and theta absolute power. The sixth concerns gamma relative
+power for late inline ads versus matched late no-ad replies. Low-frequency
+delta/theta shifts are substantial in several ad contrasts.
+
+This is not evidence that the new significant findings are automatically more
+correct. Ocular activity is concentrated at low frequencies, so a real
+ICA/no-ICA difference is expected; overly broad component removal can produce
+the same pattern. Do not promote the ICA-only findings until component review,
+especially Subjects 11, 14, and 15, is complete. The machine-readable details
+are in
+`analysis/eeg/statistics/outputs/ica_sensitivity_comparison.json`.
+
 ## Engagement decision
 
 Human feedback supports retaining engagement as an important metric. Keep all
@@ -167,8 +253,10 @@ as `alpha_asymmetry_raw_f3_minus_f4`.
 
 ## Recommended implementation order
 
-1. Implement and visually validate the separate ICA branch.
-2. Recompute current spectral, FAA, and engagement features with ICA.
+1. Human-review the implemented ICA component packs and freeze or revise the
+   candidate component choices.
+2. Review the generated ICA/no-ICA spectral, FAA, engagement, and conclusion
+   comparison.
 3. Export total PSD and mean absolute amplitude.
 4. Freeze entropy estimators before adding entropy features.
 5. Add PLV only with explicit pair, transform, and volume-conduction controls.

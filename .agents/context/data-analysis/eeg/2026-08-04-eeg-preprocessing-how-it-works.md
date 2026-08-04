@@ -638,9 +638,10 @@ Machine-checkable current state:
 Human or scientific gates:
 
 1. visually approve filtering and interpolation figures;
-2. implement and visually validate the 99%-variance ICA branch;
-3. compare ICA against the current no-ICA sensitivity and choose the final
-   primary branch;
+2. visually review the implemented 99%-variance ICA component packs and freeze
+   or revise candidate removals;
+3. review the generated ICA/no-ICA comparison and choose the final primary
+   branch;
 4. after signoff, change the overall cleaning policy status from
    `requires_visual_validation` to `frozen`;
 5. implement the era-aware read-versus-write positive control before using null

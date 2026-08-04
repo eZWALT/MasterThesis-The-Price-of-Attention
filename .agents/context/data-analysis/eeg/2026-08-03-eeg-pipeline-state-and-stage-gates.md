@@ -141,9 +141,9 @@ work.
 ### Mandatory work remaining
 
 - Obtain human signoff on the generated filtering and interpolation figures.
-- Implement and visually validate the required ICA branch; record fitted and
-  removed components per participant and compare all primary conclusions with
-  the current no-ICA branch.
+- Human-review the implemented ICA component packs, freeze or revise candidate
+  removals, and inspect the generated comparison of all primary conclusions
+  against the current no-ICA branch.
 - Change `cleaning_policy.json` from `requires_visual_validation` to `frozen`.
 
 Laboratory feedback identifies `Cz` as the online reference and `Fpz` as

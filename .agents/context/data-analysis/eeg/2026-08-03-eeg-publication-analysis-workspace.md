@@ -153,12 +153,19 @@ none becomes corrected evidence.
 These checks prove reproducible internal consistency, not neurophysiological
 validity, positive-control sensitivity, or absence of effects.
 
+The publication workspace still renders the no-ICA branch. The separately
+generated ICA comparison preserved every corrected condition-test conclusion
+but yielded six ICA-only corrected ad-response findings, mostly in early
+block-ad low-frequency features. Publication tables must not silently mix
+branches; component review and an explicit final branch decision come first.
+
 ## Remaining work
 
 Human gates:
 
 1. approve filtering and interpolation figures;
-2. implement and validate the 99%-variance ICA branch against no-ICA;
+2. human-review the implemented 99%-variance ICA component packs and the
+   generated no-ICA conclusion comparison;
 3. keep all three engagement metrics and decide their final inferential tier;
 4. optionally verify reported `Cz` reference/`Fpz` ground handling against the
    acquisition workspace;
