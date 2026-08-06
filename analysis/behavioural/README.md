@@ -32,7 +32,7 @@ cd RAG-RecSys-data
 Typical pipeline order:
 
 1. Check whether each participants completed all 5 conditions (`check_condition_completion.py`)
-2. Build survey chatpot score CSV (Helpfulness, Credibility etc) from exports (`Analysis_AdsTalkBack.ipynb`)
+2. Build survey chatbot score CSV (Helpfulness, Credibility etc) from exports (`Analysis_AdsTalkBack.ipynb`)
 3. Optionally check timings, and OCEAN correlations (Python scripts below)
 
 ---
