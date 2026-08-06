@@ -32,6 +32,10 @@ pipelines, generated manifests, and participant-level outputs remain under
   signal QC, deterministic cleaning transformations, validation evidence,
   lazy-cleaning architecture, policy-version distinctions, and remaining human
   gates.
+- `2026-08-06-remaining-human-signoff-checklist.md`
+  separates resolved acquisition and preprocessing inputs from the remaining
+  ICA, visual-QC, positive-control, and behavioral handoff decisions that
+  genuinely require a person.
 
 ## Governing distinction
 
