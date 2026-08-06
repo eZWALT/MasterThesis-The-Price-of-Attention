@@ -52,6 +52,17 @@ Preview without executing:
 python analysis/eeg/preprocessing/run_pipeline.py --dry-run
 ```
 
+Run the single-file metric and generated-dataset sanity suite:
+
+```bash
+python -m unittest analysis/eeg/preprocessing/test_eeg_metrics.py -v
+```
+
+The suite uses known synthetic sinusoids to verify band power, regional
+features, FAA, Pope and Kislov engagement formulas, artifact rejection, and ad
+response arithmetic. When local generated outputs exist, it also checks the
+primary and ICA Gold validators plus all ICA models and visual evidence.
+
 Run one stage:
 
 ```bash
