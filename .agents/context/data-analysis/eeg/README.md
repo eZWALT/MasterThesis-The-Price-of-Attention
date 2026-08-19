@@ -54,6 +54,10 @@ pipelines, generated manifests, and participant-level outputs remain under
   at every width; three confirmatory Path B Holm cells appeared (2 s Fz
   theta ICA-only; 8 s posterior alpha under both ICA and no-ICA). Primary
   stays 4 s + median + ICA.
+- `2026-08-19-eeg-only-analyses-complete.md`
+  is the EEG-only stop line: Path A/B nulls, epoch grid, ICA, read-versus-
+  write positive control (Fz theta Holm 0.007), session-order null, and
+  the figure suite. Next EEG work is manuscript prose and C1 after Goal 1.
 - `2026-08-19-literature-justifications-in-overleaf.md`
   records the literature sanity-check on the median collapse and
   person-level Holm tests, the short cite set parked as Overleaf
@@ -66,6 +70,10 @@ pipelines, generated manifests, and participant-level outputs remain under
   designs the three join tables (person × condition, person ×
   contrast, person × ad) and which Gold/stat columns are plug-in
   features. No builder yet.
+
+Publication figure: original
+`src/project/docs/eeg_pipeline/eeg_pipeline.png` is frozen. v2 is
+`eeg_pipeline_v2.png` (X → Y_A / Y_B → D, parallel Gold paths).
 
 ## Governing distinction
 

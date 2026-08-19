@@ -82,7 +82,7 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 
 | ID | Item | Ticket | Verdict |
 |---|---|---|---|
-| B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | PENDING | do if time; sanity check, not Q1 |
+| B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | APPROVED | Fz theta Holm 0.007; alpha null; pipeline lives |
 | B2 | Mixed model `EEG ~ condition + task + order + (1\|person)` | PENDING | later; paired \(D\) already answers the planned contrasts |
 | B3 | Mean-of-epoch-dB instead of median | APPROVED | Y_A 0/48 Holm; keep median primary |
 | B4 | Epoch-length grid 2/4/8/16/32 s | APPROVED | Path A null at every width; do not freeze 8 s alpha |
@@ -90,6 +90,7 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 | B6 | Epoch as independent \(n\) | OUT | COBIDAS; already refused |
 | B7 | Entropy / connectivity / PLV | OUT | no frozen estimator; thesis time |
 | B8 | Subject 4 in primary EEG | OUT | crowd protocol |
+| B9 | First vs last condition (session order) | APPROVED | exploratory null; not fatigue |
 
 ### C. Cross-modal (the missing layer)
 
@@ -110,11 +111,10 @@ Lab \(n=18\) only. Freeze behavioural ETL first.
 
 ## Recommended thesis EEG package
 
-1. A1–A6 numbers (already have) + A7 prose.
-2. B1 if a day remains (pipeline sanity).
-3. C1 once Goal 1 scores exist, confirmatory EEG features only
+1. A1–A6 numbers + B1/B4/B9 + figure suite + A7 prose.
+2. C1 once Goal 1 scores exist, confirmatory EEG features only
    (Fz theta, posterior alpha), Holm inside that small family.
-4. One sentence that C4 was inspected or deferred, not a third Goal.
+3. One sentence that C4 was inspected or deferred, not a third Goal.
 
 Do not invert the study order: behavioural Goal 1 → personality Goal 2
 → EEG Goal 3 → C1.

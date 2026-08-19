@@ -84,4 +84,5 @@ If coded, this would be a third Gold cutter on the same cleaned Raw. It would
 not change Path A or Path B shapes. Dynamic-duration windows (reply length,
 message length, `time_to_reply_ms`) would be a later sensitivity.
 
-Do not implement until Walter confirms this contract.
+Implemented 2026-08-19 (`run_task_state_positive_control.py`). Fz theta
+writing−reading is Holm-significant; posterior alpha is not.
