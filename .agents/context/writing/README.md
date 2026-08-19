@@ -28,6 +28,10 @@ Newest snapshot (completion %, STATUS map):
 Crossable leftover items (paper / thesis / analysis):
 `2026-08-18-remaining-work-checklist.md`.
 
+EEG Method comments parked in Overleaf (median / \(Y_A,Y_B,D\) / short cite
+set, not yet visible prose):
+`../data-analysis/eeg/2026-08-19-literature-justifications-in-overleaf.md`.
+
 ## Entry order
 
 1. Read this README.

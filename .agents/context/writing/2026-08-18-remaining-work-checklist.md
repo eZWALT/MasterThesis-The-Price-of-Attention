@@ -28,10 +28,15 @@ Order of analysis (do not invert):
 
 ### EEG
 
-- [x] Spectral preprocessing path exists (participant-level Gold; no ERP claim)
-- [ ] Goal 3: primary spectral contrasts written (condition + ad-locked vs \(a^{\emptyset}\))
-- [ ] Human signoff: ICA vs no-ICA as primary (Method currently says no ICA)
-- [ ] Human signoff: filter / interpolation figures
+- [x] Goal 3: primary spectral contrasts written (condition + ad-locked vs \(a^{\emptyset}\)) — tables exist; manuscript Results still unwritten
+- [x] Human signoff: ICA vs no-ICA as primary (ICA primary as of 2026-08-19)
+- [x] Human signoff: filter / interpolation figures (2026-08-19)
+- [x] Mean-of-epoch dB vs median (Y_A still 0/48 Holm; keep median)
+- [ ] Epoch-length robustness grid 2/4/8/16/32 s (do not pick by p-value)
+- [ ] Read vs write positive control (contract decided; not coded)
+- [ ] EEG × trust/credibility/manipulation: same three \(D\) as Goal 3
+  (exploratory; lab \(n=18\); after Goal 1 freeze). See
+  `../data-analysis/eeg/2026-08-19-eeg-analysis-menu-and-tickets.md`
 
 ### Later, if 1–3 are stable
 
@@ -48,6 +53,9 @@ Future Work skeleton, notice/recall slice in prose.
 - [ ] Fill Results for goal 1 (then 2, then 3). No invented tables
 - [ ] Rewrite Statistical Analysis (still a visibility / `XXXXX` template)
 - [ ] Delete leftover Method red (ERP / ICA list that fights the spectral paragraph)
+- [ ] When rewriting EEG Method: use the 2026-08-19 comments in
+  `publication/main.tex` (shapes \(Y_A,Y_B,D\); Smulders median;
+  Kislov estimand hedge; ICA now primary). Do not dump extra EEG cites.
 - [ ] Cut or rewrite the 14 RQs and H1–H3 so they match the five-goal order
 - [ ] Related Work / Research Gap polish (Heineking ≠ implicit/explicit)
 - [ ] Admin: author roles, funding, ethics number, broken cites

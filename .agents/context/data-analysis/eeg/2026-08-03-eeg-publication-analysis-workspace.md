@@ -139,7 +139,7 @@ none becomes corrected evidence.
 8. unique condition keys;
 9. unique ad keys;
 10. `frozen_v3` primary policy;
-11. explicit no-ICA policy;
+11. ICA applied as the approved primary branch;
 12. complete primary estimates;
 13. complete participant scores;
 14. valid Holm probabilities;
@@ -153,24 +153,24 @@ none becomes corrected evidence.
 These checks prove reproducible internal consistency, not neurophysiological
 validity, positive-control sensitivity, or absence of effects.
 
-The publication workspace still renders the no-ICA branch. The separately
-generated ICA comparison preserved every corrected condition-test conclusion
-but yielded six ICA-only corrected ad-response findings, mostly in early
-block-ad low-frequency features. Publication tables must not silently mix
-branches; component review and an explicit final branch decision come first.
+The publication workspace currently renders the approved ICA primary branch
+(`frozen_v5_ica_primary`). The ICA comparison preserved every corrected
+condition-test conclusion but yielded six ICA-only corrected ad-response
+findings, mostly in early block-ad low-frequency features. Those findings
+stay labelled ICA-dependent; they were not the reason the branch was chosen.
 
 ## Remaining work
 
-Human gates:
+Closed 2026-08-19: filtering/interpolation figures, ICA component review, and
+ICA as primary (no-ICA remains the mandatory sensitivity).
 
-1. approve filtering and interpolation figures;
-2. human-review the implemented 99%-variance ICA component packs and the
-   generated no-ICA conclusion comparison;
-3. keep all three engagement metrics and decide their final inferential tier;
-4. optionally verify reported `Cz` reference/`Fpz` ground handling against the
+Still open:
+
+1. keep all three engagement metrics and decide their final inferential tier;
+2. optionally verify reported `Cz` reference/`Fpz` ground handling against the
    acquisition workspace;
-5. implement the era-aware read-versus-write positive control;
-6. review manuscript captions and feature/contrast hierarchy.
+3. implement the era-aware read-versus-write positive control;
+4. review manuscript captions and feature/contrast hierarchy.
 
 Multimodal gate:
 

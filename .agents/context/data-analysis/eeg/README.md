@@ -34,8 +34,29 @@ pipelines, generated manifests, and participant-level outputs remain under
   gates.
 - `2026-08-06-remaining-human-signoff-checklist.md`
   separates resolved acquisition and preprocessing inputs from the remaining
-  ICA, visual-QC, positive-control, and behavioral handoff decisions that
-  genuinely require a person.
+  positive-control and behavioral handoff decisions. Filtering, ICA
+  exclusions, and the ICA-as-primary choice closed on 2026-08-19.
+- `2026-08-19-gold-paths-shapes-and-ica.md`
+  is the Gold-layer pedagogy note: what each of the two Gold paths writes
+  after lazy cleaning, the evolving `(32, N) → epoch → summary` shape for
+  one participant, and what ICA changes (values and provenance, not matrix
+  axes or row geometry).
+- `2026-08-19-ica-primary-and-visual-signoff.md`
+  records the 2026-08-19 approvals (filter figures, all automatic ICA
+  exclusions, ICA as primary) and explains the read-versus-write
+  positive control without implementing it.
+- `2026-08-19-mean-vs-median-and-epoch-length.md`
+  records that mean-of-epoch dB does not change the Holm-null Y_A
+  result, so median stays primary, and that a 2/4/8/16/32 s grid is a
+  robustness check rather than a search for a publishable p-value.
+- `2026-08-19-literature-justifications-in-overleaf.md`
+  records the literature sanity-check on the median collapse and
+  person-level Holm tests, the short cite set parked as Overleaf
+  comments, and what must not be added as citation soup.
+- `2026-08-19-eeg-analysis-menu-and-tickets.md`
+  is the high-level EEG analysis menu: within-person \(D\),
+  EEG–trust/UX correlations, between-person global scores, and
+  APPROVED / PENDING / OUT tickets.
 
 ## Governing distinction
 

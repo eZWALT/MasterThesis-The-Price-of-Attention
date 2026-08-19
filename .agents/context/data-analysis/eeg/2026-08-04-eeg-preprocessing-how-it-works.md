@@ -475,20 +475,31 @@ retained because `reset_bads=false`, preserving provenance.
 
 ### 8. ICA
 
-The current generated Gold datasets use no ICA:
+As of 2026-08-19 the primary Gold datasets apply the approved ICA branch
+(`frozen_v5_ica_primary`):
 
 ```text
 input:     repaired (32, N)
-operation: none
-output:    unchanged (32, N)
+operation: FastICA fit at 99% PCA variance; subtract at most three
+           ocular-like components (dual Fp1/Fp2 + frontal rule)
+output:    reconstructed (32, N)
 ```
 
+Models, JSON reports, and review figures live under
+`src/project/logs/xdf/silver/ica/candidate_v1/`. Human signoff on all
+automatic exclusions is `approved`. No-ICA tables are archived under
+`gold/features/sensitivity/no_ica_frozen_v3/` and remain a mandatory
+sensitivity. A duplicate ICA copy still exists under
+`gold/features/sensitivity/ica_candidate_v1/` and must not replace primary.
+
 `Fp1/Fp2` are ocular-sensitive frontal EEG channels, but not dedicated bipolar
-EOG. Laboratory feedback now requires a separate ICA branch retaining 99% PCA
-explained variance, usually expected to yield roughly 10–20 fitted components.
-The dimensionality rule does not identify components for removal. Selection
-must combine `Fp1/Fp2` correlation, topography, time course, spectrum, and
-visual review. Current no-ICA outputs remain the mandatory comparison branch.
+EOG. The 99% rule sets decomposition dimensionality only; it is not the
+variance held after `ica.apply`. Automatic exclusion requires both
+`|r| >= 0.35` with an `Fp1/Fp2` proxy and frontal dominance `>= 1.5`, cap
+three. For the Gold-path shape walk-through, held-variance numbers, and what
+ICA changes in the feature tables, see
+`2026-08-19-gold-paths-shapes-and-ica.md` and
+`2026-08-19-ica-primary-and-visual-signoff.md`.
 
 ### Cleaning output
 
@@ -615,10 +626,13 @@ Persisted:
 
 Not persisted:
 
-- no cleaned `.fif` recording;
+- no cleaned `.fif` recording on either the primary or ICA branch;
 - no modified XDF;
-- no permanently deleted channel or sample;
-- no ICA decomposition or removed components.
+- no permanently deleted channel or sample.
+
+The ICA sensitivity branch does persist fitted models, exclusion reports, and
+review figures under `src/project/logs/xdf/silver/ica/candidate_v1/`. That is
+decomposition provenance, not a cleaned continuous recording.
 
 ## Current evidence and gates
 
@@ -631,21 +645,18 @@ Machine-checkable current state:
 - four localized channel repairs;
 - objective cleaning validation passed;
 - all 108 eligible ad/no-ad pairs available;
-- primary condition policy retains 9,438 of 9,468 four-second epochs;
+- primary ICA condition policy retains 9,449 of 9,468 four-second epochs;
 - 20 of 20 aggregate preprocessing soundness checks pass;
 - primary conclusions are stable across 1,000, 1,050, and 1,500 µV branches.
 
-Human or scientific gates:
+Closed on 2026-08-19: filtering/interpolation figures, all automatic ICA
+exclusions, and ICA as the primary branch (`frozen_v5_ica_primary`).
 
-1. visually approve filtering and interpolation figures;
-2. visually review the implemented 99%-variance ICA component packs and freeze
-   or revise candidate removals;
-3. review the generated ICA/no-ICA comparison and choose the final primary
-   branch;
-4. after signoff, change the overall cleaning policy status from
-   `requires_visual_validation` to `frozen`;
-5. implement the era-aware read-versus-write positive control before using null
-   ad results as broad evidence of pipeline sensitivity.
+Remaining scientific gates:
+
+1. implement the era-aware read-versus-write positive control before using
+   null ad results as broad evidence of pipeline sensitivity;
+2. freeze the behavioral join contract before multimodal tables.
 
 Laboratory feedback identifies `Cz` as online reference and `Fpz` as ground;
 average rereferencing remains the separate offline policy.
