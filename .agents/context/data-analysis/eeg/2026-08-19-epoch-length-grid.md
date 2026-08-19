@@ -60,6 +60,18 @@ Primary remains **4 s + median + ICA**. Path A null is robust to tile
 size. The 8 s alpha cell may be mentioned as a sensitivity note, not as
 a new confirmatory result and not as a reason to change ad format.
 
+4 s is not an arbitrary middle. Path B locks to visual ad onset.
+On block ads the reply is already up (~0.5 s); on inline it follows
+(~1.6 s). A 2 s post window is still “ad chrome / first glance” and
+misses the reply entirely for about one in five ads. A 4 s window
+almost always contains the reply and never reaches the next act
+(early: next `user_message` ~53 s; late: conclusion ~79 s). An 8 s
+window is just more of that same reply — and the only Holm hit is
+**late block alpha**, i.e. the last reply of the condition, not a
+mid-chat turn. The 2 s hit is a **different** cell (early block theta,
+ICA-only). Two widths, two moments, two features is not one story.
+Timeline: `figure_17_epoch_timeline` and canvas `eeg-epoch-timeline`.
+
 ## Paper sentence
 
 Primary 4 s analyses are Holm-null for Fz theta and posterior alpha.
