@@ -83,10 +83,10 @@ figcaption { font-size: .9rem; color: #555; }
 </head>
 <body>
 <h1>ICA candidate component review</h1>
-<p class="notice">The automated rule is a candidate. Review every excluded
-component for ocular topography, Fp1/Fp2-aligned time course, and low-frequency
-spectrum. Also inspect the top-ranked component when no component was removed.
-Do not freeze the ICA branch until all participants receive human signoff.</p>
+<p class="notice">Human signoff 2026-08-19: all automatic exclusions
+approved. ICA is the primary Gold branch. No-ICA remains a mandatory
+sensitivity. Do not add exclusions, and do not reverse the primary branch
+because some ad tests are significant only under ICA.</p>
 """ + "".join(sections) + """
 </body>
 </html>

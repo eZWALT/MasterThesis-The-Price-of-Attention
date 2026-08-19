@@ -1,5 +1,5 @@
 {
-  "policy_version": "frozen_v5_ica_primary",
+  "policy_version": "no_ica_frozen_v3_sensitivity",
   "status": "frozen",
   "input": {
     "montage": "standard_1020",
@@ -47,39 +47,19 @@
     "reset_bad_labels": false
   },
   "ica": {
-    "enabled": true,
-    "status": "approved_as_primary_2026-08-19",
-    "model_policy_version": "ica_candidate_v1",
-    "method": "fastica",
-    "random_state": 97,
-    "max_iter": 1000,
-    "fit_highpass_hz": 1.0,
-    "fit_lowpass_hz": 40.0,
-    "fit_decim": 5,
+    "enabled": false,
+    "status": "archived_sensitivity_after_2026-08-19_primary_switch",
     "pca_explained_variance": 0.99,
+    "expected_component_range": [10, 20],
     "ocular_proxy_channels": ["Fp1", "Fp2"],
-    "proxy_correlation_abs_min": 0.35,
-    "frontal_dominance_min": 1.5,
-    "maximum_excluded_components": 3,
-    "frontal_channels": [
-      "Fp1",
-      "Fp2",
-      "F3",
-      "F4",
-      "F7",
-      "F8",
-      "F9",
-      "F10",
-      "Fz",
-      "FC1",
-      "FC2"
+    "component_selection_evidence": [
+      "Fp1/Fp2 correlation",
+      "component topography",
+      "component time course",
+      "component spectrum",
+      "visual validation"
     ],
-    "model_directory": "src/project/logs/xdf/silver/ica/candidate_v1/models",
-    "report_directory": "src/project/logs/xdf/silver/ica/candidate_v1/reports",
-    "figure_directory": "src/project/logs/xdf/silver/ica/candidate_v1/figures",
-    "no_ica_sensitivity_required": true,
-    "selection_rule": "Exclude at most three components meeting both absolute Fp1/Fp2 source correlation >= 0.35 and frontal topography dominance >= 1.5.",
-    "reason": "Human signoff 2026-08-19: filtering/interpolation figures approved; all automatic ICA exclusions approved; ICA is the primary Gold branch. No-ICA remains a mandatory sensitivity under cleaning_policy_no_ica_sensitivity.json."
+    "reason": "Mandatory no-ICA sensitivity after 2026-08-19 human approval of ICA as primary. Same notch, 0.5-40 Hz, average reference, interpolation, and frozen_v3 1050 uV epoch rule as the ICA primary branch."
   },
   "epoch_rejection": {
     "status": "frozen_v3",

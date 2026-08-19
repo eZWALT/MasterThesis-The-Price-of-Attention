@@ -10,9 +10,16 @@ from typing import Any
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
-PRIMARY_ROOT = REPOSITORY_ROOT / "analysis/eeg/statistics/outputs"
-SENSITIVITY_ROOT = PRIMARY_ROOT / "sensitivity"
-OUTPUT = PRIMARY_ROOT / "threshold_sensitivity_comparison.json"
+PRIMARY_ROOT = REPOSITORY_ROOT / (
+    "analysis/eeg/statistics/outputs/sensitivity/no_ica_frozen_v3"
+)
+SENSITIVITY_ROOT = REPOSITORY_ROOT / (
+    "analysis/eeg/statistics/outputs/sensitivity"
+)
+OUTPUT = (
+    REPOSITORY_ROOT
+    / "analysis/eeg/statistics/outputs/threshold_sensitivity_comparison.json"
+)
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:

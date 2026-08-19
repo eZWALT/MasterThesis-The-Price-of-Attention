@@ -1,6 +1,6 @@
 {
   "policy_version": "ica_candidate_v1",
-  "status": "requires_ica_visual_validation",
+  "status": "frozen",
   "input": {
     "montage": "standard_1020",
     "source_unit": "microvolts",
@@ -48,7 +48,7 @@
   },
   "ica": {
     "enabled": true,
-    "status": "candidate_requires_human_signoff",
+    "status": "approved_as_primary_recipe_2026-08-19",
     "method": "fastica",
     "random_state": 97,
     "max_iter": 1000,
@@ -76,7 +76,7 @@
     "model_directory": "src/project/logs/xdf/silver/ica/candidate_v1/models",
     "report_directory": "src/project/logs/xdf/silver/ica/candidate_v1/reports",
     "figure_directory": "src/project/logs/xdf/silver/ica/candidate_v1/figures",
-    "selection_rule": "Exclude at most three components meeting both absolute Fp1/Fp2 source correlation >= 0.35 and frontal topography dominance >= 1.5. Human visual review remains mandatory."
+    "selection_rule": "Exclude at most three components meeting both absolute Fp1/Fp2 source correlation >= 0.35 and frontal topography dominance >= 1.5. Human visual review approved all automatic exclusions on 2026-08-19."
   },
   "epoch_rejection": {
     "status": "frozen_v3",

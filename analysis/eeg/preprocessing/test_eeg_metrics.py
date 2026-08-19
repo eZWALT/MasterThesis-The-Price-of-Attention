@@ -75,6 +75,7 @@ ICA_FEATURE_ROOT = PRIMARY_FEATURE_ROOT / (
 )
 PRIMARY_POLICY = SIGNAL_CODE / "cleaning_policy.json"
 ICA_POLICY = SIGNAL_CODE / "cleaning_policy_ica_candidate_v1.json"
+NO_ICA_POLICY = SIGNAL_CODE / "cleaning_policy_no_ica_sensitivity.json"
 ICA_ROOT = REPOSITORY_ROOT / (
     "src/project/logs/xdf/silver/ica/candidate_v1"
 )
@@ -361,8 +362,12 @@ class PolicyContractTests(unittest.TestCase):
     def test_primary_and_ica_policies_are_separate_and_comparable(self) -> None:
         primary = load_policy(PRIMARY_POLICY)
         candidate = load_policy(ICA_POLICY)
-        self.assertFalse(primary["ica"]["enabled"])
+        self.assertTrue(primary["ica"]["enabled"])
         self.assertTrue(candidate["ica"]["enabled"])
+        self.assertEqual(
+            primary["ica"]["model_policy_version"],
+            "ica_candidate_v1",
+        )
         self.assertEqual(
             primary["epoch_rejection"]["status"],
             "frozen_v3",
@@ -380,7 +385,7 @@ class PolicyContractTests(unittest.TestCase):
             candidate["epoch_rejection"]["max_peak_to_peak_uv"],
         )
         self.assertEqual(
-            float(candidate["ica"]["pca_explained_variance"]),
+            float(primary["ica"]["pca_explained_variance"]),
             0.99,
         )
         self.assertEqual(
@@ -391,6 +396,13 @@ class PolicyContractTests(unittest.TestCase):
             int(candidate["ica"]["maximum_excluded_components"]),
             3,
         )
+        no_ica = load_policy(NO_ICA_POLICY)
+        self.assertFalse(no_ica["ica"]["enabled"])
+        self.assertEqual(
+            no_ica["epoch_rejection"]["max_peak_to_peak_uv"],
+            primary["epoch_rejection"]["max_peak_to_peak_uv"],
+        )
+
 
 
 @unittest.skipUnless(
@@ -402,11 +414,13 @@ class GeneratedDatasetIntegrationTests(unittest.TestCase):
         condition = validate_condition(
             PRIMARY_FEATURE_ROOT / "condition_epoch_features.csv",
             PRIMARY_FEATURE_ROOT / "condition_features.csv",
+            expected_ica_applied=True,
         )
         ad = validate_ad(
             PRIMARY_FEATURE_ROOT.parent / "windows/ad_analysis_windows.csv",
             PRIMARY_FEATURE_ROOT / "ad_epoch_features.csv",
             PRIMARY_FEATURE_ROOT / "ad_response_features.csv",
+            expected_ica_applied=True,
         )
         engagement = validate_engagement(
             PRIMARY_FEATURE_ROOT / "condition_epoch_features.csv",
@@ -417,10 +431,10 @@ class GeneratedDatasetIntegrationTests(unittest.TestCase):
         )
         self.assertEqual(condition["status"], "passed")
         self.assertEqual(condition["subject_count"], 18)
-        self.assertFalse(condition["ica_applied"])
+        self.assertTrue(condition["ica_applied"])
         self.assertEqual(ad["status"], "passed")
         self.assertEqual(ad["subject_count"], 18)
-        self.assertFalse(ad["ica_applied"])
+        self.assertTrue(ad["ica_applied"])
         self.assertEqual(engagement["validation_status"], "pass")
         self.assertTrue(all(engagement["checks"].values()))
 

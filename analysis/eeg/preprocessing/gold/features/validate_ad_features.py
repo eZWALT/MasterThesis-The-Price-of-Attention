@@ -142,7 +142,7 @@ def main() -> None:
     parser.add_argument(
         "--expected-ica-applied",
         choices=("yes", "no"),
-        default="no",
+        default="yes",
     )
     args = parser.parse_args()
     report = validate(

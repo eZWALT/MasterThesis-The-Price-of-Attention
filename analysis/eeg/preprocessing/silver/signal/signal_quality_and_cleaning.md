@@ -49,21 +49,22 @@ near-flat channels, a minimum retained fraction of 80%, and at least five
 retained epochs per condition window. It was selected after observing Subject
 14's 1,042.56 µV no-ad epoch and is therefore explicitly post-review. The
 1,000 µV `frozen_v1` and 1,500 µV `frozen_v2` rules remain mandatory
-sensitivities. Current Gold outputs use no ICA.
+sensitivities. Current Gold outputs apply the approved ICA primary branch
+(`frozen_v5_ica_primary`). No-ICA tables are archived under
+`gold/features/sensitivity/no_ica_frozen_v3/`.
 
 `validate_cleaning_visual.py` generates the validation pack under
 `src/project/logs/xdf/silver/validation/cleaning_visual/`. Representative notch
 and average-reference checks pass. All four interpolated channels fall below
 1,000 µV in their worst inspected segment and correlate with neighboring
-signals after repair (`r=0.688` to `0.991`). Human visual signoff remains
-pending.
+signals after repair (`r=0.688` to `0.991`). Human visual signoff was approved
+on 2026-08-19.
 
-## Not yet frozen
+## Frozen cleaning branch
 
 - Laboratory feedback reports `Cz` online reference and `Fpz` ground; average
   rereferencing remains the offline policy.
-- Implement ICA with 99% PCA explained variance on a separate branch.
-- Validate component selection using `Fp1/Fp2` ocular proxies, topography,
-  spectra, time courses, and visual review.
-- ICA/no-ICA sensitivity validation is required before selecting the final
-  primary cleaning branch.
+- ICA uses 99% PCA explained variance, FastICA, seed 97, at most three
+  components with both `|r| ≥ 0.35` vs Fp1/Fp2 and frontal dominance `≥ 1.5`.
+- Human review on 2026-08-19 approved all automatic exclusions and made ICA
+  the primary branch. No-ICA remains a mandatory sensitivity.

@@ -27,17 +27,19 @@ python analysis/eeg/preprocessing/run_threshold_sensitivity.py
 Sensitivity features and statistics are written under versioned
 `sensitivity/frozen_v1/` and `sensitivity/frozen_v2/` directories.
 
-Fit the candidate 99%-variance ICA models, regenerate all current features, and
-compare participant-level conclusions against the no-ICA primary branch with:
+Fit the 99%-variance ICA models (already approved as primary). Regenerating
+this runner writes a duplicate under `sensitivity/ica_candidate_v1/` and does
+**not** replace primary Gold. Compare ICA primary against the archived no-ICA
+sensitivity with:
 
 ```bash
-python analysis/eeg/preprocessing/run_ica_sensitivity.py
+python analysis/eeg/preprocessing/run_ica_sensitivity.py --skip-model-fit
+python analysis/eeg/statistics/compare_ica_sensitivity.py
 ```
 
-The command writes only to versioned `ica/candidate_v1/` and
-`sensitivity/ica_candidate_v1/` directories. Reuse already fitted models with
-`--skip-model-fit`. ICA remains a sensitivity branch until its topographies and
-source/proxy traces receive human signoff.
+Primary cleaning is `cleaning_policy.json` (`frozen_v5_ica_primary`).
+The no-ICA archive lives at
+`src/project/logs/xdf/gold/features/sensitivity/no_ica_frozen_v3/`.
 
 After generating the separate Silver visual pack and the threshold sensitivity
 branch, aggregate all machine-checkable evidence with:
@@ -107,7 +109,8 @@ python analysis/eeg/preprocessing/silver/signal/fit_ica_cohort.py
 The visual command generates filtering and interpolation figures plus
 machine-checkable evidence. ICA fitting generates per-participant component
 selection plots, topographies, source/proxy traces, and machine-readable
-reports. Human visual signoff remains required before publication.
+reports. Filtering figures and ICA exclusions were approved on 2026-08-19;
+ICA is the primary Gold branch.
 
 ### 4. Window contracts
 
@@ -158,9 +161,10 @@ living inside the executable preprocessing package.
 ## Current gate
 
 Condition and ad response datasets are executable for all 18 laboratory
-recordings. Objective cleaning checks pass. The 99%-variance ICA branch is
-implemented and reproducible; automated component choices still require human
-visual signoff before it can replace the no-ICA primary branch. Other remaining
-publication gates are interpretation decisions for the uncontrolled baseline
-and estimated inline onset. Laboratory feedback identifies `Cz` as online
-reference and `Fpz` as ground; average rereferencing remains the offline policy.
+recordings. Objective cleaning checks pass. Filtering/interpolation figures and
+all automatic ICA exclusions were approved on 2026-08-19; ICA is the primary
+Gold branch and no-ICA is the mandatory sensitivity. Remaining publication
+gates are the read-versus-write positive control, uncontrolled-baseline
+interpretation, and behavioral join. Laboratory feedback identifies `Cz` as
+online reference and `Fpz` as ground; average rereferencing remains the offline
+policy.

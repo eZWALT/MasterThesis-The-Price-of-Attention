@@ -28,20 +28,20 @@ findings, recording-specific channel repairs, ICA plan, and the frozen
 condition-epoch artifact policy are documented in
 `signal_quality_and_cleaning.md`.
 
-The ICA implementation is deliberately separate from the frozen no-ICA
-primary branch:
+The ICA implementation is the approved primary cleaning branch as of
+2026-08-19. The fitted models remain under `ica/candidate_v1/` so they can be
+reused without refitting:
 
-- `cleaning_policy_ica_candidate_v1.json` fixes the reproducible candidate
-  parameters;
+- `cleaning_policy.json` (`frozen_v5_ica_primary`) enables ICA for Gold;
+- `cleaning_policy_ica_candidate_v1.json` is the model-fit recipe;
+- `cleaning_policy_no_ica_sensitivity.json` rebuilds the mandatory no-ICA
+  archive;
 - `fit_ica_cohort.py` fits one 99%-variance model per eligible participant;
 - `ica_cleaning.py` saves the model, component-level evidence, topographies,
   and source/proxy time courses;
 - `build_ica_review_report.py` combines all participant evidence into
-  `src/project/logs/xdf/silver/ica/candidate_v1/ica_review.html`;
-- `run_ica_sensitivity.py` regenerates Gold features and statistics under ICA
-  without replacing primary outputs.
+  `src/project/logs/xdf/silver/ica/candidate_v1/ica_review.html`.
 
 Automated exclusion requires both strong `Fp1/Fp2` source correlation and a
-frontally dominant topography, with at most three excluded components. This is
-candidate automation, not final human approval. Every generated component pack
-still requires visual signoff.
+frontally dominant topography, with at most three excluded components. Human
+review on 2026-08-19 approved all automatic exclusions.

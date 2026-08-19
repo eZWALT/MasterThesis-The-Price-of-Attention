@@ -405,11 +405,31 @@ def run(
         row["amplitude_pass"] and row["spatial_consistency_pass"]
         for row in interpolation
     )
+    report_path = output_dir / "cleaning_visual_validation.json"
+    existing_signoff = "pending"
+    existing_signoff_date = None
+    existing_signoff_note = None
+    if report_path.exists():
+        try:
+            existing = json.loads(
+                report_path.read_text(encoding="utf-8")
+            )
+            existing_signoff = existing.get(
+                "human_visual_signoff", "pending"
+            )
+            existing_signoff_date = existing.get(
+                "human_visual_signoff_date"
+            )
+            existing_signoff_note = existing.get(
+                "human_visual_signoff_note"
+            )
+        except (OSError, json.JSONDecodeError):
+            existing_signoff = "pending"
     report = {
         "policy_version": policy["policy_version"],
         "policy_status": policy["status"],
         "objective_status": "passed" if objective_pass else "failed",
-        "human_visual_signoff": "pending",
+        "human_visual_signoff": existing_signoff,
         "filtering_checks": filtering,
         "interpolation_checks": interpolation,
         "figures": [
@@ -417,7 +437,10 @@ def run(
             str(output_dir / "interpolation_validation.png"),
         ],
     }
-    report_path = output_dir / "cleaning_visual_validation.json"
+    if existing_signoff_date is not None:
+        report["human_visual_signoff_date"] = existing_signoff_date
+    if existing_signoff_note is not None:
+        report["human_visual_signoff_note"] = existing_signoff_note
     with report_path.open("w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2)
         handle.write("\n")

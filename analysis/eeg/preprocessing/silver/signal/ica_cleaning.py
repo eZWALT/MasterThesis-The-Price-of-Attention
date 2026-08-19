@@ -452,10 +452,14 @@ def apply_saved_ica(
             f"{paths['model']}"
         )
     report = json.loads(paths["report"].read_text(encoding="utf-8"))
-    if report["policy_version"] != policy["policy_version"]:
+    expected_version = str(
+        policy["ica"].get("model_policy_version")
+        or policy["policy_version"]
+    )
+    if report["policy_version"] != expected_version:
         raise ValueError(
             f"{subject_id}: ICA report policy mismatch "
-            f"{report['policy_version']} != {policy['policy_version']}"
+            f"{report['policy_version']} != {expected_version}"
         )
     ica = read_ica(paths["model"], verbose=False)
     excluded = [int(value) for value in report["excluded_components"]]

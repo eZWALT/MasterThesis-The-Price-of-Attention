@@ -1,4 +1,4 @@
-"""Compare candidate ICA results with the frozen no-ICA primary branch."""
+"""Compare the ICA primary branch with the archived no-ICA sensitivity."""
 
 from __future__ import annotations
 
@@ -13,11 +13,11 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 REPOSITORY_ROOT = HERE.parents[2]
 PRIMARY_STATISTICS = HERE / "outputs"
-ICA_STATISTICS = HERE / "outputs/sensitivity/ica_candidate_v1"
+NO_ICA_STATISTICS = HERE / "outputs/sensitivity/no_ica_frozen_v3"
 PRIMARY_FEATURES = REPOSITORY_ROOT / (
     "src/project/logs/xdf/gold/features"
 )
-ICA_FEATURES = PRIMARY_FEATURES / "sensitivity/ica_candidate_v1"
+NO_ICA_FEATURES = PRIMARY_FEATURES / "sensitivity/no_ica_frozen_v3"
 ICA_COHORT_SUMMARY = REPOSITORY_ROOT / (
     "src/project/logs/xdf/silver/ica/candidate_v1/"
     "ica_cohort_summary.csv"
@@ -203,14 +203,14 @@ def build_report() -> dict[str, Any]:
     condition_primary_validation = read_json(
         PRIMARY_FEATURES / "condition_feature_validation.json"
     )
-    condition_ica_validation = read_json(
-        ICA_FEATURES / "condition_feature_validation.json"
+    condition_no_ica_validation = read_json(
+        NO_ICA_FEATURES / "condition_feature_validation.json"
     )
     ad_primary_validation = read_json(
         PRIMARY_FEATURES / "ad_feature_validation.json"
     )
-    ad_ica_validation = read_json(
-        ICA_FEATURES / "ad_feature_validation.json"
+    ad_no_ica_validation = read_json(
+        NO_ICA_FEATURES / "ad_feature_validation.json"
     )
     cohort = read_csv(ICA_COHORT_SUMMARY)
     excluded_counts = np.asarray(
@@ -223,11 +223,10 @@ def build_report() -> dict[str, Any]:
     )
 
     return {
-        "comparison": "ica_candidate_v1_vs_frozen_v3_no_ica",
-        "interpretation_status": (
-            "sensitivity_ready_pending_human_ica_visual_signoff"
-        ),
-        "primary_branch_changed": False,
+        "comparison": "frozen_v5_ica_primary_vs_no_ica_sensitivity",
+        "interpretation_status": "ica_approved_as_primary_2026-08-19",
+        "primary_branch": "ica",
+        "primary_branch_changed": True,
         "ica_cohort": {
             "subject_count": len(cohort),
             "pca_explained_variance": 0.99,
@@ -243,52 +242,54 @@ def build_report() -> dict[str, Any]:
                 np.median(excluded_counts)
             ),
             "maximum_excluded_components": int(np.max(excluded_counts)),
-            "human_visual_signoff": "pending",
+            "human_visual_signoff": "approved",
         },
         "retention": {
             "condition_epoch_fraction_no_ica": (
-                condition_primary_validation["retained_epoch_fraction"]
+                condition_no_ica_validation["retained_epoch_fraction"]
             ),
             "condition_epoch_fraction_ica": (
-                condition_ica_validation["retained_epoch_fraction"]
+                condition_primary_validation["retained_epoch_fraction"]
             ),
             "ad_epoch_fraction_no_ica": (
-                ad_primary_validation["retained_epoch_fraction"]
+                ad_no_ica_validation["retained_epoch_fraction"]
             ),
             "ad_epoch_fraction_ica": (
-                ad_ica_validation["retained_epoch_fraction"]
+                ad_primary_validation["retained_epoch_fraction"]
             ),
             "ad_eligible_pair_fraction_no_ica": (
-                ad_primary_validation[
+                ad_no_ica_validation[
                     "eligible_response_pair_fraction"
                 ]
             ),
             "ad_eligible_pair_fraction_ica": (
-                ad_ica_validation[
+                ad_primary_validation[
                     "eligible_response_pair_fraction"
                 ]
             ),
         },
         "condition_contrasts": compare_contrasts(
+            NO_ICA_STATISTICS / "eeg_condition_contrasts.csv",
             PRIMARY_STATISTICS / "eeg_condition_contrasts.csv",
-            ICA_STATISTICS / "eeg_condition_contrasts.csv",
         ),
         "condition_participant_scores": compare_scores(
+            NO_ICA_STATISTICS / "eeg_condition_contrast_scores.csv",
             PRIMARY_STATISTICS / "eeg_condition_contrast_scores.csv",
-            ICA_STATISTICS / "eeg_condition_contrast_scores.csv",
         ),
         "ad_contrasts": compare_contrasts(
+            NO_ICA_STATISTICS / "eeg_ad_response_contrasts.csv",
             PRIMARY_STATISTICS / "eeg_ad_response_contrasts.csv",
-            ICA_STATISTICS / "eeg_ad_response_contrasts.csv",
         ),
         "ad_participant_scores": compare_scores(
+            NO_ICA_STATISTICS / "eeg_ad_response_contrast_scores.csv",
             PRIMARY_STATISTICS / "eeg_ad_response_contrast_scores.csv",
-            ICA_STATISTICS / "eeg_ad_response_contrast_scores.csv",
         ),
         "interpretation": (
-            "The ICA branch is a required sensitivity analysis until all "
-            "component topographies and source/proxy traces receive human "
-            "signoff. No-ICA frozen_v3 remains the primary branch meanwhile."
+            "Human signoff on 2026-08-19 approved filtering/interpolation "
+            "figures and all automatic ICA exclusions. ICA frozen_v5 is the "
+            "primary branch. No-ICA frozen_v3 remains the mandatory "
+            "sensitivity. Do not reverse this choice because some ad tests "
+            "are significant only under ICA."
         ),
     }
 

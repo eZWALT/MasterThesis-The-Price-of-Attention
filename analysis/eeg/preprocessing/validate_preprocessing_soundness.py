@@ -121,8 +121,9 @@ def signal_evidence(
         for row in visual["interpolation_checks"]
     )
     checks = {
-        "policy_is_versioned_candidate_v5": (
-            policy["policy_version"] == "candidate_v5"
+        "policy_is_frozen_v5_ica_primary": (
+            policy["policy_version"] == "frozen_v5_ica_primary"
+            and policy["status"] == "frozen"
         ),
         "epoch_policy_is_frozen_v3": (
             policy["epoch_rejection"]["status"] == "frozen_v3"
@@ -131,14 +132,15 @@ def signal_evidence(
             float(policy["epoch_rejection"]["max_peak_to_peak_uv"]),
             1050.0,
         ),
-        "current_features_are_no_ica_with_explicit_ica_plan": (
-            policy["ica"]["enabled"] is False
+        "current_features_are_ica_primary_with_no_ica_sensitivity": (
+            policy["ica"]["enabled"] is True
             and policy["ica"]["status"]
-            == "implementation_and_validation_required"
+            == "approved_as_primary_2026-08-19"
             and math.isclose(
                 float(policy["ica"]["pca_explained_variance"]),
                 0.99,
             )
+            and policy["ica"].get("no_ica_sensitivity_required") is True
         ),
         "objective_visual_checks_pass": (
             visual["objective_status"] == "passed"
@@ -293,7 +295,11 @@ def main() -> None:
     all_machine_checks_pass = all(machine_checks.values())
     report = {
         "status": (
-            "machine_checks_passed_human_gates_pending"
+            "machine_checks_passed_human_gates_closed"
+            if all_machine_checks_pass
+            and visual["human_visual_signoff"] == "approved"
+            and policy["ica"]["enabled"] is True
+            else "machine_checks_passed_human_gates_pending"
             if all_machine_checks_pass
             else "machine_checks_failed"
         ),
@@ -310,7 +316,11 @@ def main() -> None:
             "filtering_and_interpolation_figures_signed_off": (
                 visual["human_visual_signoff"] == "approved"
             ),
-            "primary_ica_policy_accepted": False,
+            "primary_ica_policy_accepted": (
+                policy["ica"]["enabled"] is True
+                and policy["ica"]["status"]
+                == "approved_as_primary_2026-08-19"
+            ),
         },
         "interpretation_limits": [
             "Cz online reference and Fpz ground are established by laboratory "

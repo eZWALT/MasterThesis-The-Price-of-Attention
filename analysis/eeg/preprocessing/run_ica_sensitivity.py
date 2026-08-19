@@ -1,4 +1,9 @@
-"""Build the ICA-cleaned sensitivity branch without replacing primary outputs."""
+"""Rebuild ICA Gold as a duplicate under sensitivity/ica_candidate_v1.
+
+Primary Gold now uses ICA via cleaning_policy.json. This runner must not
+replace primary outputs. Compare ICA primary against the archived no-ICA
+sensitivity with compare_ica_sensitivity.py.
+"""
 
 from __future__ import annotations
 
@@ -127,8 +132,9 @@ def run_ica_branch(*, fit_models: bool, overwrite_models: bool) -> None:
     )
     run("analysis/eeg/statistics/compare_ica_sensitivity.py")
     print(
-        "Completed ICA sensitivity branch; primary frozen_v3 no-ICA "
-        "outputs were not changed."
+        "Completed ICA feature rebuild under "
+        f"sensitivity/{ICA_VERSION}/. Primary ICA Gold was not replaced. "
+        "No-ICA remains at gold/features/sensitivity/no_ica_frozen_v3/."
     )
 
 
