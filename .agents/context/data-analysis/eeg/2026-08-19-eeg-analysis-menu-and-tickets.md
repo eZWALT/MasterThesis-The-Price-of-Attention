@@ -82,7 +82,7 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 
 | ID | Item | Ticket | Verdict |
 |---|---|---|---|
-| B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | APPROVED | Fz theta Holm 0.007; alpha null; pipeline lives. Not an ad result: `2026-08-19-read-vs-write-what-it-proved.md` |
+| B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | APPROVED | one-sentence mention only; not a paper result. See `2026-08-19-read-vs-write-what-it-proved.md` |
 | B2 | Mixed model `EEG ~ condition + task + order + (1\|person)` | PENDING | later; paired \(D\) already answers the planned contrasts |
 | B3 | Mean-of-epoch-dB instead of median | APPROVED | Y_A 0/48 Holm; keep median primary |
 | B4 | Epoch-length grid 2/4/8/16/32 s | APPROVED | Path A null at every width; do not freeze 8 s alpha |
@@ -111,7 +111,8 @@ Lab \(n=18\) only. Freeze behavioural ETL first.
 
 ## Recommended thesis EEG package
 
-1. A1–A6 numbers + B1/B4/B9 + figure suite + A7 prose.
+1. A1–A6 numbers + B4/B9 + figure suite 07–13/16 + A7 prose.
+   B1 is one sentence in Results, not a results block.
 2. C1 once Goal 1 scores exist, confirmatory EEG features only
    (Fz theta, posterior alpha), Holm inside that small family.
 3. One sentence that C4 was inspected or deferred, not a third Goal.

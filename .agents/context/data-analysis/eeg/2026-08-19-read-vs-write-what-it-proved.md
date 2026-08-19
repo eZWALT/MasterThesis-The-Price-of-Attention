@@ -22,7 +22,13 @@ It did **not** prove:
 - that we should change epoch length, drop ICA, or rewrite the product.
 
 This is ticket B1. It is a pipeline sanity check, not Q1 and not Q2.
-Do not put it in the abstract as an ad result.
+
+## Paper placement
+
+**One sentence in EEG Results (or Method), then stop.** Not a subsection,
+not a main-text figure, not the abstract, not a discussion claim about
+mental effort or advertising. Figures 14–15 stay in the analysis folder
+or an appendix if a reviewer asks. Secondary bands stay unpublished.
 
 ## Why it exists
 
@@ -71,11 +77,10 @@ Secondary (uncorrected, do not promote): more delta, less beta/gamma
 and lower Pope ratios while writing. Compatible with a slower spectrum
 during composition. Not confirmatory.
 
-## Paper sentence
+## Paper sentence (that is the whole mention)
 
-The same 4 s ICA chain that is Holm-null for ad format and timing
-distinguishes writing from reading on Fz theta (Holm \(p=0.007\),
-\(d_z=0.80\), \(n=18\)). Posterior alpha does not.
+As a sanity check, the same 4 s ICA chain distinguished writing from
+reading on Fz theta (Holm \(p=0.007\), \(d_z=0.80\), \(n=18\)).
 
 ## Related
 
