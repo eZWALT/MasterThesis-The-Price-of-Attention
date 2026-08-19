@@ -22,6 +22,12 @@ docs/overleaf/example-eeg/     # EEG report template reference
 Each Overleaf folder is an independent Git repository. The parent repository
 ignores their contents. Run `git` commands inside the relevant mirror.
 
+Newest snapshot (completion %, STATUS map):
+`2026-08-19-completion-snapshot.md`.
+
+Crossable leftover items (paper / thesis / analysis):
+`2026-08-18-remaining-work-checklist.md`.
+
 ## Entry order
 
 1. Read this README.
