@@ -11,3 +11,12 @@ plan, including:
 
 Cross-arm ownership, shared identifiers, planned contrasts, and multimodal
 integration decisions remain in the parent `data-analysis/` directory.
+
+Analysis order (whole study): behavioural battery → personality /
+demographics → EEG → genre trajectories → insertion-policy model.
+See `../2026-08-18-analysis-priority-order.md`.
+
+Newest roster / log-scheme audit:
+
+- `2026-08-18-behavioural-roster-and-log-schemes.md` — finished *N*,
+  early `export.jsonl` + numeric conditions, production-only 42–44.
