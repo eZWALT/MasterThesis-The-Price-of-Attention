@@ -49,6 +49,11 @@ pipelines, generated manifests, and participant-level outputs remain under
   records that mean-of-epoch dB does not change the Holm-null Y_A
   result, so median stays primary, and that a 2/4/8/16/32 s grid is a
   robustness check rather than a search for a publishable p-value.
+- `2026-08-19-epoch-length-grid.md`
+  records the 2/8/16/32 s rebuild (4 s reused): Path A remains Holm-null
+  at every width; three confirmatory Path B Holm cells appeared (2 s Fz
+  theta ICA-only; 8 s posterior alpha under both ICA and no-ICA). Primary
+  stays 4 s + median + ICA.
 - `2026-08-19-literature-justifications-in-overleaf.md`
   records the literature sanity-check on the median collapse and
   person-level Holm tests, the short cite set parked as Overleaf
@@ -57,6 +62,10 @@ pipelines, generated manifests, and participant-level outputs remain under
   is the high-level EEG analysis menu: within-person \(D\),
   EEG–trust/UX correlations, between-person global scores, and
   APPROVED / PENDING / OUT tickets.
+- `2026-08-19-eeg-behavioural-merge-tables.md`
+  designs the three join tables (person × condition, person ×
+  contrast, person × ad) and which Gold/stat columns are plug-in
+  features. No builder yet.
 
 ## Governing distinction
 
