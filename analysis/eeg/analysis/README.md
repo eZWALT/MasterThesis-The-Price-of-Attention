@@ -84,7 +84,7 @@ The executable gates cover:
 8. unique condition keys;
 9. unique ad keys;
 10. frozen primary policy;
-11. explicit no-ICA policy;
+11. ICA applied as the approved primary branch;
 12. complete primary estimates;
 13. complete participant scores;
 14. bounded Holm-adjusted probabilities;
@@ -95,22 +95,17 @@ The executable gates cover:
 19. unique epoch keys;
 20. complete non-empty publication artifacts.
 
-Passing these gates demonstrates internal consistency and reproducibility. It
-does not replace the remaining human signoff on cleaning figures, acquisition
-reference, ICA policy, or scientific interpretation.
+Passing these gates demonstrates internal consistency and reproducibility.
 
-This workspace currently renders the frozen no-ICA primary branch. The
-implemented ICA sensitivity is generated separately with
-`analysis/eeg/preprocessing/run_ica_sensitivity.py`. Its first comparison
+This workspace currently renders the approved ICA primary branch
+(`frozen_v5_ica_primary`). No-ICA tables remain under
+`gold/features/sensitivity/no_ica_frozen_v3/`. The first ICA comparison
 preserved all corrected condition conclusions but produced six ICA-only
-corrected ad-response findings. Do not merge those findings into the
-publication notebook until component-level human review chooses the final
-cleaning branch.
+corrected ad-response findings. Those findings stay labelled as
+ICA-dependent; they were not the reason the branch was chosen.
 
 The era-aware read-versus-write positive control described in the analysis plan
-is not yet implemented. It requires additional marker-derived windows and is an
-interpretation gate, not one of the twenty checks of currently generated
-artifacts. Until it is implemented, null condition results cannot be used as
+is not yet implemented. Until it is, null condition results cannot be used as
 evidence that the pipeline was sensitive to every plausible state difference.
 
 ## Method basis

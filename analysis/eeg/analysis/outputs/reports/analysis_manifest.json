@@ -12,47 +12,47 @@
   "inputs": {
     "condition_features": {
       "path": "src/project/logs/xdf/gold/features/condition_features.csv",
-      "sha256": "2f967e35ecf48df95b5eb4146cf1c172dcbdba4e4a1a0e47285304628808a275"
+      "sha256": "4363f31d78ecc21ec2fd741b193bdb1ec5cd5a037d31071458c22360dc658c24"
     },
     "condition_epochs": {
       "path": "src/project/logs/xdf/gold/features/condition_epoch_features.csv",
-      "sha256": "6b73763fe21afae298e46dc87628c0cdda19e9d7e1d6e7aab153c5f8931accf9"
+      "sha256": "ab4a3abe56b92da42e85b5121e5546114a6a62da698fecc757ba17122ddba0d9"
     },
     "ad_responses": {
       "path": "src/project/logs/xdf/gold/features/ad_response_features.csv",
-      "sha256": "438e91940df32ab1d1298c447034149a932bef4296f4d39766da611ae89db7a2"
+      "sha256": "2e99d486a73ff2567b505020a2327302881ddef4e9a01a574d74bee62a27624c"
     },
     "condition_validation": {
       "path": "src/project/logs/xdf/gold/features/condition_feature_validation.json",
-      "sha256": "a07699bcbb16da83c1db3839cf01ebe69d3c37e5091fb8ad0a5ea21687fe401d"
+      "sha256": "703b220a6485a8fd43a682508016992ad692649ae26c7c40d10cdf822fc44dba"
     },
     "ad_validation": {
       "path": "src/project/logs/xdf/gold/features/ad_feature_validation.json",
-      "sha256": "ac2abab4f482e3668144c514bbdfa8c17a5bef614b3f0d697b5dad783cd59625"
+      "sha256": "08564c549ed6460af8814b43415b9012b7e9892217540d04458be15761b4162b"
     },
     "engagement_validation": {
       "path": "src/project/logs/xdf/gold/features/engagement_feature_validation.json",
-      "sha256": "d6eb72d66c473c83f04d2445f466c9535e4911d575ce1f2b2ff94bb80cf1fce7"
+      "sha256": "260f78d7b62f918ce41d2e94ded31c925872c1a721348c2352387642394759dc"
     },
     "soundness_validation": {
       "path": "src/project/logs/xdf/gold/validation/preprocessing_soundness.json",
-      "sha256": "8450e176af84a7c9d0e02eb94d12331d4bc01782d7d23a4ee8edf2c31fe8d524"
+      "sha256": "ed84930d31b7a5660eef9f9d13c545545310bee7f57c4680a1ee047d48438e22"
     },
     "condition_tests": {
       "path": "analysis/eeg/statistics/outputs/eeg_condition_contrasts.csv",
-      "sha256": "f09529420194b8c8df9b001d26b4d6320d79c17448dd10c11f1b8fc8226e04ae"
+      "sha256": "156bc189241c293b8b46d64f4fef6ca7283d360eaa8354d24973923bd4837459"
     },
     "condition_scores": {
       "path": "analysis/eeg/statistics/outputs/eeg_condition_contrast_scores.csv",
-      "sha256": "7efe386770799dcb6fff9a1ac940412dbd6177fd2fa02e159b3e1658d4c8df4c"
+      "sha256": "98e347bb1d5ac250eb7dcb68da8bc545dd1aa7a0fe6036450aa6206eae2d2b25"
     },
     "ad_tests": {
       "path": "analysis/eeg/statistics/outputs/eeg_ad_response_contrasts.csv",
-      "sha256": "edec086379faa42d5385145baa61c8fbc0fa01a03a80f1fc9c5ed38452cd12c8"
+      "sha256": "38632807ff39f5fec23c2f7240bb15d075e528bad98da798f1eb57d43837ef27"
     },
     "ad_scores": {
       "path": "analysis/eeg/statistics/outputs/eeg_ad_response_contrast_scores.csv",
-      "sha256": "427dfdd3e7912e0586b800422779f978154cbed4bd03d040c1f4f84252058f31"
+      "sha256": "9af7f22b44511489473ec8cb2eaf3c50caa097034deae887ae26ce14de6cd28b"
     },
     "threshold_comparison": {
       "path": "analysis/eeg/statistics/outputs/threshold_sensitivity_comparison.json",
@@ -80,7 +80,7 @@
     },
     "frozen_v3_1050_uv": {
       "path": "analysis/eeg/preprocessing/silver/signal/cleaning_policy.json",
-      "sha256": "0a25de1eb3a0b18c77d22b2fb524cb05238d69c3cf230a31fb3a7d12503b49e5"
+      "sha256": "cc0b46d95dd54f77b5a0398df3a16b7f184c7909d28d28dd2277aa7e0e74d387"
     },
     "frozen_v2_1500_uv": {
       "path": "analysis/eeg/preprocessing/silver/signal/cleaning_policy_frozen_v2.json",
@@ -126,7 +126,7 @@
       "08_no_duplicate_condition_keys": true,
       "09_no_duplicate_ad_keys": true,
       "10_primary_policy_is_frozen_v3": true,
-      "11_ica_is_disabled": true,
+      "11_ica_is_primary": true,
       "12_primary_features_are_complete": true,
       "13_primary_participant_scores_are_complete": true,
       "14_holm_values_are_valid": true,
@@ -139,11 +139,11 @@
     }
   },
   "human_gates": [
-    "Approve filtering and interpolation figures.",
+    "Filtering and interpolation figures approved 2026-08-19.",
     "If available, verify Cz/Fpz handling against the acquisition workspace because Cz is also exported as a dynamic data channel.",
-    "Implement and validate the 99%-variance ICA branch, then compare it with the required no-ICA sensitivity.",
+    "ICA is the approved primary branch (2026-08-19). Keep the no-ICA frozen_v3 tables as a mandatory sensitivity.",
     "Confirm engagement indices remain exploratory.",
-    "Implement and interpret the read-versus-write positive control before treating null condition effects as evidence of pipeline sensitivity.",
+    "Implement and interpret the read-versus-write positive control before treating null condition effects as evidence of pipeline insensitivity.",
     "Integrate behavioral covariates only after their data contract is frozen."
   ]
 }

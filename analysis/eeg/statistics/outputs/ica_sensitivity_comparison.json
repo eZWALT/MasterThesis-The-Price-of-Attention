@@ -1,7 +1,8 @@
 {
-  "comparison": "ica_candidate_v1_vs_frozen_v3_no_ica",
-  "interpretation_status": "sensitivity_ready_pending_human_ica_visual_signoff",
-  "primary_branch_changed": false,
+  "comparison": "frozen_v5_ica_primary_vs_no_ica_sensitivity",
+  "interpretation_status": "ica_approved_as_primary_2026-08-19",
+  "primary_branch": "ica",
+  "primary_branch_changed": true,
   "ica_cohort": {
     "subject_count": 18,
     "pca_explained_variance": 0.99,
@@ -13,7 +14,7 @@
     "minimum_excluded_components": 0,
     "median_excluded_components": 1.0,
     "maximum_excluded_components": 3,
-    "human_visual_signoff": "pending"
+    "human_visual_signoff": "approved"
   },
   "retention": {
     "condition_epoch_fraction_no_ica": 0.9968314321926489,
@@ -426,5 +427,5 @@
     "median_absolute_participant_score_shift": 0.1583364391143517,
     "p95_absolute_participant_score_shift": 4.415041796446272
   },
-  "interpretation": "The ICA branch is a required sensitivity analysis until all component topographies and source/proxy traces receive human signoff. No-ICA frozen_v3 remains the primary branch meanwhile."
+  "interpretation": "Human signoff on 2026-08-19 approved filtering/interpolation figures and all automatic ICA exclusions. ICA frozen_v5 is the primary branch. No-ICA frozen_v3 remains the mandatory sensitivity. Do not reverse this choice because some ad tests are significant only under ICA."
 }

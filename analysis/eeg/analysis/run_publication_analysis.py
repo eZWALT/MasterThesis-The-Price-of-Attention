@@ -760,9 +760,9 @@ def quality_gates(
             condition_features["artifact_policy_status"].eq("frozen_v3").all()
             and ad_responses["artifact_policy_status"].eq("frozen_v3").all()
         ),
-        "11_ica_is_disabled": (
-            condition_features["ica_applied"].eq("no").all()
-            and ad_responses["ica_applied"].eq("no").all()
+        "11_ica_is_primary": (
+            condition_features["ica_applied"].eq("yes").all()
+            and ad_responses["ica_applied"].eq("yes").all()
         ),
         "12_primary_features_are_complete": (
             not primary_condition[
@@ -882,9 +882,10 @@ diagnostics is {minimum_stability:.1%}.
   distributions should lead interpretation.
 - Laboratory feedback identifies `Cz` as the online reference and `Fpz` as
   ground; the XDF does not encode those physical roles directly.
-- Current feature tables are no-ICA. An ICA branch retaining 99% PCA variance
-  and using `Fp1/Fp2` as ocular proxies must be visually validated before the
-  final primary policy is chosen.
+- Current feature tables apply the approved 99%-variance ICA branch
+  (`Fp1/Fp2` ocular proxies, at most three components). No-ICA remains a
+  mandatory sensitivity. Artifact-threshold 1,000/1,500 µV branches were
+  computed on the no-ICA 1,050 µV tables and have not been rebuilt under ICA.
 - Baseline eye state was uncontrolled and is excluded from confirmatory tests.
 - Engagement ratios, FAA, global bands, and uncorrected interactions are
   secondary or exploratory.
@@ -1085,7 +1086,7 @@ def run(config_path: Path, output_root: Path) -> dict[str, Any]:
                 "value": ad_validation["maximum_combined_timing_uncertainty_s"],
             },
             {"metric": "artifact_policy", "value": "frozen_v3_1050_uv"},
-            {"metric": "ica_applied", "value": "no"},
+            {"metric": "ica_applied", "value": "yes"},
         ]
     )
 
@@ -1229,15 +1230,15 @@ def run(config_path: Path, output_root: Path) -> dict[str, Any]:
         ],
         "quality_gates": quality,
         "human_gates": [
-            "Approve filtering and interpolation figures.",
+            "Filtering and interpolation figures approved 2026-08-19.",
             "If available, verify Cz/Fpz handling against the acquisition "
             "workspace because Cz is also exported as a dynamic data channel.",
-            "Implement and validate the 99%-variance ICA branch, then compare "
-            "it with the required no-ICA sensitivity.",
+            "ICA is the approved primary branch (2026-08-19). Keep the "
+            "no-ICA frozen_v3 tables as a mandatory sensitivity.",
             "Confirm engagement indices remain exploratory.",
             "Implement and interpret the read-versus-write positive control "
             "before treating null condition effects as evidence of pipeline "
-            "sensitivity.",
+            "insensitivity.",
             "Integrate behavioral covariates only after their data contract is frozen.",
         ],
     }

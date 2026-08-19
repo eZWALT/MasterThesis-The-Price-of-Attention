@@ -13,7 +13,7 @@
     "08_no_duplicate_condition_keys": true,
     "09_no_duplicate_ad_keys": true,
     "10_primary_policy_is_frozen_v3": true,
-    "11_ica_is_disabled": true,
+    "11_ica_is_primary": true,
     "12_primary_features_are_complete": true,
     "13_primary_participant_scores_are_complete": true,
     "14_holm_values_are_valid": true,

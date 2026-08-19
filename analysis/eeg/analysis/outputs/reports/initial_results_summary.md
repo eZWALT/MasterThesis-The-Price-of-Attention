@@ -12,20 +12,20 @@ No primary sustained-condition or ad-response contrast survives its
 feature-specific Holm family at α=0.05.
 
 The smallest corrected sustained-condition result is
-`early_vs_late` for `posterior_alpha_power_db_uv2`
-(`mean=-0.089`,
-`95% CI [-0.201, 0.023]`,
-`dz=-0.395`,
-`p_Holm=0.337`,
-`p_global_Holm=0.674`).
+`early_vs_late` for `fz_theta_power_db_uv2`
+(`mean=-0.113`,
+`95% CI [-0.258, 0.032]`,
+`dz=-0.387`,
+`p_Holm=0.358`,
+`p_global_Holm=0.716`).
 
 The smallest corrected ad-response result is
 `inline_late_vs_no_ad_late` for `fz_theta_power_db_uv2`
-(`mean=-1.992`,
-`95% CI [-3.942, -0.042]`,
-`dz=-0.508`,
-`p_Holm=0.183`,
-`p_global_Holm=0.366`).
+(`mean=-1.383`,
+`95% CI [-2.803, 0.037]`,
+`dz=-0.484`,
+`p_Holm=0.223`,
+`p_global_Holm=0.445`).
 
 ## Robustness
 
@@ -40,9 +40,10 @@ diagnostics is 55.6%.
   distributions should lead interpretation.
 - Laboratory feedback identifies `Cz` as the online reference and `Fpz` as
   ground; the XDF does not encode those physical roles directly.
-- Current feature tables are no-ICA. An ICA branch retaining 99% PCA variance
-  and using `Fp1/Fp2` as ocular proxies must be visually validated before the
-  final primary policy is chosen.
+- Current feature tables apply the approved 99%-variance ICA branch
+  (`Fp1/Fp2` ocular proxies, at most three components). No-ICA remains a
+  mandatory sensitivity. Artifact-threshold 1,000/1,500 µV branches were
+  computed on the no-ICA 1,050 µV tables and have not been rebuilt under ICA.
 - Baseline eye state was uncontrolled and is excluded from confirmatory tests.
 - Engagement ratios, FAA, global bands, and uncorrected interactions are
   secondary or exploratory.
