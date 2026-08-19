@@ -44,6 +44,26 @@ subsection around it. An 8 s labelled-block late window showed lower
 posterior alpha versus matched no-ad under both ICA and no-ICA; that
 cell was not Holm-significant at the pre-specified 4 s width.
 
+## Paper figures
+
+Main text, at most two EEG figures, both at **4 s**:
+
+- `suite/figure_08_confirmatory_forests` — Path A + Path B money plot
+- `suite/figure_07_condition_rainclouds` — person-level overlap (optional
+  second figure; skip if space is tight)
+
+Do **not** also use `figure_02` / `figure_03` if 08 is in. Pipeline
+figure stays the existing Overleaf flow (`eeg_pipeline`), not
+`figure_01`.
+
+Appendix only, if mentioned: 09 (Path B slopes), 06 (threshold), 10 or
+11 (epoch grid; do not promote 8 s), 13 (ICA vs no-ICA).
+
+Not for the paper: 14, 15 (sanity check), 16 (session order).
+
+Primary epoch width for the paper is **4 s**. 8 s is a sensitivity
+footnote, not the reported analysis.
+
 ## Figures (PNG + PDF)
 
 `analysis/eeg/analysis/outputs/figures/suite/`
