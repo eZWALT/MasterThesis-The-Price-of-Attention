@@ -81,11 +81,11 @@ Figure labels are shortened, so the mapping is:
 | Baseline | `baseline` | lab only |
 | Prolific ID | `prolific_id` | crowd only |
 | Warm-Up Chat | `warmup_chat` | both |
-| Task Briefing | `condition_intro` | both |
-| Conversation | `condition_chat` | both |
-| Findings | `condition_conclusion` | both |
-| Questionnaire | `post_condition_survey` | both |
-| Ad Recall | `ads_recall_interpretation` | both |
+| 1 Task Briefing | `condition_intro` | both |
+| 2 Conversation | `condition_chat` | both |
+| 3 Findings | `condition_conclusion` | both |
+| 4 Questionnaire | `post_condition_survey` | both |
+| Cued Recall | `ads_recall_interpretation` | both |
 | BFI-10 | `ocean` | both |
 | Demographics | `demographics` | both |
 | Validation | `validation` | crowd only |
