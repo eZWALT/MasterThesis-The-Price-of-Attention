@@ -82,7 +82,7 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 
 | ID | Item | Ticket | Verdict |
 |---|---|---|---|
-| B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | APPROVED | Fz theta Holm 0.007; alpha null; pipeline lives |
+| B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | APPROVED | Fz theta Holm 0.007; alpha null; pipeline lives. Not an ad result: `2026-08-19-read-vs-write-what-it-proved.md` |
 | B2 | Mixed model `EEG ~ condition + task + order + (1\|person)` | PENDING | later; paired \(D\) already answers the planned contrasts |
 | B3 | Mean-of-epoch-dB instead of median | APPROVED | Y_A 0/48 Holm; keep median primary |
 | B4 | Epoch-length grid 2/4/8/16/32 s | APPROVED | Path A null at every width; do not freeze 8 s alpha |

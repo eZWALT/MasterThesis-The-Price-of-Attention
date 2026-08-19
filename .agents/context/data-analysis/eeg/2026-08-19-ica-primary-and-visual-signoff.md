@@ -39,7 +39,7 @@ accounted for, filtered pre-ICA Raw vs applied ICA):
 - ICA report JSON and `ica_cohort_summary.csv` signoff: `approved`.
 - Visual validation JSON signoff: `approved`.
 
-## Read versus write positive control — explained, not implemented
+## Read versus write positive control — implemented 2026-08-19
 
 This is **not** Q1 (sustained condition) and **not** Q2 (ad-locked
 post−pre). It is a pipeline sanity check.
@@ -64,7 +64,7 @@ immediately after `user_message`, still at submission, before the next
 assistant reply exists. Those three names can share one timestamp. They do
 not mark “started reading the reply” or “started typing.”
 
-### Static contract (decided 2026-08-06; still uncoded)
+### Static contract (decided 2026-08-06; coded 2026-08-19)
 
 Use events that do have trustworthy order:
 
@@ -80,9 +80,6 @@ Constraints:
 - drop warmup, questionnaires, and post-task;
 - drop pairs that overlap or are incomplete.
 
-If coded, this would be a third Gold cutter on the same cleaned Raw. It would
-not change Path A or Path B shapes. Dynamic-duration windows (reply length,
-message length, `time_to_reply_ms`) would be a later sensitivity.
-
-Implemented 2026-08-19 (`run_task_state_positive_control.py`). Fz theta
-writing−reading is Holm-significant; posterior alpha is not.
+This is a third cutter on the same cleaned Raw. It does not change Path A
+or Path B shapes. What it proved (chain alive; not an ad result):
+`2026-08-19-read-vs-write-what-it-proved.md`.

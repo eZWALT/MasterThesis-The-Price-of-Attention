@@ -42,7 +42,8 @@ without its original author.
 ### Walter-only work — 16–23 August
 
 - implement the read-versus-write EEG positive control and complete every EEG
-  task that does not require team judgment;
+  task that does not require team judgment
+  (done 2026-08-19; see `eeg/2026-08-19-read-vs-write-what-it-proved.md`);
 - freeze Action 4 EEG tables, figures, and provisional interpretation;
 - run or repair behavioural ETL only if the pre-vacation handoff is complete;
 - write thesis Introduction, Methods, EEG Results, and reproducibility sections;
@@ -228,8 +229,9 @@ EEG:
 - a publication-analysis runner, tables, six figures, and an executable
   notebook exist under `analysis/eeg/analysis/`;
 - current primary EEG contrasts do not survive Holm correction;
-- machine checks pass, while visual signoff, acquisition reference, ICA
-  confirmation, and the read-versus-write positive control remain open.
+- machine checks pass; visual signoff, ICA-as-primary, and the
+  read-versus-write positive control closed 2026-08-19
+  (`eeg/2026-08-19-read-vs-write-what-it-proved.md`).
 
 Behavioural:
 

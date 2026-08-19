@@ -420,11 +420,9 @@ and must not replace primary. Publication outputs render the ICA branch.
 - Baseline deltas on Path A are not a second experiment. They are a
   convenience column.
 - Path B’s matched no-ad onsets are log-projected replies, not visual ads.
-- The planned read-versus-write positive control is **not** implemented. If
-  added, it would be a third Gold cutter on the same cleaned Raw, using
-  existing 4 s baseline epochs plus first/last complete 4 s slices after
-  `assistant_reply` / before the next `user_message`. It would not change
-  Path A or Path B shapes.
+- Read-versus-write is a third cutter on the same cleaned Raw
+  (`build_task_state_windows.py`). It does not change Path A or Path B
+  shapes. What it proved: `2026-08-19-read-vs-write-what-it-proved.md`.
 
 ## Agent rules
 

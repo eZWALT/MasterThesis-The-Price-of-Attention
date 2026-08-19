@@ -169,7 +169,8 @@ Still open:
 1. keep all three engagement metrics and decide their final inferential tier;
 2. optionally verify reported `Cz` reference/`Fpz` ground handling against the
    acquisition workspace;
-3. implement the era-aware read-versus-write positive control;
+3. implement the era-aware read-versus-write positive control
+   (done 2026-08-19; see `2026-08-19-read-vs-write-what-it-proved.md`);
 4. review manuscript captions and feature/contrast hierarchy.
 
 Multimodal gate:

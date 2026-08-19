@@ -33,7 +33,9 @@ Order of analysis (do not invert):
 - [x] Human signoff: filter / interpolation figures (2026-08-19)
 - [x] Mean-of-epoch dB vs median (Y_A still 0/48 Holm; keep median)
 - [x] Epoch-length robustness grid 2/4/8/16/32 s (do not pick by p-value; 8 s alpha is sensitivity only)
-- [x] Read vs write positive control (Fz theta Holm 0.007; alpha null)
+- [x] Read vs write positive control (Fz theta Holm 0.007; alpha null).
+  Proved the chain is alive, not that ads work. See
+  `../data-analysis/eeg/2026-08-19-read-vs-write-what-it-proved.md`
 - [ ] EEG × trust/credibility/manipulation: same three \(D\) as Goal 3
   (exploratory; lab \(n=18\); after Goal 1 freeze). See
   `../data-analysis/eeg/2026-08-19-eeg-analysis-menu-and-tickets.md`

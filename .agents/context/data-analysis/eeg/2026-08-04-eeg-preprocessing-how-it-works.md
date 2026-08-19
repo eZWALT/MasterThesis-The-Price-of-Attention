@@ -654,8 +654,9 @@ exclusions, and ICA as the primary branch (`frozen_v5_ica_primary`).
 
 Remaining scientific gates:
 
-1. implement the era-aware read-versus-write positive control before using
-   null ad results as broad evidence of pipeline sensitivity;
+1. read-versus-write positive control: implemented 2026-08-19. It showed
+   the chain can recover a chat-state difference (Fz theta). It did not
+   prove ads work. See `2026-08-19-read-vs-write-what-it-proved.md`.
 2. freeze the behavioral join contract before multimodal tables.
 
 Laboratory feedback identifies `Cz` as online reference and `Fpz` as ground;

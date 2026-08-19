@@ -32,30 +32,21 @@ No further human action is currently needed for:
 
 ## Remaining human / scientific inputs
 
-### 1. Positive-control interpretation — decided 2026-08-06, not implemented
+### 1. Positive-control interpretation — implemented 2026-08-19
 
-The read-versus-write analysis is a pipeline sanity check, not Q1/Q2. It asks
-whether the same 4 s / 16-feature chain can tell reading from typing. If it
-cannot, a null ad-condition result is hard to interpret.
+Coded. Result: Fz theta writing > reading (+0.60 dB, Holm 0.007,
+\(d_z=0.80\)). Posterior alpha null. That **proves the chain can see a
+state difference**. It does **not** prove ads work. Full write-up:
+`2026-08-19-read-vs-write-what-it-proved.md`.
 
-Do **not** time-lock to `user_starts_typing`, `turn_N_write`, or `turn_N_read`.
-In the deployed lab app those events often share the message-submission
-timestamp, so they do not mark true reading onset or typing onset.
+Do **not** time-lock to `user_starts_typing`, `turn_N_write`, or
+`turn_N_read`. In the deployed lab app those events often share the
+message-submission timestamp.
 
-Static contract (first implementation, if/when coded):
-
-- baseline: reuse retained non-overlapping four-second baseline epochs;
-- reading: first complete four-second interval after an `assistant_reply`;
-- writing: final complete four-second interval before the following
-  `user_message`;
-- include only intervals bounded by `condition_start` and
-  `condition_conclusion_submitted`;
-- exclude warmup, questionnaires, and post-task periods;
-- reject pairs whose reading and writing intervals overlap or fall outside the
-  parent condition.
-
-Dynamic-duration epochs (reply length, message length, `time_to_reply_ms`) are
-a later sensitivity, not the first implementation.
+Contract used: first complete 4 s after `assistant_reply` vs last
+complete 4 s before the next `user_message`, inside
+`condition_start` → `condition_conclusion_submitted`. Overlapping or
+incomplete pairs dropped.
 
 ### 2. Behavioral handoff
 
@@ -86,7 +77,9 @@ After the signoffs above, the pipeline can automatically:
 - rebuild Path A summaries with `--from-epochs` (mean vs median);
 - retile Path A/B at other epoch lengths (2/8/16/32 s) as robustness,
   without promoting a width that happens to yield p < 0.05;
-- implement the static baseline/reading/writing positive-control windows;
+- rerun the coded read/write positive control
+  (`run_task_state_positive_control.py`); interpretation:
+  `2026-08-19-read-vs-write-what-it-proved.md`;
 - export total PSD and mean absolute amplitude;
 - add entropy or connectivity only after their estimator contracts are frozen;
 - regenerate publication tables, figures, and the notebook.

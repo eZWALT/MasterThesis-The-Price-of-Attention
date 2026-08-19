@@ -43,8 +43,9 @@ pipelines, generated manifests, and participant-level outputs remain under
   axes or row geometry).
 - `2026-08-19-ica-primary-and-visual-signoff.md`
   records the 2026-08-19 approvals (filter figures, all automatic ICA
-  exclusions, ICA as primary) and explains the read-versus-write
-  positive control without implementing it.
+  exclusions, ICA as primary) and the read-versus-write window contract.
+  What that control proved is in
+  `2026-08-19-read-vs-write-what-it-proved.md`.
 - `2026-08-19-mean-vs-median-and-epoch-length.md`
   records that mean-of-epoch dB does not change the Holm-null Y_A
   result, so median stays primary, and that a 2/4/8/16/32 s grid is a
@@ -54,10 +55,15 @@ pipelines, generated manifests, and participant-level outputs remain under
   at every width; three confirmatory Path B Holm cells appeared (2 s Fz
   theta ICA-only; 8 s posterior alpha under both ICA and no-ICA). Primary
   stays 4 s + median + ICA.
+- `2026-08-19-read-vs-write-what-it-proved.md`
+  is the short interpretation note: B1 proved the 4 s ICA chain can
+  recover a chat-state difference (Fz theta writing > reading, Holm
+  0.007). It did not prove ads work. Not for the abstract as an ad
+  finding.
 - `2026-08-19-eeg-only-analyses-complete.md`
   is the EEG-only stop line: Path A/B nulls, epoch grid, ICA, read-versus-
-  write positive control (Fz theta Holm 0.007), session-order null, and
-  the figure suite. Next EEG work is manuscript prose and C1 after Goal 1.
+  write positive control, session-order null, and the figure suite. Next
+  EEG work is manuscript prose and C1 after Goal 1.
 - `2026-08-19-literature-justifications-in-overleaf.md`
   records the literature sanity-check on the median collapse and
   person-level Holm tests, the short cite set parked as Overleaf

@@ -31,6 +31,9 @@ composing than while reading. Therefore the Q1/Q2 nulls are not evidence
 that the pipeline is dead. Posterior alpha does not separate the two
 states here.
 
+What that does and does not prove:
+`2026-08-19-read-vs-write-what-it-proved.md`.
+
 ## Paper sentences
 
 Primary 4 s ICA analyses show no Holm-significant Fz-theta or
