@@ -1,0 +1,224 @@
+{
+  "grid_seconds": [
+    4.0,
+    2.0,
+    8.0,
+    16.0,
+    32.0
+  ],
+  "policies": [
+    "ica",
+    "no_ica"
+  ],
+  "n_tests": 1920,
+  "holm_hits": 19,
+  "confirmatory_holm_hits": [
+    {
+      "epoch_seconds": 2.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "fz_theta_power_db_uv2",
+      "feature_tier": "primary",
+      "n_participants": 18,
+      "mean_difference": 3.3041287598900158,
+      "p_t_raw": 0.005364905049489025,
+      "p_t_holm": 0.0214596201979561,
+      "holm_significant": true,
+      "raw_p_lt_05": true,
+      "confirmatory": true
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_late_vs_no_ad_late",
+      "feature": "posterior_alpha_power_db_uv2",
+      "feature_tier": "primary",
+      "n_participants": 18,
+      "mean_difference": -1.2231372891480843,
+      "p_t_raw": 0.005732091451538317,
+      "p_t_holm": 0.02292836580615327,
+      "holm_significant": true,
+      "raw_p_lt_05": true,
+      "confirmatory": true
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "no_ica",
+      "path": "B",
+      "contrast_id": "block_late_vs_no_ad_late",
+      "feature": "posterior_alpha_power_db_uv2",
+      "feature_tier": "primary",
+      "n_participants": 18,
+      "mean_difference": -1.2955221167282198,
+      "p_t_raw": 0.0031209908554050963,
+      "p_t_holm": 0.012483963421620385,
+      "holm_significant": true,
+      "raw_p_lt_05": true,
+      "confirmatory": true
+    }
+  ],
+  "exploratory_holm_hits": [
+    {
+      "epoch_seconds": 4.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "theta_power_db_uv2",
+      "p_t_holm": 0.02292115092695731,
+      "mean_difference": 1.6771395147666652,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_power_db_uv2",
+      "p_t_holm": 0.00687431649519775,
+      "mean_difference": 4.602253733892598,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.004282517533772388,
+      "mean_difference": 0.18888723343784425,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "alpha_relative_power",
+      "p_t_holm": 0.026330131959532863,
+      "mean_difference": -0.03905186987819722,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "beta_relative_power",
+      "p_t_holm": 0.01799178299741511,
+      "mean_difference": -0.08791649979677445,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "inline_late_vs_no_ad_late",
+      "feature": "gamma_relative_power",
+      "p_t_holm": 0.0373562061785924,
+      "mean_difference": -0.043505180216825215,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 2.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_late_vs_no_ad_late",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.017482279235164502,
+      "mean_difference": 0.20503519478458068,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 2.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "inline_late_vs_no_ad_late",
+      "feature": "beta_relative_power",
+      "p_t_holm": 0.028680603827808016,
+      "mean_difference": -0.08895092283488129,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 2.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_late_vs_no_ad_late",
+      "feature": "beta_relative_power",
+      "p_t_holm": 0.008159277604799998,
+      "mean_difference": -0.09757424515360162,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 2.0,
+      "policy": "no_ica",
+      "path": "B",
+      "contrast_id": "inline_late_vs_no_ad_late",
+      "feature": "beta_power_db_uv2",
+      "p_t_holm": 0.018745803096844343,
+      "mean_difference": -1.7445087764828915,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.011686503851395672,
+      "mean_difference": 0.20052218632071364,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "beta_relative_power",
+      "p_t_holm": 0.03326286173743103,
+      "mean_difference": -0.1105349089791839,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "gamma_relative_power",
+      "p_t_holm": 0.020191561251407617,
+      "mean_difference": -0.03730766984666231,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "no_ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.012326437897082383,
+      "mean_difference": 0.11391231373079294,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 8.0,
+      "policy": "no_ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "beta_relative_power",
+      "p_t_holm": 0.04608203463610846,
+      "mean_difference": -0.06830026252975116,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 16.0,
+      "policy": "ica",
+      "path": "B",
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.03377332609622562,
+      "mean_difference": 0.0999863750719423,
+      "n_participants": 17
+    }
+  ]
+}

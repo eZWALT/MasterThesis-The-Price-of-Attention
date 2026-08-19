@@ -29,9 +29,13 @@ SIGNAL_CODE = REPOSITORY_ROOT / (
     "analysis/eeg/preprocessing/silver/signal"
 )
 STATISTICS_CODE = REPOSITORY_ROOT / "analysis/eeg/statistics"
+WINDOWS_CODE = REPOSITORY_ROOT / (
+    "analysis/eeg/preprocessing/gold/windows"
+)
 sys.path.insert(0, str(FEATURE_CODE))
 sys.path.insert(0, str(SIGNAL_CODE))
 sys.path.insert(0, str(STATISTICS_CODE))
+sys.path.insert(0, str(WINDOWS_CODE))
 
 from build_ad_features import feature_row, response_row  # noqa: E402
 from build_condition_features import (  # noqa: E402
@@ -54,6 +58,7 @@ from build_condition_contrasts import (  # noqa: E402
     CONDITIONS as CONTRAST_CONDITIONS,
     contrast_tables,
 )
+from build_ad_windows import window_pair  # noqa: E402
 
 
 SAMPLING_RATE = 500.0
@@ -556,6 +561,61 @@ class WindowAggregationTests(unittest.TestCase):
         self.assertEqual(mean_any_ad["metric"], "condition_mean")
         self.assertAlmostEqual(float(median_any_ad["mean_difference"]), 0.0)
         self.assertAlmostEqual(float(mean_any_ad["mean_difference"]), 10.0)
+
+    def test_contrast_tables_can_drop_incomplete_subjects(self) -> None:
+        rows: list[dict[str, str]] = []
+        for subject_id in ("complete_a", "complete_b", "missing_block_late"):
+            for condition in CONTRAST_CONDITIONS:
+                if subject_id == "missing_block_late" and condition == "block_late":
+                    continue
+                row = {
+                    "subject_id": subject_id,
+                    "condition": condition,
+                }
+                for feature in FEATURE_TIERS:
+                    row[f"{feature}_median"] = "1"
+                rows.append(row)
+        with self.assertRaises(ValueError):
+            contrast_tables(rows)
+        kept, scores = contrast_tables(rows, drop_incomplete_subjects=True)
+        subjects = {row["subject_id"] for row in scores}
+        self.assertEqual(subjects, {"complete_a", "complete_b"})
+        self.assertEqual(kept[0]["n_participants"], 2)
+
+    def test_ad_window_pair_scales_pre_post_duration(self) -> None:
+        condition = {
+            "start_eeg_offset_s": "0.0",
+            "end_eeg_offset_s": "120.0",
+            "primary_analysis_eligible": "yes",
+            "source_xdf": "synthetic.xdf",
+            "source_xdf_sha256": "synthetic_hash",
+        }
+        rows = window_pair(
+            subject_id="synthetic_subject",
+            experiment_id="synthetic_experiment",
+            reference_id="synthetic_ad",
+            reference_kind="advertisement",
+            condition="inline_early",
+            ad_mode="inline",
+            matched_timing="early",
+            matched_ad_conditions="inline_early",
+            onset_eeg_offset_s=40.0,
+            onset_xdf_timestamp_lsl=40.0,
+            onset_log_unix=40.0,
+            onset_estimator="synthetic",
+            onset_status="synthetic",
+            combined_timing_uncertainty_s=0.0,
+            condition_window=condition,
+            source_log="synthetic.jsonl",
+            source_canonical_markers="synthetic_markers.csv",
+            window_seconds=16.0,
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["duration_s"], "16.000000")
+        self.assertEqual(rows[1]["duration_s"], "16.000000")
+        self.assertEqual(rows[0]["start_eeg_offset_s"], "24.000000")
+        self.assertEqual(rows[1]["end_eeg_offset_s"], "56.000000")
+        self.assertEqual(rows[0]["primary_analysis_eligible"], "yes")
 
 
 @unittest.skipUnless(

@@ -60,6 +60,7 @@ def window_pair(
     condition_window: dict[str, str],
     source_log: str,
     source_canonical_markers: str,
+    window_seconds: float = WINDOW_SECONDS,
 ) -> list[dict[str, Any]]:
     condition_start = float(condition_window["start_eeg_offset_s"])
     condition_end = float(condition_window["end_eeg_offset_s"])
@@ -67,13 +68,13 @@ def window_pair(
     for phase, start, end in (
         (
             "pre",
-            onset_eeg_offset_s - WINDOW_SECONDS,
+            onset_eeg_offset_s - window_seconds,
             onset_eeg_offset_s,
         ),
         (
             "post",
             onset_eeg_offset_s,
-            onset_eeg_offset_s + WINDOW_SECONDS,
+            onset_eeg_offset_s + window_seconds,
         ),
     ):
         inside_condition = start >= condition_start and end <= condition_end
@@ -131,6 +132,7 @@ def ad_rows(
     *,
     manifests: dict[str, dict[str, str]],
     conditions: dict[tuple[str, str], dict[str, str]],
+    window_seconds: float = WINDOW_SECONDS,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for event in visibility:
@@ -167,6 +169,7 @@ def ad_rows(
                 condition_window=conditions[(subject_id, condition)],
                 source_log=event["source_log"],
                 source_canonical_markers=source["canonical_table"],
+                window_seconds=window_seconds,
             )
         )
     return rows
@@ -176,6 +179,7 @@ def no_ad_rows(
     manifest: list[dict[str, str]],
     *,
     conditions: dict[tuple[str, str], dict[str, str]],
+    window_seconds: float = WINDOW_SECONDS,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for source in manifest:
@@ -225,6 +229,7 @@ def no_ad_rows(
                     ],
                     source_log=source["source_log"],
                     source_canonical_markers=source["canonical_table"],
+                    window_seconds=window_seconds,
                 )
             )
     return rows
@@ -235,6 +240,8 @@ def run(
     visibility_path: Path,
     conditions_path: Path,
     output_path: Path,
+    *,
+    window_seconds: float = WINDOW_SECONDS,
 ) -> None:
     manifest = read_csv(manifest_path)
     manifests = {row["subject_id"]: row for row in manifest}
@@ -243,8 +250,15 @@ def run(
         read_csv(visibility_path),
         manifests=manifests,
         conditions=conditions,
+        window_seconds=window_seconds,
     )
-    rows.extend(no_ad_rows(manifest, conditions=conditions))
+    rows.extend(
+        no_ad_rows(
+            manifest,
+            conditions=conditions,
+            window_seconds=window_seconds,
+        )
+    )
     write_csv(output_path, rows)
     eligible = sum(row["primary_analysis_eligible"] == "yes" for row in rows)
     print(f"Wrote {len(rows)} ad-analysis windows to {output_path}")
@@ -257,8 +271,20 @@ def main() -> None:
     parser.add_argument("--visibility", type=Path, default=DEFAULT_VISIBILITY)
     parser.add_argument("--conditions", type=Path, default=DEFAULT_CONDITIONS)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--window-seconds",
+        type=float,
+        default=WINDOW_SECONDS,
+        help="Pre and post duration around the reference onset.",
+    )
     args = parser.parse_args()
-    run(args.manifest, args.visibility, args.conditions, args.output)
+    run(
+        args.manifest,
+        args.visibility,
+        args.conditions,
+        args.output,
+        window_seconds=args.window_seconds,
+    )
 
 
 if __name__ == "__main__":

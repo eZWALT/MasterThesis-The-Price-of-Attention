@@ -132,7 +132,12 @@ def test_row(
     }
 
 
-def run(input_path: Path, output_dir: Path) -> None:
+def run(
+    input_path: Path,
+    output_dir: Path,
+    *,
+    min_participants: int = 15,
+) -> None:
     rows = [
         row
         for row in read_csv(input_path)
@@ -170,7 +175,7 @@ def run(input_path: Path, output_dir: Path) -> None:
                         "difference": score,
                     }
                 )
-            if len(required_scores) < 15:
+            if len(required_scores) < min_participants:
                 raise ValueError(
                     f"{contrast_id}/{feature} has only "
                     f"{len(required_scores)} complete participants"

@@ -122,7 +122,10 @@ def descriptives(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
                     float(row[column])
                     for row in rows
                     if row["condition"] == condition
+                    and row.get(column) not in ("", None)
                 ]
+                if len(values) < 2:
+                    continue
                 lower, upper = confidence_interval(values)
                 output.append(
                     {
@@ -210,21 +213,36 @@ def contrast_tables(
     *,
     feature_suffix: str = "_median",
     metric: str = "condition_median",
+    drop_incomplete_subjects: bool = False,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     by_subject: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
     for row in rows:
         by_subject[row["subject_id"]][row["condition"]] = row
+    complete = {
+        subject_id: subject
+        for subject_id, subject in by_subject.items()
+        if set(subject) == set(CONDITIONS)
+    }
+    incomplete = sorted(set(by_subject) - set(complete))
+    if incomplete and not drop_incomplete_subjects:
+        raise ValueError(
+            f"{incomplete[0]} lacks complete condition cells: "
+            f"{set(by_subject[incomplete[0]])}"
+        )
+    if not complete:
+        raise ValueError("No participants have all five condition cells")
+    if incomplete:
+        print(
+            "Dropping incomplete Path A subjects: " + ", ".join(incomplete),
+            flush=True,
+        )
     contrast_rows: list[dict[str, Any]] = []
     score_rows: list[dict[str, Any]] = []
     functions = contrast_functions()
     for feature, tier in FEATURE_TIERS.items():
         scores_by_contrast: dict[str, list[float]] = defaultdict(list)
-        for subject_id in sorted(by_subject):
-            subject = by_subject[subject_id]
-            if set(subject) != set(CONDITIONS):
-                raise ValueError(
-                    f"{subject_id} lacks complete condition cells: {set(subject)}"
-                )
+        for subject_id in sorted(complete):
+            subject = complete[subject_id]
             values = {
                 condition: float(subject[condition][f"{feature}{feature_suffix}"])
                 for condition in CONDITIONS
@@ -275,6 +293,8 @@ def run(
     *,
     feature_suffix: str = "_median",
     metric: str = "condition_median",
+    expected_condition_rows: int | None = 90,
+    drop_incomplete_subjects: bool = False,
 ) -> None:
     rows = [
         row
@@ -282,13 +302,20 @@ def run(
         if row["window_type"] == "condition"
         and row["primary_analysis_eligible"] == "yes"
     ]
-    if len(rows) != 90:
-        raise ValueError(f"Expected 90 eligible condition rows, found {len(rows)}")
+    if (
+        expected_condition_rows is not None
+        and len(rows) != expected_condition_rows
+    ):
+        raise ValueError(
+            f"Expected {expected_condition_rows} eligible condition rows, "
+            f"found {len(rows)}"
+        )
     descriptive_rows = descriptives(rows)
     contrast_rows, score_rows = contrast_tables(
         rows,
         feature_suffix=feature_suffix,
         metric=metric,
+        drop_incomplete_subjects=drop_incomplete_subjects,
     )
     write_csv(output_dir / "eeg_condition_descriptives.csv", descriptive_rows)
     write_csv(output_dir / "eeg_condition_contrasts.csv", contrast_rows)
@@ -312,12 +339,24 @@ def main() -> None:
         default="condition_median",
         help="Label written to the metric column.",
     )
+    parser.add_argument(
+        "--allow-partial-cohort",
+        action="store_true",
+        help=(
+            "Drop subjects missing a condition cell instead of requiring "
+            "exactly 90 eligible condition rows."
+        ),
+    )
     args = parser.parse_args()
     run(
         args.input,
         args.output_dir,
         feature_suffix=args.feature_suffix,
         metric=args.metric,
+        expected_condition_rows=(
+            None if args.allow_partial_cohort else 90
+        ),
+        drop_incomplete_subjects=args.allow_partial_cohort,
     )
 
 

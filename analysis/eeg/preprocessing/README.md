@@ -41,6 +41,13 @@ Primary cleaning is `cleaning_policy.json` (`frozen_v5_ica_primary`).
 The no-ICA archive lives at
 `src/project/logs/xdf/gold/features/sensitivity/no_ica_frozen_v3/`.
 
+Rebuild Path A tiles and Path B pre/post windows at 2 / 8 / 16 / 32 s
+without replacing 4 s primary Gold (one clean per person per policy):
+
+```bash
+python analysis/eeg/preprocessing/run_epoch_length_sensitivity.py
+```
+
 After generating the separate Silver visual pack and the threshold sensitivity
 branch, aggregate all machine-checkable evidence with:
 
