@@ -48,6 +48,12 @@ without replacing 4 s primary Gold (one clean per person per policy):
 python analysis/eeg/preprocessing/run_epoch_length_sensitivity.py
 ```
 
+Read-versus-write positive control (does not replace Path A/B Gold):
+
+```bash
+python analysis/eeg/preprocessing/run_task_state_positive_control.py
+```
+
 After generating the separate Silver visual pack and the threshold sensitivity
 branch, aggregate all machine-checkable evidence with:
 
@@ -159,11 +165,14 @@ report, and executable notebook without mutating preprocessing outputs.
 ### 8. Pipeline diagram
 
 ```bash
-python src/project/docs/eeg_pipeline/eeg_pipeline.py
+python src/project/docs/eeg_pipeline/eeg_pipeline.py      # original, kept
+python src/project/docs/eeg_pipeline/eeg_pipeline_v2.py   # publication candidate
 ```
 
-The diagram follows the repository-wide documentation convention rather than
-living inside the executable preprocessing package.
+The original five-band figure is unchanged. v2 keeps the lake colours and
+adds $X \to Y_A,Y_B \to D$ with shape evolution. The diagram follows the
+repository-wide documentation convention rather than living inside the
+executable preprocessing package.
 
 ## Current gate
 

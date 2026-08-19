@@ -59,6 +59,7 @@ from build_condition_contrasts import (  # noqa: E402
     contrast_tables,
 )
 from build_ad_windows import window_pair  # noqa: E402
+from build_task_state_windows import pair_bounds  # noqa: E402
 
 
 SAMPLING_RATE = 500.0
@@ -616,6 +617,16 @@ class WindowAggregationTests(unittest.TestCase):
         self.assertEqual(rows[0]["start_eeg_offset_s"], "24.000000")
         self.assertEqual(rows[1]["end_eeg_offset_s"], "56.000000")
         self.assertEqual(rows[0]["primary_analysis_eligible"], "yes")
+
+    def test_task_state_pair_requires_eight_seconds_without_overlap(self) -> None:
+        fitted = pair_bounds(10.0, 62.0)
+        self.assertIsNotNone(fitted)
+        assert fitted is not None
+        reading, writing = fitted
+        self.assertEqual(reading, (10.0, 14.0))
+        self.assertEqual(writing, (58.0, 62.0))
+        self.assertIsNone(pair_bounds(10.0, 16.0))
+        self.assertIsNone(pair_bounds(10.0, 17.9))
 
 
 @unittest.skipUnless(
