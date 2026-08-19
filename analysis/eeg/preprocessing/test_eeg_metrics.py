@@ -28,14 +28,18 @@ FEATURE_CODE = REPOSITORY_ROOT / (
 SIGNAL_CODE = REPOSITORY_ROOT / (
     "analysis/eeg/preprocessing/silver/signal"
 )
+STATISTICS_CODE = REPOSITORY_ROOT / "analysis/eeg/statistics"
 sys.path.insert(0, str(FEATURE_CODE))
 sys.path.insert(0, str(SIGNAL_CODE))
+sys.path.insert(0, str(STATISTICS_CODE))
 
 from build_ad_features import feature_row, response_row  # noqa: E402
 from build_condition_features import (  # noqa: E402
     SUMMARY_FEATURES,
+    complete_epoch_bounds,
     quality_features,
     spectral_features,
+    summarize_window,
 )
 from clean_eeg import load_policy  # noqa: E402
 from validate_ad_features import validate as validate_ad  # noqa: E402
@@ -44,6 +48,11 @@ from validate_condition_features import (  # noqa: E402
 )
 from validate_engagement_features import (  # noqa: E402
     validate as validate_engagement,
+)
+from build_condition_contrasts import (  # noqa: E402
+    FEATURE_TIERS,
+    CONDITIONS as CONTRAST_CONDITIONS,
+    contrast_tables,
 )
 
 
@@ -403,6 +412,150 @@ class PolicyContractTests(unittest.TestCase):
             primary["epoch_rejection"]["max_peak_to_peak_uv"],
         )
 
+
+class WindowAggregationTests(unittest.TestCase):
+    def test_complete_epoch_bounds_scale_with_duration(self) -> None:
+        two = list(
+            complete_epoch_bounds(
+                start_s=0.0,
+                end_s=32.0,
+                sfreq=500.0,
+                epoch_seconds=2.0,
+                raw_sample_count=16_000,
+            )
+        )
+        thirty_two = list(
+            complete_epoch_bounds(
+                start_s=0.0,
+                end_s=32.0,
+                sfreq=500.0,
+                epoch_seconds=32.0,
+                raw_sample_count=16_000,
+            )
+        )
+        self.assertEqual(len(two), 16)
+        self.assertEqual(len(thirty_two), 1)
+        self.assertEqual(two[0][2] - two[0][1], 1_000)
+        self.assertEqual(thirty_two[0][2] - thirty_two[0][1], 16_000)
+
+    def test_window_mean_is_arithmetic_mean_of_retained_epoch_db(self) -> None:
+        values = [10.0, 12.0, 100.0]
+        rows = []
+        for index, value in enumerate(values):
+            row = {
+                "subject_id": "synthetic_subject",
+                "experiment_id": "synthetic_experiment",
+                "window_id": "synthetic_window",
+                "window_type": "condition",
+                "condition": "no_ads",
+                "ad_mode": "",
+                "trial_index": "0",
+                "baseline_eye_state": "not_applicable",
+                "epoch_duration_s": "4.0",
+                "ica_applied": "yes",
+                "max_peak_to_peak_uv": "100.0",
+                "max_abs_amplitude_uv": "50.0",
+                "near_flat_channel_count": "0",
+                "retained_by_policy": "yes",
+                "source_xdf": "synthetic.xdf",
+                "source_xdf_sha256": "synthetic_hash",
+            }
+            for feature in SUMMARY_FEATURES:
+                row[feature] = str(value)
+            row["epoch_index"] = str(index)
+            rows.append(row)
+        summary = summarize_window(rows, epoch_policy())
+        self.assertAlmostEqual(summary["fz_theta_power_db_uv2_median"], 12.0)
+        self.assertAlmostEqual(summary["fz_theta_power_db_uv2_mean"], 40.666666666666664)
+        self.assertGreater(
+            summary["fz_theta_power_db_uv2_mean"],
+            summary["fz_theta_power_db_uv2_median"],
+        )
+
+    def test_rejected_epochs_are_excluded_from_mean_and_median(self) -> None:
+        rows = []
+        for index, (value, retained) in enumerate(
+            ((1.0, "yes"), (2.0, "yes"), (999.0, "no"))
+        ):
+            row = {
+                "subject_id": "synthetic_subject",
+                "experiment_id": "synthetic_experiment",
+                "window_id": "synthetic_window",
+                "window_type": "condition",
+                "condition": "no_ads",
+                "ad_mode": "",
+                "trial_index": "0",
+                "baseline_eye_state": "not_applicable",
+                "epoch_duration_s": "4.0",
+                "ica_applied": "yes",
+                "max_peak_to_peak_uv": "100.0",
+                "max_abs_amplitude_uv": "50.0",
+                "near_flat_channel_count": "0",
+                "retained_by_policy": retained,
+                "source_xdf": "synthetic.xdf",
+                "source_xdf_sha256": "synthetic_hash",
+            }
+            for feature in SUMMARY_FEATURES:
+                row[feature] = str(value)
+            row["epoch_index"] = str(index)
+            rows.append(row)
+        summary = summarize_window(rows, epoch_policy())
+        self.assertEqual(summary["retained_epoch_count"], 2)
+        self.assertAlmostEqual(summary["fz_theta_power_db_uv2_median"], 1.5)
+        self.assertAlmostEqual(summary["fz_theta_power_db_uv2_mean"], 1.5)
+
+    def test_complete_epoch_bounds_drop_an_incomplete_remainder(self) -> None:
+        bounds = list(
+            complete_epoch_bounds(
+                start_s=0.0,
+                end_s=33.0,
+                sfreq=500.0,
+                epoch_seconds=4.0,
+                raw_sample_count=16_500,
+            )
+        )
+        self.assertEqual(len(bounds), 8)
+        self.assertEqual(bounds[-1][2], 16_000)
+        self.assertEqual(bounds[-1][2] - bounds[-1][1], 2_000)
+
+    def test_contrast_tables_honour_mean_suffix_independently_of_median(self) -> None:
+        rows: list[dict[str, str]] = []
+        for subject_id in ("synthetic_a", "synthetic_b"):
+            for condition in CONTRAST_CONDITIONS:
+                row = {
+                    "subject_id": subject_id,
+                    "condition": condition,
+                }
+                ad_mean = "10" if condition != "no_ads" else "0"
+                for feature in FEATURE_TIERS:
+                    row[f"{feature}_median"] = "0"
+                    row[f"{feature}_mean"] = ad_mean
+                rows.append(row)
+        median_rows, _ = contrast_tables(
+            rows,
+            feature_suffix="_median",
+            metric="condition_median",
+        )
+        mean_rows, _ = contrast_tables(
+            rows,
+            feature_suffix="_mean",
+            metric="condition_mean",
+        )
+
+        def any_ad(table: list[dict[str, object]]) -> dict[str, object]:
+            return next(
+                row
+                for row in table
+                if row["feature"] == "fz_theta_power_db_uv2"
+                and row["contrast_id"] == "any_ad_vs_no_ads"
+            )
+
+        median_any_ad = any_ad(median_rows)
+        mean_any_ad = any_ad(mean_rows)
+        self.assertEqual(median_any_ad["metric"], "condition_median")
+        self.assertEqual(mean_any_ad["metric"], "condition_mean")
+        self.assertAlmostEqual(float(median_any_ad["mean_difference"]), 0.0)
+        self.assertAlmostEqual(float(mean_any_ad["mean_difference"]), 10.0)
 
 
 @unittest.skipUnless(

@@ -111,9 +111,12 @@ def descriptives(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
     for feature, tier in FEATURE_TIERS.items():
         for metric, suffix in (
             ("condition_median", "_median"),
+            ("condition_mean", "_mean"),
             ("baseline_delta", "_baseline_delta"),
         ):
             column = f"{feature}{suffix}"
+            if not rows or column not in rows[0]:
+                continue
             for condition in CONDITIONS:
                 values = [
                     float(row[column])
@@ -158,6 +161,7 @@ def test_row(
     feature: str,
     tier: str,
     scores: list[float],
+    metric: str,
 ) -> dict[str, Any]:
     array = np.asarray(scores, dtype=float)
     lower, upper = confidence_interval(scores)
@@ -177,7 +181,7 @@ def test_row(
         ),
         "feature": feature,
         "feature_tier": tier,
-        "metric": "condition_median",
+        "metric": metric,
         "n_participants": len(scores),
         "mean_difference": mean(scores),
         "sd_difference": sd,
@@ -203,6 +207,9 @@ def test_row(
 
 def contrast_tables(
     rows: list[dict[str, str]],
+    *,
+    feature_suffix: str = "_median",
+    metric: str = "condition_median",
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     by_subject: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
     for row in rows:
@@ -219,7 +226,7 @@ def contrast_tables(
                     f"{subject_id} lacks complete condition cells: {set(subject)}"
                 )
             values = {
-                condition: float(subject[condition][f"{feature}_median"])
+                condition: float(subject[condition][f"{feature}{feature_suffix}"])
                 for condition in CONDITIONS
             }
             for contrast_id, function in functions.items():
@@ -241,6 +248,7 @@ def contrast_tables(
                     feature=feature,
                     tier=tier,
                     scores=scores_by_contrast[contrast_id],
+                    metric=metric,
                 )
             )
 
@@ -261,7 +269,13 @@ def contrast_tables(
     return contrast_rows, score_rows
 
 
-def run(input_path: Path, output_dir: Path) -> None:
+def run(
+    input_path: Path,
+    output_dir: Path,
+    *,
+    feature_suffix: str = "_median",
+    metric: str = "condition_median",
+) -> None:
     rows = [
         row
         for row in read_csv(input_path)
@@ -271,7 +285,11 @@ def run(input_path: Path, output_dir: Path) -> None:
     if len(rows) != 90:
         raise ValueError(f"Expected 90 eligible condition rows, found {len(rows)}")
     descriptive_rows = descriptives(rows)
-    contrast_rows, score_rows = contrast_tables(rows)
+    contrast_rows, score_rows = contrast_tables(
+        rows,
+        feature_suffix=feature_suffix,
+        metric=metric,
+    )
     write_csv(output_dir / "eeg_condition_descriptives.csv", descriptive_rows)
     write_csv(output_dir / "eeg_condition_contrasts.csv", contrast_rows)
     write_csv(output_dir / "eeg_condition_contrast_scores.csv", score_rows)
@@ -284,8 +302,23 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--feature-suffix",
+        default="_median",
+        help="Window-summary suffix, e.g. _median or _mean.",
+    )
+    parser.add_argument(
+        "--metric",
+        default="condition_median",
+        help="Label written to the metric column.",
+    )
     args = parser.parse_args()
-    run(args.input, args.output_dir)
+    run(
+        args.input,
+        args.output_dir,
+        feature_suffix=args.feature_suffix,
+        metric=args.metric,
+    )
 
 
 if __name__ == "__main__":

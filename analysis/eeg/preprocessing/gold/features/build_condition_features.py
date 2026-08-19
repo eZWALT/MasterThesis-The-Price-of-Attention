@@ -400,6 +400,7 @@ def summarize_window(
     for feature in SUMMARY_FEATURES:
         values = [float(row[feature]) for row in retained_rows]
         summary[f"{feature}_median"] = percentile(values, 0.5)
+        summary[f"{feature}_mean"] = float(np.mean(np.asarray(values, dtype=float)))
         summary[f"{feature}_iqr"] = percentile(values, 0.75) - percentile(
             values, 0.25
         )
@@ -420,10 +421,15 @@ def add_baseline_deltas(summaries: list[dict[str, Any]]) -> None:
             output_name = f"{feature}_baseline_delta"
             if baseline is None:
                 row[output_name] = ""
+                row[f"{feature}_mean_baseline_delta"] = ""
                 continue
             row[output_name] = (
                 float(row[f"{feature}_median"])
                 - float(baseline[f"{feature}_median"])
+            )
+            row[f"{feature}_mean_baseline_delta"] = (
+                float(row[f"{feature}_mean"])
+                - float(baseline[f"{feature}_mean"])
             )
 
 
@@ -436,9 +442,34 @@ def build(
     epoch_seconds: float,
     subjects: set[str] | None,
     policy_path: Path,
+    from_epochs: Path | None = None,
 ) -> None:
     if epoch_seconds < 2.0:
         raise ValueError("Epoch duration must be at least 2 seconds")
+    policy = load_policy(policy_path)
+    epoch_rejection = policy["epoch_rejection"]
+    if not str(epoch_rejection.get("status", "")).startswith("frozen_"):
+        raise ValueError("Condition features require frozen epoch rejection")
+    if from_epochs is not None:
+        epoch_rows = read_csv(from_epochs)
+        if subjects is not None:
+            epoch_rows = [
+                row for row in epoch_rows if row["subject_id"] in subjects
+            ]
+        if not epoch_rows:
+            raise ValueError("No epoch rows selected")
+        grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for row in epoch_rows:
+            grouped[str(row["window_id"])].append(row)
+        summaries = [
+            summarize_window(grouped[key], epoch_rejection)
+            for key in sorted(grouped)
+        ]
+        add_baseline_deltas(summaries)
+        write_csv(summary_output, summaries)
+        print(f"Reused {len(epoch_rows)} epochs from {from_epochs}")
+        print(f"Wrote {len(summaries)} window summaries to {summary_output}")
+        return
     windows = [
         row
         for row in read_csv(windows_path)
@@ -448,10 +479,6 @@ def build(
     ]
     if not windows:
         raise ValueError("No eligible windows selected")
-    policy = load_policy(policy_path)
-    epoch_rejection = policy["epoch_rejection"]
-    if not str(epoch_rejection.get("status", "")).startswith("frozen_"):
-        raise ValueError("Condition features require frozen epoch rejection")
 
     windows_by_subject: dict[str, list[dict[str, str]]] = defaultdict(list)
     for window in windows:
@@ -535,6 +562,11 @@ def main() -> None:
         nargs="+",
         help="Optional subject IDs, for example: lab_subject_1 lab_subject_8",
     )
+    parser.add_argument(
+        "--from-epochs",
+        type=Path,
+        help="Re-summarize an existing epoch table without recleaning EEG.",
+    )
     args = parser.parse_args()
     build(
         windows_path=args.windows,
@@ -544,6 +576,7 @@ def main() -> None:
         epoch_seconds=args.epoch_seconds,
         subjects=set(args.subjects) if args.subjects else None,
         policy_path=args.policy,
+        from_epochs=args.from_epochs,
     )
 
 
