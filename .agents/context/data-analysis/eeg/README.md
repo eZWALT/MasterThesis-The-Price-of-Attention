@@ -1,10 +1,18 @@
 # EEG analysis context
 
+> **CRITICAL — read first:** `CRITICAL-do-not-overwrite-ica-models.md`
+> Do not run `fit_ica_cohort.py --overwrite` or
+> `run_ica_sensitivity.py --overwrite-models`. The signed-off models in
+> `src/project/logs/xdf/silver/ica/candidate_v1/` must be reused.
+
 This directory contains durable EEG-arm decisions and summaries. Executable
 pipelines, generated manifests, and participant-level outputs remain under
 `analysis/eeg/` and `src/project/logs/xdf/`.
 
 ## Current entries
+
+- `CRITICAL-do-not-overwrite-ica-models.md`
+  is the hard stop on refitting or replacing the 2026-08-19 ICA archive.
 
 - `2026-08-03-independent-xdf-recording-audit.md`
   records recording identity, marker anomalies, reconstruction, exclusions, and
@@ -55,6 +63,10 @@ pipelines, generated manifests, and participant-level outputs remain under
   at every width; three confirmatory Path B Holm cells appeared (2 s Fz
   theta ICA-only; 8 s posterior alpha under both ICA and no-ICA). Primary
   stays 4 s + median + ICA.
+- `2026-08-20-pipeline-sanity-audit.md`
+  records the 20 August check that Gold IDs, clocks, window geometry,
+  ICA flags, and contrast arithmetic are consistent, so the 4 s null is
+  treated as a small estimated effect rather than a broken pipeline.
 - `2026-08-19-read-vs-write-what-it-proved.md`
   is the short interpretation note: B1 proved the 4 s ICA chain can
   recover a chat-state difference (Fz theta writing > reading, Holm
@@ -64,6 +76,8 @@ pipelines, generated manifests, and participant-level outputs remain under
   is the EEG-only stop line: Path A/B nulls, epoch grid, ICA, read-versus-
   write positive control, session-order null, and the figure suite. Next
   EEG work is manuscript prose and C1 after Goal 1.
+  Figure hub: `analysis/eeg/analysis/outputs/figures/eeg_only/`
+  (Holm heatmaps Path A/B at 2 / 4 / 8 s).
 - `2026-08-19-literature-justifications-in-overleaf.md`
   records the literature sanity-check on the median collapse and
   person-level Holm tests, the short cite set parked as Overleaf
@@ -77,9 +91,19 @@ pipelines, generated manifests, and participant-level outputs remain under
   contrast, person × ad) and which Gold/stat columns are plug-in
   features. No builder yet.
 
+- `2026-08-20-eeg-pipeline-figure-v2.md`
+  records the publication preprocessing figure v2: title
+  **Laboratory EEG Preprocessing Pipeline**; Silver follows
+  `clean_recording()` (notch → 0.5–40 Hz → average ref → spline → ICA);
+  Gold says **4 s epochs** (not tiles); shape rail is
+  \(X\to\tilde{X}\to E\to Y_A,Y_B\) with
+  \(X,\tilde{X}\in\mathbb{R}^{18\times 32\times T_i}\) and
+  \(E\in\mathbb{R}^{18\times K_i\times 32\times 2000}\) (Path A
+  \(K_i\) varies; Path B \(K_i=12\)) and no `y(16)`.
+
 Publication figure: original
-`src/project/docs/eeg_pipeline/eeg_pipeline.png` is frozen. v2 is
-`eeg_pipeline_v2.png` (X → Y_A / Y_B → D, parallel Gold paths).
+`src/project/docs/eeg_pipeline/eeg_pipeline.png` is frozen (6 Aug). v2 is
+`eeg_pipeline_v2.png` / `.pdf` / `.svg`.
 
 ## Governing distinction
 

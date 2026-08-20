@@ -64,6 +64,22 @@ Not for the paper: 14, 15 (sanity check), 16 (session order).
 Primary epoch width for the paper is **4 s**. 8 s is a sensitivity
 footnote, not the reported analysis.
 
+Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Path A and Path B):
+
+`analysis/eeg/analysis/outputs/figures/eeg_only/`
+
+```bash
+python analysis/eeg/analysis/plot_eeg_only_heatmaps.py
+```
+
+Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Path A and Path B):
+
+`analysis/eeg/analysis/outputs/figures/eeg_only/`
+
+```bash
+python analysis/eeg/analysis/plot_eeg_only_heatmaps.py
+```
+
 ## Figures (PNG + PDF)
 
 `analysis/eeg/analysis/outputs/figures/suite/`
