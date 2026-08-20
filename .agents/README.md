@@ -1,5 +1,10 @@
 # Agent resources
 
+> **CRITICAL (EEG / ICA).** Do not overwrite
+> `src/project/logs/xdf/silver/ica/candidate_v1/`.
+> Read `.agents/context/data-analysis/eeg/CRITICAL-do-not-overwrite-ica-models.md`
+> before any ICA fit, `--overwrite`, or Gold rebuild.
+
 Project-specific material for AI agents and collaborators:
 
 - `context/` contains dated handover documents, settled decisions, and operational

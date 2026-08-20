@@ -1,5 +1,11 @@
 # Agent entrypoint
 
+> **CRITICAL (EEG / ICA) — read before any cleaning or Gold command.**
+> Do **not** run `fit_ica_cohort.py --overwrite` or
+> `run_ica_sensitivity.py --overwrite-models`. Do **not** replace files
+> under `src/project/logs/xdf/silver/ica/candidate_v1/`.
+> Full stop: `.agents/context/data-analysis/eeg/CRITICAL-do-not-overwrite-ica-models.md`
+
 ## Writing / Overleaf
 
 - Start with `.agents/context/writing/README.md`, then the newest dated entry
