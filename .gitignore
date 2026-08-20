@@ -220,6 +220,9 @@ session-ses_*.md
 # Production logs — ignored by default, track specific ones with git add -f or use logs/tracked/
 src/project/logs/xdf/
 
+# Local EEG experiments — never commit.
+analysis/eeg/scratch/
+
 # Local Overleaf Git mirrors — each has its own Git history and remote.
 /docs/overleaf/*
 !/docs/overleaf/.gitkeep

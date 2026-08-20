@@ -7,6 +7,10 @@ Branch: `eeg-path-b-after-reply`
 lock. After-reply is a dead sensitivity. It did not improve the 4 s
 confirmatory tests. Do not promote it. Do not touch golden Gold.
 
+A later hybrid (implicit @ `assistant_reply`, explicit golden) lives
+only in untracked `analysis/eeg/scratch/hybrid_implicit_reply/`.
+Same verdict: 4 s confirmatory still null. Do not commit that folder.
+
 What “onset” means: `2026-08-20-what-path-b-onset-is.md`.
 
 The confirmatory Path B lock stays what it is on `main`:
