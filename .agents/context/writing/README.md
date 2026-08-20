@@ -22,6 +22,9 @@ docs/overleaf/example-eeg/     # EEG report template reference
 Each Overleaf folder is an independent Git repository. The parent repository
 ignores their contents. Run `git` commands inside the relevant mirror.
 
+Monday agenda (Katerina + Sebastian):
+`2026-08-20-monday-katerina-sebastian-agenda.md`.
+
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
 
