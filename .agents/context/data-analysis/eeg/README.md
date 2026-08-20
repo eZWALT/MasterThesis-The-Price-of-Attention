@@ -15,6 +15,13 @@ pipelines, generated manifests, and participant-level outputs remain under
   paper names: implicit / explicit. Log keys stay `inline_*` / `block_*`.
 - `CRITICAL-do-not-overwrite-ica-models.md`
   is the hard stop on refitting or replacing the 2026-08-19 ICA archive.
+- `2026-08-20-pipeline-sanity-audit.md`
+  Gold IDs, Path A/B arithmetic, and why the 4 s Holm-null is not a
+  scrambled pipeline.
+- `2026-08-20-eeg-pipeline-figure-v2.md`
+  thesis preprocessing figure; do not edit the 6 Aug original.
+- `2026-08-19-eeg-behavioural-merge-tables.md`
+  person × condition / ad-response join only. No epoch merge.
 
 - `2026-08-03-independent-xdf-recording-audit.md`
   records recording identity, marker anomalies, reconstruction, exclusions, and
