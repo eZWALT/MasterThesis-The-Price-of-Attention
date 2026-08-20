@@ -39,18 +39,18 @@ ad−matched-control contrasts):
 
 | W | Cleaning | Contrast | Feature | n | mean dB | Holm p |
 |---|---|---|---|---|---|---|
-| 2 s | ICA | block early − no-ad | Fz theta | 18 | +3.30 | 0.021 |
-| 8 s | ICA | block late − no-ad | posterior alpha | 18 | −1.22 | 0.023 |
-| 8 s | no-ICA | block late − no-ad | posterior alpha | 18 | −1.30 | 0.012 |
+| 2 s | ICA | explicit early − no-ad | Fz theta | 18 | +3.30 | 0.021 |
+| 8 s | ICA | explicit late − no-ad | posterior alpha | 18 | −1.22 | 0.023 |
+| 8 s | no-ICA | explicit late − no-ad | posterior alpha | 18 | −1.30 | 0.012 |
 
-The 8 s posterior-alpha labelled-block-late cell is the only confirmatory
+The 8 s posterior-alpha explicit-late cell is the only confirmatory
 hit that appears under **both** ICA and no-ICA. It is not Holm-significant
 at 2, 4, 16, or 32 s (32 s is a near miss, Holm ~0.09, n=16).
 
-The 2 s Fz-theta block-early cell is ICA-only (no-ICA Holm 0.44) and is
+The 2 s Fz-theta explicit-early cell is ICA-only (no-ICA Holm 0.44) and is
 gone at every longer width.
 
-Exploratory Holm hits (16 of 19) are mostly the same labelled-block-early
+Exploratory Holm hits (16 of 19) are mostly the same explicit-early
 spectral tilt already seen at 4 s ICA (more delta/theta, less relative
 alpha/beta). They thin out at 16–32 s.
 
@@ -61,21 +61,21 @@ size. The 8 s alpha cell may be mentioned as a sensitivity note, not as
 a new confirmatory result and not as a reason to change ad format.
 
 4 s is not an arbitrary middle. Path B locks to visual ad onset.
-On block ads the reply is already up (~0.5 s); on inline it follows
+On explicit ads the reply is already up (~0.5 s); on implicit it follows
 (~1.6 s). A 2 s post window is still “ad chrome / first glance” and
 misses the reply entirely for about one in five ads. A 4 s window
 almost always contains the reply and never reaches the next act
 (early: next `user_message` ~53 s; late: conclusion ~79 s). An 8 s
 window is just more of that same reply — and the only Holm hit is
-**late block alpha**, i.e. the last reply of the condition, not a
-mid-chat turn. The 2 s hit is a **different** cell (early block theta,
+**late explicit alpha**, i.e. the last reply of the condition, not a
+mid-chat turn. The 2 s hit is a **different** cell (early explicit theta,
 ICA-only). Two widths, two moments, two features is not one story.
 Timeline: `figure_17_epoch_timeline` and canvas `eeg-epoch-timeline`.
 
 ## Paper sentence
 
 Primary 4 s analyses are Holm-null for Fz theta and posterior alpha.
-An 8 s ad-locked window showed lower posterior alpha after labelled-block
+An 8 s ad-locked window showed lower posterior alpha after explicit
 late ads than after matched no-ad replies under both ICA and no-ICA; that
 contrast was not Holm-significant at the pre-specified 4 s width or at
 2 / 16 / 32 s.

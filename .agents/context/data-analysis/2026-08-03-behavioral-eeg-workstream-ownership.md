@@ -69,7 +69,7 @@ analysis inputs.
 ### A3. Primary behavioural inference
 
 - Fit repeated-measures mixed models using the planned contrasts:
-  any advertising versus no advertising, inline versus labelled block, and
+  any advertising versus no advertising, implicit versus explicit, and
   early versus late. Treat format-by-timing as secondary.
 - Include task, condition position, and study arm.
 - Report raw 1–7 scale effects, intervals, within-person effect sizes, and

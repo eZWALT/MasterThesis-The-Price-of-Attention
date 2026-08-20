@@ -17,6 +17,13 @@ import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 
+from condition_labels import (
+    CONDITION_LABELS,
+    PATH_A_LABELS,
+    PATH_B_LABELS,
+    PATH_B_SLOPE_PANELS,
+)
+
 
 ROOT = Path(__file__).resolve().parents[3]
 STATS = ROOT / "analysis/eeg/statistics/outputs"
@@ -40,24 +47,6 @@ CONDITIONS = [
     "block_early",
     "block_late",
 ]
-CONDITION_LABELS = {
-    "no_ads": "No ads",
-    "inline_early": "Inline early",
-    "inline_late": "Inline late",
-    "block_early": "Block early",
-    "block_late": "Block late",
-}
-PATH_A_LABELS = {
-    "any_ad_vs_no_ads": "Any ad − no ads",
-    "inline_vs_block": "Inline − block",
-    "early_vs_late": "Early − late",
-}
-PATH_B_LABELS = {
-    "inline_early_vs_no_ad_early": "Inline early",
-    "block_early_vs_no_ad_early": "Block early",
-    "inline_late_vs_no_ad_late": "Inline late",
-    "block_late_vs_no_ad_late": "Block late",
-}
 BANDS = [
     ("delta_power_db_uv2", "Delta"),
     ("theta_power_db_uv2", "Theta"),
@@ -262,10 +251,7 @@ def plot_confirmatory_forests(
 
 def plot_ad_paired_slopes(ad_responses: pd.DataFrame) -> None:
     cells = [
-        ("inline_early", "no_ads_early", "Inline early"),
-        ("block_early", "no_ads_early", "Block early"),
-        ("inline_late", "no_ads_late", "Inline late"),
-        ("block_late", "no_ads_late", "Block late"),
+        *PATH_B_SLOPE_PANELS,
     ]
     figure, axes = plt.subplots(2, 4, figsize=(13.2, 6.8), sharey="row")
     for row_index, (feature, ylabel) in enumerate(PRIMARY.items()):
@@ -375,6 +361,233 @@ def plot_epoch_grid_heatmap(grid: pd.DataFrame) -> None:
     save(figure, "figure_10_epoch_grid_heatmap")
 
 
+def plot_epoch_grid_heatmap_ica_noica(grid: pd.DataFrame) -> None:
+    contrasts = list(PATH_B_LABELS)
+    features = list(PRIMARY)
+    lengths = [2.0, 4.0, 8.0, 16.0, 32.0]
+    cmap = LinearSegmentedColormap.from_list(
+        "holm",
+        ["#C45C26", "#F0D5B8", "#F4F6F7", "#9BB0BC"],
+    )
+    figure, axes = plt.subplots(1, 2, figsize=(13.2, 6.6), sharey=True)
+    labels = [
+        f"{PRIMARY[feature]} · {PATH_B_LABELS[contrast]}"
+        for feature in features
+        for contrast in contrasts
+    ]
+    for axis, policy, title in (
+        (axes[0], "ica", "Path B confirmatory Holm p · ICA"),
+        (axes[1], "no_ica", "Path B confirmatory Holm p · No-ICA"),
+    ):
+        conf = grid[
+            (grid["confirmatory"] == True)  # noqa: E712
+            & (grid["path"] == "B")
+            & (grid["policy"] == policy)
+        ]
+        matrix = np.full((len(labels), len(lengths)), np.nan)
+        for i, feature in enumerate(features):
+            for j, contrast in enumerate(contrasts):
+                for k, seconds in enumerate(lengths):
+                    hit = conf[
+                        (conf["feature"] == feature)
+                        & (conf["contrast_id"] == contrast)
+                        & (conf["epoch_seconds"] == seconds)
+                    ]
+                    if not hit.empty:
+                        matrix[i * len(contrasts) + j, k] = float(
+                            hit.iloc[0]["p_t_holm"]
+                        )
+        image = axis.imshow(matrix, aspect="auto", cmap=cmap, vmin=0, vmax=1)
+        axis.set_xticks(range(len(lengths)), [f"{s:g} s" for s in lengths])
+        axis.set_yticks(range(len(labels)), labels)
+        for y in range(matrix.shape[0]):
+            for x in range(matrix.shape[1]):
+                value = matrix[y, x]
+                if np.isnan(value):
+                    continue
+                axis.text(
+                    x,
+                    y,
+                    f"{value:.3f}",
+                    ha="center",
+                    va="center",
+                    color="white" if value < 0.05 else INK,
+                    fontsize=7.5,
+                    fontweight="semibold" if value < 0.05 else "normal",
+                )
+        for x, seconds in enumerate(lengths):
+            if seconds in (4.0, 8.0):
+                axis.add_patch(
+                    plt.Rectangle(
+                        (x - 0.5, -0.5),
+                        1,
+                        matrix.shape[0],
+                        fill=False,
+                        edgecolor=NAVY,
+                        linewidth=1.6,
+                    )
+                )
+        axis.set_title(title)
+    figure.colorbar(image, ax=axes, fraction=0.03, pad=0.02, label="Holm p")
+    caption(
+        figure,
+        "Navy boxes = 4 s (primary) and 8 s. Orange = Holm p < 0.05 within "
+        "feature at that length, not across the grid. Source: "
+        "epoch_length_grid_comparison.csv.",
+    )
+    save(figure, "figure_10b_epoch_grid_heatmap_ica_noica")
+
+
+def plot_epoch_timeline() -> None:
+    explicit_inject = -3.3
+    explicit_reply = -0.49
+    implicit_inject = -1.57
+    implicit_reply = 1.6
+    early_next = 52.7
+    late_next = 79.4
+    widths = (2, 4, 8)
+    colors = {2: "#C45C26", 4: "#5C6B73", 8: "#2A6F6F"}
+    pre_colors = {2: "#D5DDE3", 4: "#9BB0BC", 8: "#1B3A4B"}
+
+    figure, axes = plt.subplots(
+        3,
+        1,
+        figsize=(11.4, 8.4),
+        gridspec_kw={"height_ratios": [1.15, 1.15, 0.85]},
+    )
+
+    def draw_zoom(axis, title, inject, reply) -> None:
+        t0, t1 = -8.6, 10.2
+        axis.set_xlim(t0, t1)
+        axis.set_ylim(0, 4.2)
+        axis.axvline(0, color=CLAY, linestyle="--", linewidth=1.2)
+        axis.axvline(inject, color=SLATE, linestyle="--", linewidth=1.0)
+        axis.axvline(reply, color=NAVY, linestyle="--", linewidth=1.0)
+        axis.text(inject, 4.05, "inject", ha="center", va="top", fontsize=8, color=SLATE)
+        axis.text(reply, 4.05, "reply", ha="center", va="top", fontsize=8, color=NAVY)
+        axis.text(0, 4.05, "ad onset", ha="center", va="top", fontsize=8, color=CLAY)
+        for index, width in enumerate(widths):
+            y = 0.55 + index * 1.05
+            axis.barh(
+                y,
+                width,
+                left=-width,
+                height=0.62,
+                color=pre_colors[width],
+                edgecolor="none",
+            )
+            axis.barh(
+                y,
+                width,
+                left=0,
+                height=0.62,
+                color=colors[width],
+                alpha=0.72 if width != 2 else 0.9,
+                edgecolor="none",
+            )
+            axis.text(
+                -width - 0.15,
+                y,
+                f"{width}s pre",
+                ha="right",
+                va="center",
+                fontsize=7.5,
+                color=INK,
+            )
+            axis.text(
+                width + 0.15,
+                y,
+                f"{width}s post",
+                ha="left",
+                va="center",
+                fontsize=7.5,
+                color=INK,
+            )
+        axis.set_yticks([])
+        axis.set_xlabel("seconds from visual ad onset")
+        axis.set_title(title, loc="left")
+        axis.text(
+            t1,
+            0.15,
+            "median n=19",
+            ha="right",
+            va="bottom",
+            fontsize=7.5,
+            color=SLATE,
+        )
+        for spine in ("left", "top", "right"):
+            axis.spines[spine].set_visible(False)
+
+    draw_zoom(
+        axes[0],
+        "Explicit ads (ICA hits live here) · reply already up ~0.5 s",
+        explicit_inject,
+        explicit_reply,
+    )
+    draw_zoom(
+        axes[1],
+        "Implicit ads · reply follows display by ~1.6 s",
+        implicit_inject,
+        implicit_reply,
+    )
+
+    axis = axes[2]
+    axis.set_xlim(0, 120)
+    axis.set_ylim(0, 2.4)
+    for y, _label in ((0.7, "early / late post windows"), (1.55, "")):
+        axis.barh(y, 120, left=0, height=0.38, color=MIST, edgecolor="none")
+        for width in (8, 4, 2):
+            axis.barh(
+                y,
+                width,
+                left=0,
+                height=0.38,
+                color=colors[width],
+                edgecolor="none",
+            )
+    axis.axvline(early_next, color=INK, linewidth=1.3)
+    axis.axvline(late_next, color=CLAY, linewidth=1.3)
+    axis.text(
+        early_next,
+        2.2,
+        "early · next user_message +53 s",
+        ha="center",
+        fontsize=8,
+        color=INK,
+    )
+    axis.text(
+        late_next,
+        2.2,
+        "late · conclusion +79 s",
+        ha="center",
+        fontsize=8,
+        color=CLAY,
+    )
+    axis.set_yticks([])
+    axis.set_xlabel("seconds from visual ad onset")
+    axis.set_title(
+        "Same post windows on a 2-minute scale · next act differs by timing",
+        loc="left",
+    )
+    axis.text(
+        1,
+        0.12,
+        "clay=2s  slate=4s  teal=8s",
+        fontsize=7.5,
+        color=SLATE,
+    )
+    for spine in ("left", "top", "right"):
+        axis.spines[spine].set_visible(False)
+
+    caption(
+        figure,
+        "Path B lock = visual ad onset. 2/4/8 post never reach writing or "
+        "conclusion. 4 s is the width that usually contains the reply and not "
+        "the next act. Source: ad_visibility_events.csv + canonical markers.",
+    )
+    save(figure, "figure_17_epoch_timeline")
+
+
 def plot_epoch_traces(grid: pd.DataFrame) -> None:
     figure, axes = plt.subplots(1, 2, figsize=(11.4, 4.8), sharey=True)
     traces = (
@@ -382,13 +595,13 @@ def plot_epoch_traces(grid: pd.DataFrame) -> None:
             axes[0],
             "fz_theta_power_db_uv2",
             "block_early_vs_no_ad_early",
-            "Fz theta · block early − no-ad",
+            "Fz theta · explicit early − no-ad",
         ),
         (
             axes[1],
             "posterior_alpha_power_db_uv2",
             "block_late_vs_no_ad_late",
-            "Posterior alpha · block late − no-ad",
+            "Posterior alpha · explicit late − no-ad",
         ),
     )
     lengths = [2.0, 4.0, 8.0, 16.0, 32.0]
@@ -617,6 +830,8 @@ def main() -> None:
     plot_confirmatory_forests(condition_tests, ad_tests)
     plot_ad_paired_slopes(ad_responses)
     plot_epoch_grid_heatmap(grid)
+    plot_epoch_grid_heatmap_ica_noica(grid)
+    plot_epoch_timeline()
     plot_epoch_traces(grid)
     plot_band_profiles(condition_features)
     plot_ica_agreement(grid)

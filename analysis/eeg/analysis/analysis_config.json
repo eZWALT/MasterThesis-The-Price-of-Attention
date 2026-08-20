@@ -20,24 +20,24 @@
   },
   "condition_labels": {
     "no_ads": "No ads",
-    "inline_early": "Inline early",
-    "inline_late": "Inline late",
-    "block_early": "Labelled block early",
-    "block_late": "Labelled block late"
+    "inline_early": "Implicit early",
+    "inline_late": "Implicit late",
+    "block_early": "Explicit early",
+    "block_late": "Explicit late"
   },
   "condition_contrast_labels": {
     "any_ad_vs_no_ads": "Any ad − no ads",
-    "inline_vs_block": "Inline − labelled block",
+    "inline_vs_block": "Implicit − explicit",
     "early_vs_late": "Early − late",
     "format_x_timing": "Format × timing"
   },
   "ad_contrast_labels": {
-    "inline_early_vs_no_ad_early": "Inline early − matched no-ad",
-    "block_early_vs_no_ad_early": "Labelled block early − matched no-ad",
-    "inline_late_vs_no_ad_late": "Inline late − matched no-ad",
-    "block_late_vs_no_ad_late": "Labelled block late − matched no-ad",
+    "inline_early_vs_no_ad_early": "Implicit early − matched no-ad",
+    "block_early_vs_no_ad_early": "Explicit early − matched no-ad",
+    "inline_late_vs_no_ad_late": "Implicit late − matched no-ad",
+    "block_late_vs_no_ad_late": "Explicit late − matched no-ad",
     "any_ad_vs_matched_no_ad": "Any ad − matched no-ad",
-    "inline_vs_block": "Inline − labelled block",
+    "inline_vs_block": "Implicit − explicit",
     "early_vs_late": "Early − late",
     "format_x_timing": "Format × timing"
   },

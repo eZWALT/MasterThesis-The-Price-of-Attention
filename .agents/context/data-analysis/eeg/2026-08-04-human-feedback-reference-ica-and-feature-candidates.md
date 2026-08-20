@@ -134,10 +134,10 @@ Ad-response conclusions were more sensitive:
 - six corrected tests changed from non-significant without ICA to significant
   with ICA.
 
-Five of those six changes concern the early block-ad versus matched early
+Five of those six changes concern the early explicit-ad versus matched early
 no-ad contrast: alpha relative power, beta relative power, delta absolute and
 relative power, and theta absolute power. The sixth concerns gamma relative
-power for late inline ads versus matched late no-ad replies. Low-frequency
+power for late implicit ads versus matched late no-ad replies. Low-frequency
 delta/theta shifts are substantial in several ad contrasts.
 
 This is not evidence that the new significant findings are automatically more

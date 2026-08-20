@@ -19,10 +19,10 @@ The implemented protocol, not the earlier publication draft, defines the analysi
 | Condition | Logged key | Format | Timing |
 |---|---|---|---|
 | No ads | `no_ads` | none | — |
-| Inline early | `inline_early` | integrated into reply | turn 2 |
-| Inline late | `inline_late` | integrated into reply | turn 4 |
-| Block early | `block_early` | labelled separate block | turn 2 |
-| Block late | `block_late` | labelled separate block | turn 4 |
+| Implicit early | `inline_early` | woven into the reply | turn 2 |
+| Implicit late | `inline_late` | woven into the reply | turn 4 |
+| Explicit early | `block_early` | labelled separate unit | turn 2 |
+| Explicit late | `block_late` | labelled separate unit | turn 4 |
 
 The five-level condition factor is primary. A 2×2 format-by-timing decomposition
 among the four ad conditions is secondary.
@@ -42,8 +42,8 @@ among the four ad conditions is secondary.
 1. **Primary — experience and commercial pressure.** How does the presentation
    condition change perceived credibility and perceived manipulation within the
    same participant?
-2. **Primary — recognition.** Are integrated inline advertisements remembered or
-   identified differently from labelled blocks, and does early versus late
+2. **Primary — recognition.** Are implicit advertisements remembered or
+   identified differently from explicit ones, and does early versus late
    placement change recognition?
 3. **Secondary — observable behaviour.** Do conditions alter reply latency,
    response effort, or pre-to-post-exposure conversational behaviour after
@@ -79,7 +79,7 @@ means.
 | Contrast | Definition | Status |
 |---|---|---|
 | Any advertising | mean of four ad conditions minus no ads | primary |
-| Integration format | mean inline minus mean labelled block | primary |
+| Presentation format | mean implicit minus mean explicit | primary |
 | Timing | mean early minus mean late | primary |
 | Format × timing | difference of the two format-specific timing effects | secondary, lower power |
 | Arm heterogeneity | each contrast by study arm | sensitivity, wide intervals |

@@ -11,6 +11,8 @@ pipelines, generated manifests, and participant-level outputs remain under
 
 ## Current entries
 
+- `../2026-08-20-implicit-explicit-names.md`
+  paper names: implicit / explicit. Log keys stay `inline_*` / `block_*`.
 - `CRITICAL-do-not-overwrite-ica-models.md`
   is the hard stop on refitting or replacing the 2026-08-19 ICA archive.
 
@@ -104,6 +106,12 @@ pipelines, generated manifests, and participant-level outputs remain under
 Publication figure: original
 `src/project/docs/eeg_pipeline/eeg_pipeline.png` is frozen (6 Aug). v2 is
 `eeg_pipeline_v2.png` / `.pdf` / `.svg`.
+
+## Names
+
+Paper language is **implicit** / **explicit**. Log keys stay
+`inline_*` / `block_*`. See
+`../2026-08-20-implicit-explicit-names.md`.
 
 ## Governing distinction
 

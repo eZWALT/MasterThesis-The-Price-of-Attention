@@ -40,7 +40,7 @@ Primary 4 s ICA analyses show no Holm-significant Fz-theta or
 posterior-alpha condition or ad-locked contrast (\(n=18\)). Mention in
 one sentence that the same chain distinguished writing from reading on
 Fz theta (Holm \(p=0.007\), \(d_z=0.80\)); do not build a Results
-subsection around it. An 8 s labelled-block late window showed lower
+subsection around it. An 8 s explicit-late window showed lower
 posterior alpha versus matched no-ad under both ICA and no-ICA; that
 cell was not Holm-significant at the pre-specified 4 s width.
 

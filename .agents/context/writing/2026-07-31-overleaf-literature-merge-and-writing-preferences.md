@@ -62,18 +62,20 @@ The accepted taxonomy treats explicitness and appeal as independent dimensions:
 - Explicitness: overt/separated/disclosed versus covert/integrated.
 - Appeal: informational/rational versus transformational/emotional.
 - The experiment manipulates presentation and disclosure, not appeal.
-- The implemented comparison is **integrated inline advertising** versus a
-  **labelled advertising block**. Integrated does not mean subliminal; the
+- The implemented comparison is **implicit** versus **explicit** advertising
+  (log keys `inline_*` / `block_*`). Implicit does not mean subliminal; the
   advertisement is visible in both conditions.
 
 ## Canonical experimental terminology
 
-Use these labels consistently in new prose:
+Use these labels consistently in new prose. Superseded 20 August 2026:
+implicit / explicit, not inline / block. See
+`.agents/context/data-analysis/2026-08-20-implicit-explicit-names.md`.
 
 | Concept | Canonical wording |
 |---|---|
-| Format 1 | integrated inline advertising |
-| Format 2 | labelled advertising block |
+| Format 1 | implicit advertising |
+| Format 2 | explicit advertising |
 | Early timing | turn 2 |
 | Late timing | turn 4 |
 | Control | no-advertising condition |

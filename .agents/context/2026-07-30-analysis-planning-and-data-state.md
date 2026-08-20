@@ -17,10 +17,10 @@ The five conditions, as logged:
 
 | Condition label | `ad_mode` | Meaning |
 |---|---|---|
-| `inline_early` | `inline_persuasive` | Advertisement woven into the reply, early turn |
-| `inline_late` | `inline_persuasive` | Advertisement woven into the reply, late turn |
-| `block_early` | `explicit_ad_block` | Labelled advertising block, early turn |
-| `block_late` | `explicit_ad_block` | Labelled advertising block, late turn |
+| `inline_early` | `inline_persuasive` | Implicit: advertisement woven into the reply, early turn |
+| `inline_late` | `inline_persuasive` | Implicit: advertisement woven into the reply, late turn |
+| `block_early` | `explicit_ad_block` | Explicit: labelled advertising unit, early turn |
+| `block_late` | `explicit_ad_block` | Explicit: labelled advertising unit, late turn |
 | `no_ads` | *(empty)* | Control condition, no injection |
 
 Condition order is randomised per participant. Because each participant sees every

@@ -70,7 +70,7 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 
 | ID | Item | Ticket | Verdict |
 |---|---|---|---|
-| A1 | Path A: 3 primary \(D\) (any-ad, inline vs block, early vs late) on 16 features; \(t\) + Wilcoxon + Holm | APPROVED | keep; write Results |
+| A1 | Path A: 3 primary \(D\) (any-ad, implicit vs explicit, early vs late) on 16 features; \(t\) + Wilcoxon + Holm | APPROVED | keep; write Results |
 | A2 | Path B: 4 primary ad-minus-matched-control \(D\); same tests | APPROVED | keep; write Results |
 | A3 | Publication layer: forest plots, bootstrap, LOO, Subject 14, onset provenance | APPROVED | keep |
 | A4 | Threshold sensitivity 1000 / 1050 / 1500 µV | APPROVED | keep as robustness |

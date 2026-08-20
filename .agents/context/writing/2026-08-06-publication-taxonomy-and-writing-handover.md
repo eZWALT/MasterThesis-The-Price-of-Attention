@@ -48,7 +48,8 @@ Use Walter’s current labels:
 
 **Implicit ≠ subliminal.** Implicit means integration, not below-threshold
 awareness. Older publication placeholders and some Method leftovers may still
-say “integrated inline / labelled block” or “subliminal”; clean those only with
+say “integrated inline / labelled block” or “subliminal”. Paper names are
+implicit / explicit. Clean leftover Overleaf wording only with
 explicit approval and after pulling.
 
 Older handover (31 July) preferred “integrated inline / labelled advertising

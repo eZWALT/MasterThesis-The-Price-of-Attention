@@ -43,7 +43,7 @@ for why: `ad_injected` is the only ad marker present, correctly labelled, and
 semantically stable across all sessions and both formats.
 
 - Measures: frontal midline theta (4–7 Hz), parieto-occipital alpha (8–12 Hz).
-- Contrasts: inline versus labelled block; early versus late.
+- Contrasts: implicit versus explicit; early versus late.
 - Structure: one value per participant per condition, compared with a paired
   model or a mixed model with participant random intercepts.
 - Interpretation: theta increase and alpha suppression are conventionally read as
@@ -125,7 +125,7 @@ in Drive and the following gates must close first.
    procedure below. The `timestamp` field has microsecond precision, so this is a
    solved problem provided the recording contains anchor markers.
 4. **Use `ad_injected` as the ad time lock.** Do not use `ad_displayed`: it is
-   absent for three participants, emitted only for labelled blocks in six, and
+   absent for three participants, emitted only for explicit (`block_*`) ads in six, and
    quadruplicated where present.
 5. **Validate any derived visibility estimate** against the participants who do
    have display markers, and report its error.
@@ -178,7 +178,7 @@ reply event matches `llm_latency_ms` almost exactly (for example 3.069 s against
 | `assistant_reply` → `ad_displayed` | 3, block | **0.48 s** | 0.45–0.73 s |
 
 The era-3 reply-to-display interval is tight enough (about 0.28 s of spread) to
-support a derived visibility estimate for labelled blocks.
+support a derived visibility estimate for explicit ads.
 
 ## Offline reconstruction of event timing
 
@@ -207,7 +207,7 @@ that were never pushed to LSL at all.
 
 For every advertisement in every session:
 
-- Labelled block: visibility ≈ reply timestamp + 0.5 s, using the era-3 calibration.
+- Explicit (`block_*`): visibility ≈ reply timestamp + 0.5 s, using the era-3 calibration.
 - Inline: the advertisement text appears progressively during streaming, so
   estimate onset ≈ injection + `llm_latency_ms` × (character offset of the ad text
   within the reply ÷ total reply length). Both the reply `content` and the ad title

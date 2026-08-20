@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 
+from condition_labels import PATH_A_LABELS, PATH_B_LABELS
+
 
 ROOT = Path(__file__).resolve().parents[3]
 GRID = ROOT / (
@@ -48,17 +50,8 @@ FEATURES = [
     ("engagement_pope_frontocentral_beta_over_alpha_theta", "Pope FC"),
     ("engagement_kislov_central_beta16_24_over_alpha8_12", "Kislov"),
 ]
-PATH_A = [
-    ("any_ad_vs_no_ads", "Any ad"),
-    ("inline_vs_block", "Inline−block"),
-    ("early_vs_late", "Early−late"),
-]
-PATH_B = [
-    ("inline_early_vs_no_ad_early", "Inline early"),
-    ("block_early_vs_no_ad_early", "Block early"),
-    ("inline_late_vs_no_ad_late", "Inline late"),
-    ("block_late_vs_no_ad_late", "Block late"),
-]
+PATH_A = list(PATH_A_LABELS.items())
+PATH_B = list(PATH_B_LABELS.items())
 WIDTHS = (2.0, 4.0, 8.0)
 POLICY = "ica"
 

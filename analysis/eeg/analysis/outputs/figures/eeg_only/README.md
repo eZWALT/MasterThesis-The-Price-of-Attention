@@ -25,8 +25,9 @@ feature at that width, not across 2/4/8 s.
 | `path_b_4s` | Path B only, 4 s (primary) |
 | `path_b_8s` | Path B only, 8 s |
 
-Path A columns: any-ad, inline−block, early−late.
-Path B columns: inline/block × early/late vs matched no-ad.
+Path A columns: any-ad, implicit−explicit, early−late.
+Path B columns: implicit/explicit × early/late vs matched no-ad.
+Log keys remain `inline_*` / `block_*`.
 
 ## Where the other pictures live
 

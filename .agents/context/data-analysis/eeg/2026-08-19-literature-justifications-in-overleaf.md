@@ -48,7 +48,7 @@ audit and the 19 August literature canvas if an appendix wants them.
 - \(Y_A\): 18 × 5 × 16 medians of epoch dB (baseline row dropped for tests)
 - \(Y_B\): 18 × 6 × 16 post−pre
 - \(D\): planned contrasts of those rows, not one vector per condition
-- Path A primary \(D\): any-ad, inline vs block, early vs late
+- Path A primary \(D\): any-ad, implicit vs explicit, early vs late
 - Path B primary \(D\): each ad minus the timing-matched \(a^{\emptyset}\) reply
 - \(H_0:\mathbb{E}[D]=0\) on 18 people; \(t\) + Wilcoxon; Holm inside that family
 

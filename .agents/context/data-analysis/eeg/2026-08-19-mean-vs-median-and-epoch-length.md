@@ -40,7 +40,7 @@ python analysis/eeg/statistics/build_condition_contrasts.py \
 
 Confirmatory Q1/Q2 (Fz theta, posterior alpha) are Holm-null at \(n=18\)
 with and without ICA. Six ICA-only Holm hits on other Y_B bands (mostly
-early labelled block, more delta/theta) are exploratory and
+early explicit, more delta/theta) are exploratory and
 cleaning-dependent. Do not put them in the abstract. Do not change ad
 format or timing from EEG.
 

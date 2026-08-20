@@ -14,6 +14,8 @@ from pathlib import Path
 import altair as alt
 import pandas as pd
 
+from condition_labels import CONDITION_LABELS
+
 ROOT = Path(__file__).resolve().parents[3]
 MARKER_DIR = ROOT / "src/project/logs/xdf/silver/canonical_markers"
 AUDIT_PATH = (
@@ -28,13 +30,6 @@ CONDITION_ORDER = [
     "block_late",
     "no_ads",
 ]
-CONDITION_LABELS = {
-    "inline_early": "Implicit early",
-    "inline_late": "Implicit late",
-    "block_early": "Explicit early",
-    "block_late": "Explicit late",
-    "no_ads": "No ads",
-}
 CONDITION_LABEL_ORDER = [CONDITION_LABELS[c] for c in CONDITION_ORDER]
 
 

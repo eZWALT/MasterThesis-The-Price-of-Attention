@@ -21,19 +21,19 @@ import {
 
 const conditionRows = [
   ["No ads", "no_ads", "None", "None", "Reference condition"],
-  ["Inline early", "inline_early", "Integrated into reply", "Turn 2", "Native-like ad"],
-  ["Inline late", "inline_late", "Integrated into reply", "Turn 4", "Native-like ad"],
-  ["Block early", "block_early", "Labelled separate block", "Turn 2", "Overt ad"],
-  ["Block late", "block_late", "Labelled separate block", "Turn 4", "Overt ad"],
+  ["Implicit early", "inline_early", "Woven into the reply", "Turn 2", "Implicit ad"],
+  ["Implicit late", "inline_late", "Woven into the reply", "Turn 4", "Implicit ad"],
+  ["Explicit early", "block_early", "Labelled separate unit", "Turn 2", "Explicit ad"],
+  ["Explicit late", "block_late", "Labelled separate unit", "Turn 4", "Explicit ad"],
 ];
 
 const contrastRows = [
   ["C1 · Any advertising", "Mean of four ad conditions − no ads", "Trust/credibility; manipulation", "Primary"],
-  ["C2 · Integration format", "Mean inline − mean labelled block", "All three outcome families", "Primary"],
+  ["C2 · Integration format", "Mean implicit − mean explicit", "All three outcome families", "Primary"],
   ["C3 · Timing", "Mean early − mean late", "All three outcome families", "Primary"],
   [
     "C4 · Format × timing",
-    "(inline early − inline late) − (block early − block late)",
+    "(implicit early − implicit late) − (explicit early − explicit late)",
     "All three outcome families",
     "Secondary; lower power",
   ],
@@ -97,14 +97,14 @@ const eegCoreRows = [
     "Ad-evoked spectral response",
     "First ad_displayed marker",
     "Frontal theta and posterior/central alpha change from pre-ad baseline",
-    "Inline vs block; early vs late",
+    "Implicit vs explicit; early vs late",
     "Confirmatory core",
   ],
   [
     "ERP response to visible ad",
     "First ad_displayed marker",
     "Predefined centroparietal amplitude window only after onset validation",
-    "Inline vs block; early vs late",
+    "Implicit vs explicit; early vs late",
     "Conditional confirmatory",
   ],
   [
@@ -188,7 +188,7 @@ const sourceRows = [
   ],
   [
     "Heineking et al. (2026)",
-    "Maps inline/native-like versus overt/labelled advertising styles.",
+    "Maps implicit/native-like versus explicit/labelled advertising styles.",
     "resources/papers/IMPORTANT/advertising-styles-in-RAG.pdf",
   ],
   [
@@ -255,7 +255,7 @@ function App() {
             </CardHeader>
             <CardBody>
               <Text>
-                Are native-like inline ads remembered or identified differently from labelled blocks, and
+                Are implicit ads remembered or identified differently from explicit ads, and
                 does early versus late placement change recognition?
               </Text>
             </CardBody>
@@ -466,8 +466,8 @@ function App() {
             ad_displayed-locked EEG if their full XDF and ad markers are valid.
           </Callout>
           <Text tone="secondary">
-            ERP analysis is conditional because a visually precise onset must be demonstrated for both inline
-            and block formats. If inline content appeared progressively during token streaming, sustained
+            ERP analysis is conditional because a visually precise onset must be demonstrated for both implicit
+            and explicit formats. If implicit content appeared progressively during token streaming, sustained
             time-frequency analysis is more defensible than millisecond-scale ERP claims.
           </Text>
           <Text tone="secondary">

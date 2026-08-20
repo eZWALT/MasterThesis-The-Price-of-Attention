@@ -18,6 +18,12 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from condition_labels import (
+    AD_CONTRAST_LABELS,
+    CONDITION_CONTRAST_LABELS,
+    CONDITION_LABELS,
+)
+
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 ANALYSIS_ROOT = Path(__file__).resolve().parent
@@ -904,6 +910,18 @@ diagnostics is {minimum_stability:.1%}.
 
 def run(config_path: Path, output_root: Path) -> dict[str, Any]:
     config = load_json(config_path)
+    config["condition_labels"] = {
+        **config.get("condition_labels", {}),
+        **CONDITION_LABELS,
+    }
+    config["condition_contrast_labels"] = {
+        **config.get("condition_contrast_labels", {}),
+        **CONDITION_CONTRAST_LABELS,
+    }
+    config["ad_contrast_labels"] = {
+        **config.get("ad_contrast_labels", {}),
+        **AD_CONTRAST_LABELS,
+    }
     configure_style()
     tables = output_root / "tables"
     figures = output_root / "figures"

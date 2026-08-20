@@ -7,7 +7,9 @@ Date: 19 August 2026
 This entry explains what Gold actually obtains after Silver has defined
 trustworthy time and the cleaning policy. It is the durable record of:
 
-- the two independent Gold paths (sustained condition vs locked advertisement);
+- the two independent Gold paths (condition windows vs ad windows;
+  older notes also say sustained condition vs locked advertisement);
+
 - the exact tables each path writes;
 - how one participant’s data shape evolves from cleaned `(32, N)` to the
   participant-level numbers that statistics later consume;
@@ -59,8 +61,8 @@ the in-memory Raw.
 
 ```mermaid
 flowchart TD
-    RAW["cleaned Raw in RAM<br/>(32, N)"] --> CA["Path A: condition / sustained"]
-    RAW --> CB["Path B: ad / locked 4 s"]
+    RAW["cleaned Raw in RAM<br/>(32, N)"] --> CA["Path A: condition windows"]
+    RAW --> CB["Path B: ad windows"]
     MARK["Silver markers"] --> WA["condition_windows.csv"]
     MARK --> WB["ad_analysis_windows.csv"]
     WA --> CA

@@ -10,7 +10,7 @@ and notebooks.
 The initial analysis answers two distinct questions:
 
 1. **Sustained condition effects:** Does EEG activity differ between any-ad and
-   no-ad conversations, inline and labelled-block formats, or early and late
+   no-ad conversations, implicit and explicit formats, or early and late
    ad timing?
 2. **Ad-locked responses:** Does the four-second post-onset change differ from
    the timing-matched no-ad response for each format and timing cell?
@@ -20,8 +20,8 @@ The participant is always the replication unit.
 ## Analysis hierarchy
 
 - **Primary features:** Fz theta and posterior alpha.
-- **Primary condition contrasts:** any ad minus no ads, inline minus labelled
-  block, and early minus late.
+- **Primary condition contrasts:** any ad minus no ads, implicit minus
+  explicit, and early minus late.
 - **Primary ad contrasts:** each of four ad cells minus its timing-matched
   no-ad response.
 - **Secondary:** global theta/alpha/beta, FAA, and factorial interactions.

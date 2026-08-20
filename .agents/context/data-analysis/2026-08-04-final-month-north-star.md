@@ -140,7 +140,7 @@ These identifiers are the stable project-wide meaning of “the five goals.”
 Estimate within-participant differences among:
 
 - any advertising versus no advertising;
-- inline versus labelled-block advertising;
+- implicit versus explicit advertising;
 - early versus late placement;
 - format-by-timing interaction as secondary.
 

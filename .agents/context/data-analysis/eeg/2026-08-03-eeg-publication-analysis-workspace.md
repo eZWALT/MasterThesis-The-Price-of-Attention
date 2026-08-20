@@ -28,15 +28,15 @@ Primary EEG features:
 Primary sustained-condition contrasts:
 
 - any ad minus no ads;
-- inline minus labelled block;
+- implicit minus explicit;
 - early minus late.
 
 Primary ad-response contrasts:
 
-- inline early minus matched no-ad early;
-- labelled-block early minus matched no-ad early;
-- inline late minus matched no-ad late;
-- labelled-block late minus matched no-ad late.
+- implicit early minus matched no-ad early;
+- explicit early minus matched no-ad early;
+- implicit late minus matched no-ad late;
+- explicit late minus matched no-ad late.
 
 Holm correction is applied across the prespecified primary contrast family
 separately for each feature. The publication tables also include a stricter
@@ -100,7 +100,7 @@ posterior alpha:
 - feature-family `p_Holm=0.337`;
 - global six-test `p_Holm=0.674`.
 
-The smallest corrected ad-response result is inline-late minus matched no-ad
+The smallest corrected ad-response result is implicit-late minus matched no-ad
 late Fz theta:
 
 - mean difference `-1.992 dB µV²`;
@@ -120,7 +120,7 @@ This reinforces participant-level visualization and uncertainty-first
 reporting.
 
 The explicit Subject 14 deletion changes the sign of one primary condition
-estimate, inline minus labelled-block posterior alpha, from `0.006` to `-0.013
+estimate, implicit minus explicit posterior alpha, from `0.006` to `-0.013
 dB µV²`. Both values are effectively centered on zero and the inferential
 conclusion is unchanged. Two secondary ad factorial summaries also cross zero;
 none becomes corrected evidence.

@@ -590,14 +590,14 @@ Wilcoxon sensitivity tests, confidence intervals, Cohen's dz, and Holm
 correction within each primary EEG-feature family.
 
 The initial smoke analysis found no Holm-corrected primary effect for Fz theta
-or posterior alpha. One inline-late Fz-theta ad response had raw `p≈0.046`, but
+or posterior alpha. One implicit-late Fz-theta ad response had raw `p≈0.046`, but
 the Holm-adjusted value was `p≈0.183`; it is not corrected evidence of an
 effect.
 
 The added engagement measures also produce no Holm-corrected exploratory
 effect. The smallest corrected condition value is global Pope-family
-engagement for inline versus block (`p_Holm≈0.299`, `dz≈0.410`). The smallest
-corrected ad-response value is frontocentral Pope-family engagement for block
+engagement for implicit versus explicit (`p_Holm≈0.299`, `dz≈0.410`). The smallest
+corrected ad-response value is frontocentral Pope-family engagement for explicit
 early versus matched no-ad early (`p_Holm≈0.509`, `dz≈-0.378`). These are smoke
 analysis results, not evidence that engagement is absent.
 
@@ -622,7 +622,7 @@ reports `status=pass`:
 - three engagement measures keep the same direction in every comparison;
 - the 1,500 µV ad dataset and all ad statistics are identical to 1,050 µV;
 - relative to 1,000 µV, four early ad-control effects change direction:
-  absolute beta and gamma for block early and inline early versus matched no-ad;
+  absolute beta and gamma for explicit early and implicit early versus matched no-ad;
 - those four features are secondary or exploratory, and none is
   Holm-corrected evidence under any policy.
 

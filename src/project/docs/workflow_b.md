@@ -14,10 +14,10 @@ Implemented by `core/experiment/controller.py`; all constants live in
 | Condition | Label | Ad format | Injector | Ad turn |
 |---|---|---|---|---|
 | `no_ads` | NO | none (control) | — | — |
-| `inline_early` | IN-EA | woven into the reply | `inline_persuasive` | 2 |
-| `inline_late` | IN-LA | woven into the reply | `inline_persuasive` | 4 |
-| `block_early` | BL-EA | labelled block above the reply | `explicit_ad_block` | 2 |
-| `block_late` | BL-LA | labelled block above the reply | `explicit_ad_block` | 4 |
+| `inline_early` | IN-EA | implicit: woven into the reply | `inline_persuasive` | 2 |
+| `inline_late` | IN-LA | implicit: woven into the reply | `inline_persuasive` | 4 |
+| `block_early` | BL-EA | explicit: labelled unit above the reply | `explicit_ad_block` | 2 |
+| `block_late` | BL-LA | explicit: labelled unit above the reply | `explicit_ad_block` | 4 |
 
 Each ad condition injects **exactly one ad**; `no_ads` never injects. The
 product is retrieved live from the catalog and filtered to the categories
