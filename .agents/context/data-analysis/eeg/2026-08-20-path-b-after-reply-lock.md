@@ -2,7 +2,7 @@
 
 Date: 20 August 2026
 Branch: `eeg-path-b-after-reply`
-Status: **design. Do not run. Do not touch golden Gold.**
+Status: **built in parallel. Do not touch golden Gold.**
 
 The confirmatory Path B lock stays what it is on `main`:
 
@@ -87,3 +87,27 @@ at *p*. Primary stays the frozen visual-onset 4 s + median + ICA unless
 Sebastian agrees to change the estimand **before** looking.
 
 Path A is irrelevant here. Those tiles cover the whole condition.
+
+## Built 20 August 2026 (this branch)
+
+Runner: `analysis/eeg/preprocessing/run_after_reply_path_b.py`
+Heatmaps: `analysis/eeg/analysis/outputs/figures/eeg_only/heatmaps/after_reply/`
+
+Onset moved relative to golden visual onset:
+
+- implicit (`inline_persuasive`): mean +2.57 s (min +0.89, max +10.54)
+- explicit (`explicit_ad_block`): mean +0.42 s (min −0.24, max +5.34)
+
+All 216 windows eligible at 2 / 4 s; 8 s dropped one pair (107/108).
+
+Confirmatory Path B (Fz theta, posterior alpha), ICA, Holm within feature:
+
+| Width | What changed |
+|---|---|
+| 4 s | Still Holm-null. Implicit did not appear. Several *p* values moved toward 1. |
+| 2 s | Golden explicit-early Fz theta (0.021) is gone (now 0.090). |
+| 8 s | Explicit-late posterior alpha stays Holm 0.023 (same cell as golden). |
+
+Exploratory 4 s hits that remain are explicit-early delta / relative delta / relative alpha. That is a thinner version of the golden 4 s exploratory cluster, not a new implicit story.
+
+The assumption did **not** create a 4 s confirmatory effect. It removed the 2 s “first glance” theta cell, which is what you would expect if that cell was banner chrome rather than the finished reply. Primary stays golden visual-onset 4 s.

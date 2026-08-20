@@ -1,0 +1,87 @@
+{
+  "lock": "after_reply",
+  "grid_seconds": [
+    2.0,
+    4.0,
+    8.0
+  ],
+  "policy": "ica",
+  "n_tests": 384,
+  "holm_hits": 8,
+  "confirmatory_holm_hits": [
+    {
+      "epoch_seconds": 8.0,
+      "policy": "ica",
+      "path": "B",
+      "lock": "after_reply",
+      "contrast_id": "block_late_vs_no_ad_late",
+      "feature": "posterior_alpha_power_db_uv2",
+      "feature_tier": "primary",
+      "n_participants": 18,
+      "mean_difference": -1.0781692389449948,
+      "p_t_raw": 0.005668695238901687,
+      "p_t_holm": 0.02267478095560675,
+      "holm_significant": true,
+      "raw_p_lt_05": true,
+      "confirmatory": true
+    }
+  ],
+  "exploratory_holm_hits": [
+    {
+      "epoch_seconds": 2.0,
+      "contrast_id": "block_late_vs_no_ad_late",
+      "feature": "alpha_power_db_uv2",
+      "p_t_holm": 0.03202619208792737,
+      "mean_difference": -1.892700341731847,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_power_db_uv2",
+      "p_t_holm": 0.030252526093677925,
+      "mean_difference": 3.427295314414532,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.015535488877450153,
+      "mean_difference": 0.17311467451742563,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 4.0,
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "alpha_relative_power",
+      "p_t_holm": 0.036366882430979686,
+      "mean_difference": -0.03273932463731549,
+      "n_participants": 18
+    },
+    {
+      "epoch_seconds": 8.0,
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "delta_relative_power",
+      "p_t_holm": 0.011183775056332921,
+      "mean_difference": 0.19914177268485686,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 8.0,
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "beta_relative_power",
+      "p_t_holm": 0.024352042322280946,
+      "mean_difference": -0.10934563106429729,
+      "n_participants": 17
+    },
+    {
+      "epoch_seconds": 8.0,
+      "contrast_id": "block_early_vs_no_ad_early",
+      "feature": "gamma_relative_power",
+      "p_t_holm": 0.048362364801884064,
+      "mean_difference": -0.034157187340766476,
+      "n_participants": 17
+    }
+  ]
+}
