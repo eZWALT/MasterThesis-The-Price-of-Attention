@@ -1,8 +1,13 @@
-# Path B lock after the finished reply — proposed only
+# Path B lock after the finished reply — rejected as primary
 
 Date: 20 August 2026
 Branch: `eeg-path-b-after-reply`
-Status: **built in parallel. Do not touch golden Gold.**
+
+**Decision (Walter, 20 August):** keep the golden visual-onset Path B
+lock. After-reply is a dead sensitivity. It did not improve the 4 s
+confirmatory tests. Do not promote it. Do not touch golden Gold.
+
+What “onset” means: `2026-08-20-what-path-b-onset-is.md`.
 
 The confirmatory Path B lock stays what it is on `main`:
 

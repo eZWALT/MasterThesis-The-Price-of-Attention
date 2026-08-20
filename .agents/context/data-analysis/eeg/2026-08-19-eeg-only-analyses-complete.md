@@ -44,6 +44,11 @@ subsection around it. An 8 s explicit-late window showed lower
 posterior alpha versus matched no-ad under both ICA and no-ICA; that
 cell was not Holm-significant at the pre-specified 4 s width.
 
+A 20 August after-reply lock (finished message + 0.49 s for every
+cell) stayed 4 s Holm-null and removed the 2 s explicit-early theta
+hit. **Keep the golden visual-onset lock.** See
+`2026-08-20-what-path-b-onset-is.md`.
+
 ## Paper figures
 
 Main text, at most two EEG figures, both at **4 s**:

@@ -15,9 +15,12 @@ pipelines, generated manifests, and participant-level outputs remain under
   paper names: implicit / explicit. Log keys stay `inline_*` / `block_*`.
 - `CRITICAL-do-not-overwrite-ica-models.md`
   is the hard stop on refitting or replacing the 2026-08-19 ICA archive.
+- `2026-08-20-what-path-b-onset-is.md`
+  Path B \(t=0\) is when the ad becomes visible, not “they noticed it”
+  and not “message finished.” Read this before arguing about locks.
 - `2026-08-20-path-b-after-reply-lock.md`
-  **this branch only.** Proposed Path B lock after the finished reply.
-  Do not overwrite golden Gold.
+  tried locking after the finished reply. **Rejected as primary.**
+  Golden visual-onset lock stays. Do not overwrite golden Gold.
 - `2026-08-20-pipeline-sanity-audit.md`
   Gold IDs, Path A/B arithmetic, and why the 4 s Holm-null is not a
   scrambled pipeline.

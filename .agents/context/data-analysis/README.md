@@ -14,6 +14,8 @@ The top level is reserved for documents that govern both analysis arms:
 - `2026-08-04-final-month-north-star.md`
 - `2026-08-20-implicit-explicit-names.md` — paper says implicit /
   explicit; log keys stay `inline_*` / `block_*`.
+- `eeg/2026-08-20-what-path-b-onset-is.md` — Path B onset is when the
+  ad becomes visible. After-reply lock rejected; keep golden.
 - `2026-08-18-analysis-priority-order.md` — behavioural first, then
   personality, EEG, trajectories, policy model last.
 - Crossable leftover list (analysis + manuscripts):
