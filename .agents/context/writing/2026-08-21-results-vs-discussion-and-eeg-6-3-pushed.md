@@ -216,6 +216,51 @@ them, but Results reports numbers. `subliminal` should stay at three
 occurrences: Method (definition), Discussion limits, Conclusion (design
 implication).
 
+### Ultra-critical audit of 5/6/7, 21 Aug
+
+Walter asked for a hostile read of Sections 5, 6, 7 and for Section 9
+to be gutted. Fixed in this pass:
+
+- **Section 9 (Conclusion) reduced to a commented outline.** Its one
+  paragraph duplicated the design implication already in 7.4
+  (Implications), so nothing unique was lost. Banner now `TO-START`.
+- **`Goal~1` leaked into 7.1** ("the missing Goal 1 composites"). The
+  vocabulary sweep missed it. Now "the behavioural composites".
+- **7.1 was project-status prose, not discussion**: "the study has not
+  answered its first question", "trajectory algebra", "are not in"
+  three times, "on the page". Rewritten as scope.
+- **"chrome"** in 7.2 read as the browser to anyone outside HCI. Now
+  "a visually separate unit carrying a disclosure header".
+- **"covert in Heineking's sense"** had no `\cite`; added.
+- **`confirmatory features`** in the heatmap caption — last survivor of
+  the feature→measure sweep.
+- **"it awaits"** for a plural subject in 6.3; now "they await".
+- **Comma splice** in Limitations: "Cued memory is a self-report after
+  the instance is shown again, it could be improved." The trailing
+  "could be improved" was a note to self, not a limitation.
+- **Informal comments in the TeX source** (two leftover draft notes)
+  removed. Commented source ships with an arXiv source
+  upload. The two commented-out draft paragraphs beside them were
+  already covered by the live text, so they went too.
+
+**Still open, needs Walter's call:**
+
+1. **6.2 is the worst remaining paragraph in the paper.** It makes six
+   directional claims with zero numbers ("stay low", "sit at the top of
+   the scale", "appears weak beside format", "only modestly
+   associated"), and it says results "will be recomputed on the final
+   data extract" while 6.1 says the sample is *finished* at N=54. Those
+   two statements contradict each other. Either give the descriptives
+   numbers and a table, or cut the paragraph to one sentence saying the
+   battery is not yet estimated.
+2. **Future Work uses `\\` after paragraphs** (three times), which
+   produces bad vertical spacing; and "paired up with", "we completely
+   acknowledge" are informal for a GOLDEN section.
+3. Section 4 (RQs/hypotheses) is still `IN-PROGRESS (LOW)` — Walter
+   already said 4 needs revision at the end.
+4. Personal TODOs sit after `\end{document}` (revise Sebastian's
+   citation, ping for review). Harmless, not rendered, left alone.
+
 Rule of thumb for this section: 5.8 states **methods and goals only**.
 Thresholds, component rules, and QC provenance belong in
 `sec:app-eeg-device`; measure definitions and tiers in
