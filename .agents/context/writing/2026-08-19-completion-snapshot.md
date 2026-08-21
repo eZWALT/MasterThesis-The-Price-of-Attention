@@ -1,5 +1,10 @@
 # Completion snapshot (19 August 2026)
 
+> 21 August: EEG 6.3 Results + 7.3 Discussion split are on Overleaf.
+> See `2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
+> EEG Epoching was already pushed earlier; ignore the stale
+> “DRAFTED (local, unpushed)” line below.
+
 Rough. Weighted by what still has to exist, not by pages typed.
 Analysis feeds the paper. The paper feeds the thesis.
 Hard deadline: **thesis 17 September 2026**.
@@ -52,8 +57,12 @@ exist. Future Work is golden again (restored list; do not skeletonize).
 - **IN-PROGRESS (MID):** Research Gap, EEG Preprocessing, Limitations
 - **IN-PROGRESS (LOW):** Research Questions + H1–H3; Data availability
 - **SKELETON:** Results (except sample), Discussion, Conclusion
-- **TO-START:** leftover EEG epoching / measures / stats template;
+- **TO-START:** EEG Measures / Statistical Analysis templates;
   funding; ethics; appendices
+- **DRAFTED (local, unpushed):** EEG Epoching (20 August) --- Path A/B
+  geometry, 4~s freeze, 2~s/8~s sensitivity. In
+  `docs/overleaf/publication/main.tex`. Do not push until Walter asks.
 
-EEG Acquisition is done. EEG Preprocessing is mid because of the leftover
-red list under the spectral paragraph.
+EEG Acquisition is done. EEG Epoching is drafted locally. EEG
+Preprocessing is mid because of the leftover red list and the outdated
+``ICA was not applied'' sentence.

@@ -22,6 +22,18 @@ docs/overleaf/example-eeg/     # EEG report template reference
 Each Overleaf folder is an independent Git repository. The parent repository
 ignores their contents. Run `git` commands inside the relevant mirror.
 
+**Results ≠ Discussion (standing).** Results report numbers. Discussion
+interprets. EEG 6.3 is confirmatory; 7.3 is the EEG read. Lock:
+`2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`. That note is
+the **newest entry**: it also holds the anti-redundancy layout (which
+EEG artefact lives in Results vs appendix) and the open Method items.
+
+EEG Results 6.3 is on Overleaf (pushed 21 August). Local-draft history:
+`2026-08-20-eeg-results-section-drafted.md`.
+
+EEG paper figure cut and Results sentences (20 August):
+`../data-analysis/eeg/2026-08-20-paper-figures-and-narrative.md`.
+
 Monday agenda (Katerina + Sebastian):
 `2026-08-20-monday-katerina-sebastian-agenda.md`.
 
@@ -32,7 +44,9 @@ Crossable leftover items (paper / thesis / analysis):
 `2026-08-18-remaining-work-checklist.md`.
 
 EEG Method comments parked in Overleaf (median / \(Y_A,Y_B,D\) / short cite
-set, not yet visible prose):
+set). Visible `EEG Epoching` was pushed 20 August (`cf48a14`):
+`2026-08-20-eeg-epoching-section-drafted.md`.
+Parked-comment history:
 `../data-analysis/eeg/2026-08-19-literature-justifications-in-overleaf.md`.
 
 ## Entry order

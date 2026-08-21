@@ -52,7 +52,9 @@ Order of analysis (do not invert):
 Already standing: Theory, most of Method, flow figure, Results / Discussion /
 Future Work skeleton, notice/recall slice in prose.
 
-- [ ] Fill Results for goal 1 (then 2, then 3). No invented tables
+- [ ] Fill Results for goal 1 (then 2). Goal 3 EEG Results 6.3 are on
+  Overleaf (pushed 21 August). Interpretation is Discussion 7.3, not 6.3.
+  No invented Goal 1 tables.
 - [ ] Rewrite Statistical Analysis (still a visibility / `XXXXX` template)
 - [ ] Delete leftover Method red (ERP / ICA list that fights the spectral paragraph)
 - [ ] When rewriting EEG Method: use the 2026-08-19 comments in

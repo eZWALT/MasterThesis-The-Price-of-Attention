@@ -20,7 +20,9 @@ This meeting is for **decisions and ownership**, not a methods seminar.
   conditions + \(a^{\emptyset}\). Implicit ≠ subliminal ≠ covert.
 - Inferential unit is the **participant**.
 - EEG primary: 4 s + median + ICA. Path A/B confirmatory Holm-null.
-- 8 s late-explicit alpha and 2 s early-explicit theta are sensitivity only.
+- 8 s late-explicit alpha and 2 s early-explicit theta are sensitivity only
+  (mention both). Full CIs:
+  `../data-analysis/eeg/2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
   After-reply lock was tried and rejected; keep visual-onset \(t=0\).
 - Read vs write: one sentence (Fz theta Holm 0.007). Not an ad result.
 - No ERP. No epoch-as-\(n\). No entropy/PLV. Session baseline not in
