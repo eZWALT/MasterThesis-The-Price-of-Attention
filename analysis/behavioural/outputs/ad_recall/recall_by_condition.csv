@@ -1,0 +1,5 @@
+condition,n_trials,n_participants,memory_median,memory_q1,memory_q3,trust_median,trust_q1,trust_q3
+inline_early,45,45,5.0,2.0,6.0,4.0,3.0,5.0
+inline_late,45,45,5.0,2.0,6.0,5.0,3.0,6.0
+block_early,45,45,7.0,5.0,7.0,3.0,2.0,5.0
+block_late,45,45,6.0,5.0,7.0,5.0,3.0,6.0
