@@ -245,7 +245,7 @@ to be gutted. Fixed in this pass:
 
 **Still open, needs Walter's call:**
 
-1. **6.2 is the worst remaining paragraph in the paper.** It makes six
+1. ~~6.2~~ **DONE (cut to one sentence, 21 Aug).** Was: It makes six
    directional claims with zero numbers ("stay low", "sit at the top of
    the scale", "appears weak beside format", "only modestly
    associated"), and it says results "will be recomputed on the final
