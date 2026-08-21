@@ -94,9 +94,67 @@ Kislov), states the tiers, and carries the dB-reading note
 Relative powers are flagged compositional there — that is what makes
 the five explicit-early cells one finding.
 
+## Section 5 + 6 readability pass (21 Aug, commit `ebd0a2b`)
+
+Walter: Sections 5/6 were cryptic — things "you and I understand" that a
+reader cannot. He chose: fix GOLDEN subsections too (prose only, never
+change a claim), EEG-only statistical analysis with the behavioural half
+left an explicit stub, introduce Path A/B in 5.6 **and** formally in
+5.8, keep Bronze/Silver/Gold but explain it, and write for an
+HCI / consumer-neuroscience audience (explain Holm, \(d_z\), dB inline).
+
+**5.8 Statistical Analysis is now written.** It was still the raw
+template ("Describe the statistical model used, such as:"). It now has:
+unit of analysis = participant and why the epoch is not; how \(D_i\) is
+formed per path (Path B is a difference of differences); the 3 Path A
+and 4 Path B planned comparisons; confirmatory (2) vs exploratory (14);
+paired \(t\) + Wilcoxon and why **not** RM-ANOVA or cluster permutation;
+Cohen's \(d_z\) defined; Holm within a measure and the compositional
+reason for not correcting across the sixteen; the writing−reading
+positive control; three sensitivity branches (no-ICA, width grid,
+threshold); software (MNE-Python 1.12, SciPy 1.17, NumPy 2.2, Py 3.13).
+
+**New fact surfaced from code, now in the paper:** `format_x_timing` in
+`build_condition_contrasts.py` is `contrast_tier="secondary"` and
+`correction_family="secondary_uncorrected"`. The presentation×timing
+interaction is therefore secondary and uncorrected, and 5.8 says so.
+It is **not** one of the three Path A confirmatory contrasts (those are
+`any_ad_vs_no_ads`, `inline_vs_block`, `early_vs_late`; note inline =
+implicit, block = explicit in the code).
+
+Also verified from code for 5.8: CI is a two-sided 95% \(t\) interval
+(`stats.t.ppf(0.975, n-1)`), the test is `ttest_1samp` on the person
+differences against 0, `d_z = mean/SD` with `ddof=1`, Wilcoxon is
+two-sided. Turn pairs for the positive control: reading = first complete
+4 s after `assistant_reply`, writing = last complete 4 s before the next
+`user_message`, within condition bounds, non-overlapping, 268 pairs,
+13–15 per person.
+
+**Rendering bugs fixed** (all were printing in the PDF): an unclosed
+`\color{red}` at old line 1262 rendered *all of 5.4 Dependent
+Variables* in red; `\ref{architecture}`, `\ref{pipeline}`,
+`\ref{fig:eeg}`, `\ref{fig:flow-crowd}` and the two ad-example refs had
+no "Figure~" so they printed as bare numbers; the montage caption
+printed "(placeholder) ... Replace this file with the signed-off
+drawing" (moved to a LaTeX comment — the figure **is** still a
+placeholder); typos `recieved`, `alongisde`, `An crucial`, `5-tasks`;
+and a garbled clause in 5.3.2 ("we believe sincerely in the research
+questions can have the most impact").
+
+**Vocabulary:** the sixteen spectral "coordinates" are now "measures"
+throughout (paper-wide, including 7.3 and the appendix). Added a
+four-symbol notation recap (\(a\), \(\lambda\), \(\pi\), \(a^{\emptyset}\),
+\(\phi\)) to the Method intro so readers need not flip back to Section 4.
+Added `\label{sec:behavioral-measures}` and a `gramfort2013mne` bib entry.
+
+Pre-existing broken citations, **not** introduced here and still open:
+`cite-of-arxiv-thesis` (template leftover) and `subramanian2026riding`.
+
 ## Still TO-START / not this push
 
-- 5.8 Statistical Analysis still `XXXXX`.
+- 5.8 behavioural half is a deliberate stub: it names a likely
+  mixed-effects specification and states that nothing is estimated.
+  Do not turn that into a results claim before Goal 1 lands.
 - 6.2 Goal 1 behavioural models still skeleton. Do not invent tables.
 - Extra Analysis appendix empty.
 - Appendix `Device` subsection is a TO-START stub whose only sentence
