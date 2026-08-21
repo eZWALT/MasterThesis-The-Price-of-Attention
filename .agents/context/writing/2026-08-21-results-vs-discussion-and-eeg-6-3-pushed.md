@@ -156,13 +156,42 @@ Walter: "5.8 is HUGE". It has to hold the behavioural, trajectory, and
 behaviour×EEG analyses later, so it must be **concise and scalable**,
 and may use maths to shorten prose.
 
-**5.8 is now 820 words and extensible.** Structure to preserve:
+**5.8 is now 660 words and extensible.** Structure to preserve:
 three shared conventions → `tab:analysis-families` → within-participant
 spectral contrasts (with \(D^{A}_{i}\), \(D^{B}_{i}\) as an `aligned`
-equation pair) → positive control and robustness → families not yet
-estimated → software. **To add an analysis later, add a table row and a
-sentence — do not add another paragraph block per topic.** Families not
-estimated are flagged \(^{\dagger}\) in the table.
+equation pair) → tiers and Holm scope → positive control and
+sensitivity → software. **To add an analysis later, add a table row and
+a sentence — do not add another paragraph block per topic.** Families
+not estimated are flagged \(^{\dagger}\) in the table.
+
+### Third pass on 5.8, 21 Aug
+
+Walter again: "too long and redundant, too many details, the first
+paragraphs are fine but the last are horrible." The tail went 515 → 350
+words. What was cut and why:
+
+- **"Families not yet estimated" paragraph deleted entirely.** Every
+  claim in it was already a column of `tab:analysis-families`: mixed
+  effects with a participant random effect, pending genre estimator,
+  association and laboratory-arm-only for behaviour×EEG. The table *is*
+  the scalable mechanism — do not re-prose it.
+- **Relative-power denominator argument** and **RM-ANOVA / cluster
+  permutation rejection** moved to App. EEG Measures (the latter as a
+  new `Estimators not used.` paragraph). The tier discussion there
+  already covered the same ground, so 5.8 now points at it.
+- **Positive-control window definitions** stay out of 5.8: 6.3 defines
+  reading and writing windows precisely, so the Method only needs the
+  contrast and its directional prediction.
+
+Fixed an inconsistency while cutting: 5.8 said "the other fourteen are
+exploratory" but App. Tiers says four are *secondary* and ten
+exploratory. 5.8 now reads "secondary or exploratory".
+
+Rule of thumb for this section: 5.8 states **methods and goals only**.
+Thresholds, component rules, and QC provenance belong in
+`sec:app-eeg-device`; measure definitions and tiers in
+`sec:app-eeg-measures`; window mechanics in the Results subsection that
+uses them.
 
 \(D^{A}_{i}=\sum_{c}w_{c}\operatorname{med}_{\ell\in c}y_{i\ell}\) with
 \(\sum_c w_c=0\) is exactly what the code computes (weighted condition
@@ -173,7 +202,7 @@ means), so the maths is not decoration.
 | Subsection | words |
 |---|---|
 | 5.6 EEG Preprocessing | ~1,490 (the real outlier) |
-| 5.8 Statistical Analysis | 820 |
+| 5.8 Statistical Analysis | 660 (was 820) |
 | 6.3 Neurophysiological | ~880 |
 | 5.7 EEG Epoching | ~515 |
 | App. EEG Measures | ~1,110 |
