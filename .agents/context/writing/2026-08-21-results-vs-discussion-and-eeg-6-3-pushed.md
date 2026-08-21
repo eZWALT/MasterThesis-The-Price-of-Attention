@@ -150,6 +150,67 @@ Added `\label{sec:behavioral-measures}` and a `gramfort2013mne` bib entry.
 Pre-existing broken citations, **not** introduced here and still open:
 `cite-of-arxiv-thesis` (template leftover) and `subramanian2026riding`.
 
+## Section 5 + 6 second pass, 21 Aug (`2a88611`…`d9d476c`)
+
+Walter: "5.8 is HUGE". It has to hold the behavioural, trajectory, and
+behaviour×EEG analyses later, so it must be **concise and scalable**,
+and may use maths to shorten prose.
+
+**5.8 is now 820 words and extensible.** Structure to preserve:
+three shared conventions → `tab:analysis-families` → within-participant
+spectral contrasts (with \(D^{A}_{i}\), \(D^{B}_{i}\) as an `aligned`
+equation pair) → positive control and robustness → families not yet
+estimated → software. **To add an analysis later, add a table row and a
+sentence — do not add another paragraph block per topic.** Families not
+estimated are flagged \(^{\dagger}\) in the table.
+
+\(D^{A}_{i}=\sum_{c}w_{c}\operatorname{med}_{\ell\in c}y_{i\ell}\) with
+\(\sum_c w_c=0\) is exactly what the code computes (weighted condition
+means), so the maths is not decoration.
+
+### Word counts after the pass (use to judge "too long")
+
+| Subsection | words |
+|---|---|
+| 5.6 EEG Preprocessing | ~1,490 (the real outlier) |
+| 5.8 Statistical Analysis | 820 |
+| 6.3 Neurophysiological | ~880 |
+| 5.7 EEG Epoching | ~515 |
+| App. EEG Measures | ~1,110 |
+
+5.6 stays largest because it carries the whole measurement chain plus
+five equations. Implementation detail was already moved out to
+`sec:app-eeg-device`; **further cuts would remove facts, so ask Walter
+first.**
+
+### Vocabulary now standardised (do not regress)
+
+- sixteen spectral **measures**, never "coordinates", never "features".
+- a **contrast**, never a "cell". A **grid**, never a "board".
+- **pre-specified** or **fixed**, not "frozen", in the manuscript.
+  "Frozen" stays fine in these notes.
+- Holm applied **within each measure**, never "within feature".
+- Internal terms removed from the PDF: "Goal 1 extract", "frozen
+  against executable code", "already on the table", "levers",
+  "advertisement chrome", "the next act".
+
+### Also done
+
+- Rewrote 5.1, 5.2.1, 5.2.2, 5.3.2, 5.4.1, 5.5, 5.6, 5.7, 6.1, 6.2,
+  6.4, 6.5 prose. Removed `\\` used as paragraph breaks.
+- `\label{EEG_adquisition}` → `\label{sec:eeg-acquisition}`.
+- Both broken citations resolved. `subramanian2026riding` is
+  **Subramanian, Bettadapura, Sathish, "Riding Brainwaves in LLM
+  Space", arXiv:2603.21847 (2026)** — verified against the abstract,
+  the \(\rho=0.183\) vs \(0.020\) high-gamma figures in §2 are correct.
+  `cite-of-arxiv-thesis` was a placeholder for Walter's own
+  dissertation; the sentence no longer carries a dangling key and has a
+  TODO for when it gets an identifier.
+- Fixed "Age ommited" caption and five plain grammar errors in the §3
+  intent passage (`an true`, `recieved`, `its untractable`, and two
+  broken clauses). §3 was otherwise left alone — Walter says 1–3 are
+  good and §4 needs revision at the end.
+
 ## Still TO-START / not this push
 
 - 5.8 behavioural half is a deliberate stub: it names a likely
@@ -157,8 +218,17 @@ Pre-existing broken citations, **not** introduced here and still open:
   Do not turn that into a results claim before Goal 1 lands.
 - 6.2 Goal 1 behavioural models still skeleton. Do not invent tables.
 - Extra Analysis appendix empty.
-- Appendix `Device` subsection is a TO-START stub whose only sentence
-  describes the *measures*, not a device. Leftover; delete or fill.
+- ~~Appendix `Device` stub~~ — done. It is now
+  `sec:app-eeg-device`, "Acquisition and signal quality": recording
+  descriptives, the condition-blind quality profile, the per-channel
+  evidence for the three interpolations, the exact ICA thresholds, and
+  the status of the two engineering thresholds.
+- Next up per Walter: **trajectory analysis**. 5.8 has a table row and
+  a sentence waiting for it; fill those rather than restructuring.
+- §4 Research Questions and Hypotheses needs a revision pass "at the
+  end" (Walter's call, not started).
+- Methods figure is still `eeg_preprocessing.png` and the montage is
+  still a placeholder file; both carry TODO comments in `main.tex`.
 - Method never states *why* Fz theta and posterior alpha were chosen
   (functional rationale). That currently lives only in 7.3 and
   `sec:app-eeg-measures`. A sentence belongs in the Method too.
