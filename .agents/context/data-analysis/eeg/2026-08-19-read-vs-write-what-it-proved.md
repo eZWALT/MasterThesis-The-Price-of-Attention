@@ -68,10 +68,10 @@ Figures: `figure_14_task_state`, `figure_15_task_state_slopes`.
 
 ## Numbers
 
-| Feature | Mean (write − read) | Holm \(p\) | \(d_z\) | Read as |
-|---|---|---|---|---|
-| Fz theta | +0.60 dB | 0.007 | 0.80 | chain sees a state difference |
-| Posterior alpha | +0.08 dB | 0.75 | 0.08 | this feature does not separate the two states |
+| Feature | Mean (write − read) | 95% CI | Holm \(p\) | \(d_z\) | Read as |
+|---|---|---|---|---|---|
+| Fz theta | +0.60 dB | [0.22, 0.97] | 0.007 | 0.80 | chain sees a state difference |
+| Posterior alpha | +0.08 dB | [−0.43, 0.59] | 0.75 | 0.08 | this feature does not separate the two states |
 
 Secondary (uncorrected, do not promote): more delta, less beta/gamma
 and lower Pope ratios while writing. Compatible with a slower spectrum
@@ -80,7 +80,8 @@ during composition. Not confirmatory.
 ## Paper sentence (that is the whole mention)
 
 As a sanity check, the same 4 s ICA chain distinguished writing from
-reading on Fz theta (Holm \(p=0.007\), \(d_z=0.80\), \(n=18\)).
+reading on Fz theta (\(M=+0.60\) dB, 95% CI \([0.22, 0.97]\), Holm
+\(p=0.007\), \(d_z=0.80\), \(n=18\)).
 
 ## Related
 

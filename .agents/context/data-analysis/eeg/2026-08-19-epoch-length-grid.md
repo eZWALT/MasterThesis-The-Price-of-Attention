@@ -37,11 +37,11 @@ Path A: **0 Holm hits** at every length, ICA and no-ICA.
 Confirmatory Path B Holm hits (Fz theta or posterior alpha, primary
 ad−matched-control contrasts):
 
-| W | Cleaning | Contrast | Feature | n | mean dB | Holm p |
-|---|---|---|---|---|---|---|
-| 2 s | ICA | explicit early − no-ad | Fz theta | 18 | +3.30 | 0.021 |
-| 8 s | ICA | explicit late − no-ad | posterior alpha | 18 | −1.22 | 0.023 |
-| 8 s | no-ICA | explicit late − no-ad | posterior alpha | 18 | −1.30 | 0.012 |
+| W | Cleaning | Contrast | Feature | n | mean dB | 95% CI | \(d_z\) | Holm p |
+|---|---|---|---|---|---|---|---|---|
+| 2 s | ICA | explicit early − no-ad | Fz theta | 18 | +3.30 | [1.12, 5.49] | 0.75 | 0.021 |
+| 8 s | ICA | explicit late − no-ad | posterior alpha | 18 | −1.22 | [−2.04, −0.41] | −0.74 | 0.023 |
+| 8 s | no-ICA | explicit late − no-ad | posterior alpha | 18 | −1.30 | [−2.09, −0.50] | −0.81 | 0.012 |
 
 The 8 s posterior-alpha explicit-late cell is the only confirmatory
 hit that appears under **both** ICA and no-ICA. It is not Holm-significant
@@ -57,8 +57,9 @@ alpha/beta). They thin out at 16–32 s.
 ## Decision
 
 Primary remains **4 s + median + ICA**. Path A null is robust to tile
-size. The 8 s alpha cell may be mentioned as a sensitivity note, not as
-a new confirmatory result and not as a reason to change ad format.
+size. Mention **both** off-width cells as sensitivity, not as a new
+confirmatory result and not as a reason to change ad format or epoch
+width. Numbers: `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
 
 4 s is not an arbitrary middle. Path B locks to visual ad onset
 (see `2026-08-20-what-path-b-onset-is.md`). A 20 August after-reply
@@ -75,10 +76,17 @@ mid-chat turn. The 2 s hit is a **different** cell (early explicit theta,
 ICA-only). Two widths, two moments, two features is not one story.
 Timeline: `figure_17_epoch_timeline` and canvas `eeg-epoch-timeline`.
 
-## Paper sentence
+## Paper sentence (frozen 20 August)
 
-Primary 4 s analyses are Holm-null for Fz theta and posterior alpha.
-An 8 s ad-locked window showed lower posterior alpha after explicit
-late ads than after matched no-ad replies under both ICA and no-ICA; that
-contrast was not Holm-significant at the pre-specified 4 s width or at
-2 / 16 / 32 s.
+Primary stays **4 s + median + ICA**. Mention **both** off-width Path B
+cells as sensitivity, or mention neither. Full CIs, \(d_z\), Wilcoxon,
+and the 4 s comparison:
+
+`2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`
+
+Short form: 2 s explicit-early Fz theta, ICA only,
+\(M=+3.30\) dB, 95% CI \([1.12, 5.49]\), \(d_z=0.75\), Holm \(p=0.021\);
+8 s explicit-late posterior alpha, ICA
+\(M=-1.22\) dB, 95% CI \([-2.04, -0.41]\), \(d_z=-0.74\), Holm \(p=0.023\),
+and no-ICA \(M=-1.30\) dB, 95% CI \([-2.09, -0.50]\), Holm \(p=0.012\).
+Neither cell is Holm-significant at 4 s.

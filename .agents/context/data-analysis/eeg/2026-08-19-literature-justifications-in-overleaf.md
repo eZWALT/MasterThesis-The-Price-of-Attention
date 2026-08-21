@@ -13,7 +13,11 @@ Walter asked to park the reusable justifications as **comments** in the
 publication Overleaf, with a short bibliography, not a citation soup, and
 without rewriting the visible Method yet.
 
-No pipeline code was changed. Overleaf was not committed or pushed.
+**Update 20 August:** the visible `EEG Epoching` subsection is now
+drafted in the local publication mirror (Path A tiles, Path B locked
+windows, 4~s rationale, both sensitivity cells). Comments under that
+heading were replaced. Preprocessing / Measures / Stats comments remain.
+Overleaf was **not** committed or pushed.
 
 ## Where it lives
 

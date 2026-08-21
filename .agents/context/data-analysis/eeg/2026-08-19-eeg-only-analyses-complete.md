@@ -39,15 +39,23 @@ What that does and does not prove:
 Primary 4 s ICA analyses show no Holm-significant Fz-theta or
 posterior-alpha condition or ad-locked contrast (\(n=18\)). Mention in
 one sentence that the same chain distinguished writing from reading on
-Fz theta (Holm \(p=0.007\), \(d_z=0.80\)); do not build a Results
-subsection around it. An 8 s explicit-late window showed lower
-posterior alpha versus matched no-ad under both ICA and no-ICA; that
-cell was not Holm-significant at the pre-specified 4 s width.
+Fz theta (\(M=+0.60\) dB, 95% CI \([0.22, 0.97]\), Holm \(p=0.007\),
+\(d_z=0.80\)); do not build a Results subsection around it.
+
+Sensitivity, mention **both** or neither (full table:
+`2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`): 2 s
+explicit-early Fz theta, ICA only (\(M=+3.30\) dB, 95% CI
+\([1.12, 5.49]\), Holm \(p=0.021\)); 8 s explicit-late posterior alpha
+under ICA (\(M=-1.22\) dB, 95% CI \([-2.04, -0.41]\), Holm \(p=0.023\))
+and no-ICA (Holm \(p=0.012\)). Neither cell is Holm-significant at 4 s.
 
 A 20 August after-reply lock (finished message + 0.49 s for every
 cell) stayed 4 s Holm-null and removed the 2 s explicit-early theta
 hit. **Keep the golden visual-onset lock.** See
 `2026-08-20-what-path-b-onset-is.md`.
+
+Figure cut and Results sentences (20 August lock):
+`2026-08-20-paper-figures-and-narrative.md`.
 
 ## Paper figures
 
@@ -62,12 +70,13 @@ figure stays the existing Overleaf flow (`eeg_pipeline`), not
 `figure_01`.
 
 Appendix only, if mentioned: 09 (Path B slopes), 06 (threshold), 10 or
-11 (epoch grid; do not promote 8 s), 13 (ICA vs no-ICA).
+11 (epoch grid; show both 2 s and 8 s cells, do not re-freeze either),
+13 (ICA vs no-ICA).
 
 Not for the paper: 14, 15 (sanity check), 16 (session order).
 
-Primary epoch width for the paper is **4 s**. 8 s is a sensitivity
-footnote, not the reported analysis.
+Primary epoch width for the paper is **4 s**. 2 s and 8 s are a
+sensitivity footnote (both cells), not the reported analysis.
 
 Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Path A and Path B):
 

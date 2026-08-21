@@ -11,13 +11,27 @@ pipelines, generated manifests, and participant-level outputs remain under
 
 ## Current entries
 
+- `2026-08-20-paper-depth-audit.md`
+  independent recomputation, MDE, Path A \(\pm 0.3\) dB compatibility,
+  bootstrap-vs-\(t\) leans, six ICA-only exploratory hits locked.
+  Runner: `analysis/eeg/analysis/run_paper_depth_audit.py`.
+- `2026-08-20-paper-figures-and-narrative.md`
+  statistician lock for paper/thesis figures and the EEG Results
+  paragraph. Canvas:
+  `paper-eeg-figures-narrative.canvas.tsx`. 2/3 EEG points frozen;
+  C1 blocked on Goal 1. Prose is now on Overleaf: 6.3 numbers, 7.3
+  interpretation (`../../writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`).
 - `../2026-08-20-implicit-explicit-names.md`
   paper names: implicit / explicit. Log keys stay `inline_*` / `block_*`.
 - `CRITICAL-do-not-overwrite-ica-models.md`
   is the hard stop on refitting or replacing the 2026-08-19 ICA archive.
+- `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`
+  frozen paper story: 4 s confirmatory + both off-width Path B cells
+  as sensitivity. Full means, 95% CIs, \(d_z\), Holm, Wilcoxon.
 - `2026-08-20-what-path-b-onset-is.md`
   Path B \(t=0\) is when the ad becomes visible, not “they noticed it”
   and not “message finished.” Read this before arguing about locks.
+  (Referenced from the after-reply note; keep the golden lock.)
 - `2026-08-20-path-b-after-reply-lock.md`
   tried locking after the finished reply. **Rejected as primary.**
   Golden visual-onset lock stays. Do not overwrite golden Gold.
@@ -77,7 +91,8 @@ pipelines, generated manifests, and participant-level outputs remain under
   records the 2/8/16/32 s rebuild (4 s reused): Path A remains Holm-null
   at every width; three confirmatory Path B Holm cells appeared (2 s Fz
   theta ICA-only; 8 s posterior alpha under both ICA and no-ICA). Primary
-  stays 4 s + median + ICA.
+  stays 4 s + median + ICA. Paper numbers live in
+  `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
 - `2026-08-20-pipeline-sanity-audit.md`
   records the 20 August check that Gold IDs, clocks, window geometry,
   ICA flags, and contrast arithmetic are consistent, so the 4 s null is

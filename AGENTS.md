@@ -15,6 +15,11 @@
   summarize decisions; they never override the LaTeX.
 - Pull the relevant Overleaf mirror before drafting or editing. Show proposed
   text before applying; push only after explicit approval.
+- **Results ≠ Discussion.** Results report estimands and numbers.
+  Discussion interprets (precise null vs dead pipeline, Path B not
+  absence, abstract placement, design implications, H1–H3). EEG 6.3 is
+  confirmatory; 7.3 is the EEG read. Lock:
+  `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
 - Canonical ad labels: **implicit** vs **explicit**; early = turn 2; late =
   turn 4; five-condition repeated-measures (+ no-ad control). Implicit does
   not mean subliminal.
@@ -30,6 +35,11 @@
   `src/project/logs/xdf/`.
 - Treat participants—not epochs—as inferential units.
 - Record scientific decisions in `.agents/context/data-analysis/`.
+- EEG paper figure cut and Results sentences:
+  `.agents/context/data-analysis/eeg/2026-08-20-paper-figures-and-narrative.md`.
+  Depth audit (MDE, compatibility, exploratory lock):
+  `.agents/context/data-analysis/eeg/2026-08-20-paper-depth-audit.md`.
+  Confirmatory is 4 s + median + ICA. C1 is blocked on Goal 1.
 
 ## General
 

@@ -1,0 +1,17 @@
+---
+description: Results report numbers; Discussion interprets. Do not mix.
+alwaysApply: true
+---
+
+# Results vs Discussion
+
+Results (publication §6) report what was tested and what the numbers are.
+Discussion (§7) interprets. Do not put design implications, H1–H3 claims,
+“what this means for ads/trust,” “precise null vs dead pipeline,” or
+“do not put this in the abstract” into Results.
+
+EEG 6.3 (`sec:results-eeg`) is confirmatory numbers, tables, forests.
+EEG interpretation lives in 7.3 (`Heterogeneity, EEG, and trajectories`).
+Limitations stay in 7.5.
+
+Full lock: `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`

@@ -1,0 +1,14 @@
+---
+description: CRITICAL — never overwrite signed-off EEG ICA models
+alwaysApply: true
+---
+
+# CRITICAL: do not overwrite ICA models
+
+Read `.agents/context/data-analysis/eeg/CRITICAL-do-not-overwrite-ica-models.md` before any ICA or Gold rebuild.
+
+Never run `fit_ica_cohort.py --overwrite` or `run_ica_sensitivity.py --overwrite-models`. Never delete or replace files under `src/project/logs/xdf/silver/ica/candidate_v1/`.
+
+Those 18 models are human-signed (2026-08-19). After ICA became primary, `clean_recording()` already applies them. A refit on that Raw would overwrite the archive with a second, wrong ICA.
+
+Reuse the archived models. If a refit is ever ordered, clean only with `cleaning_policy_no_ica_sensitivity.json` and require a new visual signoff.

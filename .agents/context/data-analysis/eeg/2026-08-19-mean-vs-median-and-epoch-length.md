@@ -44,17 +44,17 @@ early explicit, more delta/theta) are exploratory and
 cleaning-dependent. Do not put them in the abstract. Do not change ad
 format or timing from EEG.
 
-## Epoch-length grid (next, not a fishing licence)
+## Epoch-length grid (done; not a fishing licence)
 
-Walter asked to try 2 / 4 / 8 / 16 / 32 s. Treat that as a **robustness
-grid**, not a search for a p-value to publish.
+Grid ran 19 August. Primary stays **4 s + median + ICA**. The 2 s and
+8 s Path B cells are a sensitivity mention (both or neither). Full
+CIs: `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`. Contract:
+`2026-08-19-epoch-length-grid.md`.
 
-- Primary stays 4 s + median until a **pre-specified** length is frozen.
-- If only one width is Holm-significant, that is a sensitivity note, not
-  a new confirmatory result.
+- Do not pick 2 s or 8 s because a Holm cell appeared.
 - Do not pick 16 s or 32 s because it is the one that “comes out.”
 - Path A: 2–32 s only changes tile size; the condition is still minutes
-  long.
+  long. Holm-null at every width.
 - Path B: the window **is** the observation; 16–32 s around an ad is a
   different question (and 32+32 s read/write pairs do not fit a typical
   52 s turn).
@@ -64,4 +64,6 @@ grid**, not a search for a p-value to publish.
 Primary 4 s median analyses show no Holm-significant Fz-theta or
 posterior-alpha condition or ad-locked contrast (\(n=18\)). Mean-of-epoch
 summaries agree. Compatible effects are small; a null is not evidence of
-absence.
+absence. Epoch-length sensitivity (2 s explicit-early Fz theta ICA-only;
+8 s explicit-late posterior alpha under both cleanings) does not unfreeze
+4 s.

@@ -114,8 +114,8 @@ Confirmatory Path B (Fz theta, posterior alpha), ICA, Holm within feature:
 | Width | What changed |
 |---|---|
 | 4 s | Still Holm-null. Implicit did not appear. Several *p* values moved toward 1. |
-| 2 s | Golden explicit-early Fz theta (0.021) is gone (now 0.090). |
-| 8 s | Explicit-late posterior alpha stays Holm 0.023 (same cell as golden). |
+| 2 s | Golden explicit-early Fz theta (Holm 0.021; \(M=+3.30\) dB, CI \([1.12, 5.49]\)) is gone (now Holm 0.090; \(M=+2.55\) dB, CI \([0.41, 4.69]\)). |
+| 8 s | Explicit-late posterior alpha stays Holm 0.023 (\(M=-1.08\) dB, CI \([-1.80, -0.36]\); same cell as golden). |
 
 Exploratory 4 s hits that remain are explicit-early delta / relative delta / relative alpha. That is a thinner version of the golden 4 s exploratory cluster, not a new implicit story.
 

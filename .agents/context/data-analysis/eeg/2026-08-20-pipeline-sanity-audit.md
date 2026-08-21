@@ -61,4 +61,7 @@ That is why 2 s / 8 s Holm cells appear and disappear. Keep 4 s primary.
 ## Paper
 
 Write the confirmatory 4 s null with CIs. Do not claim absence of any
-neural ad effect. Do not promote the 8 s alpha cell.
+neural ad effect. Mention the 2 s ICA-only explicit-early Fz theta cell
+and the 8 s explicit-late posterior-alpha cell together as sensitivity;
+do not promote either to confirmatory. Full numbers:
+`2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.

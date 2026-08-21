@@ -18,6 +18,8 @@ The top level is reserved for documents that govern both analysis arms:
   ad becomes visible. After-reply lock rejected; keep golden.
 - `2026-08-18-analysis-priority-order.md` — behavioural first, then
   personality, EEG, trajectories, policy model last.
+- `eeg/2026-08-20-paper-figures-and-narrative.md` — paper/thesis EEG
+  figure cut and what the Holm-nulls allow you to say.
 - Crossable leftover list (analysis + manuscripts):
   `../writing/2026-08-18-remaining-work-checklist.md`.
 
