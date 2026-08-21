@@ -156,7 +156,7 @@ Walter: "5.8 is HUGE". It has to hold the behavioural, trajectory, and
 behaviour×EEG analyses later, so it must be **concise and scalable**,
 and may use maths to shorten prose.
 
-**5.8 is now 660 words and extensible.** Structure to preserve:
+**5.8 is now 603 words and extensible.** Structure to preserve:
 three shared conventions → `tab:analysis-families` → within-participant
 spectral contrasts (with \(D^{A}_{i}\), \(D^{B}_{i}\) as an `aligned`
 equation pair) → tiers and Holm scope → positive control and
@@ -186,6 +186,16 @@ words. What was cut and why:
 Fixed an inconsistency while cutting: 5.8 said "the other fourteen are
 exploratory" but App. Tiers says four are *secondary* and ten
 exploratory. 5.8 now reads "secondary or exploratory".
+
+**Second cut, same day** (Walter repeated the complaint): tail 350 →
+293 words, section 660 → 603. The remaining engineering numbers left
+5.8 as well — epoch widths 2/8/16/32~s and bounds 1,000/1,500~µV around
+1,050~µV now live only in `sec:app-eeg-device`, and 5.8 names the three
+branches abstractly as artefact removal, epoch width, and rejection
+bound. This also removed a circular pointer: the appendix used to say
+"Section 5.8 lists the sensitivity branches" while 5.8 listed the
+numbers, so neither section was self-contained. The appendix now lists
+them and 5.8 points to the appendix, one direction only.
 
 Rule of thumb for this section: 5.8 states **methods and goals only**.
 Thresholds, component rules, and QC provenance belong in
