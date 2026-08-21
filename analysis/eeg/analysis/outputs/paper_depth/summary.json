@@ -1,0 +1,129 @@
+{
+  "n": 18,
+  "recomputed_all_means_match": true,
+  "recomputed_all_p_match": true,
+  "path_a_primary_holm_hits": 0,
+  "path_a_all_feature_primary_holm_hits": 0,
+  "path_b_confirmatory_holm_hits": 0,
+  "path_a_all_cis_inside_0p3db": true,
+  "path_b_any_ci_inside_1db": false,
+  "bootstrap_t_zero_disagreements": [
+    {
+      "path": "B",
+      "contrast": "implicit late \u2212 no-ad",
+      "feature": "Fz theta",
+      "ci_lower": -2.803017726613116,
+      "ci_upper": 0.0373896825429909,
+      "bootstrap_ci_lower": -2.632972851713904,
+      "bootstrap_ci_upper": -0.0899071303525229
+    },
+    {
+      "path": "B",
+      "contrast": "explicit late \u2212 no-ad",
+      "feature": "posterior alpha",
+      "ci_lower": -2.695430596066976,
+      "ci_upper": 0.1232836777963199,
+      "bootstrap_ci_lower": -2.6259061555933365,
+      "bootstrap_ci_upper": -0.0612286826368249
+    }
+  ],
+  "exploratory_ica_only_holm_hits": [
+    {
+      "contrast": "explicit early \u2212 no-ad",
+      "feature": "global theta",
+      "tier": "secondary_global",
+      "mean_db": 1.6771395147666652,
+      "ci_lower": 0.5570449158106816,
+      "ci_upper": 2.7972341137226486,
+      "cohen_dz": 0.7445994830564199,
+      "p_t_raw": 0.0057302877317393,
+      "p_t_holm": 0.0229211509269573,
+      "p_wilcoxon_holm": 0.03076171875,
+      "ica_only": true,
+      "no_ica_holm": 1.0,
+      "paper_status": "exploratory ICA-only; do not abstract"
+    },
+    {
+      "contrast": "explicit early \u2212 no-ad",
+      "feature": "global delta",
+      "tier": "exploratory",
+      "mean_db": 4.602253733892598,
+      "ci_lower": 1.988980611758309,
+      "ci_upper": 7.215526856026887,
+      "cohen_dz": 0.8757779351085477,
+      "p_t_raw": 0.0017185791237994,
+      "p_t_holm": 0.0068743164951977,
+      "p_wilcoxon_holm": 0.002685546875,
+      "ica_only": true,
+      "no_ica_holm": 0.29316217472972333,
+      "paper_status": "exploratory ICA-only; do not abstract"
+    },
+    {
+      "contrast": "explicit early \u2212 no-ad",
+      "feature": "relative delta",
+      "tier": "exploratory",
+      "mean_db": 0.1888872334378442,
+      "ci_lower": 0.0875774530883228,
+      "ci_upper": 0.2901970137873657,
+      "cohen_dz": 0.9271702200776316,
+      "p_t_raw": 0.001070629383443,
+      "p_t_holm": 0.0042825175337723,
+      "p_wilcoxon_holm": 0.007720947265625,
+      "ica_only": true,
+      "no_ica_holm": 0.06988555279637439,
+      "paper_status": "exploratory ICA-only; do not abstract"
+    },
+    {
+      "contrast": "explicit early \u2212 no-ad",
+      "feature": "relative alpha",
+      "tier": "exploratory",
+      "mean_db": -0.0390518698781972,
+      "ci_lower": -0.0656777959004203,
+      "ci_upper": -0.012425943855974,
+      "cohen_dz": -0.7293657315499359,
+      "p_t_raw": 0.0065825329898832,
+      "p_t_holm": 0.0263301319595328,
+      "p_wilcoxon_holm": 0.035858154296875,
+      "ica_only": true,
+      "no_ica_holm": 0.30588158766665474,
+      "paper_status": "exploratory ICA-only; do not abstract"
+    },
+    {
+      "contrast": "explicit early \u2212 no-ad",
+      "feature": "relative beta",
+      "tier": "exploratory",
+      "mean_db": -0.0879164997967744,
+      "ci_lower": -0.1446136955658883,
+      "ci_upper": -0.0312193040276605,
+      "cohen_dz": -0.7711112727093279,
+      "p_t_raw": 0.0044979457493537,
+      "p_t_holm": 0.0179917829974151,
+      "p_wilcoxon_holm": 0.02239990234375,
+      "ica_only": true,
+      "no_ica_holm": 0.19763195619377444,
+      "paper_status": "exploratory ICA-only; do not abstract"
+    },
+    {
+      "contrast": "implicit late \u2212 no-ad",
+      "feature": "relative gamma",
+      "tier": "exploratory",
+      "mean_db": -0.0435051802168252,
+      "ci_lower": -0.0748271172594316,
+      "ci_upper": -0.0121832431742188,
+      "cohen_dz": -0.6907177264550445,
+      "p_t_raw": 0.0093390515446481,
+      "p_t_holm": 0.0373562061785924,
+      "p_wilcoxon_holm": 0.006317138671875,
+      "ica_only": true,
+      "no_ica_holm": 0.5635627390185355,
+      "paper_status": "exploratory ICA-only; do not abstract"
+    }
+  ],
+  "mde_path_a_theta_anyad_holm80": 0.24691297207355203,
+  "mde_path_b_explicit_early_theta_holm80": 1.7372778731206104,
+  "tost_note": "TOST bounds 0.3/0.5/1.0/2.0 dB are post-hoc illustrations, not a pre-registered equivalence margin.",
+  "stale_docs": [
+    "analysis/eeg/analysis/README.md still says read-vs-write is unimplemented",
+    "outputs/reports/initial_results_summary.md still says the same"
+  ]
+}

@@ -104,9 +104,11 @@ preserved all corrected condition conclusions but produced six ICA-only
 corrected ad-response findings. Those findings stay labelled as
 ICA-dependent; they were not the reason the branch was chosen.
 
-The era-aware read-versus-write positive control described in the analysis plan
-is not yet implemented. Until it is, null condition results cannot be used as
-evidence that the pipeline was sensitive to every plausible state difference.
+The era-aware read-versus-write positive control is implemented
+(`statistics/outputs/task_state/`). Writing − reading Fz theta is
++0.60 dB, Holm \(p=0.007\), \(d_z=0.80\). That is a pipeline check, not
+an ad result. Paper-depth audit (MDE, compatibility, exploratory-hit
+lock): `python analysis/eeg/analysis/run_paper_depth_audit.py`.
 
 ## Method basis
 

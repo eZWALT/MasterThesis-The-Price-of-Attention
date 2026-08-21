@@ -47,9 +47,11 @@ diagnostics is 55.6%.
 - Baseline eye state was uncontrolled and is excluded from confirmatory tests.
 - Engagement ratios, FAA, global bands, and uncorrected interactions are
   secondary or exploratory.
-- The era-aware read-versus-write positive control is not yet implemented;
-  null condition results therefore do not establish universal pipeline
-  sensitivity.
+- The era-aware read-versus-write positive control is implemented:
+  writing − reading Fz theta \(M=+0.60\) dB, Holm \(p=0.007\),
+  \(d_z=0.80\). Pipeline check only; not an ad finding. See
+  `2026-08-19-read-vs-write-what-it-proved.md` and
+  `outputs/paper_depth/`.
 - A non-significant result is not evidence of absence; report compatible effect
   ranges and study power limitations.
 
