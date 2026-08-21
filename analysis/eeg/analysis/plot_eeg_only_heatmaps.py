@@ -215,8 +215,57 @@ def plot_board(grid: pd.DataFrame) -> None:
     save(figure, "board_path_a_b_2_4_8s")
 
 
+def plot_board_4s(grid: pd.DataFrame) -> None:
+    """Frozen 4 s ICA board: Path A (3) + Path B (4), all 16 features."""
+    style()
+    figure, axes = plt.subplots(
+        1,
+        2,
+        figsize=(12.6, 8.8),
+        gridspec_kw={"wspace": 0.28, "width_ratios": [3, 4]},
+    )
+    draw(
+        axes[0],
+        matrix(grid, path="A", seconds=4.0, contrasts=PATH_A),
+        PATH_A,
+        title="Path A · 4 s · ICA",
+        show_ylabels=True,
+    )
+    draw(
+        axes[1],
+        matrix(grid, path="B", seconds=4.0, contrasts=PATH_B),
+        PATH_B,
+        title="Path B · 4 s · ICA",
+        show_ylabels=False,
+    )
+    cbar = figure.colorbar(
+        plt.cm.ScalarMappable(cmap=CMAP, norm=plt.Normalize(0, 1)),
+        ax=axes,
+        fraction=0.03,
+        pad=0.02,
+    )
+    cbar.set_label("Holm p")
+    figure.suptitle(
+        "4 s Holm p · ICA · 16 features (Path A + Path B)",
+        y=0.995,
+        color=INK,
+    )
+    figure.text(
+        0.01,
+        0.008,
+        "Rows 1–2 (above the line) are confirmatory and Holm-null. "
+        "Orange cells are exploratory Path B hits, ICA-only; they are not a second primary. "
+        "Holm is within feature across the 3 (A) or 4 (B) contrasts at 4 s, not across the 16 features. "
+        "n=18. Source: epoch_length_grid_comparison.csv.",
+        fontsize=8,
+        color=SLATE,
+    )
+    save(figure, "board_path_a_b_4s")
+
+
 def main() -> None:
     grid = pd.read_csv(GRID)
+    plot_board_4s(grid)
     plot_board(grid)
     for seconds in WIDTHS:
         plot_one(
