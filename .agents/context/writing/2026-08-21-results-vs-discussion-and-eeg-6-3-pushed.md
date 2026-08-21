@@ -197,6 +197,25 @@ bound. This also removed a circular pointer: the appendix used to say
 numbers, so neither section was self-contained. The appendix now lists
 them and 5.8 points to the appendix, one direction only.
 
+### Results intro, same complaint
+
+Walter: "the first results paragraph also started good but the end is
+trash... again stating too much stuff we don't need to state as
+subliminal." Cut the closing sentence "Two interpretive conventions
+hold throughout: we do not treat implicit presentation as subliminal,
+and we do not treat a participant noticing a brand mention as evidence
+that they detected an advertisement." Intro 155 → 108 words.
+
+Both conventions were already stated where they are *defined*:
+implicit-is-not-subliminal in 5.3.2 (`main.tex` line ~821), and
+brand-mention-is-not-detection in 5.4.1 with the notice composite. The
+Results copy was the fourth occurrence of the first and the second of
+the second. **Do not restate interpretive conventions at the head of
+Results.** Define them once in the Method; the Discussion may draw on
+them, but Results reports numbers. `subliminal` should stay at three
+occurrences: Method (definition), Discussion limits, Conclusion (design
+implication).
+
 Rule of thumb for this section: 5.8 states **methods and goals only**.
 Thresholds, component rules, and QC provenance belong in
 `sec:app-eeg-device`; measure definitions and tiers in
