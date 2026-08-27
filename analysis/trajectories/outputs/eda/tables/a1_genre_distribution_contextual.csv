@@ -1,0 +1,8 @@
+genre,utterances,share,participants,mean_top_posterior,median_words
+general_guidance_and_info,755,0.6990740740740741,54,0.482,15
+academic_help,244,0.22592592592592592,52,0.465,15
+relationships_and_personal_reflection,69,0.06388888888888888,23,0.409,23
+creative_writing_and_role_play,8,0.007407407407407408,3,0.299,23
+creative_ideation,2,0.001851851851851852,2,0.353,14
+writing_and_editing,1,0.000925925925925926,1,0.248,208
+personal_writing_or_communication,1,0.000925925925925926,1,0.334,22

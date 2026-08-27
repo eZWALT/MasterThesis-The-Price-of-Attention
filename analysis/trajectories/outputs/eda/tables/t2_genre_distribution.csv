@@ -1,0 +1,14 @@
+genre,utterances,share,participants,mean_top_posterior,median_words
+general_guidance_and_info,350,0.32407407407407407,54,0.428,21
+relationships_and_personal_reflection,193,0.1787037037037037,53,0.451,13
+academic_help,110,0.10185185185185185,45,0.451,25
+other_obscene_or_illegal,86,0.07962962962962963,42,0.408,11
+personal_writing_or_communication,72,0.06666666666666667,37,0.443,9
+other,71,0.06574074074074074,39,0.367,11
+creative_writing_and_role_play,43,0.03981481481481482,31,0.425,23
+creative_ideation,39,0.03611111111111111,26,0.442,24
+greetings_and_chitchat,35,0.032407407407407406,24,0.456,9
+writing_and_editing,34,0.03148148148148148,25,0.376,16
+media_generation_or_analysis,27,0.025,19,0.371,19
+purchasable_products,19,0.017592592592592594,15,0.36,13
+programming_and_data_analysis,1,0.000925925925925926,1,0.36,4

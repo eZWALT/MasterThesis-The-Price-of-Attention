@@ -1,0 +1,4 @@
+contrast,n,shifted_treatment,shifted_control,only_treatment,only_control,p_exact,p_holm
+implicit early - no ad,54,47,42,11,6,0.332305908203125,0.996917724609375
+explicit early - no ad,54,42,42,8,8,1.0,1.0
+implicit early - explicit early,54,47,42,12,7,0.359283447265625,0.996917724609375

@@ -1,0 +1,5 @@
+contrast,n,with_ad,without_ad,only_ad,only_control,p_exact
+early pooled: ad genre appears at turn 3 or 4,54,24,22,15,13,0.8505540192127228
+implicit early: ad genre appears at turn 3 or 4,54,13,12,9,8,1.0
+explicit early: ad genre appears at turn 3 or 4,54,11,17,7,13,0.26317596435546875
+PLACEBO late: ad genre appears at turn 3 or 4,54,32,25,16,9,0.2295229434967041

@@ -1,0 +1,12 @@
+genre_source,set,subset,to_genre,count,share,n
+contextual,crossing,all,general_guidance_and_info,82,0.7592592592592593,108
+contextual,crossing,all,academic_help,19,0.17592592592592593,108
+contextual,crossing,all,relationships_and_personal_reflection,7,0.06481481481481481,108
+contextual,crossing,shifts_only,general_guidance_and_info,6,0.42857142857142855,14
+contextual,crossing,shifts_only,relationships_and_personal_reflection,5,0.35714285714285715,14
+contextual,crossing,shifts_only,academic_help,3,0.21428571428571427,14
+contextual,no_ad_k2,all,general_guidance_and_info,44,0.8148148148148148,54
+contextual,no_ad_k2,all,academic_help,6,0.1111111111111111,54
+contextual,no_ad_k2,all,relationships_and_personal_reflection,4,0.07407407407407407,54
+contextual,no_ad_k2,shifts_only,general_guidance_and_info,6,0.75,8
+contextual,no_ad_k2,shifts_only,relationships_and_personal_reflection,2,0.25,8

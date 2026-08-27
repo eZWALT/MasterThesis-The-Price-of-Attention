@@ -1,0 +1,7 @@
+quantity,value
+Transitions,810
+Self-transitions (diagonal mass),0.183
+Shift rate,0.817
+Distinct genre pairs observed,120 of 169
+Modal destination,guidance (0.273)
+Top three edges,guidance→guidance 82; guidance→relationships 56; relationships→guidance 36

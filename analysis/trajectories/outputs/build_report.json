@@ -1,0 +1,26 @@
+{
+  "sessions_read": 54,
+  "sessions_skipped_no_log": [],
+  "conditions_dropped_wrong_turn_count": [],
+  "malformed_lines": 2,
+  "runtime_label_agreement": {
+    "utterance": {
+      "matched": 351,
+      "compared": 1080,
+      "rate": 0.325
+    },
+    "contextual": {
+      "matched": 1080,
+      "compared": 1080,
+      "rate": 1.0
+    }
+  },
+  "arms": {
+    "lab": 18,
+    "crowd": 36
+  },
+  "utterances": 2160,
+  "conversations": 540,
+  "transitions": 1620,
+  "transition_matrix_rows": 715
+}

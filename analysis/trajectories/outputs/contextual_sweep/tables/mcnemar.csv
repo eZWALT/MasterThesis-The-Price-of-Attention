@@ -1,0 +1,19 @@
+recipe,contrast,n,shifted_treatment,shifted_control,only_treatment,only_control,p_exact,p_holm
+bare,implicit early - no ad,54,47,42,11,6,0.332305908203125,0.996917724609375
+bare,explicit early - no ad,54,42,42,8,8,1.0,1.0
+bare,implicit early - explicit early,54,47,42,12,7,0.359283447265625,0.996917724609375
+deployed,implicit early - no ad,54,7,8,5,6,1.0,1.0
+deployed,explicit early - no ad,54,7,8,7,8,1.0,1.0
+deployed,implicit early - explicit early,54,7,7,6,6,1.0,1.0
+no_task,implicit early - no ad,54,18,15,11,8,0.6476058959960938,1.0
+no_task,explicit early - no ad,54,13,15,11,13,0.8388197422027588,1.0
+no_task,implicit early - explicit early,54,18,13,13,8,0.38331031799316406,1.0
+prev_only,implicit early - no ad,54,33,40,10,17,0.24778856337070465,0.5059126317501068
+prev_only,explicit early - no ad,54,32,40,9,17,0.16863754391670227,0.5059126317501068
+prev_only,implicit early - explicit early,54,33,32,13,12,1.0,1.0
+task_only,implicit early - no ad,54,6,9,6,9,0.6072387695312499,1.0
+task_only,explicit early - no ad,54,10,9,7,6,1.0,1.0
+task_only,implicit early - explicit early,54,6,10,6,10,0.454498291015625,1.0
+opening,implicit early - no ad,54,25,26,12,13,1.0,1.0
+opening,explicit early - no ad,54,21,26,8,13,0.38331031799316406,1.0
+opening,implicit early - explicit early,54,25,21,17,13,0.5846647117286922,1.0

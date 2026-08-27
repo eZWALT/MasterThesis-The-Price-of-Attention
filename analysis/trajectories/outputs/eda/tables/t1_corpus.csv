@@ -1,0 +1,12 @@
+quantity,value
+Participants,54
+Arms,"crowd 36, lab 18"
+Conditions per participant,5
+Conversations,270
+User utterances,1080
+Turns per conversation,4
+Transitions per conversation,3
+"Words per message, median [IQR]","15 [8, 29]"
+"Characters per message, median [IQR]","77 [44, 153]"
+"Response latency (s), median [IQR]","49 [30, 75]"
+Genre space,13 ThradBERT conversation-intent classes
