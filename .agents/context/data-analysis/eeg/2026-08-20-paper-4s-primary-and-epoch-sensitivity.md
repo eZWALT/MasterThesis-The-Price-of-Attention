@@ -2,11 +2,11 @@
 
 Date: 20 August 2026
 Walter: keep **4 s + median + ICA** as confirmatory. Mention the 2 s
-and 8 s Path B cells as **sensitivity**, not as a new result and not as
+and 8 s Dataset B cells as **sensitivity**, not as a new result and not as
 a reason to change epoch width.
 
 Inferential unit is always the **participant**. Holm is per feature
-across the 3 Path A or 4 Path B primary contrasts, **not** across five
+across the 3 Dataset A or 4 Dataset B primary contrasts, **not** across five
 widths × two cleanings. CIs are 95% paired *t* intervals on the
 person-level differences. Scores are (ad post−pre) − (matched no-ad
 post−pre), in dB.
@@ -32,8 +32,8 @@ Log keys stay `block_*`. Paper names: **explicit** = `block`,
 | One-sentence sanity check | writing − reading Fz theta |
 | Not primary | after-reply lock, hybrid lock, mean-of-epoch, 16/32 s, exploratory bands |
 
-Path A is Holm-null at every width (2–32 s), ICA and no-ICA. The two
-Path B hits are **different cells**: different width, different timing,
+Dataset A is Holm-null at every width (2–32 s), ICA and no-ICA. The two
+Dataset B hits are **different cells**: different width, different timing,
 different feature. That is why they are a sensitivity note, not a
 re-freeze.
 
@@ -47,7 +47,7 @@ from reading on Fz theta (\(M=+0.60\) dB, 95% CI \([0.22, 0.97]\),
 finding.
 
 A pre-specified epoch-length sensitivity (2 / 8 / 16 / 32 s; 4 s
-reused) left Path A Holm-null at every width. Two Path B confirmatory
+reused) left Dataset A Holm-null at every width. Two Dataset B confirmatory
 cells crossed Holm only off the frozen 4 s width: (i) a 2 s window
 after explicit-early ads showed higher Fz theta than matched no-ad
 under ICA only (\(M=+3.30\) dB, 95% CI \([1.12, 5.49]\), \(d_z=0.75\),
@@ -64,7 +64,7 @@ figure: epoch-grid heatmap / traces (`figure_10` / `figure_11`).
 
 ## Confirmatory 4 s ICA (what the paper reports)
 
-Path A, person-median of retained 4 s tiles, \(n=18\), df = 17.
+Dataset A, person-median of retained 4 s tiles, \(n=18\), df = 17.
 
 | Contrast (paper) | Feature | \(M\) (dB) | SD | SE | 95% CI | \(d_z\) | \(t\) | raw \(p\) | Holm \(p\) |
 |---|---|---|---|---|---|---|---|---|---|
@@ -75,7 +75,7 @@ Path A, person-median of retained 4 s tiles, \(n=18\), df = 17.
 | implicit − explicit | posterior alpha | +0.05 | 0.29 | 0.07 | [−0.10, 0.19] | 0.17 | 0.72 | 0.481 | 0.961 |
 | early − late | posterior alpha | −0.09 | 0.28 | 0.07 | [−0.23, 0.05] | −0.32 | −1.35 | 0.196 | 0.587 |
 
-Path B, the two cells that later light up off-width, at the **frozen**
+Dataset B, the two cells that later light up off-width, at the **frozen**
 4 s lock:
 
 | Contrast | Feature | Cleaning | \(n\) | \(M\) (dB) | SD | SE | 95% CI | \(d_z\) | \(t\) | raw \(p\) | Holm \(p\) | Wilcoxon \(W\) | Wilcoxon Holm |
@@ -132,7 +132,7 @@ fails amplitude QC.
 
 ## Why mention both
 
-The whole confirmatory Path B × Fz-theta/posterior-alpha × ICA/no-ICA
+The whole confirmatory Dataset B × Fz-theta/posterior-alpha × ICA/no-ICA
 × {2,4,8,16,32} s grid has **exactly three** Holm hits, and they are
 these two stories (8 s alpha appears twice, once per cleaning).
 Mentioning only the 2 s theta cell looks like fishing. Mentioning only

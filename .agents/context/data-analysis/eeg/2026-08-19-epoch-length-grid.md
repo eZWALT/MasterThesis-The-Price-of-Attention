@@ -4,15 +4,15 @@ Date: 19 August 2026
 
 ## Contract
 
-Fixed-length epochs only. Path A tiles from condition start (remainder
-dropped). Path B is `[onset−W, onset)` / `[onset, onset+W)`. Welch
+Fixed-length epochs only. Dataset A tiles from condition start (remainder
+dropped). Dataset B is `[onset−W, onset)` / `[onset, onset+W)`. Welch
 `nperseg` stays 2 s, so the grid changes how much time is averaged into
-one row, not the FFT resolution. Median remains the Path A aggregator.
+one row, not the FFT resolution. Median remains the Dataset A aggregator.
 ICA remains primary. 4 s is not rebuilt; existing ICA primary and no-ICA
 archives are reused.
 
 Do **not** freeze 2 s or 8 s because a Holm cell appeared. Holm is per
-feature across the 3 (Path A) or 4 (Path B) primary contrasts, not across
+feature across the 3 (Dataset A) or 4 (Dataset B) primary contrasts, not across
 five lengths × two cleaning branches.
 
 ## What ran
@@ -25,16 +25,16 @@ five lengths × two cleaning branches.
   (gitignored) and `statistics/outputs/sensitivity/epoch_{N}s/`
 - comparison: `statistics/outputs/sensitivity/epoch_length_grid_comparison.csv`
 
-32 s Path A drops Subjects 10, 14, 17 (too few complete tiles / 80%
-rule) → n=15. Baseline ~30 s cannot make a 32 s epoch. Path B pair
+32 s Dataset A drops Subjects 10, 14, 17 (too few complete tiles / 80%
+rule) → n=15. Baseline ~30 s cannot make a 32 s epoch. Dataset B pair
 counts fall at 16–32 s (some onsets too close to the condition edge, or
 a 32 s slice fails amplitude QC).
 
 ## Holm hunt (1,920 tests)
 
-Path A: **0 Holm hits** at every length, ICA and no-ICA.
+Dataset A: **0 Holm hits** at every length, ICA and no-ICA.
 
-Confirmatory Path B Holm hits (Fz theta or posterior alpha, primary
+Confirmatory Dataset B Holm hits (Fz theta or posterior alpha, primary
 ad−matched-control contrasts):
 
 | W | Cleaning | Contrast | Feature | n | mean dB | 95% CI | \(d_z\) | Holm p |
@@ -56,12 +56,12 @@ alpha/beta). They thin out at 16–32 s.
 
 ## Decision
 
-Primary remains **4 s + median + ICA**. Path A null is robust to tile
+Primary remains **4 s + median + ICA**. Dataset A null is robust to tile
 size. Mention **both** off-width cells as sensitivity, not as a new
 confirmatory result and not as a reason to change ad format or epoch
 width. Numbers: `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
 
-4 s is not an arbitrary middle. Path B locks to visual ad onset
+4 s is not an arbitrary middle. Dataset B locks to visual ad onset
 (see `2026-08-20-what-path-b-onset-is.md`). A 20 August after-reply
 lock (finished message + 0.49 s) stayed 4 s Holm-null and killed the
 2 s explicit-early theta cell. Keep the golden lock.
@@ -78,7 +78,7 @@ Timeline: `figure_17_epoch_timeline` and canvas `eeg-epoch-timeline`.
 
 ## Paper sentence (frozen 20 August)
 
-Primary stays **4 s + median + ICA**. Mention **both** off-width Path B
+Primary stays **4 s + median + ICA**. Mention **both** off-width Dataset B
 cells as sensitivity, or mention neither. Full CIs, \(d_z\), Wilcoxon,
 and the 4 s comparison:
 

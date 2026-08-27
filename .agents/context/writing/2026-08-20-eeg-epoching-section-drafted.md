@@ -4,7 +4,7 @@ Date: 20 August 2026
 
 Visible prose lives under `\subsection{EEG Epoching}` (Method 5.7).
 Tightened 20 August after 5.6 Preprocessing was rewritten: no Gold
-rebuild, no ``p-value search''. Epoching is induced-vs-ERP, Path B
+rebuild, no ``p-value search''. Epoching is induced-vs-ERP, Dataset B
 \(t=0\), why 4~s, and the width grid. 5.6 was not edited.
 
 Pulled first (`b3a6869`, Walter's sample-figure caption + `\raggedbottom`).
@@ -17,17 +17,17 @@ the bib). Revert on Overleaf if the prose is wrong.
 
 - Induced 4~s spectra, not ERP (onset LOO p95 0.23~s explicit / 0.43~s
   implicit).
-- Path A: non-overlapping 4~s tiles; leftover dropped; 1{,}050 µV /
+- Dataset A: non-overlapping 4~s tiles; leftover dropped; 1{,}050 µV /
   near-flat; ≥5 epochs and ≥80\% retained; median of epoch dB →
   \(Y_A\in\mathbb{R}^{18\times 5\times 16}\). 9{,}468 / 9{,}449
   retained under ICA.
-- Path B: visual-onset \(t=0\); pre \([t-4,t)\), post \([t,t+4)\);
+- Dataset B: visual-onset \(t=0\); pre \([t-4,t)\), post \([t,t+4)\);
   window = epoch; 216/216 retained →
   \(Y_B\in\mathbb{R}^{18\times 6\times 16}\). Reconstruction lags and
   30/36 implicit derived onsets are in the prose.
 - 4~s frozen before the grid (Welch, leftover vs condition, chat
   timeline ~53/~79~s, Kislov width not Kislov estimand).
-- Sensitivity 2/8/16/32~s: Path A null everywhere; both Path B cells
+- Sensitivity 2/8/16/32~s: Dataset A null everywhere; both Dataset B cells
   with CIs; Holm not across the grid; neither cell unfreezes 4~s.
 - Mean-of-epoch-dB 0/48; median stays primary.
 

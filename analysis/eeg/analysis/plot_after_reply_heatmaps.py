@@ -1,4 +1,4 @@
-"""After-reply Path B heatmaps. Writes only under heatmaps/after_reply/."""
+"""After-reply Dataset B heatmaps. Writes only under heatmaps/after_reply/."""
 
 from __future__ import annotations
 
@@ -15,8 +15,8 @@ from plot_eeg_only_heatmaps import (  # noqa: E402
     CMAP,
     FEATURES,
     INK,
-    PATH_A,
-    PATH_B,
+    DATASET_A,
+    DATASET_B,
     SLATE,
     WIDTHS,
     draw,
@@ -49,13 +49,13 @@ def save(figure: plt.Figure, stem: str) -> None:
 
 def plot_one(grid: pd.DataFrame, seconds: float) -> None:
     style()
-    values = matrix(grid, path="B", seconds=seconds, contrasts=PATH_B)
+    values = matrix(grid, dataset="B", seconds=seconds, contrasts=DATASET_B)
     figure, axis = plt.subplots(figsize=(8.4, 8.6))
     draw(
         axis,
         values,
-        PATH_B,
-        title=f"Path B after-reply Holm p · {seconds:g} s · ICA",
+        DATASET_B,
+        title=f"Dataset B after-reply Holm p · {seconds:g} s · ICA",
         show_ylabels=True,
     )
     figure.text(
@@ -68,7 +68,7 @@ def plot_one(grid: pd.DataFrame, seconds: float) -> None:
         color=SLATE,
     )
     figure.tight_layout(rect=(0, 0.04, 1, 0.98))
-    save(figure, f"path_b_{seconds:g}s")
+    save(figure, f"dataset_b_{seconds:g}s")
 
 
 def plot_after_board(after: pd.DataFrame) -> None:
@@ -77,9 +77,9 @@ def plot_after_board(after: pd.DataFrame) -> None:
     for col, seconds in enumerate(WIDTHS):
         draw(
             axes[col],
-            matrix(after, path="B", seconds=seconds, contrasts=PATH_B),
-            PATH_B,
-            title=f"After-reply Path B · {seconds:g} s",
+            matrix(after, dataset="B", seconds=seconds, contrasts=DATASET_B),
+            DATASET_B,
+            title=f"After-reply Dataset B · {seconds:g} s",
             show_ylabels=col == 0,
         )
     figure.colorbar(
@@ -89,7 +89,7 @@ def plot_after_board(after: pd.DataFrame) -> None:
         pad=0.02,
     ).set_label("Holm p")
     figure.suptitle(
-        "After-reply Path B Holm p · ICA · 16 features",
+        "After-reply Dataset B Holm p · ICA · 16 features",
         y=0.98,
         color=INK,
     )
@@ -101,7 +101,7 @@ def plot_after_board(after: pd.DataFrame) -> None:
         fontsize=8,
         color=SLATE,
     )
-    save(figure, "board_path_b_2_4_8s")
+    save(figure, "board_dataset_b_2_4_8s")
 
 
 def plot_vs_golden(golden: pd.DataFrame, after: pd.DataFrame) -> None:
@@ -115,15 +115,15 @@ def plot_vs_golden(golden: pd.DataFrame, after: pd.DataFrame) -> None:
     for col, seconds in enumerate(WIDTHS):
         draw(
             axes[0, col],
-            matrix(golden, path="B", seconds=seconds, contrasts=PATH_B),
-            PATH_B,
+            matrix(golden, dataset="B", seconds=seconds, contrasts=DATASET_B),
+            DATASET_B,
             title=f"Golden visual onset · {seconds:g} s",
             show_ylabels=col == 0,
         )
         draw(
             axes[1, col],
-            matrix(after, path="B", seconds=seconds, contrasts=PATH_B),
-            PATH_B,
+            matrix(after, dataset="B", seconds=seconds, contrasts=DATASET_B),
+            DATASET_B,
             title=f"After-reply lock · {seconds:g} s",
             show_ylabels=col == 0,
         )
@@ -134,7 +134,7 @@ def plot_vs_golden(golden: pd.DataFrame, after: pd.DataFrame) -> None:
         pad=0.02,
     ).set_label("Holm p")
     figure.suptitle(
-        "Path B Holm p · golden visual onset vs after-reply lock",
+        "Dataset B Holm p · golden visual onset vs after-reply lock",
         y=0.995,
         color=INK,
     )
@@ -142,11 +142,11 @@ def plot_vs_golden(golden: pd.DataFrame, after: pd.DataFrame) -> None:
         0.01,
         0.008,
         "Top = confirmatory lock (ad becomes visible). Bottom = finished reply + 0.49 s. "
-        "Same ICA, same 18 people, same Holm rule. Path A is unchanged and not shown.",
+        "Same ICA, same 18 people, same Holm rule. Dataset A is unchanged and not shown.",
         fontsize=8,
         color=SLATE,
     )
-    save(figure, "board_path_b_golden_vs_after_reply")
+    save(figure, "board_dataset_b_golden_vs_after_reply")
 
 
 def plot_familiar_board(golden: pd.DataFrame, after: pd.DataFrame) -> None:
@@ -160,16 +160,16 @@ def plot_familiar_board(golden: pd.DataFrame, after: pd.DataFrame) -> None:
     for col, seconds in enumerate(WIDTHS):
         draw(
             axes[0, col],
-            matrix(golden, path="A", seconds=seconds, contrasts=PATH_A),
-            PATH_A,
-            title=f"Path A golden · {seconds:g} s",
+            matrix(golden, dataset="A", seconds=seconds, contrasts=DATASET_A),
+            DATASET_A,
+            title=f"Dataset A golden · {seconds:g} s",
             show_ylabels=col == 0,
         )
         draw(
             axes[1, col],
-            matrix(after, path="B", seconds=seconds, contrasts=PATH_B),
-            PATH_B,
-            title=f"Path B after-reply · {seconds:g} s",
+            matrix(after, dataset="B", seconds=seconds, contrasts=DATASET_B),
+            DATASET_B,
+            title=f"Dataset B after-reply · {seconds:g} s",
             show_ylabels=col == 0,
         )
     figure.colorbar(
@@ -179,19 +179,19 @@ def plot_familiar_board(golden: pd.DataFrame, after: pd.DataFrame) -> None:
         pad=0.02,
     ).set_label("Holm p")
     figure.suptitle(
-        "Path A unchanged · Path B after-reply lock",
+        "Dataset A unchanged · Dataset B after-reply lock",
         y=0.995,
         color=INK,
     )
     figure.text(
         0.01,
         0.008,
-        "Path A is the golden tiled-condition tests. Path B uses the after-reply lock. "
+        "Dataset A is the golden tiled-condition tests. Dataset B uses the after-reply lock. "
         "Do not treat this as a replacement for the confirmatory board.",
         fontsize=8,
         color=SLATE,
     )
-    save(figure, "board_path_a_golden_path_b_after_reply")
+    save(figure, "board_dataset_a_golden_dataset_b_after_reply")
 
 
 def main() -> None:

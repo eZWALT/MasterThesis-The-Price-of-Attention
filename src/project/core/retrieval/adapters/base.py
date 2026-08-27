@@ -57,7 +57,7 @@ class DatasetAdapter(ABC):
 
     # ── Provided helpers ─────────────────────────────────────────────────
 
-    def read_jsonl(self, path: str | Path) -> Iterator[Dict[str, Any]]:
+    def read_jsonl(self, dataset: str | Path) -> Iterator[Dict[str, Any]]:
         """Yield parsed JSON objects from a JSONL file, skipping blanks."""
         with open(path, "r", encoding="utf-8") as fh:
             for line in fh:
@@ -66,7 +66,7 @@ class DatasetAdapter(ABC):
                     yield json.loads(line)
 
     def iter_catalog(
-        self, path: str | Path
+        self, dataset: str | Path
     ) -> Generator["CatalogItemDict", None, None]:
         """Full pipeline: read JSONL → map → yield normalised dicts."""
         for raw in self.read_jsonl(path):

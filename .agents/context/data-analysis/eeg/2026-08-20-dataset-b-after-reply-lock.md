@@ -1,9 +1,9 @@
-# Path B lock after the finished reply — rejected as primary
+# Dataset B lock after the finished reply — rejected as primary
 
 Date: 20 August 2026
 Branch: `eeg-path-b-after-reply`
 
-**Decision (Walter, 20 August):** keep the golden visual-onset Path B
+**Decision (Walter, 20 August):** keep the golden visual-onset Dataset B
 lock. After-reply is a dead sensitivity. It did not improve the 4 s
 confirmatory tests. Do not promote it. Do not touch golden Gold.
 
@@ -13,7 +13,7 @@ Same verdict: 4 s confirmatory still null. Do not commit that folder.
 
 What “onset” means: `2026-08-20-what-path-b-onset-is.md`.
 
-The confirmatory Path B lock stays what it is on `main`:
+The confirmatory Dataset B lock stays what it is on `main`:
 
 ```text
 t = 0  visual ad onset
@@ -42,7 +42,7 @@ The lab chat **streams** the assistant text (`st.write_stream`).
   exists **after the whole reply is sent**.
 - **Explicit:** `_render_turn_ads` paints the banner on that same rerun
   and logs `ad_displayed`. The banner is **after** the reply. Current
-  Path B is already about this moment (reply + ~0.5 s).
+  Dataset B is already about this moment (reply + ~0.5 s).
 
 So Walter’s read is right for implicit, and already roughly true for
 explicit. The mismatch is the implicit lock vs the no-ad lock.
@@ -86,7 +86,7 @@ gold/features/sensitivity/after_reply/ad_response_features.csv
 statistics/outputs/sensitivity/after_reply/eeg_ad_response_contrasts.csv
 ```
 
-Reuse `candidate_v1` ICA. No `--overwrite`. Path A is unchanged.
+Reuse `candidate_v1` ICA. No `--overwrite`. Dataset A is unchanged.
 
 ## What this will and will not answer
 
@@ -95,11 +95,11 @@ before the URL existed.” It cannot become the paper primary by peeking
 at *p*. Primary stays the frozen visual-onset 4 s + median + ICA unless
 Sebastian agrees to change the estimand **before** looking.
 
-Path A is irrelevant here. Those tiles cover the whole condition.
+Dataset A is irrelevant here. Those tiles cover the whole condition.
 
 ## Built 20 August 2026 (this branch)
 
-Runner: `analysis/eeg/preprocessing/run_after_reply_path_b.py`
+Runner: `analysis/eeg/preprocessing/run_after_reply_dataset_b.py`
 Heatmaps: `analysis/eeg/analysis/outputs/figures/eeg_only/heatmaps/after_reply/`
 
 Onset moved relative to golden visual onset:
@@ -109,7 +109,7 @@ Onset moved relative to golden visual onset:
 
 All 216 windows eligible at 2 / 4 s; 8 s dropped one pair (107/108).
 
-Confirmatory Path B (Fz theta, posterior alpha), ICA, Holm within feature:
+Confirmatory Dataset B (Fz theta, posterior alpha), ICA, Holm within feature:
 
 | Width | What changed |
 |---|---|

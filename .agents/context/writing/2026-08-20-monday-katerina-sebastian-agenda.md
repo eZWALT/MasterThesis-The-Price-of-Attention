@@ -19,7 +19,7 @@ This meeting is for **decisions and ownership**, not a methods seminar.
 - Design: implicit vs explicit; early = turn 2; late = turn 4; five
   conditions + \(a^{\emptyset}\). Implicit ≠ subliminal ≠ covert.
 - Inferential unit is the **participant**.
-- EEG primary: 4 s + median + ICA. Path A/B confirmatory Holm-null.
+- EEG primary: 4 s + median + ICA. Dataset A/B confirmatory Holm-null.
 - 8 s late-explicit alpha and 2 s early-explicit theta are sensitivity only
   (mention both). Full CIs:
   `../data-analysis/eeg/2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
@@ -39,13 +39,13 @@ Confirm the confirmatory framing; this is not another ICA tutorial.
 1. **ICA 99%.** `n_components=0.99` is fit dimensionality, not variance
    kept after `apply`. Held-after-apply: median 65%, min 25%, Subjects
    11/15 ~75% removed. ICA is primary; no-ICA is mandatory sensitivity.
-   Six Path B exploratory hits are ICA-only and stay labelled that way.
+   Six Dataset B exploratory hits are ICA-only and stay labelled that way.
    Ask: is that an acceptable primary, or does he want no-ICA in the
    main text too?
-2. **Epoch width.** 4 s was frozen before the grid. Path A null at every
+2. **Epoch width.** 4 s was frozen before the grid. Dataset A null at every
    width. 2 s and 8 s light up *different* cells (early theta vs late
    alpha). Confirm: do not switch primary to 8 s.
-3. **Null framing.** Pipeline is alive (read/write). Path A CI is tight
+3. **Null framing.** Pipeline is alive (read/write). Dataset A CI is tight
    around zero. Ask: one confirmatory EEG sentence + appendix
    robustness, or does he want a longer EEG Results?
 4. **Paper cut.** 14 RQs + H1–H3 must collapse to the five-goal order.

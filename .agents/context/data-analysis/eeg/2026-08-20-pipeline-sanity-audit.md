@@ -9,7 +9,7 @@ Walter asked whether the EEG data can actually be analyzed, given the
 
 **Analyzable**, with the caveats already on the books. No fatal
 implementation bug turned up. The null is a small, precisely estimated
-Path A effect plus a noisy Path B slice, not scrambled IDs or inverted
+Dataset A effect plus a noisy Dataset B slice, not scrambled IDs or inverted
 arithmetic. The 19 August read-versus-write control already showed the
 same 4 s ICA chain can recover Fz theta (writing−reading +0.60 dB,
 Holm 0.007, \(d_z=0.80\)).
@@ -21,9 +21,9 @@ Holm 0.007, \(d_z=0.80\)).
 - 108 condition summaries, 90 eligible condition rows, 9,468 / 9,449
   retained 4 s epochs, 108/108 eligible ad pairs, 216/216 retained ad
   epochs. All `ica_applied=yes`. No NaNs in the 16 spectral features.
-- Path A any-ad Fz theta recomputed from Gold medians: mean −0.0847,
+- Dataset A any-ad Fz theta recomputed from Gold medians: mean −0.0847,
   matches `eeg_condition_contrasts.csv` to 1e−12. Score vectors match.
-- Path B `post − pre` matches epoch rows: 0 mismatches in 1,728 cells.
+- Dataset B `post − pre` matches epoch rows: 0 mismatches in 1,728 cells.
 - Condition windows: no overlaps, no negative starts. No person has
   five identical Fz-theta medians.
 - JSONL–XDF clock RMSE 15–29 µs on eligible recordings.
@@ -34,12 +34,12 @@ Holm 0.007, \(d_z=0.80\)).
 
 ## Why the null is not a red flag
 
-Path A any-ad Fz theta CI is [−0.23, +0.06] dB (dz −0.28). n=18 needs
+Dataset A any-ad Fz theta CI is [−0.23, +0.06] dB (dz −0.28). n=18 needs
 about |dz| ≈ 0.66 for 80% power. A tight CI around zero is what a
 working pipeline looks like when the contrast is small.
 
-Path B SD for a comparable Fz-theta contrast is ~2.0 dB versus ~0.30 dB
-on Path A. 30 of 36 implicit onsets are derived (p95 lag error 0.43 s).
+Dataset B SD for a comparable Fz-theta contrast is ~2.0 dB versus ~0.30 dB
+on Dataset A. 30 of 36 implicit onsets are derived (p95 lag error 0.43 s).
 That is why 2 s / 8 s Holm cells appear and disappear. Keep 4 s primary.
 
 ## Still true, still not bugs

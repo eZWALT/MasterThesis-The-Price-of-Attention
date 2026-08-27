@@ -1,4 +1,4 @@
-"""Organised EEG-only Holm heatmaps at 2 / 4 / 8 s for Path A and Path B.
+"""Organised EEG-only Holm heatmaps at 2 / 4 / 8 s for Dataset A and Dataset B.
 
 Writes PNG (300 dpi) and PDF under outputs/figures/eeg_only/heatmaps/.
 
@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 
-from condition_labels import PATH_A_LABELS, PATH_B_LABELS
+from condition_labels import DATASET_A_LABELS, DATASET_B_LABELS
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -50,8 +50,8 @@ FEATURES = [
     ("engagement_pope_frontocentral_beta_over_alpha_theta", "Pope FC"),
     ("engagement_kislov_central_beta16_24_over_alpha8_12", "Kislov"),
 ]
-PATH_A = list(PATH_A_LABELS.items())
-PATH_B = list(PATH_B_LABELS.items())
+DATASET_A = list(DATASET_A_LABELS.items())
+DATASET_B = list(DATASET_B_LABELS.items())
 WIDTHS = (2.0, 4.0, 8.0)
 POLICY = "ica"
 
@@ -82,7 +82,7 @@ def save(figure: plt.Figure, stem: str) -> None:
 def matrix(
     grid: pd.DataFrame,
     *,
-    path: str,
+    dataset: str,
     seconds: float,
     contrasts: list[tuple[str, str]],
 ) -> np.ndarray:
@@ -144,22 +144,22 @@ def draw(
 def plot_one(
     grid: pd.DataFrame,
     *,
-    path: str,
+    dataset: str,
     seconds: float,
     contrasts: list[tuple[str, str]],
     stem: str,
     title: str,
 ) -> None:
     style()
-    values = matrix(grid, path=path, seconds=seconds, contrasts=contrasts)
-    figure, axis = plt.subplots(figsize=(7.2 if path == "A" else 8.4, 8.6))
+    values = matrix(grid, dataset=dataset, seconds=seconds, contrasts=contrasts)
+    figure, axis = plt.subplots(figsize=(7.2 if dataset == "A" else 8.4, 8.6))
     draw(axis, values, contrasts, title=title, show_ylabels=True)
     figure.text(
         0.01,
         0.012,
         "Holm p within feature across the primary contrasts at this width, "
         "not across lengths. * = confirmatory features. Orange = Holm < 0.05. "
-        f"ICA. n=18 except 8 s Path B early n=17. Source: {GRID.name}.",
+        f"ICA. n=18 except 8 s Dataset B early n=17. Source: {GRID.name}.",
         fontsize=8,
         color=SLATE,
     )
@@ -178,16 +178,16 @@ def plot_board(grid: pd.DataFrame) -> None:
     for col, seconds in enumerate(WIDTHS):
         draw(
             axes[0, col],
-            matrix(grid, path="A", seconds=seconds, contrasts=PATH_A),
-            PATH_A,
-            title=f"Path A · {seconds:g} s",
+            matrix(grid, dataset="A", seconds=seconds, contrasts=DATASET_A),
+            DATASET_A,
+            title=f"Dataset A · {seconds:g} s",
             show_ylabels=col == 0,
         )
         draw(
             axes[1, col],
-            matrix(grid, path="B", seconds=seconds, contrasts=PATH_B),
-            PATH_B,
-            title=f"Path B · {seconds:g} s",
+            matrix(grid, dataset="B", seconds=seconds, contrasts=DATASET_B),
+            DATASET_B,
+            title=f"Dataset B · {seconds:g} s",
             show_ylabels=col == 0,
         )
     cbar = figure.colorbar(
@@ -208,15 +208,15 @@ def plot_board(grid: pd.DataFrame) -> None:
         "Rows 1–2 (above the line) are confirmatory: Fz theta and posterior alpha. "
         "Holm is within feature at that width, not across 2/4/8 s. "
         "Primary remains 4 s. Orange = Holm < 0.05. "
-        "Path B early at 8 s is n=17. Source: epoch_length_grid_comparison.csv · 19 Aug 2026.",
+        "Dataset B early at 8 s is n=17. Source: epoch_length_grid_comparison.csv · 19 Aug 2026.",
         fontsize=8,
         color=SLATE,
     )
-    save(figure, "board_path_a_b_2_4_8s")
+    save(figure, "board_dataset_a_b_2_4_8s")
 
 
 def plot_board_4s(grid: pd.DataFrame) -> None:
-    """Frozen 4 s ICA board: Path A (3) + Path B (4), all 16 features."""
+    """Frozen 4 s ICA board: Dataset A (3) + Dataset B (4), all 16 features."""
     style()
     figure, axes = plt.subplots(
         1,
@@ -226,16 +226,16 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
     )
     draw(
         axes[0],
-        matrix(grid, path="A", seconds=4.0, contrasts=PATH_A),
-        PATH_A,
-        title="Path A · 4 s · ICA",
+        matrix(grid, dataset="A", seconds=4.0, contrasts=DATASET_A),
+        DATASET_A,
+        title="Dataset A · 4 s · ICA",
         show_ylabels=True,
     )
     draw(
         axes[1],
-        matrix(grid, path="B", seconds=4.0, contrasts=PATH_B),
-        PATH_B,
-        title="Path B · 4 s · ICA",
+        matrix(grid, dataset="B", seconds=4.0, contrasts=DATASET_B),
+        DATASET_B,
+        title="Dataset B · 4 s · ICA",
         show_ylabels=False,
     )
     cbar = figure.colorbar(
@@ -246,7 +246,7 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
     )
     cbar.set_label("Holm p")
     figure.suptitle(
-        "4 s Holm p · ICA · 16 features (Path A + Path B)",
+        "4 s Holm p · ICA · 16 features (Dataset A + Dataset B)",
         y=0.995,
         color=INK,
     )
@@ -254,13 +254,13 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
         0.01,
         0.008,
         "Rows 1–2 (above the line) are confirmatory and Holm-null. "
-        "Orange cells are exploratory Path B hits, ICA-only; they are not a second primary. "
+        "Orange cells are exploratory Dataset B hits, ICA-only; they are not a second primary. "
         "Holm is within feature across the 3 (A) or 4 (B) contrasts at 4 s, not across the 16 features. "
         "n=18. Source: epoch_length_grid_comparison.csv.",
         fontsize=8,
         color=SLATE,
     )
-    save(figure, "board_path_a_b_4s")
+    save(figure, "board_dataset_a_b_4s")
 
 
 def main() -> None:
@@ -270,19 +270,19 @@ def main() -> None:
     for seconds in WIDTHS:
         plot_one(
             grid,
-            path="A",
+            dataset="A",
             seconds=seconds,
-            contrasts=PATH_A,
-            stem=f"path_a_{seconds:g}s",
-            title=f"Path A Holm p · {seconds:g} s · ICA",
+            contrasts=DATASET_A,
+            stem=f"dataset_a_{seconds:g}s",
+            title=f"Dataset A Holm p · {seconds:g} s · ICA",
         )
         plot_one(
             grid,
-            path="B",
+            dataset="B",
             seconds=seconds,
-            contrasts=PATH_B,
-            stem=f"path_b_{seconds:g}s",
-            title=f"Path B Holm p · {seconds:g} s · ICA",
+            contrasts=DATASET_B,
+            stem=f"dataset_b_{seconds:g}s",
+            title=f"Dataset B Holm p · {seconds:g} s · ICA",
         )
 
 

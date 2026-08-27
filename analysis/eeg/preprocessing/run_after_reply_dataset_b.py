@@ -1,4 +1,4 @@
-"""Parallel Path B after the finished reply. Does not write golden Gold.
+"""Parallel Dataset B after the finished reply. Does not write golden Gold.
 
 Lock: assistant_reply + frozen explicit banner lag, for ads and matched
 no-ad. Cleans each recording once with apply_saved_ica. Writes only under
@@ -243,7 +243,7 @@ def extract_ad_epochs(
     return rows
 
 
-def write_path_b(epoch_rows: list[dict[str, Any]], output: Path) -> Path:
+def write_dataset_b(epoch_rows: list[dict[str, Any]], output: Path) -> Path:
     assert_parallel(output)
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in epoch_rows:
@@ -257,7 +257,7 @@ def write_path_b(epoch_rows: list[dict[str, Any]], output: Path) -> Path:
     write_csv(responses_path, responses)
     eligible = sum(row["primary_analysis_eligible"] == "yes" for row in responses)
     print(
-        f"  Path B: {len(epoch_rows)} epochs, {len(responses)} pairs "
+        f"  Dataset B: {len(epoch_rows)} epochs, {len(responses)} pairs "
         f"({eligible} eligible)"
     )
     return responses_path
@@ -454,7 +454,7 @@ def run(*, skip_features: bool) -> None:
             output = feature_dir(seconds)
             output.mkdir(parents=True, exist_ok=True)
             print(f"after_reply {seconds:g}s: writing features", flush=True)
-            responses = write_path_b(accum[seconds], output)
+            responses = write_dataset_b(accum[seconds], output)
             stats = stats_dir(seconds)
             stats.mkdir(parents=True, exist_ok=True)
             assert_parallel(stats / "eeg_ad_response_contrasts.csv")

@@ -1,4 +1,4 @@
-# What Path B “onset” is
+# What Dataset B “onset” is
 
 Date: 20 August 2026
 
@@ -22,7 +22,7 @@ On one ad turn the log has (at least) three different clocks:
 |---|---|---|
 | **inject** | Server stuffed the product into the prompt | before anything new is on screen |
 | **reply** | `assistant_reply` — stream ended, full text is in the log | message finished sending |
-| **onset** | Best estimate of **when the ad became visible** | the Path B lock |
+| **onset** | Best estimate of **when the ad became visible** | the Dataset B lock |
 
 Those are not the same instant.
 
@@ -52,7 +52,7 @@ spectrum. Useless for an ERP.
 2. Reply appears (~0.5 s **before** onset). The assistant text is
    already up.
 3. **Onset:** banner appears above the reply.
-4. Path B post is the next 4 s: labelled ad + the reply that was
+4. Dataset B post is the next 4 s: labelled ad + the reply that was
    already there.
 
 ## One implicit turn, in order
@@ -63,7 +63,7 @@ spectrum. Useless for an ERP.
    plain text; the URL is not clickable yet.
 3. Reply marker (~1.6 s **after** onset). Stream done. Next rerun
    linkifies the URL.
-4. Path B post is 4 s from that mid-stream estimate, so it usually
+4. Dataset B post is 4 s from that mid-stream estimate, so it usually
    contains the reply start. A 2 s post often misses the reply.
 
 ## What we tried and rejected
@@ -76,4 +76,4 @@ stayed Holm-null. The 2 s explicit-early Fz theta hit died.
 **Keep the golden visual-onset lock.** After-reply is a sensitivity
 only. See `2026-08-20-path-b-after-reply-lock.md`.
 
-Path A does not use this clock. Path A tiles the whole condition.
+Dataset A does not use this clock. Dataset A tiles the whole condition.

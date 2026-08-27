@@ -16,7 +16,7 @@
 - Pull the relevant Overleaf mirror before drafting or editing. Show proposed
   text before applying; push only after explicit approval.
 - **Results ≠ Discussion.** Results report estimands and numbers.
-  Discussion interprets (precise null vs dead pipeline, Path B not
+  Discussion interprets (precise null vs dead pipeline, Dataset B not
   absence, abstract placement, design implications, H1–H3). EEG 6.3 is
   confirmatory; 7.3 is the EEG read. Lock:
   `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
@@ -50,9 +50,9 @@ Medallion zones under `src/project/logs/xdf/` (Bronze is immutable):
   timelines; `silver/audits/` — channel and recording QC;
   `silver/ica/candidate_v1/` — fitted ICA models, see the banner above.
 - `gold/windows/condition_windows.csv` — window definitions.
-- `gold/features/condition_features.csv` — **Path A**, one row per
+- `gold/features/condition_features.csv` — **Dataset A**, one row per
   participant × condition, 18 subjects, all `primary_analysis_eligible`.
-- `gold/features/ad_response_features.csv` — **Path B**, one row per
+- `gold/features/ad_response_features.csv` — **Dataset B**, one row per
   participant × advertisement, with onset estimator and uncertainty.
 - `gold/features/task_state/task_state_person_features.csv` — the
   writing-versus-reading positive control.

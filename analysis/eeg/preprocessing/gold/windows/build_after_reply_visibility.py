@@ -1,4 +1,4 @@
-"""After-reply Path B onsets. Writes only under sensitivity/after_reply/.
+"""After-reply Dataset B onsets. Writes only under sensitivity/after_reply/.
 
 t=0 is assistant_reply plus the frozen explicit banner lag, for every
 ad format. This is not the confirmatory visual-onset lock.

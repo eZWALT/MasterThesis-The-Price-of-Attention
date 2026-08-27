@@ -324,7 +324,7 @@ def load_xdf_markers(path: Path) -> XdfMarkerData:
     return XdfMarkerData(
         subject_id=f"lab_subject_{number}",
         subject_number=number,
-        path=path,
+        dataset=dataset,
         markers=tuple(markers),
         marker_stream_count=len(marker_streams),
         eeg_start_lsl=float(eeg_timestamps[0]) if len(eeg_timestamps) else None,

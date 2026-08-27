@@ -23,7 +23,7 @@ Filled his skeleton in `chapters/dataset.tex`:
 - Trajectories: Bronze / Silver / Gold, two Gold grains, table
   `\label{tab:trajectory-medallion}`, \(f_{\mathrm{genre}}\),
   `genre_source` as rows, primary = bare utterance. No results numbers.
-- EEG: same contract, Path A / Path B, \(n=18\), participant is the
+- EEG: same contract, Dataset A / Dataset B, \(n=18\), participant is the
   unit. Paper 5.6 ported into Dataset (preprocessing + two Gold
   tables) on 23 Aug local; not pushed. See
   `2026-08-23-thesis-eeg-gold-ported.md`.

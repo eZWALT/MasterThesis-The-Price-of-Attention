@@ -4,7 +4,7 @@ Date: 19 August 2026
 
 ## Keep median as primary
 
-Path A window summaries stay **median of retained 4 s epoch dB**, not the
+Dataset A window summaries stay **median of retained 4 s epoch dB**, not the
 mean. A mean-of-epoch-dB rebuild (ICA and no-ICA) left every Holm test
 null: **0 / 48** on both aggregators. Confirmatory means barely moved
 (Fz theta any-ad−no-ad: median −0.085, mean −0.063). The null is not
@@ -15,7 +15,7 @@ pass 1,050 µV still pull a mean more than a median. The synthetic unit
 test `test_window_mean_is_arithmetic_mean_of_retained_epoch_db` shows
 that split.
 
-Path B has **no aggregator**. Each ad is one 4 s pre and one 4 s post.
+Dataset B has **no aggregator**. Each ad is one 4 s pre and one 4 s post.
 Mean vs median does not apply there.
 
 Outputs (do not replace primary Gold):
@@ -47,15 +47,15 @@ format or timing from EEG.
 ## Epoch-length grid (done; not a fishing licence)
 
 Grid ran 19 August. Primary stays **4 s + median + ICA**. The 2 s and
-8 s Path B cells are a sensitivity mention (both or neither). Full
+8 s Dataset B cells are a sensitivity mention (both or neither). Full
 CIs: `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`. Contract:
 `2026-08-19-epoch-length-grid.md`.
 
 - Do not pick 2 s or 8 s because a Holm cell appeared.
 - Do not pick 16 s or 32 s because it is the one that “comes out.”
-- Path A: 2–32 s only changes tile size; the condition is still minutes
+- Dataset A: 2–32 s only changes tile size; the condition is still minutes
   long. Holm-null at every width.
-- Path B: the window **is** the observation; 16–32 s around an ad is a
+- Dataset B: the window **is** the observation; 16–32 s around an ad is a
   different question (and 32+32 s read/write pairs do not fit a typical
   52 s turn).
 

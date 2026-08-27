@@ -32,7 +32,7 @@ or an appendix if a reviewer asks. Secondary bands stay unpublished.
 
 ## Why it exists
 
-Q1 (Path A) and Q2 (Path B) came back Holm-null on the two confirmatory
+Q1 (Dataset A) and Q2 (Dataset B) came back Holm-null on the two confirmatory
 features. A null has two readings:
 
 1. ads do not move Fz theta / posterior alpha in this design;

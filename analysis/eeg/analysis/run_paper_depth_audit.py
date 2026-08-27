@@ -22,8 +22,8 @@ ANALYSIS = REPOSITORY_ROOT / "analysis/eeg/analysis/outputs"
 OUT = ANALYSIS / "paper_depth"
 
 PRIMARY_FEATURES = ("fz_theta_power_db_uv2", "posterior_alpha_power_db_uv2")
-PATH_A_PRIMARY = ("any_ad_vs_no_ads", "inline_vs_block", "early_vs_late")
-PATH_B_PRIMARY = (
+DATASET_A_PRIMARY = ("any_ad_vs_no_ads", "inline_vs_block", "early_vs_late")
+DATASET_B_PRIMARY = (
     "inline_early_vs_no_ad_early",
     "block_early_vs_no_ad_early",
     "inline_late_vs_no_ad_late",
@@ -168,8 +168,8 @@ def main() -> None:
     loo_frames = []
     n = 18
     for path, tests, scores, contrasts, family in (
-        ("A", condition_tests, condition_scores, PATH_A_PRIMARY, 3),
-        ("B", ad_tests, ad_scores, PATH_B_PRIMARY, 4),
+        ("A", condition_tests, condition_scores, DATASET_A_PRIMARY, 3),
+        ("B", ad_tests, ad_scores, DATASET_B_PRIMARY, 4),
     ):
         alpha_holm = 0.05 / family
         alpha_raw = 0.05
@@ -188,13 +188,13 @@ def main() -> None:
                 check = verify_t(diffs, stored)
                 people = loo_people(scores, contrast_id, feature)
                 people["people"] = people["people"].assign(
-                    path=path,
+                    dataset=dataset,
                     contrast_id=contrast_id,
                     feature=feature,
                 )
                 loo_frames.append(people["people"])
                 diag = diagnostics[
-                    (diagnostics["analysis"] == ("condition" if path == "A" else "ad"))
+                    (diagnostics["analysis"] == ("condition" if dataset == "A" else "ad"))
                     & (diagnostics["contrast_id"] == contrast_id)
                     & (diagnostics["feature"] == feature)
                 ]
@@ -312,14 +312,14 @@ def main() -> None:
         )
     exploratory = pd.DataFrame(expl_rows)
 
-    path_a_holm_hits = int(
+    dataset_a_holm_hits = int(
         (
             (condition_tests["contrast_tier"] == "primary")
             & (condition_tests["p_t_holm"] != "")
             & (condition_tests["p_t_holm"].astype(float) < 0.05)
         ).sum()
     )
-    path_b_conf_hits = int(
+    dataset_b_conf_hits = int(
         (
             (ad_tests["contrast_tier"] == "primary")
             & (ad_tests["feature"].isin(PRIMARY_FEATURES))
@@ -331,7 +331,7 @@ def main() -> None:
         "n": 18,
         "recomputed_all_means_match": bool(confirmatory["recomputed_mean_match"].all()),
         "recomputed_all_p_match": bool(confirmatory["recomputed_p_match"].all()),
-        "path_a_primary_holm_hits": 0
+        "dataset_a_primary_holm_hits": 0
         if int(
             (
                 (confirmatory["path"] == "A")
@@ -345,12 +345,12 @@ def main() -> None:
                 & (confirmatory["p_t_holm"] < 0.05)
             ).sum()
         ),
-        "path_a_all_feature_primary_holm_hits": path_a_holm_hits,
-        "path_b_confirmatory_holm_hits": path_b_conf_hits,
-        "path_a_all_cis_inside_0p3db": bool(
+        "dataset_a_all_feature_primary_holm_hits": dataset_a_holm_hits,
+        "dataset_b_confirmatory_holm_hits": dataset_b_conf_hits,
+        "dataset_a_all_cis_inside_0p3db": bool(
             confirmatory.loc[confirmatory["path"] == "A", "inside_pm_0p3"].all()
         ),
-        "path_b_any_ci_inside_1db": bool(
+        "dataset_b_any_ci_inside_1db": bool(
             confirmatory.loc[confirmatory["path"] == "B", "inside_pm_1p0"].any()
         ),
         "bootstrap_t_zero_disagreements": confirmatory.loc[
@@ -358,14 +358,14 @@ def main() -> None:
             ["path", "contrast", "feature", "ci_lower", "ci_upper", "bootstrap_ci_lower", "bootstrap_ci_upper"],
         ].to_dict(orient="records"),
         "exploratory_ica_only_holm_hits": expl_rows,
-        "mde_path_a_theta_anyad_holm80": float(
+        "mde_dataset_a_theta_anyad_holm80": float(
             confirmatory[
                 (confirmatory["path"] == "A")
                 & (confirmatory["contrast_id"] == "any_ad_vs_no_ads")
                 & (confirmatory["feature"] == "Fz theta")
             ]["mde_db_holm80"].iloc[0]
         ),
-        "mde_path_b_explicit_early_theta_holm80": float(
+        "mde_dataset_b_explicit_early_theta_holm80": float(
             confirmatory[
                 (confirmatory["path"] == "B")
                 & (confirmatory["contrast_id"] == "block_early_vs_no_ad_early")

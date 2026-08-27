@@ -12,10 +12,10 @@ Confirmatory primary (unchanged): 4 s, median, ICA, person as \(n\).
 
 | Analysis | Result | Artefact |
 |---|---|---|
-| Path A, 4 s | Holm-null on all 16×3 tests | `eeg_condition_contrasts.csv`; figures 02, 07, 08, 12 |
-| Path B, 4 s | Confirmatory Holm-null; 6 ICA-only exploratory hits | `eeg_ad_response_contrasts.csv`; figures 03, 08, 09 |
+| Dataset A, 4 s | Holm-null on all 16×3 tests | `eeg_condition_contrasts.csv`; figures 02, 07, 08, 12 |
+| Dataset B, 4 s | Confirmatory Holm-null; 6 ICA-only exploratory hits | `eeg_ad_response_contrasts.csv`; figures 03, 08, 09 |
 | Mean vs median | Still 0/48 Holm | `sensitivity/mean_of_epoch_db/` |
-| Epoch grid 2–32 s | Path A null at every width; 3 confirmatory Path B cells that do not hold at 4 s | `epoch_length_grid_comparison.csv`; figures 10, 11 |
+| Epoch grid 2–32 s | Dataset A null at every width; 3 confirmatory Dataset B cells that do not hold at 4 s | `epoch_length_grid_comparison.csv`; figures 10, 11 |
 | ICA vs no-ICA | ICA primary; effects agree in sign more than size | figure 13 |
 | Read vs write | **Fz theta writing−reading +0.60 dB, Holm 0.007, \(d_z=0.80\), n=18**. Posterior alpha null (Holm 0.75) | `outputs/task_state/`; figures 14, 15 |
 | Session order | Last−first condition null (theta p=0.47, alpha p=0.20) | `eeg_session_order_contrasts.csv`; figure 16 |
@@ -61,7 +61,7 @@ Figure cut and Results sentences (20 August lock):
 
 Main text, at most two EEG figures, both at **4 s**:
 
-- `suite/figure_08_confirmatory_forests` — Path A + Path B money plot
+- `suite/figure_08_confirmatory_forests` — Dataset A + Dataset B money plot
 - `suite/figure_07_condition_rainclouds` — person-level overlap (optional
   second figure; skip if space is tight)
 
@@ -69,7 +69,7 @@ Do **not** also use `figure_02` / `figure_03` if 08 is in. Pipeline
 figure stays the existing Overleaf flow (`eeg_pipeline`), not
 `figure_01`.
 
-Appendix only, if mentioned: 09 (Path B slopes), 06 (threshold), 10 or
+Appendix only, if mentioned: 09 (Dataset B slopes), 06 (threshold), 10 or
 11 (epoch grid; show both 2 s and 8 s cells, do not re-freeze either),
 13 (ICA vs no-ICA).
 
@@ -78,7 +78,7 @@ Not for the paper: 14, 15 (sanity check), 16 (session order).
 Primary epoch width for the paper is **4 s**. 2 s and 8 s are a
 sensitivity footnote (both cells), not the reported analysis.
 
-Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Path A and Path B):
+Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Dataset A and Dataset B):
 
 `analysis/eeg/analysis/outputs/figures/eeg_only/`
 
@@ -86,7 +86,7 @@ Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Path A and Path B):
 python analysis/eeg/analysis/plot_eeg_only_heatmaps.py
 ```
 
-Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Path A and Path B):
+Organised EEG-only hub (heatmaps at 2 / 4 / 8 s, Dataset A and Dataset B):
 
 `analysis/eeg/analysis/outputs/figures/eeg_only/`
 

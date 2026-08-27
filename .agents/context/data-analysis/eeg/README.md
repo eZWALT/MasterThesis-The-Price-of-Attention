@@ -12,7 +12,7 @@ pipelines, generated manifests, and participant-level outputs remain under
 ## Current entries
 
 - `2026-08-20-paper-depth-audit.md`
-  independent recomputation, MDE, Path A \(\pm 0.3\) dB compatibility,
+  independent recomputation, MDE, Dataset A \(\pm 0.3\) dB compatibility,
   bootstrap-vs-\(t\) leans, six ICA-only exploratory hits locked.
   Runner: `analysis/eeg/analysis/run_paper_depth_audit.py`.
 - `2026-08-20-paper-figures-and-narrative.md`
@@ -26,17 +26,17 @@ pipelines, generated manifests, and participant-level outputs remain under
 - `CRITICAL-do-not-overwrite-ica-models.md`
   is the hard stop on refitting or replacing the 2026-08-19 ICA archive.
 - `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`
-  frozen paper story: 4 s confirmatory + both off-width Path B cells
+  frozen paper story: 4 s confirmatory + both off-width Dataset B cells
   as sensitivity. Full means, 95% CIs, \(d_z\), Holm, Wilcoxon.
 - `2026-08-20-what-path-b-onset-is.md`
-  Path B \(t=0\) is when the ad becomes visible, not “they noticed it”
+  Dataset B \(t=0\) is when the ad becomes visible, not “they noticed it”
   and not “message finished.” Read this before arguing about locks.
   (Referenced from the after-reply note; keep the golden lock.)
 - `2026-08-20-path-b-after-reply-lock.md`
   tried locking after the finished reply. **Rejected as primary.**
   Golden visual-onset lock stays. Do not overwrite golden Gold.
 - `2026-08-20-pipeline-sanity-audit.md`
-  Gold IDs, Path A/B arithmetic, and why the 4 s Holm-null is not a
+  Gold IDs, Dataset A/B arithmetic, and why the 4 s Holm-null is not a
   scrambled pipeline.
 - `2026-08-20-eeg-pipeline-figure-v2.md`
   thesis preprocessing figure; do not edit the 6 Aug original.
@@ -88,8 +88,8 @@ pipelines, generated manifests, and participant-level outputs remain under
   result, so median stays primary, and that a 2/4/8/16/32 s grid is a
   robustness check rather than a search for a publishable p-value.
 - `2026-08-19-epoch-length-grid.md`
-  records the 2/8/16/32 s rebuild (4 s reused): Path A remains Holm-null
-  at every width; three confirmatory Path B Holm cells appeared (2 s Fz
+  records the 2/8/16/32 s rebuild (4 s reused): Dataset A remains Holm-null
+  at every width; three confirmatory Dataset B Holm cells appeared (2 s Fz
   theta ICA-only; 8 s posterior alpha under both ICA and no-ICA). Primary
   stays 4 s + median + ICA. Paper numbers live in
   `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
@@ -103,11 +103,11 @@ pipelines, generated manifests, and participant-level outputs remain under
   0.007). It did not prove ads work. Not for the abstract as an ad
   finding.
 - `2026-08-19-eeg-only-analyses-complete.md`
-  is the EEG-only stop line: Path A/B nulls, epoch grid, ICA, read-versus-
+  is the EEG-only stop line: Dataset A/B nulls, epoch grid, ICA, read-versus-
   write positive control, session-order null, and the figure suite. Next
   EEG work is manuscript prose and C1 after Goal 1.
   Figure hub: `analysis/eeg/analysis/outputs/figures/eeg_only/`
-  (Holm heatmaps Path A/B at 2 / 4 / 8 s).
+  (Holm heatmaps Dataset A/B at 2 / 4 / 8 s).
 - `2026-08-19-literature-justifications-in-overleaf.md`
   records the literature sanity-check on the median collapse and
   person-level Holm tests, the short cite set parked as Overleaf
@@ -128,8 +128,8 @@ pipelines, generated manifests, and participant-level outputs remain under
   Gold says **4 s epochs** (not tiles); shape rail is
   \(X\to\tilde{X}\to E\to Y_A,Y_B\) with
   \(X,\tilde{X}\in\mathbb{R}^{18\times 32\times T_i}\) and
-  \(E\in\mathbb{R}^{18\times K_i\times 32\times 2000}\) (Path A
-  \(K_i\) varies; Path B \(K_i=12\)) and no `y(16)`.
+  \(E\in\mathbb{R}^{18\times K_i\times 32\times 2000}\) (Dataset A
+  \(K_i\) varies; Dataset B \(K_i=12\)) and no `y(16)`.
 
 Publication figure: original
 `src/project/docs/eeg_pipeline/eeg_pipeline.png` is frozen (6 Aug). v2 is

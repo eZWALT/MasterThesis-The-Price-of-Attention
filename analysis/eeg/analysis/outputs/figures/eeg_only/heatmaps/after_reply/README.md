@@ -1,9 +1,9 @@
-# After-reply Path B heatmaps
+# After-reply Dataset B heatmaps
 
 Parallel sensitivity. **Not** the confirmatory lock.
 
 ```bash
-python analysis/eeg/preprocessing/run_after_reply_path_b.py
+python analysis/eeg/preprocessing/run_after_reply_dataset_b.py
 python analysis/eeg/analysis/plot_after_reply_heatmaps.py
 ```
 
@@ -15,7 +15,7 @@ Golden visual-onset Gold is untouched. These files live only under
 
 | File | What |
 |---|---|
-| `board_path_b_golden_vs_after_reply` | Top = golden Path B; bottom = this lock |
-| `board_path_b_2_4_8s` | After-reply Path B only |
-| `path_b_2s` / `path_b_4s` / `path_b_8s` | Singles |
-| `board_path_a_golden_path_b_after_reply` | Unchanged Path A + this Path B |
+| `board_dataset_b_golden_vs_after_reply` | Top = golden Dataset B; bottom = this lock |
+| `board_dataset_b_2_4_8s` | After-reply Dataset B only |
+| `dataset_b_2s` / `dataset_b_4s` / `dataset_b_8s` | Singles |
+| `board_dataset_a_golden_dataset_b_after_reply` | Unchanged Dataset A + this Dataset B |

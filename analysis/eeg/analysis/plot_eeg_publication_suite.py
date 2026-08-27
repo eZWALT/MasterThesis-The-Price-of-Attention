@@ -19,9 +19,9 @@ from matplotlib.colors import LinearSegmentedColormap
 
 from condition_labels import (
     CONDITION_LABELS,
-    PATH_A_LABELS,
-    PATH_B_LABELS,
-    PATH_B_SLOPE_PANELS,
+    DATASET_A_LABELS,
+    DATASET_B_LABELS,
+    DATASET_B_SLOPE_PANELS,
 )
 
 
@@ -162,7 +162,7 @@ def plot_condition_rainclouds(features: pd.DataFrame) -> None:
         )
         axis.set_ylabel(label)
         axis.set_title(label)
-    figure.suptitle("Condition medians by participant (Path A, 4 s, ICA)", y=1.02)
+    figure.suptitle("Condition medians by participant (Dataset A, 4 s, ICA)", y=1.02)
     caption(
         figure,
         "Each point is one participant (n=18). Violin = distribution; "
@@ -181,19 +181,19 @@ def plot_confirmatory_forests(
             axes[0],
             condition[
                 (condition["feature"].isin(PRIMARY))
-                & (condition["contrast_id"].isin(PATH_A_LABELS))
+                & (condition["contrast_id"].isin(DATASET_A_LABELS))
             ],
-            PATH_A_LABELS,
-            "Path A · sustained condition",
+            DATASET_A_LABELS,
+            "Dataset A · sustained condition",
         ),
         (
             axes[1],
             ad[
                 (ad["feature"].isin(PRIMARY))
-                & (ad["contrast_id"].isin(PATH_B_LABELS))
+                & (ad["contrast_id"].isin(DATASET_B_LABELS))
             ],
-            PATH_B_LABELS,
-            "Path B · ad-locked post−pre vs matched no-ad",
+            DATASET_B_LABELS,
+            "Dataset B · ad-locked post−pre vs matched no-ad",
         ),
     )
     for axis, frame, labels, title in panels:
@@ -251,7 +251,7 @@ def plot_confirmatory_forests(
 
 def plot_ad_paired_slopes(ad_responses: pd.DataFrame) -> None:
     cells = [
-        *PATH_B_SLOPE_PANELS,
+        *DATASET_B_SLOPE_PANELS,
     ]
     figure, axes = plt.subplots(2, 4, figsize=(13.2, 6.8), sharey="row")
     for row_index, (feature, ylabel) in enumerate(PRIMARY.items()):
@@ -312,14 +312,14 @@ def plot_epoch_grid_heatmap(grid: pd.DataFrame) -> None:
         & (grid["path"] == "B")
         & (grid["policy"] == "ica")
     ].copy()
-    contrasts = list(PATH_B_LABELS)
+    contrasts = list(DATASET_B_LABELS)
     features = list(PRIMARY)
     lengths = [2.0, 4.0, 8.0, 16.0, 32.0]
     matrix = np.full((len(features) * len(contrasts), len(lengths)), np.nan)
     labels = []
     for i, feature in enumerate(features):
         for j, contrast in enumerate(contrasts):
-            labels.append(f"{PRIMARY[feature]} · {PATH_B_LABELS[contrast]}")
+            labels.append(f"{PRIMARY[feature]} · {DATASET_B_LABELS[contrast]}")
             for k, seconds in enumerate(lengths):
                 hit = conf[
                     (conf["feature"] == feature)
@@ -351,7 +351,7 @@ def plot_epoch_grid_heatmap(grid: pd.DataFrame) -> None:
                 fontsize=8,
                 fontweight="semibold" if value < 0.05 else "normal",
             )
-    axis.set_title("Path B confirmatory Holm p across epoch lengths (ICA)")
+    axis.set_title("Dataset B confirmatory Holm p across epoch lengths (ICA)")
     figure.colorbar(image, ax=axis, fraction=0.03, pad=0.02, label="Holm p")
     caption(
         figure,
@@ -362,7 +362,7 @@ def plot_epoch_grid_heatmap(grid: pd.DataFrame) -> None:
 
 
 def plot_epoch_grid_heatmap_ica_noica(grid: pd.DataFrame) -> None:
-    contrasts = list(PATH_B_LABELS)
+    contrasts = list(DATASET_B_LABELS)
     features = list(PRIMARY)
     lengths = [2.0, 4.0, 8.0, 16.0, 32.0]
     cmap = LinearSegmentedColormap.from_list(
@@ -371,13 +371,13 @@ def plot_epoch_grid_heatmap_ica_noica(grid: pd.DataFrame) -> None:
     )
     figure, axes = plt.subplots(1, 2, figsize=(13.2, 6.6), sharey=True)
     labels = [
-        f"{PRIMARY[feature]} · {PATH_B_LABELS[contrast]}"
+        f"{PRIMARY[feature]} · {DATASET_B_LABELS[contrast]}"
         for feature in features
         for contrast in contrasts
     ]
     for axis, policy, title in (
-        (axes[0], "ica", "Path B confirmatory Holm p · ICA"),
-        (axes[1], "no_ica", "Path B confirmatory Holm p · No-ICA"),
+        (axes[0], "ica", "Dataset B confirmatory Holm p · ICA"),
+        (axes[1], "no_ica", "Dataset B confirmatory Holm p · No-ICA"),
     ):
         conf = grid[
             (grid["confirmatory"] == True)  # noqa: E712
@@ -581,7 +581,7 @@ def plot_epoch_timeline() -> None:
 
     caption(
         figure,
-        "Path B lock = visual ad onset. 2/4/8 post never reach writing or "
+        "Dataset B lock = visual ad onset. 2/4/8 post never reach writing or "
         "conclusion. 4 s is the width that usually contains the reply and not "
         "the next act. Source: ad_visibility_events.csv + canonical markers.",
     )
@@ -669,7 +669,7 @@ def plot_band_profiles(features: pd.DataFrame) -> None:
     axis.legend(ncols=5, frameon=False, loc="upper right")
     caption(
         figure,
-        "Five global bands from Path A window medians. Overlapping lines are "
+        "Five global bands from Dataset A window medians. Overlapping lines are "
         "the visual form of the Holm-null condition tests.",
     )
     save(figure, "figure_12_band_profiles")
@@ -685,7 +685,7 @@ def plot_ica_agreement(grid: pd.DataFrame) -> None:
     )
     shared = ica.index.intersection(no_ica.index)
     figure, axis = plt.subplots(figsize=(6.6, 6.2))
-    for path, color, label in (("A", NAVY, "Path A"), ("B", CLAY, "Path B")):
+    for path, color, label in (("A", NAVY, "Dataset A"), ("B", CLAY, "Dataset B")):
         keys = [key for key in shared if key[0] == path]
         xs = [float(no_ica.loc[key, "mean_difference"]) for key in keys]
         ys = [float(ica.loc[key, "mean_difference"]) for key in keys]

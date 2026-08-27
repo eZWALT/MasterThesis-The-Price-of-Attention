@@ -233,7 +233,7 @@ def contrast_tables(
         raise ValueError("No participants have all five condition cells")
     if incomplete:
         print(
-            "Dropping incomplete Path A subjects: " + ", ".join(incomplete),
+            "Dropping incomplete Dataset A subjects: " + ", ".join(incomplete),
             flush=True,
         )
     contrast_rows: list[dict[str, Any]] = []

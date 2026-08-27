@@ -10,11 +10,11 @@ Results / Discussion split in agent context immediately.
 - **Results** report the estimand, the sample, the numbers, the figure,
   the tables. No design implication. No “this means ads do not affect
   EEG.” No abstract-placement advice.
-- **Discussion** interprets: precise Path A null vs dead pipeline,
-  Path B underpowered / not absence, do not harvest leans, mention both
+- **Discussion** interprets: precise Dataset A null vs dead pipeline,
+  Dataset B underpowered / not absence, do not harvest leans, mention both
   off-width cells or neither, write−read is a task-state check not an
   ad result, C1 waits on Goal 1, H1–H3 are not a liking claim.
-- **Limitations** hold the EEG constraints (n=18, one Path B trial,
+- **Limitations** hold the EEG constraints (n=18, one Dataset B trial,
   reconstructed implicit onset, no EOG, no ERP).
 - Do not invert study order: Goal 1 behaviour first, then 2, then EEG.
 
@@ -25,10 +25,10 @@ Cursor rule: `.cursor/rules/results-vs-discussion.mdc`.
 Repo: `docs/overleaf/publication/` (its own git remote).
 
 - §6.3 `sec:results-eeg`: confirmatory 4 s ICA, n=18, person as n.
-  Path A Holm-null; six CIs inside ±0.3 dB. Path B Holm-null; wide CIs.
+  Dataset A Holm-null; six CIs inside ±0.3 dB. Dataset B Holm-null; wide CIs.
   Write−read Fz theta one paragraph of numbers. Both 2 s and 8 s
-  sensitivity cells. 16-feature 4 s board (`fig:eeg-holm-board`): Path A
-  0/48; six Path B exploratory ICA-only hits named, no extra table.
+  sensitivity cells. 16-feature 4 s board (`fig:eeg-holm-board`): Dataset A
+  0/48; six Dataset B exploratory ICA-only hits named, no extra table.
   C1 deferred. Figure `fig:eeg-forests`, tables `tab:eeg-path-a` and
   `tab:eeg-path-b` (confirmatory only — do not duplicate the board).
 - Figures: `Figures/eeg_confirmatory_forests.{pdf,png}`,
@@ -39,7 +39,7 @@ Repo: `docs/overleaf/publication/` (its own git remote).
   "unfreeze" shop-talk; that stays here, not in the PDF):
   - what the markers mean: Fz theta = effortful control / WM; posterior
     alpha falls with visual engagement. Both pre-specified for that.
-  - Path A tight null = no sustained reallocation of effort or visual
+  - Dataset A tight null = no sustained reallocation of effort or visual
     engagement. Informative on Fz theta because write−read recovers
     +0.60 dB on it; posterior alpha is the weaker instrument (it fails
     the task-state check), so a posterior-alpha null is weaker evidence.
@@ -63,7 +63,7 @@ Repo: `docs/overleaf/publication/` (its own git remote).
     consumer-neuroscience engagement/arousal/approach indices, and none
     moved on either path, while behavioural notice separates the formats
     sharply.
-- §7.5: EEG XXXX filled (n, Path B trials, onset p95 0.43 s, no EOG,
+- §7.5: EEG XXXX filled (n, Dataset B trials, onset p95 0.43 s, no EOG,
   unused pre-task baseline, no ERP). Typo
   `prookey coocoooduction` → `production`.
 
@@ -79,7 +79,7 @@ Three artefacts, no overlap except two deliberate reference rows.
 
 | Artefact | Where | Unique job |
 |---|---|---|
-| `fig:eeg-forests` | 6.3 | \(M\) ± 95% CI; the Path A vs Path B precision contrast |
+| `fig:eeg-forests` | 6.3 | \(M\) ± 95% CI; the Dataset A vs Dataset B precision contrast |
 | `fig:eeg-holm-board` | 6.3 | the other 98 tests; 16 coordinates × 7 cells |
 | `tab:eeg-path-a`, `tab:eeg-path-b` | Appendix `sec:app-eeg-measures` | statistics of record: SD, raw \(p\), Wilcoxon Holm |
 
@@ -99,15 +99,15 @@ the five explicit-early cells one finding.
 Walter: Sections 5/6 were cryptic — things "you and I understand" that a
 reader cannot. He chose: fix GOLDEN subsections too (prose only, never
 change a claim), EEG-only statistical analysis with the behavioural half
-left an explicit stub, introduce Path A/B in 5.6 **and** formally in
+left an explicit stub, introduce Dataset A/B in 5.6 **and** formally in
 5.8, keep Bronze/Silver/Gold but explain it, and write for an
 HCI / consumer-neuroscience audience (explain Holm, \(d_z\), dB inline).
 
 **5.8 Statistical Analysis is now written.** It was still the raw
 template ("Describe the statistical model used, such as:"). It now has:
 unit of analysis = participant and why the epoch is not; how \(D_i\) is
-formed per path (Path B is a difference of differences); the 3 Path A
-and 4 Path B planned comparisons; confirmatory (2) vs exploratory (14);
+formed per path (Dataset B is a difference of differences); the 3 Dataset A
+and 4 Dataset B planned comparisons; confirmatory (2) vs exploratory (14);
 paired \(t\) + Wilcoxon and why **not** RM-ANOVA or cluster permutation;
 Cohen's \(d_z\) defined; Holm within a measure and the compositional
 reason for not correcting across the sixteen; the writing−reading
@@ -118,7 +118,7 @@ threshold); software (MNE-Python 1.12, SciPy 1.17, NumPy 2.2, Py 3.13).
 `build_condition_contrasts.py` is `contrast_tier="secondary"` and
 `correction_family="secondary_uncorrected"`. The presentation×timing
 interaction is therefore secondary and uncorrected, and 5.8 says so.
-It is **not** one of the three Path A confirmatory contrasts (those are
+It is **not** one of the three Dataset A confirmatory contrasts (those are
 `any_ad_vs_no_ads`, `inline_vs_block`, `early_vs_late`; note inline =
 implicit, block = explicit in the code).
 
@@ -348,7 +348,7 @@ against `cleaning_policy_ica_candidate_v1.json` and
 < 0.5 µV, ≥5 epochs / ≥80%, ICA 99% PCA / \(|r|\ge0.35\) / dominance
 ≥1.5 / ≤3 components, interpolations P4·s1, P4·s9, C4·s10, notch 50,
 0.5–40 Hz, average ref excluding bads, spline, twelve 30 s QC windows,
-Welch 2 s × 50% = 3 periodograms at \(\Delta f=0.5\) Hz, 216 Path B
+Welch 2 s × 50% = 3 periodograms at \(\Delta f=0.5\) Hz, 216 Dataset B
 epochs / 108 pairs / \(K_i=12\). The stale “ICA not applied” prose is
 gone; ICA is stated as primary.
 
@@ -373,12 +373,12 @@ Four gaps were fixed in `bfa6723`:
    in bold it "must never be described as preregistered or
    literature-derived". 5.6 now says so and cites the 1,000/1,500 µV
    reruns. **Never let this sentence be edited back out.**
-4. Path B onset provenance: 5.6 now says **30 of 36 implicit onsets
+4. Dataset B onset provenance: 5.6 now says **30 of 36 implicit onsets
    are derived**, not merely "a reconstruction".
 
 5.7 also gained a pre-specification clause. This matters because 5.7
 argues 2 s is "too stimulus-locked" and 8 s "too aggregated", while 6.3
-reports the only two Path B Holm cells at exactly 2 s and 8 s. Without
+reports the only two Dataset B Holm cells at exactly 2 s and 8 s. Without
 the clause a reviewer reads the Method as retrofitted. The claim is
 true: 4 s epochs are already in the 3 Aug datasets note, the grid ran
 19 Aug. The stale appendix cross-ref ("names are listed") now says the

@@ -80,6 +80,6 @@ Constraints:
 - drop warmup, questionnaires, and post-task;
 - drop pairs that overlap or are incomplete.
 
-This is a third cutter on the same cleaned Raw. It does not change Path A
-or Path B shapes. What it proved (chain alive; not an ad result):
+This is a third cutter on the same cleaned Raw. It does not change Dataset A
+or Dataset B shapes. What it proved (chain alive; not an ad result):
 `2026-08-19-read-vs-write-what-it-proved.md`.

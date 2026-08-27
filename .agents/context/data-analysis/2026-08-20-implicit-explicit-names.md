@@ -15,8 +15,8 @@ Log / Gold keys are unchanged. Do not rename these fields:
 | Explicit late | `block_late` | `explicit_ad_block` |
 | No ads | `no_ads` | — |
 
-Path A format contrast: implicit − explicit (`inline_vs_block` in
-tables). Path B cells: implicit/explicit × early/late minus matched
+Dataset A format contrast: implicit − explicit (`inline_vs_block` in
+tables). Dataset B cells: implicit/explicit × early/late minus matched
 no-ad.
 
 Display labels live in `analysis/eeg/analysis/condition_labels.py`.

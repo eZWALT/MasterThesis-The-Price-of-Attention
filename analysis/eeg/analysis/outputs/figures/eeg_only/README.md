@@ -17,16 +17,16 @@ feature at that width, not across 2/4/8 s.
 
 | File | What |
 |---|---|
-| `board_path_a_b_2_4_8s` | Path A (top) and Path B (bottom) at 2 / 4 / 8 s |
-| `path_a_2s` | Path A only, 2 s |
-| `path_a_4s` | Path A only, 4 s (primary) |
-| `path_a_8s` | Path A only, 8 s |
-| `path_b_2s` | Path B only, 2 s |
-| `path_b_4s` | Path B only, 4 s (primary) |
-| `path_b_8s` | Path B only, 8 s |
+| `board_dataset_a_b_2_4_8s` | Dataset A (top) and Dataset B (bottom) at 2 / 4 / 8 s |
+| `dataset_a_2s` | Dataset A only, 2 s |
+| `dataset_a_4s` | Dataset A only, 4 s (primary) |
+| `dataset_a_8s` | Dataset A only, 8 s |
+| `dataset_b_2s` | Dataset B only, 2 s |
+| `dataset_b_4s` | Dataset B only, 4 s (primary) |
+| `dataset_b_8s` | Dataset B only, 8 s |
 
-Path A columns: any-ad, implicit−explicit, early−late.
-Path B columns: implicit/explicit × early/late vs matched no-ad.
+Dataset A columns: any-ad, implicit−explicit, early−late.
+Dataset B columns: implicit/explicit × early/late vs matched no-ad.
 Log keys remain `inline_*` / `block_*`.
 
 ## Where the other pictures live
@@ -39,7 +39,7 @@ Paper / talk (4 s):
 
 Appendix / robustness:
 
-- `../suite/figure_10_epoch_grid_heatmap` — Path B confirmatory across 2–32 s
+- `../suite/figure_10_epoch_grid_heatmap` — Dataset B confirmatory across 2–32 s
 - `../suite/figure_10b_epoch_grid_heatmap_ica_noica` — same, ICA + no-ICA
 - `../suite/figure_11_epoch_grid_traces`
 - `../suite/figure_13_ica_vs_noica`

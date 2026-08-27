@@ -1,6 +1,6 @@
 """Publication figure v2 of the laboratory EEG preprocessing pipeline.
 
-Four lake bands. Path A and Path B are parallel. Inference is omitted.
+Four lake bands. Dataset A and Dataset B are parallel. Inference is omitted.
 
 Silver cards follow ``clean_recording()`` in
 ``analysis/eeg/preprocessing/silver/signal/clean_eeg.py``.
@@ -27,8 +27,8 @@ BLUE, BLUE_E = "#EDF5FB", "#7FA9CB"
 PURPLE, PURPLE_E = "#F3F1FA", "#8E86BE"
 GREEN, GREEN_E = "#EEF6EE", "#6FA574"
 GOLD, GOLD_E = "#FDF6E6", "#C4B07A"
-PATH_A = "#2F6B45"
-PATH_B = "#8A4E22"
+DATASET_A = "#2F6B45"
+DATASET_B = "#8A4E22"
 
 
 def rounded(ax, x, y, w, h, *, face, edge, r=1.2, lw=1.05, z=1):
@@ -157,7 +157,7 @@ def build() -> plt.Figure:
     band(ax, 3, "Silver", 3, 44.8, 106, 29.8, face=GREEN, edge=GREEN_E)
 
     rounded(ax, 5.4, 61.6, 100.4, 7.6, face="#F6FBF6", edge=GREEN_E, r=1.0, lw=0.7, z=1)
-    txt(ax, 7.0, 67.8, "Event preprocessing", size=6.8, weight="bold", color=PATH_A)
+    txt(ax, 7.0, 67.8, "Event preprocessing", size=6.8, weight="bold", color=DATASET_A)
     card(ax, 7.2, 62.2, 30.4, 4.8, "Marker audit", "duplicates  ·  missing", edge=GREEN_E)
     card(ax, 40.0, 62.2, 31.0, 4.8, "Align event clocks", r"JSONL  $\leftrightarrow$  XDF LSL", edge=GREEN_E)
     card(ax, 73.4, 62.2, 31.2, 4.8, "Canonical markers", "observed or reconstructed", edge=GREEN_E)
@@ -167,7 +167,7 @@ def build() -> plt.Figure:
     arrow(ax, (56.0, 61.6), (56.0, 60.0), color=GREEN_E)
 
     rounded(ax, 5.4, 45.6, 100.4, 14.2, face="#F6FBF6", edge=GREEN_E, r=1.0, lw=0.7, z=1)
-    txt(ax, 7.0, 58.4, "EEG signal QC and preprocessing", size=6.8, weight="bold", color=PATH_A)
+    txt(ax, 7.0, 58.4, "EEG signal QC and preprocessing", size=6.8, weight="bold", color=DATASET_A)
     card(ax, 7.2, 53.0, 47.0, 4.6, r"XDF $\rightarrow$ MNE Raw", r"$\mu$V $\rightarrow$ V  ·  10–20  ·  annotations", edge=GREEN_E)
     card(ax, 56.6, 53.0, 47.8, 4.6, "Channel QC", r"condition-blind  ·  QC $\cup$ review", edge=GREEN_E)
     arrow(ax, (54.2, 55.3), (56.6, 55.3))
@@ -217,20 +217,20 @@ def build() -> plt.Figure:
     )
     arrow(ax, (56.0, 32.4), (56.0, 31.0), color=GOLD_E)
 
-    rounded(ax, 6.2, 14.8, 49.0, 8.6, face="#F4FAF4", edge=PATH_A, r=1.2, lw=1.15, z=2)
-    txt(ax, 30.7, 21.2, "Path A  —  condition windows", size=8.6, weight="bold", color=PATH_A, ha="center")
+    rounded(ax, 6.2, 14.8, 49.0, 8.6, face="#F4FAF4", edge=DATASET_A, r=1.2, lw=1.15, z=2)
+    txt(ax, 30.7, 21.2, "Dataset A  —  condition windows", size=8.6, weight="bold", color=DATASET_A, ha="center")
     txt(ax, 30.7, 19.2, "5 conditions", size=7.6, ha="center")
-    txt(ax, 30.7, 17.2, r"$Y_A \in \mathbb{R}^{18 \times 5 \times 16}$", size=9.2, weight="bold", color=PATH_A, ha="center")
+    txt(ax, 30.7, 17.2, r"$Y_A \in \mathbb{R}^{18 \times 5 \times 16}$", size=9.2, weight="bold", color=DATASET_A, ha="center")
     txt(ax, 30.7, 15.6, "median, IQR, baseline delta", size=7.2, color=MUTED, ha="center")
 
-    rounded(ax, 57.8, 14.8, 48.0, 8.6, face="#FBF6F0", edge=PATH_B, r=1.2, lw=1.15, z=2)
-    txt(ax, 81.8, 21.2, "Path B  —  ad windows", size=8.6, weight="bold", color=PATH_B, ha="center")
+    rounded(ax, 57.8, 14.8, 48.0, 8.6, face="#FBF6F0", edge=DATASET_B, r=1.2, lw=1.15, z=2)
+    txt(ax, 81.8, 21.2, "Dataset B  —  ad windows", size=8.6, weight="bold", color=DATASET_B, ha="center")
     txt(ax, 81.8, 19.2, "4 ads + 2 no-ad", size=7.6, ha="center")
-    txt(ax, 81.8, 17.2, r"$Y_B \in \mathbb{R}^{18 \times 6 \times 16}$", size=9.2, weight="bold", color=PATH_B, ha="center")
+    txt(ax, 81.8, 17.2, r"$Y_B \in \mathbb{R}^{18 \times 6 \times 16}$", size=9.2, weight="bold", color=DATASET_B, ha="center")
     txt(ax, 81.8, 15.6, r"post $-$ pre", size=7.2, color=MUTED, ha="center")
 
-    arrow(ax, (42.0, 24.8), (30.7, 23.4), color=PATH_A, rad=-0.22)
-    arrow(ax, (70.0, 24.8), (81.8, 23.4), color=PATH_B, rad=0.22)
+    arrow(ax, (42.0, 24.8), (30.7, 23.4), color=DATASET_A, rad=-0.22)
+    arrow(ax, (70.0, 24.8), (81.8, 23.4), color=DATASET_B, rad=0.22)
 
     txt(ax, 4.0, 12.0, "Shape", size=8.0, weight="bold", color=MUTED)
     txt(

@@ -74,8 +74,8 @@ After the signoffs above, the pipeline can automatically:
 
 - regenerate Gold outputs under the approved ICA primary policy;
 - rerun ICA/no-ICA and threshold sensitivities;
-- rebuild Path A summaries with `--from-epochs` (mean vs median);
-- retile Path A/B at other epoch lengths (2/8/16/32 s) as robustness,
+- rebuild Dataset A summaries with `--from-epochs` (mean vs median);
+- retile Dataset A/B at other epoch lengths (2/8/16/32 s) as robustness,
   without promoting a width that happens to yield p < 0.05;
 - rerun the coded read/write positive control
   (`run_task_state_positive_control.py`); interpretation:

@@ -12,13 +12,13 @@ CONDITION_LABELS = {
     "block_late": "Explicit late",
 }
 
-PATH_A_LABELS = {
+DATASET_A_LABELS = {
     "any_ad_vs_no_ads": "Any ad − no ads",
     "inline_vs_block": "Implicit − explicit",
     "early_vs_late": "Early − late",
 }
 
-PATH_B_LABELS = {
+DATASET_B_LABELS = {
     "inline_early_vs_no_ad_early": "Implicit early",
     "block_early_vs_no_ad_early": "Explicit early",
     "inline_late_vs_no_ad_late": "Implicit late",
@@ -43,7 +43,7 @@ AD_CONTRAST_LABELS = {
     "format_x_timing": "Format × timing",
 }
 
-PATH_B_SLOPE_PANELS = (
+DATASET_B_SLOPE_PANELS = (
     ("inline_early", "no_ads_early", "Implicit early"),
     ("block_early", "no_ads_early", "Explicit early"),
     ("inline_late", "no_ads_late", "Implicit late"),

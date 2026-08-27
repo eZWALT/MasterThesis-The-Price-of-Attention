@@ -2,7 +2,7 @@
 
 Sanity check, not Q1/Q2. Person-level median of (writing − reading) on the
 same 16 spectral features. Holm is across the two confirmatory features.
-Does not replace Path A or Path B Gold.
+Does not replace Dataset A or Dataset B Gold.
 """
 
 from __future__ import annotations

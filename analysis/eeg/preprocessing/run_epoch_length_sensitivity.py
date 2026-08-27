@@ -1,4 +1,4 @@
-"""Rebuild Path A/B features at 2/8/16/32 s without replacing primary Gold.
+"""Rebuild Dataset A/B features at 2/8/16/32 s without replacing primary Gold.
 
 Cleans each recording once per policy (ICA primary, no-ICA), then tiles
 condition windows from condition start and cuts ad-locked pre/post windows
@@ -191,7 +191,7 @@ def extract_ad_epochs(
     return rows
 
 
-def write_path_a(
+def write_dataset_a(
     epoch_rows: list[dict[str, Any]],
     epoch_rejection: dict[str, Any],
     output: Path,
@@ -206,13 +206,13 @@ def write_path_a(
     write_csv(epochs_path, epoch_rows)
     write_csv(summary_path, summaries)
     print(
-        f"  Path A: {len(epoch_rows)} epochs, {len(summaries)} summaries",
+        f"  Dataset A: {len(epoch_rows)} epochs, {len(summaries)} summaries",
         flush=True,
     )
     return summary_path
 
 
-def write_path_b(
+def write_dataset_b(
     epoch_rows: list[dict[str, Any]],
     output: Path,
 ) -> Path:
@@ -230,7 +230,7 @@ def write_path_b(
         row["primary_analysis_eligible"] == "yes" for row in responses
     )
     print(
-        f"  Path B: {len(epoch_rows)} epochs, {len(responses)} pairs "
+        f"  Dataset B: {len(epoch_rows)} epochs, {len(responses)} pairs "
         f"({eligible} eligible)",
         flush=True,
     )
@@ -490,8 +490,8 @@ def run_grid(
             output = feature_dir(seconds, policy_name)
             output.mkdir(parents=True, exist_ok=True)
             print(f"{policy_name} {seconds:g}s: writing features", flush=True)
-            write_path_a(condition_accum[seconds], epoch_rejection, output)
-            write_path_b(ad_accum[seconds], output)
+            write_dataset_a(condition_accum[seconds], epoch_rejection, output)
+            write_dataset_b(ad_accum[seconds], output)
             run_stats(seconds, policy_name, skip_stats=skip_stats)
 
         run_stats(REUSED_SECONDS, policy_name, skip_stats=skip_stats)

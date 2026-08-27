@@ -61,8 +61,8 @@ the in-memory Raw.
 
 ```mermaid
 flowchart TD
-    RAW["cleaned Raw in RAM<br/>(32, N)"] --> CA["Path A: condition windows"]
-    RAW --> CB["Path B: ad windows"]
+    RAW["cleaned Raw in RAM<br/>(32, N)"] --> CA["Dataset A: condition windows"]
+    RAW --> CB["Dataset B: ad windows"]
     MARK["Silver markers"] --> WA["condition_windows.csv"]
     MARK --> WB["ad_analysis_windows.csv"]
     WA --> CA
@@ -101,7 +101,7 @@ engagement indices are exploratory until Person A freezes behaviour.
 Epoch rejection (`frozen_v3`): any channel peak-to-peak above 1,050 µV, or any
 channel with standard deviation below 0.5 µV.
 
-## Path A — sustained condition windows
+## Dataset A — sustained condition windows
 
 Scripts:
 
@@ -167,7 +167,7 @@ they cancel algebraically because both sides subtract the same baseline.
 Primary table: **108 rows × 73 columns** (18 baselines + 90 conditions).
 Statistics later requires exactly those **90 eligible condition rows**.
 
-Path A therefore obtains, for the cohort:
+Dataset A therefore obtains, for the cohort:
 
 | Object | Shape / count | Meaning |
 |---|---|---|
@@ -177,7 +177,7 @@ Path A therefore obtains, for the cohort:
 | window summaries | 108 rows | median spectrum per cell |
 | inferential input | 90 condition rows | one number per person × condition × feature |
 
-## Path B — locked advertisement pre/post
+## Dataset B — locked advertisement pre/post
 
 Scripts:
 
@@ -232,7 +232,7 @@ Primary table: **108 rows × 69 columns**, all eligible. Statistics later
 builds four primary Holm-corrected ad-versus-matched-control tests per
 feature from these participant-level deltas.
 
-Path B therefore obtains:
+Dataset B therefore obtains:
 
 | Object | Shape / count | Meaning |
 |---|---|---|
@@ -241,7 +241,7 @@ Path B therefore obtains:
 | response pairs | 108 rows | post − pre per onset |
 | inferential input | 18 people × 6 onsets | ad vs matched no-ad |
 
-Path B does **not** median-aggregate many epochs. One noisy 4 s slice is the
+Dataset B does **not** median-aggregate many epochs. One noisy 4 s slice is the
 observation. That is why ICA can move a single ad delta more than it moves a
 six-minute condition median.
 
@@ -258,7 +258,7 @@ Subject 3 has no interpolated channels. The ICA branch fitted 15 components
 and excluded component 0 only (`|r|` with Fp1/Fp2 ≈ 0.93, frontal dominance
 ≈ 1.57). Fourteen components remain mixed back into the same 32 channels.
 
-### Path A, this person
+### Dataset A, this person
 
 Six eligible windows:
 
@@ -318,7 +318,7 @@ inline_late’s Fz-theta elevation grew (0.932 → 1.350) while block_late’s
 shrank (2.034 → 1.417). The table geometry is identical: still six rows,
 still 16 medians, still 16 deltas.
 
-### Path B, this person
+### Dataset B, this person
 
 Six onsets, twelve locked windows, all inside their parent condition:
 
@@ -419,11 +419,11 @@ and must not replace primary. Publication outputs render the ICA branch.
 - Gold does not test hypotheses. `build_condition_contrasts.py` and
   `build_ad_contrasts.py` sit outside the lake and consume the summary
   tables.
-- Baseline deltas on Path A are not a second experiment. They are a
+- Baseline deltas on Dataset A are not a second experiment. They are a
   convenience column.
-- Path B’s matched no-ad onsets are log-projected replies, not visual ads.
+- Dataset B’s matched no-ad onsets are log-projected replies, not visual ads.
 - Read-versus-write is a third cutter on the same cleaned Raw
-  (`build_task_state_windows.py`). It does not change Path A or Path B
+  (`build_task_state_windows.py`). It does not change Dataset A or Dataset B
   shapes. What it proved: `2026-08-19-read-vs-write-what-it-proved.md`.
 
 ## Agent rules

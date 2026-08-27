@@ -2,11 +2,11 @@
   "n": 18,
   "recomputed_all_means_match": true,
   "recomputed_all_p_match": true,
-  "path_a_primary_holm_hits": 0,
-  "path_a_all_feature_primary_holm_hits": 0,
-  "path_b_confirmatory_holm_hits": 0,
-  "path_a_all_cis_inside_0p3db": true,
-  "path_b_any_ci_inside_1db": false,
+  "dataset_a_primary_holm_hits": 0,
+  "dataset_a_all_feature_primary_holm_hits": 0,
+  "dataset_b_confirmatory_holm_hits": 0,
+  "dataset_a_all_cis_inside_0p3db": true,
+  "dataset_b_any_ci_inside_1db": false,
   "bootstrap_t_zero_disagreements": [
     {
       "path": "B",
@@ -119,8 +119,8 @@
       "paper_status": "exploratory ICA-only; do not abstract"
     }
   ],
-  "mde_path_a_theta_anyad_holm80": 0.24691297207355203,
-  "mde_path_b_explicit_early_theta_holm80": 1.7372778731206104,
+  "mde_dataset_a_theta_anyad_holm80": 0.24691297207355203,
+  "mde_dataset_b_explicit_early_theta_holm80": 1.7372778731206104,
   "tost_note": "TOST bounds 0.3/0.5/1.0/2.0 dB are post-hoc illustrations, not a pre-registered equivalence margin.",
   "stale_docs": [
     "analysis/eeg/analysis/README.md still says read-vs-write is unimplemented",

@@ -26,7 +26,7 @@ Yes, but only as exploratory, and only at the same grain as the surveys.
 
 Post-condition trust, credibility, manipulation, and the UX-like
 composites (helpfulness, convincingness, relevance, neutrality) are
-**person × condition** scores, same geometry as Path A \(Y_A\). The
+**person × condition** scores, same geometry as Dataset A \(Y_A\). The
 honest correlation is therefore:
 
 - same person's \(D_{\mathrm{EEG}}\) with that person's \(D_{\mathrm{survey}}\)
@@ -70,8 +70,8 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 
 | ID | Item | Ticket | Verdict |
 |---|---|---|---|
-| A1 | Path A: 3 primary \(D\) (any-ad, implicit vs explicit, early vs late) on 16 features; \(t\) + Wilcoxon + Holm | APPROVED | keep; write Results |
-| A2 | Path B: 4 primary ad-minus-matched-control \(D\); same tests | APPROVED | keep; write Results |
+| A1 | Dataset A: 3 primary \(D\) (any-ad, implicit vs explicit, early vs late) on 16 features; \(t\) + Wilcoxon + Holm | APPROVED | keep; write Results |
+| A2 | Dataset B: 4 primary ad-minus-matched-control \(D\); same tests | APPROVED | keep; write Results |
 | A3 | Publication layer: forest plots, bootstrap, LOO, Subject 14, onset provenance | APPROVED | keep |
 | A4 | Threshold sensitivity 1000 / 1050 / 1500 µV | APPROVED | keep as robustness |
 | A5 | ICA vs no-ICA comparison; ICA is primary (`frozen_v5`) | APPROVED | do not pick ICA to rescue six ad hits |
@@ -85,7 +85,7 @@ Goal 1. Not confirmatory. Not a substitute for \(D\).
 | B1 | Read vs write positive control (static 4 s after `assistant_reply` / before `user_message`) | APPROVED | one-sentence mention only; not a paper result. See `2026-08-19-read-vs-write-what-it-proved.md` |
 | B2 | Mixed model `EEG ~ condition + task + order + (1\|person)` | PENDING | later; paired \(D\) already answers the planned contrasts |
 | B3 | Mean-of-epoch-dB instead of median | APPROVED | Y_A 0/48 Holm; keep median primary |
-| B4 | Epoch-length grid 2/4/8/16/32 s | APPROVED | Path A null at every width; do not freeze 8 s alpha |
+| B4 | Epoch-length grid 2/4/8/16/32 s | APPROVED | Dataset A null at every width; do not freeze 8 s alpha |
 | B5 | ERP / P1–P3 | OUT | onset error 0.23–0.43 s; one trial per cell |
 | B6 | Epoch as independent \(n\) | OUT | COBIDAS; already refused |
 | B7 | Entropy / connectivity / PLV | OUT | no frozen estimator; thesis time |
@@ -99,9 +99,9 @@ Lab \(n=18\) only. Freeze behavioural ETL first.
 
 | ID | Item | Ticket | Verdict |
 |---|---|---|---|
-| C1 | Spearman / rmcorr of Path A \(D_{\mathrm{EEG}}\) with the same three \(D\) on trust, credibility, manipulation | PENDING | **do this** after Goal 1; exploratory; 2 primary EEG features only |
+| C1 | Spearman / rmcorr of Dataset A \(D_{\mathrm{EEG}}\) with the same three \(D\) on trust, credibility, manipulation | PENDING | **do this** after Goal 1; exploratory; 2 primary EEG features only |
 | C2 | Person × condition: \(Y_A\) vs post-condition UX-like scores (helpfulness, convincingness, `personality_trust`) | PENDING | later; same grain as C1, more tests |
-| C3 | Path B \(D\) vs notice / `recall_memory` / `recall_trust_shift` | PENDING | later; recall has no no-ad cell |
+| C3 | Dataset B \(D\) vs notice / `recall_memory` / `recall_trust_shift` | PENDING | later; recall has no no-ad cell |
 | C4 | Between-person: person-mean EEG vs session `overall_trust` / `overall_usefulness` / BFI-10 | PENDING | appendix only; \(n=18\) |
 | C5 | Between-person: baseline EEG vs traits | PENDING | weaker than C4; eyes uncontrolled |
 | C6 | Incremental model: behaviour vs behaviour+EEG, grouped by person | PENDING | don't for thesis; Goal 5 / tiny \(n\) |

@@ -11,9 +11,9 @@ Visible prose lives under `\subsection{Neurophysiological outcomes}`
 ## What 6.3 states (results only)
 
 - Confirmatory: 4~s, ICA, person as \(n\), Fz theta + posterior alpha.
-- Path A Holm-null; all six CIs inside \(\pm 0.3\)~dB. Table
+- Dataset A Holm-null; all six CIs inside \(\pm 0.3\)~dB. Table
   `tab:eeg-path-a`.
-- Path B Holm-null; wide CIs. Table `tab:eeg-path-b`.
+- Dataset B Holm-null; wide CIs. Table `tab:eeg-path-b`.
 - Write − read Fz theta numbers (task-state check).
 - Sensitivity: both off-width cells named. No “do not abstract”
   sentence here — that is Discussion.

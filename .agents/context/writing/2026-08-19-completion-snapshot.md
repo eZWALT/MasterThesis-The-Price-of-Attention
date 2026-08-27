@@ -59,7 +59,7 @@ exist. Future Work is golden again (restored list; do not skeletonize).
 - **SKELETON:** Results (except sample), Discussion, Conclusion
 - **TO-START:** EEG Measures / Statistical Analysis templates;
   funding; ethics; appendices
-- **DRAFTED (local, unpushed):** EEG Epoching (20 August) --- Path A/B
+- **DRAFTED (local, unpushed):** EEG Epoching (20 August) --- Dataset A/B
   geometry, 4~s freeze, 2~s/8~s sensitivity. In
   `docs/overleaf/publication/main.tex`. Do not push until Walter asks.
 

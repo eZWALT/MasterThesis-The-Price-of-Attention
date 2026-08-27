@@ -1144,7 +1144,7 @@ z
     </g>
    </g>
    <g id="text_50">
-    <text style="font-weight: 700; font-size: 8.6px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2f6b45" x="140.357571" y="382.27592" transform="rotate(-0 140.357571 382.27592)">Path A  —  condition windows</text>
+    <text style="font-weight: 700; font-size: 8.6px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #2f6b45" x="140.357571" y="382.27592" transform="rotate(-0 140.357571 382.27592)">Dataset A  —  condition windows</text>
    </g>
    <g id="text_51">
     <text style="font-size: 7.6px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #243240" x="140.357571" y="390.640116" transform="rotate(-0 140.357571 390.640116)">5 conditions</text>
@@ -1171,7 +1171,7 @@ z
     <text style="font-size: 7.2px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #53616e" x="140.357571" y="406.059394" transform="rotate(-0 140.357571 406.059394)">median, IQR, baseline delta</text>
    </g>
    <g id="text_54">
-    <text style="font-weight: 700; font-size: 8.6px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #8a4e22" x="364.394571" y="382.27592" transform="rotate(-0 364.394571 382.27592)">Path B  —  ad windows</text>
+    <text style="font-weight: 700; font-size: 8.6px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #8a4e22" x="364.394571" y="382.27592" transform="rotate(-0 364.394571 382.27592)">Dataset B  —  ad windows</text>
    </g>
    <g id="text_55">
     <text style="font-size: 7.6px; font-family: 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #243240" x="364.394571" y="390.640116" transform="rotate(-0 364.394571 390.640116)">4 ads + 2 no-ad</text>

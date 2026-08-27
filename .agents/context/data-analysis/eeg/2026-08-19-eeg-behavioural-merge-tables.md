@@ -22,7 +22,7 @@ collapsed across people (descriptives).
 | same file | 16 `*_baseline_delta` | person × condition | 90 |
 | `ad_response_features.csv` | 16 `*_post_minus_pre` | person × event | 108 (72 ad + 36 no-ad) |
 | `eeg_condition_contrast_scores.csv` | `difference` after pivot | person × contrast | 18 × 4 × 16 long |
-| `eeg_ad_response_contrast_scores.csv` | `difference` after pivot | person × Path B \(D\) | 18 × 4 primary |
+| `eeg_ad_response_contrast_scores.csv` | `difference` after pivot | person × Dataset B \(D\) | 18 × 4 primary |
 
 **Do not plug as ML / correlation features**
 
@@ -84,12 +84,12 @@ D_timing   = mean(early) − mean(late)
 Build by pivoting `eeg_condition_contrast_scores.csv` and applying the
 identical contrast functions to the frozen survey scores.
 
-### T3 — person × ad event (C3 / Path B)
+### T3 — person × ad event (C3 / Dataset B)
 
 72 ad rows (+ 36 no-ad if you need the control \(\Delta\)).
 
 EEG: `eeg_*_post_minus_pre`, plus `eeg_*_vs_control` =
-ad \(\Delta\) minus matched no-ad \(\Delta\) (already in the Path B
+ad \(\Delta\) minus matched no-ad \(\Delta\) (already in the Dataset B
 score file).
 
 Behaviour: `notice_*`, `recall_memory`, `recall_trust_shift`.
