@@ -54,6 +54,20 @@ Read-versus-write positive control (does not replace Dataset A/B Gold):
 python analysis/eeg/preprocessing/run_task_state_positive_control.py
 ```
 
+Rebuild Dataset A/B on the George nine-site and/or Wang-zone channel
+sets (ten global band powers only). Never writes primary Gold:
+
+```bash
+python analysis/eeg/preprocessing/run_channel_set_sensitivity.py \
+  --channel-set-policy \
+  analysis/eeg/preprocessing/gold/features/channel_set_policy_literature_roi.json \
+  analysis/eeg/preprocessing/gold/features/channel_set_policy_wang2022.json
+```
+
+Default electrode lists stay `channel_set_policy.json` (`current_v1`).
+Cleaning remains the full 32-channel montage. See
+`.agents/context/data-analysis/eeg/2026-08-24-channel-set-policy.md`.
+
 After generating the separate Silver visual pack and the threshold sensitivity
 branch, aggregate all machine-checkable evidence with:
 

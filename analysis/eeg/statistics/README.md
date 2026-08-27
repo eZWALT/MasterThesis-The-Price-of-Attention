@@ -23,6 +23,11 @@ participant baseline cancels algebraically from every paired contrast.
 
 Outputs are written to `analysis/eeg/statistics/outputs/`.
 
+A filled channel-set sensitivity writes contrasts under
+`outputs/sensitivity/channel_sets/<version>/` via
+`analysis/eeg/preprocessing/run_channel_set_sensitivity.py`. That
+branch is not confirmatory.
+
 The ad-response script compares `post − pre` spectral changes against the
 timing-matched no-ad reply for each ad condition. Four primary ad-versus-control
 tests are Holm-corrected per feature. Factorial summaries are retained as

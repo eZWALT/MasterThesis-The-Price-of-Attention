@@ -36,6 +36,14 @@ from build_condition_contrasts import (  # noqa: E402
     mean,
     write_csv,
 )
+from channel_sets import (  # noqa: E402
+    assert_output_allowed,
+    rejection_channel_spec,
+    require_ready,
+    resolve_channel_set,
+    suggested_sensitivity_dir,
+    suggested_stats_dir,
+)
 from build_condition_features import (  # noqa: E402
     SUMMARY_FEATURES,
     quality_features,
@@ -75,8 +83,14 @@ def feature_row(
     channel_names: list[str],
     epoch_rejection: dict[str, Any],
     ica_applied: bool,
+    channel_set=None,
 ) -> dict[str, Any]:
-    quality = quality_features(data_v, channel_names)
+    policy = resolve_channel_set(channel_set)
+    quality = quality_features(
+        data_v,
+        channel_names,
+        rejection_channels=rejection_channel_spec(policy),
+    )
     rejection: list[str] = []
     if float(quality["max_peak_to_peak_uv"]) > float(
         epoch_rejection["max_peak_to_peak_uv"]
@@ -107,7 +121,17 @@ def feature_row(
         **quality,
         "retained_by_policy": "no" if rejection else "yes",
         "artifact_rejection_reason": ";".join(rejection),
-        **spectral_features(data_v, sfreq=sfreq, channel_names=channel_names),
+        **spectral_features(
+            data_v,
+            sfreq=sfreq,
+            channel_names=channel_names,
+            channel_set=policy,
+        ),
+        **(
+            {"channel_set_policy_version": policy.policy_version}
+            if not policy.is_primary
+            else {}
+        ),
         "source_log": window["source_log"],
         "source_xdf": window["source_xdf"],
         "source_xdf_sha256": window["source_xdf_sha256"],
@@ -249,7 +273,10 @@ def contrast_tables(summaries: list[dict[str, Any]]) -> tuple[
     return tests, scores
 
 
-def extract_features(windows: list[dict[str, str]]) -> list[dict[str, Any]]:
+def extract_features(
+    windows: list[dict[str, str]],
+    channel_set=None,
+) -> list[dict[str, Any]]:
     policy = load_policy(POLICY)
     epoch_rejection = policy["epoch_rejection"]
     by_subject: dict[str, list[dict[str, str]]] = defaultdict(list)
@@ -289,35 +316,61 @@ def extract_features(windows: list[dict[str, str]]) -> list[dict[str, Any]]:
                     channel_names=raw.ch_names,
                     epoch_rejection=epoch_rejection,
                     ica_applied=report.ica_applied,
+                    channel_set=channel_set,
                 )
             )
         del raw
     return rows
 
 
-def run(*, skip_extract: bool = False) -> None:
-    FEATURE_OUTPUT.mkdir(parents=True, exist_ok=True)
-    STATS_OUTPUT.mkdir(parents=True, exist_ok=True)
-    if skip_extract and (FEATURE_OUTPUT / "task_state_pair_features.csv").exists():
+def run(
+    *,
+    skip_extract: bool = False,
+    channel_set_path: Path | None = None,
+    feature_output: Path | None = None,
+    stats_output: Path | None = None,
+) -> None:
+    channel_set = resolve_channel_set(channel_set_path)
+    require_ready(channel_set)
+    if feature_output is None:
+        feature_output = (
+            FEATURE_OUTPUT
+            if channel_set.is_primary
+            else REPOSITORY_ROOT / suggested_sensitivity_dir(channel_set)
+        )
+    if stats_output is None:
+        stats_output = (
+            STATS_OUTPUT
+            if channel_set.is_primary
+            else REPOSITORY_ROOT / suggested_stats_dir(channel_set)
+        )
+    assert_output_allowed(
+        channel_set,
+        feature_output / "task_state_person_features.csv",
+        stats_output / "eeg_task_state_contrasts.csv",
+    )
+    feature_output.mkdir(parents=True, exist_ok=True)
+    stats_output.mkdir(parents=True, exist_ok=True)
+    if skip_extract and (feature_output / "task_state_pair_features.csv").exists():
         from build_condition_contrasts import read_csv
 
-        pairs = read_csv(FEATURE_OUTPUT / "task_state_pair_features.csv")
+        pairs = read_csv(feature_output / "task_state_pair_features.csv")
     else:
         windows = build_windows(MANIFEST, CONDITIONS, WINDOWS_OUTPUT)
-        epoch_rows = extract_features(windows)
+        epoch_rows = extract_features(windows, channel_set=channel_set)
         grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in epoch_rows:
             grouped[str(row["pair_id"])].append(row)
         pairs = [pair_row(grouped[key]) for key in sorted(grouped)]
-        write_csv(FEATURE_OUTPUT / "task_state_epoch_features.csv", epoch_rows)
-        write_csv(FEATURE_OUTPUT / "task_state_pair_features.csv", pairs)
+        write_csv(feature_output / "task_state_epoch_features.csv", epoch_rows)
+        write_csv(feature_output / "task_state_pair_features.csv", pairs)
         print(f"Wrote {len(epoch_rows)} epochs and {len(pairs)} pairs")
     summaries = person_medians(pairs)
-    write_csv(FEATURE_OUTPUT / "task_state_person_features.csv", summaries)
+    write_csv(feature_output / "task_state_person_features.csv", summaries)
     tests, scores = contrast_tables(summaries)
-    write_csv(STATS_OUTPUT / "eeg_task_state_contrasts.csv", tests)
-    write_csv(STATS_OUTPUT / "eeg_task_state_contrast_scores.csv", scores)
-    print(f"Wrote {len(tests)} task-state tests to {STATS_OUTPUT}")
+    write_csv(stats_output / "eeg_task_state_contrasts.csv", tests)
+    write_csv(stats_output / "eeg_task_state_contrast_scores.csv", scores)
+    print(f"Wrote {len(tests)} task-state tests to {stats_output}")
     for row in tests:
         if row["feature_tier"] == "primary":
             holm = row["p_t_holm"]
@@ -334,8 +387,21 @@ def main() -> None:
         action="store_true",
         help="Reuse existing task-state feature CSVs.",
     )
+    parser.add_argument(
+        "--channel-set-policy",
+        type=Path,
+        default=None,
+        help=(
+            "Optional channel-set JSON. Non-primary policies write under "
+            "sensitivity/channel_sets/<version>/ and never replace the "
+            "primary task-state tables."
+        ),
+    )
     args = parser.parse_args()
-    run(skip_extract=args.skip_extract)
+    run(
+        skip_extract=args.skip_extract,
+        channel_set_path=args.channel_set_policy,
+    )
 
 
 if __name__ == "__main__":

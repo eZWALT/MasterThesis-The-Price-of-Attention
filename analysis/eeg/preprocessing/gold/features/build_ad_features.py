@@ -15,6 +15,15 @@ sys.path.insert(0, str(SIGNAL_DIR))
 
 from clean_eeg import clean_recording, load_policy  # noqa: E402
 
+from channel_sets import (  # noqa: E402
+    ChannelSetPolicy,
+    assert_output_allowed,
+    rejection_channel_spec,
+    require_ready,
+    reroute_if_default,
+    resolve_channel_set,
+    suggested_sensitivity_dir,
+)
 from build_condition_features import (  # noqa: E402
     SUMMARY_FEATURES,
     quality_features,
@@ -46,8 +55,14 @@ def feature_row(
     channel_names: list[str],
     epoch_rejection: dict[str, Any],
     ica_applied: bool,
+    channel_set: ChannelSetPolicy | Path | None = None,
 ) -> dict[str, Any]:
-    quality = quality_features(data_v, channel_names)
+    policy = resolve_channel_set(channel_set)
+    quality = quality_features(
+        data_v,
+        channel_names,
+        rejection_channels=rejection_channel_spec(policy),
+    )
     rejection_reasons: list[str] = []
     if float(quality["max_peak_to_peak_uv"]) > float(
         epoch_rejection["max_peak_to_peak_uv"]
@@ -96,8 +111,11 @@ def feature_row(
             data_v,
             sfreq=sfreq,
             channel_names=channel_names,
+            channel_set=policy,
         )
     )
+    if not policy.is_primary:
+        row["channel_set_policy_version"] = policy.policy_version
     row["source_log"] = window["source_log"]
     row["source_xdf"] = window["source_xdf"]
     row["source_xdf_sha256"] = window["source_xdf_sha256"]
@@ -140,6 +158,15 @@ def response_row(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "exclusion_reason": "" if eligible else "gross_artifact_in_pair",
         "artifact_policy_status": pre["artifact_policy_status"],
         "ica_applied": pre["ica_applied"],
+        **(
+            {
+                "channel_set_policy_version": pre[
+                    "channel_set_policy_version"
+                ]
+            }
+            if pre.get("channel_set_policy_version")
+            else {}
+        ),
     }
     for feature in SUMMARY_FEATURES:
         pre_value = float(pre[feature])
@@ -161,6 +188,7 @@ def build(
     responses_output: Path,
     subjects: set[str] | None,
     policy_path: Path,
+    channel_set_path: Path | None = None,
 ) -> None:
     windows = [
         row
@@ -170,6 +198,22 @@ def build(
     ]
     if not windows:
         raise ValueError("No eligible ad-analysis windows selected")
+    channel_set = resolve_channel_set(channel_set_path)
+    require_ready(channel_set)
+    target = REPOSITORY_ROOT / suggested_sensitivity_dir(channel_set)
+    epochs_output = reroute_if_default(
+        channel_set,
+        epochs_output,
+        DEFAULT_EPOCHS,
+        target / "ad_epoch_features.csv",
+    )
+    responses_output = reroute_if_default(
+        channel_set,
+        responses_output,
+        DEFAULT_RESPONSES,
+        target / "ad_response_features.csv",
+    )
+    assert_output_allowed(channel_set, epochs_output, responses_output)
     policy = load_policy(policy_path)
     epoch_rejection = policy["epoch_rejection"]
 
@@ -210,6 +254,7 @@ def build(
                     channel_names=raw.ch_names,
                     epoch_rejection=epoch_rejection,
                     ica_applied=cleaning_report.ica_applied,
+                    channel_set=channel_set,
                 )
             )
 
@@ -242,6 +287,15 @@ def main() -> None:
         type=Path,
         default=SIGNAL_DIR / "cleaning_policy.json",
     )
+    parser.add_argument(
+        "--channel-set-policy",
+        type=Path,
+        default=None,
+        help=(
+            "Optional channel-set JSON. Default is the frozen current_v1 "
+            "contract. Non-primary policies cannot write primary Gold."
+        ),
+    )
     args = parser.parse_args()
     build(
         windows_path=args.windows,
@@ -250,6 +304,7 @@ def main() -> None:
         responses_output=args.responses_output,
         subjects=set(args.subjects) if args.subjects else None,
         policy_path=args.policy,
+        channel_set_path=args.channel_set_policy,
     )
 
 

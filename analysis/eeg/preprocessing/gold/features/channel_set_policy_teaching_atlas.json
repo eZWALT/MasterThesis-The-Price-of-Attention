@@ -1,0 +1,69 @@
+{
+  "policy_version": "teaching_atlas_v0",
+  "status": "ready",
+  "role": "sensitivity_only",
+  "description": "Ten global band powers averaged on regions named in the AES introductory atlas (Britton et al. 2016), mapped onto this 32-channel cap. The atlas does not publish these electrode tuples. Derived measures stay on current_v1. Not confirmatory. Cleaning stays full-montage. Hz edges stay Angela/Zheng/Cochran.",
+  "provenance": {
+    "source": "Britton JW, Frey LC, Hopp JL, et al. Electroencephalography (EEG): An Introductory Text and Atlas of Normal and Abnormal Findings in Adults, Children, and Infants. St. Louis EK, Frey LC, eds. Chicago: American Epilepsy Society; 2016. doi:10.5698/978-0-9979756-0-4.",
+    "chapters": [
+      "https://www.ncbi.nlm.nih.gov/books/NBK390343/ (The Normal EEG)",
+      "https://www.ncbi.nlm.nih.gov/books/NBK390342/ (An orderly approach…; band names and 10-20 letters)"
+    ],
+    "what_the_atlas_says": "α posteriorly dominant, occipital generator. β fronto-centro-temporal / precentral. θ/δ in wakefulness occasional; drowsy bursts frontally dominant; vertex waves fronto-central. γ not commonly encountered on scalp EEG.",
+    "what_this_file_does": "Maps those region words onto classic 10-20 sites recorded here. This mapping is ours. Do not cite the atlas as if it listed these electrodes.",
+    "not_used": "George nine-site montage and Wang left C/P/T theta. Do not mix."
+  },
+  "welch": {
+    "nperseg_seconds": 2.0,
+    "overlap": 0.5
+  },
+  "bands": {
+    "delta": {
+      "low_hz": 0.5,
+      "high_hz": 4.0,
+      "channels": ["F3", "Fz", "F4", "F7", "F8"]
+    },
+    "theta": {
+      "low_hz": 4.0,
+      "high_hz": 8.0,
+      "channels": ["F3", "Fz", "F4", "FC1", "FC2", "C3", "Cz", "C4"]
+    },
+    "alpha": {
+      "low_hz": 8.0,
+      "high_hz": 13.0,
+      "channels": ["O1", "Oz", "O2", "P3", "Pz", "P4"]
+    },
+    "beta": {
+      "low_hz": 13.0,
+      "high_hz": 30.0,
+      "channels": ["F3", "Fz", "F4", "F7", "F8", "C3", "Cz", "C4", "T7", "T8"]
+    },
+    "gamma": {
+      "low_hz": 30.0,
+      "high_hz": 40.0,
+      "channels": ["F3", "Fz", "F4", "FC1", "FC2", "C3", "Cz", "C4"]
+    }
+  },
+  "derived": {
+    "fz_theta": {"band": "theta", "channels": ["Fz"]},
+    "posterior_alpha": {
+      "band": "alpha",
+      "channels": ["O1", "Oz", "O2", "P3", "Pz", "P4"]
+    },
+    "faa": {"band": "alpha", "left": ["F3"], "right": ["F4"]},
+    "engagement_pope_global": {"channels": "all"},
+    "engagement_pope_frontocentral": {
+      "channels": ["F3", "F4", "Fz", "FC1", "FC2", "C3", "C4", "Cz"]
+    },
+    "engagement_kislov": {
+      "channels": ["Cz", "Pz", "P3", "P4"],
+      "alpha_hz": [8.0, 12.0],
+      "beta_hz": [16.0, 24.0]
+    }
+  },
+  "epoch_rejection_channels": "all",
+  "cleaning": {
+    "scope": "full_montage",
+    "note": "Do not subset channels before notch, average reference, interpolation, or ICA."
+  }
+}

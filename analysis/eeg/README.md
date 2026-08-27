@@ -26,4 +26,8 @@ the preprocessing code only reads them and writes reproducible derivatives.
 The pipeline diagram follows the project documentation convention and lives at
 `src/project/docs/eeg_pipeline/`.
 
-Start with `preprocessing/README.md`.
+Start with `preprocessing/README.md`. Channel-set / literature-ROI
+averages (George nine-site and Wang-zone) are a sensitivity
+(`preprocessing/run_channel_set_sensitivity.py`); they do not replace
+primary Gold. Heatmaps:
+`analysis/plot_channel_set_heatmaps.py`.

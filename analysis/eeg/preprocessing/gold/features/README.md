@@ -3,6 +3,28 @@
 `build_condition_features.py` creates the first analysis-shaped EEG tables from
 eligible baseline and sustained condition windows.
 
+## Channel sets
+
+Electrode lists for the 16 spectral formulas live in
+`channel_set_policy.json` (`current_v1`, primary Gold). Cleaning still
+uses the full montage. `channel_set_policy_literature_roi.json` is filled
+(`literature_roi_v0`, George 2025 nine-site). 
+`channel_set_policy_wang2022.json` is the Wang-zone sensitivity
+(`wang2022_v0`). Both are hardcoded; the JSON must match.
+They change the ten global band powers only.
+
+```bash
+python analysis/eeg/preprocessing/run_channel_set_sensitivity.py \
+  --channel-set-policy \
+  analysis/eeg/preprocessing/gold/features/channel_set_policy_literature_roi.json \
+  analysis/eeg/preprocessing/gold/features/channel_set_policy_wang2022.json
+```
+
+The builders also accept `--channel-set-policy`. Non-primary policies
+are rerouted under `gold/features/sensitivity/channel_sets/<version>/`
+and cannot overwrite primary Gold. See
+`.agents/context/data-analysis/eeg/2026-08-24-channel-set-policy.md`.
+
 ## Current contract
 
 - Clean continuous EEG with the candidate Silver policy.

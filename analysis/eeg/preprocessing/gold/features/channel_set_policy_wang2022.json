@@ -1,0 +1,66 @@
+{
+  "policy_version": "wang2022_v0",
+  "status": "ready",
+  "role": "sensitivity_only",
+  "description": "Ten global band powers averaged on Wang and Mengoni 2022 §2.2 geography, mapped onto that paper's own 10-20 zone letters on this 32-channel cap. Wang does not publish these electrode tuples. Derived measures stay on current_v1. Not confirmatory. Cleaning stays full-montage. Hz edges stay Angela/Zheng/Cochran.",
+  "provenance": {
+    "paper": "Wang Z, Mengoni P. Brain Inform. 2022;9:11. doi:10.1186/s40708-022-00159-3.",
+    "what_wang_says": "§2.2 is location prose: adults frontal δ; left central/parietal/temporal θ; occipital α; frontal and central β; cortex γ, grouped in the introduction with frontal/central alertness. §2.1 maps letters Fp F C P T O and notes P7/P8 are posterior temporal, F7/F8 sit on frontal plus temporal pole. The method then picks zones per patient from clinical-report keywords. Not one fixed five-band electrode list.",
+    "what_this_file_does": "Applies those zone words to the recorded 10-20 sites. δ = Fp+F (frontally). θ = left C/P/T, with P7 in T. α = O. β and γ = F+C, not Fp. No FC/CP invented sites. Same Hz edges as current_v1.",
+    "not_used": "George and Gulia 2025 nine-site montage (that is literature_roi_v0). Do not mix the two papers into one list.",
+    "angela_does": "Band power on every recorded channel; Zheng and Cochran cited only for Hz edges. Those edges stay: δ 0.5–4, θ 4–8, α 8–13, β 13–30, γ 30–40."
+  },
+  "welch": {
+    "nperseg_seconds": 2.0,
+    "overlap": 0.5
+  },
+  "bands": {
+    "delta": {
+      "low_hz": 0.5,
+      "high_hz": 4.0,
+      "channels": ["Fp1", "Fp2", "F3", "Fz", "F4", "F7", "F8", "F9", "F10"]
+    },
+    "theta": {
+      "low_hz": 4.0,
+      "high_hz": 8.0,
+      "channels": ["C3", "P3", "T7", "P7"]
+    },
+    "alpha": {
+      "low_hz": 8.0,
+      "high_hz": 13.0,
+      "channels": ["O1", "Oz", "O2"]
+    },
+    "beta": {
+      "low_hz": 13.0,
+      "high_hz": 30.0,
+      "channels": ["F3", "Fz", "F4", "F7", "F8", "F9", "F10", "C3", "Cz", "C4"]
+    },
+    "gamma": {
+      "low_hz": 30.0,
+      "high_hz": 40.0,
+      "channels": ["F3", "Fz", "F4", "F7", "F8", "F9", "F10", "C3", "Cz", "C4"]
+    }
+  },
+  "derived": {
+    "fz_theta": {"band": "theta", "channels": ["Fz"]},
+    "posterior_alpha": {
+      "band": "alpha",
+      "channels": ["O1", "Oz", "O2", "P3", "Pz", "P4"]
+    },
+    "faa": {"band": "alpha", "left": ["F3"], "right": ["F4"]},
+    "engagement_pope_global": {"channels": "all"},
+    "engagement_pope_frontocentral": {
+      "channels": ["F3", "F4", "Fz", "FC1", "FC2", "C3", "C4", "Cz"]
+    },
+    "engagement_kislov": {
+      "channels": ["Cz", "Pz", "P3", "P4"],
+      "alpha_hz": [8.0, 12.0],
+      "beta_hz": [16.0, 24.0]
+    }
+  },
+  "epoch_rejection_channels": "all",
+  "cleaning": {
+    "scope": "full_montage",
+    "note": "Do not subset channels before notch, average reference, interpolation, or ICA."
+  }
+}

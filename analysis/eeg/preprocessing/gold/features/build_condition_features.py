@@ -19,6 +19,18 @@ SIGNAL_DIR = REPOSITORY_ROOT / "analysis/eeg/preprocessing/silver/signal"
 sys.path.insert(0, str(SIGNAL_DIR))
 
 from clean_eeg import clean_recording, load_policy  # noqa: E402
+from channel_sets import (  # noqa: E402
+    ChannelSetPolicy,
+    assert_output_allowed,
+    channel_indices,
+    lookup_names,
+    mean_over,
+    rejection_channel_spec,
+    require_ready,
+    reroute_if_default,
+    resolve_channel_set,
+    suggested_sensitivity_dir,
+)
 
 
 DEFAULT_WINDOWS = REPOSITORY_ROOT / (
@@ -96,7 +108,10 @@ def spectral_features(
     *,
     sfreq: float,
     channel_names: list[str],
+    channel_set: ChannelSetPolicy | Path | None = None,
 ) -> dict[str, float]:
+    policy = resolve_channel_set(channel_set)
+    require_ready(policy)
     nperseg = min(int(round(2.0 * sfreq)), data_v.shape[1])
     frequencies, psd = welch(
         data_v,
@@ -108,120 +123,130 @@ def spectral_features(
         scaling="density",
     )
     powers = {
-        band: band_integral(psd, frequencies, low_hz, high_hz)
-        for band, (low_hz, high_hz) in BANDS.items()
+        name: band_integral(psd, frequencies, band.low_hz, band.high_hz)
+        for name, band in policy.bands.items()
     }
     total_per_channel = band_integral(psd, frequencies, 0.5, 40.0)
-    total_power = float(np.mean(total_per_channel))
+    lookup = lookup_names(channel_names)
 
     features: dict[str, float] = {}
-    for band, channel_powers in powers.items():
-        global_power = float(np.mean(channel_powers))
-        features[f"{band}_power_db_uv2"] = safe_db_uv2(global_power)
-        features[f"{band}_relative_power"] = (
-            global_power / total_power if total_power > 0 else math.nan
+    for name, band in policy.bands.items():
+        regional_power = mean_over(
+            powers[name],
+            band.channels,
+            lookup,
+            field=f"{name} power",
+        )
+        regional_total = mean_over(
+            total_per_channel,
+            band.channels,
+            lookup,
+            field=f"{name} relative total",
+        )
+        features[f"{name}_power_db_uv2"] = safe_db_uv2(regional_power)
+        features[f"{name}_relative_power"] = (
+            regional_power / regional_total if regional_total > 0 else math.nan
         )
 
-    lookup = {name.lower(): index for index, name in enumerate(channel_names)}
-    if "f3" not in lookup or "f4" not in lookup:
-        raise ValueError("FAA requires F3 and F4 channels")
-    f3_alpha = float(powers["alpha"][lookup["f3"]])
-    f4_alpha = float(powers["alpha"][lookup["f4"]])
-    if "fz" not in lookup:
-        raise ValueError("Frontal-midline theta requires Fz")
     features["fz_theta_power_db_uv2"] = safe_db_uv2(
-        float(powers["theta"][lookup["fz"]])
+        mean_over(
+            powers["theta"],
+            policy.fz_theta_channels,
+            lookup,
+            field="Fz theta",
+        )
     )
-    posterior_channels = ("o1", "oz", "o2", "p3", "pz", "p4")
-    missing_posterior = [
-        channel for channel in posterior_channels if channel not in lookup
-    ]
-    if missing_posterior:
-        raise ValueError(
-            f"Posterior alpha requires channels: {missing_posterior}"
-        )
     features["posterior_alpha_power_db_uv2"] = safe_db_uv2(
-        float(
-            np.mean(
-                [
-                    powers["alpha"][lookup[channel]]
-                    for channel in posterior_channels
-                ]
-            )
+        mean_over(
+            powers["alpha"],
+            policy.posterior_alpha_channels,
+            lookup,
+            field="posterior alpha",
         )
+    )
+    left_alpha = mean_over(
+        powers["alpha"],
+        policy.faa_left,
+        lookup,
+        field="FAA left",
+    )
+    right_alpha = mean_over(
+        powers["alpha"],
+        policy.faa_right,
+        lookup,
+        field="FAA right",
     )
     features["faa_log_f4_minus_f3"] = math.log(
-        max(f4_alpha, np.finfo(float).tiny)
-    ) - math.log(max(f3_alpha, np.finfo(float).tiny))
+        max(right_alpha, np.finfo(float).tiny)
+    ) - math.log(max(left_alpha, np.finfo(float).tiny))
 
-    alpha = float(np.mean(powers["alpha"]))
-    theta = float(np.mean(powers["theta"]))
-    beta = float(np.mean(powers["beta"]))
+    alpha = mean_over(
+        powers["alpha"],
+        policy.pope_global_channels,
+        lookup,
+        field="Pope global alpha",
+    )
+    theta = mean_over(
+        powers["theta"],
+        policy.pope_global_channels,
+        lookup,
+        field="Pope global theta",
+    )
+    beta = mean_over(
+        powers["beta"],
+        policy.pope_global_channels,
+        lookup,
+        field="Pope global beta",
+    )
     denominator = alpha + theta
     features["engagement_beta_over_alpha_theta"] = (
         beta / denominator if denominator > 0 else math.nan
     )
-    frontocentral_channels = (
-        "f3",
-        "f4",
-        "fz",
-        "fc1",
-        "fc2",
-        "c3",
-        "c4",
-        "cz",
+    frontocentral_alpha = mean_over(
+        powers["alpha"],
+        policy.pope_frontocentral_channels,
+        lookup,
+        field="Pope frontocentral alpha",
     )
-    missing_frontocentral = [
-        channel for channel in frontocentral_channels if channel not in lookup
-    ]
-    if missing_frontocentral:
-        raise ValueError(
-            "Frontocentral engagement requires channels: "
-            f"{missing_frontocentral}"
-        )
-    frontocentral_alpha = float(
-        np.mean(
-            [
-                powers["alpha"][lookup[channel]]
-                for channel in frontocentral_channels
-            ]
-        )
+    frontocentral_theta = mean_over(
+        powers["theta"],
+        policy.pope_frontocentral_channels,
+        lookup,
+        field="Pope frontocentral theta",
     )
-    frontocentral_theta = float(
-        np.mean(
-            [
-                powers["theta"][lookup[channel]]
-                for channel in frontocentral_channels
-            ]
-        )
-    )
-    frontocentral_beta = float(
-        np.mean(
-            [
-                powers["beta"][lookup[channel]]
-                for channel in frontocentral_channels
-            ]
-        )
+    frontocentral_beta = mean_over(
+        powers["beta"],
+        policy.pope_frontocentral_channels,
+        lookup,
+        field="Pope frontocentral beta",
     )
     features["engagement_pope_frontocentral_beta_over_alpha_theta"] = (
         frontocentral_beta / (frontocentral_alpha + frontocentral_theta)
     )
 
-    central_channels = ("cz", "pz", "p3", "p4")
-    missing_central = [
-        channel for channel in central_channels if channel not in lookup
-    ]
-    if missing_central:
-        raise ValueError(
-            f"Central engagement requires channels: {missing_central}"
-        )
-    alpha_8_12 = band_integral(psd, frequencies, 8.0, 12.0)
-    beta_16_24 = band_integral(psd, frequencies, 16.0, 24.0)
-    central_alpha = float(
-        np.mean([alpha_8_12[lookup[channel]] for channel in central_channels])
+    alpha_8_12 = band_integral(
+        psd,
+        frequencies,
+        policy.kislov_alpha_hz[0],
+        policy.kislov_alpha_hz[1],
     )
-    central_beta = float(
-        np.mean([beta_16_24[lookup[channel]] for channel in central_channels])
+    beta_16_24 = band_integral(
+        psd,
+        frequencies,
+        policy.kislov_beta_hz[0],
+        policy.kislov_beta_hz[1],
+    )
+    central_alpha = mean_over(
+        alpha_8_12,
+        policy.kislov_channels,
+        lookup,
+        field="Kislov alpha",
+    )
+    central_beta = mean_over(
+        beta_16_24,
+        policy.kislov_channels,
+        lookup,
+        field="Kislov beta",
     )
     features["engagement_kislov_central_beta16_24_over_alpha8_12"] = (
         central_beta / central_alpha
@@ -232,14 +257,19 @@ def spectral_features(
 def quality_features(
     data_v: np.ndarray,
     channel_names: list[str],
+    rejection_channels: str | tuple[str, ...] | None = None,
 ) -> dict[str, float | int | str]:
     data_uv = data_v * 1e6
     peak_to_peak = np.ptp(data_uv, axis=1)
     channel_std = np.std(data_uv, axis=1)
     max_abs_by_channel = np.max(np.abs(data_uv), axis=1)
-    channel_lookup = {
-        name.lower(): index for index, name in enumerate(channel_names)
-    }
+    channel_lookup = lookup_names(channel_names)
+    spec = "all" if rejection_channels is None else rejection_channels
+    reject_index = channel_indices_or_all(spec, channel_lookup)
+    rejected_ptp = peak_to_peak[reject_index]
+    rejected_std = channel_std[reject_index]
+    rejected_abs = max_abs_by_channel[reject_index]
+    rejected_names = [channel_names[int(index)] for index in reject_index]
     frontal_peak_to_peak = {
         f"{channel.lower()}_peak_to_peak_uv": (
             float(peak_to_peak[channel_lookup[channel.lower()]])
@@ -249,18 +279,25 @@ def quality_features(
         for channel in ("Fp1", "Fp2", "F3", "F4")
     }
     return {
-        "max_abs_amplitude_uv": float(np.max(max_abs_by_channel)),
-        "max_abs_amplitude_channel": channel_names[
-            int(np.argmax(max_abs_by_channel))
+        "max_abs_amplitude_uv": float(np.max(rejected_abs)),
+        "max_abs_amplitude_channel": rejected_names[
+            int(np.argmax(rejected_abs))
         ],
-        "max_peak_to_peak_uv": float(np.max(peak_to_peak)),
-        "max_peak_to_peak_channel": channel_names[int(np.argmax(peak_to_peak))],
-        "median_peak_to_peak_uv": float(np.median(peak_to_peak)),
-        "max_channel_std_uv": float(np.max(channel_std)),
-        "median_channel_std_uv": float(np.median(channel_std)),
-        "near_flat_channel_count": int(np.count_nonzero(channel_std < 0.5)),
+        "max_peak_to_peak_uv": float(np.max(rejected_ptp)),
+        "max_peak_to_peak_channel": rejected_names[int(np.argmax(rejected_ptp))],
+        "median_peak_to_peak_uv": float(np.median(rejected_ptp)),
+        "max_channel_std_uv": float(np.max(rejected_std)),
+        "median_channel_std_uv": float(np.median(rejected_std)),
+        "near_flat_channel_count": int(np.count_nonzero(rejected_std < 0.5)),
         **frontal_peak_to_peak,
     }
+
+
+def channel_indices_or_all(
+    spec: str | tuple[str, ...],
+    lookup: dict[str, int],
+) -> np.ndarray:
+    return channel_indices(spec, lookup, field="epoch rejection")
 
 
 def complete_epoch_bounds(
@@ -291,6 +328,7 @@ def epoch_row(
     channel_names: list[str],
     epoch_rejection: dict[str, Any],
     ica_applied: bool,
+    channel_set: ChannelSetPolicy | Path | None = None,
 ) -> dict[str, Any]:
     row: dict[str, Any] = {
         "subject_id": window["subject_id"],
@@ -317,7 +355,12 @@ def epoch_row(
             "max_peak_to_peak_uv"
         ],
     }
-    quality = quality_features(data_v, channel_names)
+    policy = resolve_channel_set(channel_set)
+    quality = quality_features(
+        data_v,
+        channel_names,
+        rejection_channels=rejection_channel_spec(policy),
+    )
     row.update(quality)
     rejection_reasons: list[str] = []
     if float(quality["max_peak_to_peak_uv"]) > float(
@@ -331,7 +374,16 @@ def epoch_row(
         rejection_reasons.append("near_flat_channel")
     row["retained_by_policy"] = "no" if rejection_reasons else "yes"
     row["artifact_rejection_reason"] = ";".join(rejection_reasons)
-    row.update(spectral_features(data_v, sfreq=sfreq, channel_names=channel_names))
+    row.update(
+        spectral_features(
+            data_v,
+            sfreq=sfreq,
+            channel_names=channel_names,
+            channel_set=policy,
+        )
+    )
+    if not policy.is_primary:
+        row["channel_set_policy_version"] = policy.policy_version
     row["source_xdf"] = window["source_xdf"]
     row["source_xdf_sha256"] = window["source_xdf_sha256"]
     row["source_canonical_markers"] = window["source_canonical_markers"]
@@ -384,6 +436,11 @@ def summarize_window(
         "exclusion_reason": "" if window_eligible else "insufficient_clean_epochs",
         "artifact_policy_status": epoch_rejection["status"],
         "ica_applied": first["ica_applied"],
+        **(
+            {"channel_set_policy_version": first["channel_set_policy_version"]}
+            if first.get("channel_set_policy_version")
+            else {}
+        ),
         "max_peak_to_peak_uv_p50": percentile(
             [float(row["max_peak_to_peak_uv"]) for row in rows], 0.5
         ),
@@ -443,9 +500,26 @@ def build(
     subjects: set[str] | None,
     policy_path: Path,
     from_epochs: Path | None = None,
+    channel_set_path: Path | None = None,
 ) -> None:
     if epoch_seconds < 2.0:
         raise ValueError("Epoch duration must be at least 2 seconds")
+    channel_set = resolve_channel_set(channel_set_path)
+    require_ready(channel_set)
+    target = REPOSITORY_ROOT / suggested_sensitivity_dir(channel_set)
+    epochs_output = reroute_if_default(
+        channel_set,
+        epochs_output,
+        DEFAULT_EPOCHS,
+        target / "condition_epoch_features.csv",
+    )
+    summary_output = reroute_if_default(
+        channel_set,
+        summary_output,
+        DEFAULT_SUMMARY,
+        target / "condition_features.csv",
+    )
+    assert_output_allowed(channel_set, epochs_output, summary_output)
     policy = load_policy(policy_path)
     epoch_rejection = policy["epoch_rejection"]
     if not str(epoch_rejection.get("status", "")).startswith("frozen_"):
@@ -524,6 +598,7 @@ def build(
                         channel_names=raw.ch_names,
                         epoch_rejection=epoch_rejection,
                         ica_applied=cleaning_report.ica_applied,
+                        channel_set=channel_set,
                     )
                 )
             print(
@@ -567,6 +642,15 @@ def main() -> None:
         type=Path,
         help="Re-summarize an existing epoch table without recleaning EEG.",
     )
+    parser.add_argument(
+        "--channel-set-policy",
+        type=Path,
+        default=None,
+        help=(
+            "Optional channel-set JSON. Default is the frozen current_v1 "
+            "contract. Non-primary policies cannot write primary Gold."
+        ),
+    )
     args = parser.parse_args()
     build(
         windows_path=args.windows,
@@ -577,6 +661,7 @@ def main() -> None:
         subjects=set(args.subjects) if args.subjects else None,
         policy_path=args.policy,
         from_epochs=args.from_epochs,
+        channel_set_path=args.channel_set_policy,
     )
 
 

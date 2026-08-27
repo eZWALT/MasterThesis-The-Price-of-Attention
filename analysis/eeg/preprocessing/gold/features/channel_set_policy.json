@@ -1,0 +1,39 @@
+{
+  "policy_version": "current_v1",
+  "status": "frozen",
+  "role": "primary_gold",
+  "description": "Channel sets that produced the confirmatory 16-feature Gold tables. Global bands average the full recorded montage. Regional measures keep the existing Fz / posterior / FAA / Pope / Kislov lists.",
+  "welch": {
+    "nperseg_seconds": 2.0,
+    "overlap": 0.5
+  },
+  "bands": {
+    "delta": {"low_hz": 0.5, "high_hz": 4.0, "channels": "all"},
+    "theta": {"low_hz": 4.0, "high_hz": 8.0, "channels": "all"},
+    "alpha": {"low_hz": 8.0, "high_hz": 13.0, "channels": "all"},
+    "beta": {"low_hz": 13.0, "high_hz": 30.0, "channels": "all"},
+    "gamma": {"low_hz": 30.0, "high_hz": 40.0, "channels": "all"}
+  },
+  "derived": {
+    "fz_theta": {"band": "theta", "channels": ["Fz"]},
+    "posterior_alpha": {
+      "band": "alpha",
+      "channels": ["O1", "Oz", "O2", "P3", "Pz", "P4"]
+    },
+    "faa": {"band": "alpha", "left": ["F3"], "right": ["F4"]},
+    "engagement_pope_global": {"channels": "all"},
+    "engagement_pope_frontocentral": {
+      "channels": ["F3", "F4", "Fz", "FC1", "FC2", "C3", "C4", "Cz"]
+    },
+    "engagement_kislov": {
+      "channels": ["Cz", "Pz", "P3", "P4"],
+      "alpha_hz": [8.0, 12.0],
+      "beta_hz": [16.0, 24.0]
+    }
+  },
+  "epoch_rejection_channels": "all",
+  "cleaning": {
+    "scope": "full_montage",
+    "note": "Do not subset channels before notch, average reference, interpolation, or ICA."
+  }
+}
