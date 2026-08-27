@@ -52,7 +52,7 @@ and no-ICA (Holm \(p=0.012\)). Neither cell is Holm-significant at 4 s.
 A 20 August after-reply lock (finished message + 0.49 s for every
 cell) stayed 4 s Holm-null and removed the 2 s explicit-early theta
 hit. **Keep the golden visual-onset lock.** See
-`2026-08-20-what-path-b-onset-is.md`.
+`2026-08-20-what-dataset-b-onset-is.md`.
 
 Figure cut and Results sentences (20 August lock):
 `2026-08-20-paper-figures-and-narrative.md`.

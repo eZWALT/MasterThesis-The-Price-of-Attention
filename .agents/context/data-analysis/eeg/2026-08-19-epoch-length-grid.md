@@ -62,7 +62,7 @@ confirmatory result and not as a reason to change ad format or epoch
 width. Numbers: `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`.
 
 4 s is not an arbitrary middle. Dataset B locks to visual ad onset
-(see `2026-08-20-what-path-b-onset-is.md`). A 20 August after-reply
+(see `2026-08-20-what-dataset-b-onset-is.md`). A 20 August after-reply
 lock (finished message + 0.49 s) stayed 4 s Holm-null and killed the
 2 s explicit-early theta cell. Keep the golden lock.
 On explicit ads the reply is already up (~0.5 s); on implicit it follows

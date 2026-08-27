@@ -39,5 +39,5 @@ Preprocessing still says ICA was not applied.
 ## Related
 
 - Numbers: `../data-analysis/eeg/2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`
-- Onset: `../data-analysis/eeg/2026-08-20-what-path-b-onset-is.md`
+- Onset: `../data-analysis/eeg/2026-08-20-what-dataset-b-onset-is.md`
 - Writing rule: pull → show → apply → push only when asked.

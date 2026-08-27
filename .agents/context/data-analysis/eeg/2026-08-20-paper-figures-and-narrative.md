@@ -3,7 +3,7 @@
 Date: 20 August 2026
 Branch note: this lock uses **golden visual-onset** 4 s numbers. The
 `eeg-path-b-after-reply` sensitivity was tried and rejected
-(`2026-08-20-path-b-after-reply-lock.md`). Do not overwrite golden Gold.
+(`2026-08-20-dataset-b-after-reply-lock.md`). Do not overwrite golden Gold.
 
 This file consolidates the EEG-only stop line, the 4 s / sensitivity
 CIs, the figure suite, the Monday agenda, and the Goal-1 blocker into
@@ -166,7 +166,7 @@ Subject 4 is out of Gold (\(n=18\)). Silver applies ICA; Gold measures
 - Numbers: `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`
 - Stop line: `2026-08-19-eeg-only-analyses-complete.md`
 - Tickets / C1: `2026-08-19-eeg-analysis-menu-and-tickets.md`
-- Onset: `2026-08-20-what-path-b-onset-is.md`
+- Onset: `2026-08-20-what-dataset-b-onset-is.md`
 - Pipeline figure: `2026-08-20-eeg-pipeline-figure-v2.md`
 - Names: `../2026-08-20-implicit-explicit-names.md`
 - Monday ask: `../../writing/2026-08-20-monday-katerina-sebastian-agenda.md`

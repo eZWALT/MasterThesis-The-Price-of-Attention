@@ -154,6 +154,6 @@ Not Q1, not Q2, not the abstract.
 
 - Grid contract: `2026-08-19-epoch-length-grid.md`
 - Median stays primary: `2026-08-19-mean-vs-median-and-epoch-length.md`
-- After-reply rejected: `2026-08-20-path-b-after-reply-lock.md`
+- After-reply rejected: `2026-08-20-dataset-b-after-reply-lock.md`
 - Pipeline alive: `2026-08-19-read-vs-write-what-it-proved.md`
 - Stop line: `2026-08-19-eeg-only-analyses-complete.md`

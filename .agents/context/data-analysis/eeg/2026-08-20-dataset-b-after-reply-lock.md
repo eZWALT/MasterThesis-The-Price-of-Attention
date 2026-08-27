@@ -11,7 +11,7 @@ A later hybrid (implicit @ `assistant_reply`, explicit golden) lives
 only in untracked `analysis/eeg/scratch/hybrid_implicit_reply/`.
 Same verdict: 4 s confirmatory still null. Do not commit that folder.
 
-What “onset” means: `2026-08-20-what-path-b-onset-is.md`.
+What “onset” means: `2026-08-20-what-dataset-b-onset-is.md`.
 
 The confirmatory Dataset B lock stays what it is on `main`:
 

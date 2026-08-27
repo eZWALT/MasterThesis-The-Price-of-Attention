@@ -74,6 +74,6 @@ lag). Implicit onsets jumped +2.6 s on average. 4 s confirmatory
 stayed Holm-null. The 2 s explicit-early Fz theta hit died.
 
 **Keep the golden visual-onset lock.** After-reply is a sensitivity
-only. See `2026-08-20-path-b-after-reply-lock.md`.
+only. See `2026-08-20-dataset-b-after-reply-lock.md`.
 
 Dataset A does not use this clock. Dataset A tiles the whole condition.
