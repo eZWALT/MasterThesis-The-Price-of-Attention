@@ -36,5 +36,9 @@ Newest roster / log-scheme audit:
 - `2026-08-18-behavioural-roster-and-log-schemes.md` — finished *N*,
   early `export.jsonl` + numeric conditions, production-only 42–44.
 
+Crowd age for thesis Results 7.1 is a **prose-only** Prolific-export
+estimate (26 of 36 with numeric age; not in Gold):
+`2026-08-27-crowd-age-prolific-estimate.md`.
+
 Instrument order / why-this-order (for Methods Flow Design):
 `../../writing/2026-08-25-experiment-flow-design.md`.
