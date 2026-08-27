@@ -88,7 +88,7 @@ def matrix(
 ) -> np.ndarray:
     values = np.full((len(FEATURES), len(contrasts)), np.nan)
     slice_ = grid[
-        (grid["path"] == path)
+        (grid["path"] == dataset)
         & (grid["policy"] == POLICY)
         & (grid["epoch_seconds"] == seconds)
     ]

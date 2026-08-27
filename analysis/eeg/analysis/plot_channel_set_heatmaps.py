@@ -301,7 +301,7 @@ def plot_holm_board(path_name: str, contrasts: list, stem: str) -> None:
     )
     cbar.set_label("Holm p")
     figure.suptitle(
-        f"Channel-set sensitivity · Path {path_name} Holm p · 4 s · ICA",
+        f"Channel-set sensitivity · Dataset {path_name} Holm p · 4 s · ICA",
         y=0.995,
         color=INK,
     )
@@ -404,7 +404,7 @@ def plot_mean_diff_board(path_name: str, contrasts: list, stem: str) -> None:
     )
     cbar.set_label("Mean difference")
     figure.suptitle(
-        f"Channel-set sensitivity · Path {path_name} mean difference · globals · 4 s · ICA",
+        f"Channel-set sensitivity · Dataset {path_name} mean difference · globals · 4 s · ICA",
         y=0.995,
         color=INK,
     )
