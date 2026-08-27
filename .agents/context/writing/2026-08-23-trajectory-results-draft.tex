@@ -1,0 +1,255 @@
+% =============================================================================
+% Date: 23 Aug 2026. Agent draft for Walter's review.
+%
+% STATUS: pushed to the publication Overleaf on 23 Aug as eef01b5.
+% Walter retouches in Overleaf from here, so THIS FILE WILL GO STALE --
+% main.tex is the source of truth. The thesis port waits until the paper
+% version is agreed. Kept as the reference copy of what was sent.
+%
+% Replaced the SKELETON block at main.tex \subsection{Genre trajectories
+% and intent theory}, and added \section{Additional information on genre
+% trajectories} before \section{Implementation Details}.
+%
+% House style copied from \subsection{Neurophysiological outcomes}
+% (sec:results-eeg): \paragraph{} blocks, \(...\) inline math, booktabs,
+% figure[H] with \linewidth, Holm-null as an established term.
+%
+% RESULTS != DISCUSSION. Nothing below interprets. Items deliberately NOT
+% written here, because they belong in 7.3 / 7.5:
+%   - "the pipeline is not dead" as an argument (6.4 reports the control only)
+%   - what a bounded null means for advertising practice or for trust
+%   - Definition 6 being a weak instrument on this corpus
+%   - the deployed classifier's stickiness as a system limitation
+%
+% FIGURES: all four copied into publication/Figures/ (pdf + png), from
+% analysis/trajectories/:
+%
+%   outputs/stages_2_4/figures/s24_crossing_forest  -> s24_crossing_forest
+%   outputs/stages_2_4/figures/s24_depth_versus_ad  -> s24_depth_versus_ad
+%   outputs/figures/direction/heatmap_overall_both  -> traj_heatmap_both
+%   outputs/eda/figures/eda_label_validity          -> traj_label_validity
+%
+% Two in Results, two in the appendix. Regenerate the sources with
+% run_stages_2_4.py, run_direction_pass.py, and eda_stage1.py.
+% =============================================================================
+
+\subsection{Genre trajectories and intent theory}
+\label{sec:results-trajectories}
+
+Trajectory results use all fifty-four participants, both arms pooled, and follow Definitions 1--6 of Section~\ref{sec:theoretical-foundations}. Each participant contributes five conversations of \(T=4\) user utterances, giving 270 conversations, 1{,}080 utterances, and 810 transitions. The genre of an utterance is \(f_{\mathrm{genre}}(u_k)\) applied to the bare message, which is Definition~1 read literally \eqref{eq:genre-trajectory}. The deployed system classified a context window instead; that labelling reproduces the runtime log exactly and is carried throughout as a sensitivity analysis, not as the estimand. The two disagree substantively, and Appendix~\ref{sec:app-trajectories} reports both in full. The inferential unit is the participant, and Holm correction is applied within each outcome.
+
+\paragraph{Descriptive structure of the trajectories.}
+Under the bare labelling all thirteen classes are used. The modal genre is general guidance and information (32.4\% of utterances), followed by relationships and personal reflection (17.9\%) and academic help (10.2\%); purchasable products reaches 19 of 1{,}080 utterances despite every task being a shopping scenario. Trajectories move often. Pooled across conditions, a conversation averages \(N_{\mathrm{shift}}=2.45\) of a possible 3 \eqref{eq:genre-shift}, visits \(D=3.10\) distinct genres of a possible 4 \eqref{eq:genre-diversity}, and reaches \(H=1.05\) nats of a possible \(\ln 4 = 1.386\) \eqref{eq:genre-entropy}; 97.4\% of conversations contain at least one shift and maximal persistence \eqref{eq:genre-persistence} averages 1.54 turns of a possible 4. The ceilings here are imposed by \(T=4\), not by \(|\mathcal{G}|=13\), so diversity sits at 78\% of what the design permits rather than at 24\% of the genre space. Of the 169 possible ordered genre pairs, 120 are observed, and the diagonal carries 0.183 of the transition mass.
+
+\paragraph{The five conditions are descriptively indistinguishable.}
+No conversation-level measure separates the conditions: \(N_{\mathrm{shift}}\) gives Kruskal--Wallis \(H=2.89\), \(p=.58\), and entropy and persistence behave the same way (\(p=.88\) and \(p=.59\)). The same is true of every other design factor examined descriptively --- task (\(p=.33\)), arm (\(p=.85\)), and session position (\(p=.52\)) --- and the between-participant intraclass correlation is 0.043 to 0.111 across the three measures. Because 97.4\% of conversations shift somewhere, the conversation-level dichotomy ``did this conversation shift at all'' is near-degenerate and is not used as a treatment test; the confirmatory tests below sit on the single transition that can cross an advertisement. Full per-condition tables are in Appendix~\ref{sec:app-trajectories}.
+
+\paragraph{What the labelling can bear.}
+Messages shorten sharply across a conversation, from a median of 40 words at turn~1 to 10 at turn~4, and the two fallback classes absorb the difference, rising from 4.1\% of turn-1 utterances to 20.0\% at turn~4. In a logistic model of a fallback label clustered by participant, the turn coefficient is \(\beta=0.43\) (\(p<.001\)); adding \(\log(\text{words})\) leaves the turn term at \(\beta=0.34\) (\(p=.0003\)) alongside \(\beta=-0.29\) for length (\(p=.0007\)). Mean posterior mass on the winning class is flat across turns (0.427 to 0.430). Length therefore explains part of the drift and not all of it, and both halves qualify every genre result in this section.
+
+\paragraph{Advertisements and the crossing transition.}
+The estimand is the transition that an advertisement can actually cross. With \(T=4\), only a turn-2 advertisement is followed by a further user utterance, so \(\delta^{(a)}_k\) \eqref{eq:ad-associated-genre-shift} is evaluated on the transition \(2\rightarrow3\) and compared with the same transition in that participant's \(a^{\emptyset}\) conversation, paired within participant. No contrast is significant. Early advertisements pooled against \(a^{\emptyset}\) give \(+0.046\) on the shift probability, 95\% CI \([-0.082,\,0.174]\), \(d_z=0.10\), Holm \(p=.94\); the implicit and explicit rows and the implicit-minus-explicit comparison are in Table~\ref{tab:traj-crossing}. Because the outcome is binary and each participant contributes exactly one crossing transition per condition, an exact McNemar test reads the same data without a normal approximation, and it agrees: implicit early against \(a^{\emptyset}\) is 11 versus 6 discordant pairs (\(p=.33\)) and explicit early is 8 versus 8 (\(p=1.00\)). A logistic GEE restricted to the same \(k=2\) rows, adjusting for task and session position and clustered by participant, puts the advertisement odds ratio at 1.31 (\(p=.51\)). The confidence interval excludes \(|d_z|>0.27\), and a bias-corrected bootstrap agrees with the \(t\) interval (\([-0.074,\,0.176]\)).
+
+\paragraph{Genre-aligned shifts.}
+The subcase \(\tilde{\delta}^{(a)}_k\) \eqref{eq:genre-aligned-ad-shift} requires the next utterance to land on the advertised genre, where \(g^{(a)}\) is obtained by applying \(f_{\mathrm{genre}}\) to the served product title. It occurs in 9 of the 108 early-advertisement conversations. That count is not interpretable on its own, because advertisements and utterances share a modal genre: 98 of the 156 distinct products are labelled general guidance and information, at a mean top posterior of 0.402, and only 4 are labelled purchasable products. Reassigning the observed advertisement genres across conversations, which preserves both marginals and destroys only the pairing, gives an expected 10.46 alignments against the observed 9 (20{,}000 permutations, \(p=.80\)); the weaker event ``the next utterance is in the advertised genre'', ignoring whether a shift occurred, is 11 observed against 14.28 expected (\(p=.92\)). Conditional on a shift, alignment is \(9/89=0.101\). One structural constraint belongs with these numbers: because advertisements are retrieved from the participant's own utterance, the advertised genre already equals the current genre in 25 of the 108 conversations, and a shift away from that genre cannot land on it. Those 25 are zeros under Definition~6 as written; dropping them gives \(9/83=0.108\).
+
+\paragraph{Presentation format and the late-advertisement control.}
+Presentation format is tested on the same crossing estimand and does not separate: implicit minus explicit early is \(+0.093\), 95\% CI \([-0.069,\,0.254]\), Holm \(p=.91\). Advertisement timing is not a second level of the same estimand, because a turn-4 advertisement has no following user utterance; the late conditions are therefore a negative control, and they are quiet. Late advertisements pooled against \(a^{\emptyset}\) give \(-0.074\) shifts per conversation, 95\% CI \([-0.361,\,0.213]\), Holm \(p=1.00\), with the implicit and explicit late rows also Holm-null.
+
+\paragraph{Positive control: conversational depth.}
+Conversational depth occurred in every conversation regardless of condition and is used here as an instrument check, in the same role as the writing-versus-reading contrast of Section~\ref{sec:results-eeg}. The battery is fixed by prevalence --- every genre labelling at least 5\% of utterances, Holm applied across the six that qualify --- rather than selected after inspection. The share of utterances labelled general guidance and information falls from 0.478 at turn~1 to 0.211 at turn~4, \(d_z=-1.00\), Holm \(p<.001\); other obscene or illegal rises by 0.093 (\(d_z=0.57\), Holm \(p=.002\)), other by 0.067 (\(d_z=0.48\), Holm \(p=.004\)), and personal writing or communication by 0.070 (\(d_z=0.38\), Holm \(p=.019\)). Figure~\ref{fig:traj-depth} places that contrast beside the advertisement contrast on the same participants.
+
+\paragraph{Sensitivity to the labelling.}
+Under the deployed contextual labelling the crossing contrast is \(-0.018\), 95\% CI \([-0.137,\,0.100]\), Holm \(p=1.00\), and every McNemar cell is \(p=1.00\). That labelling is markedly stickier: it uses 7 of the 13 classes, averages 0.40 shifts per conversation against 2.45, and leaves 70\% of conversations in a single genre for all four turns. Its \(\tilde{\delta}^{(a)}\) is 2 of 108, with the advertised genre already current in 53 of the 108. Appendix~\ref{sec:app-trajectories} reports the full contextual tables together with a sweep over four further context windows, none of which produces a significant advertisement contrast.
+
+\begin{table}[H]
+\centering
+\caption{Advertisement-crossing transition \(2\rightarrow3\) against the same transition under \(a^{\emptyset}\), paired within participant (\(N=54\), bare-utterance labelling). Mean differences are on the shift probability; Holm is applied within this family of four. Exact McNemar counts are the discordant pairs.}
+\label{tab:traj-crossing}
+\begin{tabular}{lrlrrr}
+\toprule
+Contrast & Mean \(\delta^{(a)}\) & 95\% CI & \(d_z\) & Holm \(p\) & McNemar \(p\) \\
+\midrule
+Early pooled \(-\) \(a^{\emptyset}\)  & $+0.046$ & $[-0.082,\ 0.174]$ & 0.10 & .94 & --- \\
+Implicit early \(-\) \(a^{\emptyset}\) & $+0.093$ & $[-0.060,\ 0.245]$ & 0.17 & .91 & .33 \\
+Explicit early \(-\) \(a^{\emptyset}\) & $\phantom{+}0.000$ & $[-0.150,\ 0.150]$ & 0.00 & 1.00 & 1.00 \\
+Implicit \(-\) explicit early & $+0.093$ & $[-0.069,\ 0.254]$ & 0.16 & .91 & .36 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{s24_crossing_forest.pdf}
+\caption{Within-person contrasts on the advertisement-crossing transition \(2\rightarrow3\) (\(N=54\), bare-utterance labelling).
+Bars are 95\% paired-\(t\) intervals on the shift probability; Holm is applied within the family of four.
+No interval excludes zero.}
+\label{fig:traj-forest}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{s24_depth_versus_ad.pdf}
+\caption{Instrument check on the same fifty-four participants.
+Left: change in genre share from turn~1 to turn~4 for the six genres labelling at least 5\% of utterances, Holm applied across them.
+Right: the confirmatory advertisement contrast of Table~\ref{tab:traj-crossing}, on the same scale of a within-person difference.
+The labelling moves with conversational depth and not with advertisements.}
+\label{fig:traj-depth}
+\end{figure}
+
+
+% =============================================================================
+% APPENDIX --- place after \subsection{EEG Measures} block, i.e. as a new
+% top-level appendix \section next to sec:app-eeg.
+% =============================================================================
+
+\section{Additional information on genre trajectories}
+\label{sec:app-trajectories}
+
+Section~\ref{sec:results-trajectories} reports the confirmatory trajectory family and summarises the descriptive structure. This appendix gives the full descriptive tables under both readings of Definition~1, the sweep over context windows, and the exploratory estimators that were computed but are not part of the confirmatory family.
+
+\subsection{Corpus and descriptive tables}
+\label{sec:app-traj-descriptives}
+
+The corpus is 54 participants (36 crowd, 18 laboratory), five conditions each, four user utterances per conversation: 270 conversations, 1{,}080 utterances, 810 transitions. Messages have a median of 15 words (IQR 8--29) and a median response latency of 49~s (IQR 30--75). Arms are pooled throughout, which the variance checks below support.
+
+\begin{table}[H]
+\centering
+\caption{Trajectory measures by condition under the bare-utterance labelling (\(N=54\) participants, 270 conversations). Ceilings are imposed by \(T=4\): at most 3 shifts, 4 distinct genres, \(\ln 4 = 1.386\) nats, and 4 turns of persistence. Entries are means with standard deviations.}
+\label{tab:app-traj-measures}
+\begin{tabular}{lrrrr}
+\toprule
+Condition & \(N_{\mathrm{shift}}\) (/3) & \(D\) (/4) & \(H\) nats (/1.386) & \(R\) (/4) \\
+\midrule
+\(a^{\emptyset}\)   & 2.48 (0.77) & 3.11 (0.74) & 1.055 (0.305) & 1.52 (0.77) \\
+Implicit early      & 2.56 (0.66) & 3.17 (0.69) & 1.084 (0.277) & 1.43 (0.63) \\
+Explicit early      & 2.41 (0.71) & 3.13 (0.75) & 1.064 (0.305) & 1.57 (0.69) \\
+Implicit late       & 2.46 (0.82) & 3.00 (0.80) & 1.008 (0.347) & 1.54 (0.82) \\
+Explicit late       & 2.35 (0.78) & 3.11 (0.69) & 1.057 (0.287) & 1.63 (0.76) \\
+\midrule
+All                 & 2.45 (0.75) & 3.10 (0.73) & 1.054 (0.304) & 1.54 (0.74) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Where the variance sits. Descriptive omnibus checks on conversation-level measures under the bare-utterance labelling; these ask which design factor a measure varies with at all and are not advertisement tests. The participant row is an intraclass correlation rather than a test.}
+\label{tab:app-traj-variance}
+\begin{tabular}{llrrr}
+\toprule
+Measure & Factor & Levels & Kruskal \(H\) & \(p\) \\
+\midrule
+\(N_{\mathrm{shift}}\) & Condition        & 5 & 2.89 & .58 \\
+\(N_{\mathrm{shift}}\) & Task             & 5 & 4.61 & .33 \\
+\(N_{\mathrm{shift}}\) & Arm              & 2 & 0.04 & .85 \\
+\(N_{\mathrm{shift}}\) & Session position & 4 & 2.25 & .52 \\
+Entropy                & Condition        & 5 & 1.16 & .88 \\
+Max persistence        & Condition        & 5 & 2.80 & .59 \\
+\midrule
+\multicolumn{5}{l}{Participant ICC: \(N_{\mathrm{shift}}\) 0.067, entropy 0.111, max persistence 0.043.} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Transition structure.}
+Under the bare labelling, 120 of the 169 ordered genre pairs are observed, the diagonal carries 0.183 of the mass, and the shift rate is 0.817. The modal destination is general guidance and information (0.273) and the three heaviest edges are guidance to guidance (82), guidance to relationships (56), and relationships to guidance (36). Among the 89 crossing transitions that are shifts, the destinations are led by relationships (0.191), guidance (0.146), and other obscene or illegal (0.135); purchasable products receives 4 of the 89.
+
+\subsection{The two readings of Definition~1}
+\label{sec:app-traj-labelling}
+
+Definition~1 applies \(f_{\mathrm{genre}}\) to the utterance \(u_k\). The deployed system instead classified a 510-token window holding the task prompt, the last three messages, and the current message, in that order. Both readings are carried in every table as rows of a \texttt{genre\_source} column, and every analysis selects one. The bare reading agrees with the logged runtime label on 351 of 1{,}080 utterances (32.5\%); the contextual reading reproduces it on 1{,}080 of 1{,}080, by construction.
+
+The trade-off is between fidelity to the definition and fidelity to the deployed system, and the two readings are near-opposite failure modes rather than a spectrum. The bare reading is close to saturation: it uses all 13 classes, shifts on 81.7\% of transitions, and assigns a fallback class to a fifth of turn-4 utterances because late messages are short. The contextual reading is close to the floor: it uses 7 of 13 classes, shifts on 13.2\% of transitions, observes only 16 of 169 genre pairs, leaves 70\% of conversations in a single genre for all four turns, and carries 0.868 of its mass on the diagonal. The task prompt is what holds it there; Section~\ref{sec:app-traj-sweep} isolates that. Task also appears to dominate under the contextual reading and not under the bare one, which is expected, because the task prompt sits inside the contextual classifier's own input.
+
+\begin{table}[H]
+\centering
+\caption{The two readings of Definition~1 compared on the same 1{,}080 utterances.}
+\label{tab:app-traj-sources}
+\begin{tabular}{lrr}
+\toprule
+Quantity & Bare utterance (primary) & Contextual (deployed) \\
+\midrule
+Agreement with the runtime log & 351/1{,}080 & 1{,}080/1{,}080 \\
+Genre classes used             & 13 of 13 & 7 of 13 \\
+Mean \(N_{\mathrm{shift}}\) (of 3) & 2.45 & 0.40 \\
+Mean diversity \(D\) (of 4)    & 3.10 & 1.33 \\
+Mean max persistence \(R\) (of 4) & 1.54 & 3.53 \\
+Shift rate                     & 0.817 & 0.132 \\
+Diagonal transition mass       & 0.183 & 0.868 \\
+Distinct genre pairs observed  & 120 of 169 & 16 of 169 \\
+Crossing contrast, early pooled & $+0.046$ (Holm \(p=.94\)) & $-0.018$ (Holm \(p=1.00\)) \\
+\(\tilde{\delta}^{(a)}\)       & 9 of 108 & 2 of 108 \\
+Advertised genre already current & 25 of 108 & 53 of 108 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{traj_heatmap_both.pdf}
+\caption{Genre transition matrices under the two readings of Definition~1, over the same 810 transitions.
+Left: the bare utterance, the primary reading, spreading mass over 120 of 169 ordered pairs with 0.183 on the diagonal.
+Right: the deployed contextual window, concentrating 0.868 on the diagonal across 16 pairs.
+Rows are the source genre and columns the destination; shading is the row-normalised probability.}
+\label{fig:app-traj-heatmap}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{traj_label_validity.pdf}
+\caption{What the bare-utterance labelling can bear, across the four turns of a conversation (1{,}080 utterances).
+Left: message length falls from a median of 40 words to 10.
+Centre: the share of utterances receiving one of the two fallback classes rises from 0.041 to 0.200.
+Right: mean posterior mass on the winning class is flat, so the drift is not the classifier losing confidence.}
+\label{fig:app-traj-validity}
+\end{figure}
+
+\subsection{Sweep over context windows}
+\label{sec:app-traj-sweep}
+
+Because the deployed window is the stickier of the two readings, four further windows were classified with the same model to establish whether the confirmatory result depends on how context is supplied. The recipes were fixed before the tests were run: the current message alone (the primary reading), the deployed window, the deployed window with the task prompt removed, the previous user message plus the current one, the task prompt plus the current message, and the conversation's opening message plus the current one. Task prompts were recovered for all 270 conversations. Holm is applied across the six early-pooled contrasts, which is the comparison a reader would otherwise select from.
+
+No window produces a significant advertisement contrast. The smallest unadjusted \(p\) is .096, for the previous-message window, where the estimate is negative (\(-0.139\)); after Holm across the six it is .58. The genre-aligned subcase remains at chance under every window (\(p\) between .79 and .97). The task prompt is what suppresses movement: removing it raises the mean shift count from 0.40 to 0.94 while leaving the advertisement contrast at \(+0.009\) (\(p=.90\)).
+
+\begin{table}[H]
+\centering
+\caption{Sweep over context windows supplied to \(f_{\mathrm{genre}}\). The crossing contrast is early advertisements pooled against \(a^{\emptyset}\) on the transition \(2\rightarrow3\), \(N=54\). Holm is across the six windows. ``Sticky'' is the share of conversations whose four utterances all receive the same genre.}
+\label{tab:app-traj-sweep}
+\begin{tabular}{llrrrrr}
+\toprule
+Window & Input & Classes & \(N_{\mathrm{shift}}\) & Sticky & Crossing \(\delta^{(a)}\) & Holm \(p\) \\
+\midrule
+Bare      & current message              & 13 & 2.45 & 0.03 & $+0.046$ & 1.00 \\
+Deployed  & task \(+\) last 3 \(+\) current & 7  & 0.40 & 0.70 & $-0.019$ & 1.00 \\
+No task   & last 3 \(+\) current         & 12 & 0.94 & 0.38 & $+0.009$ & 1.00 \\
+Previous  & previous \(+\) current       & 13 & 1.59 & 0.10 & $-0.139$ & 0.58 \\
+Task only & task \(+\) current           & 5  & 0.50 & 0.68 & $-0.019$ & 1.00 \\
+Opening   & first message \(+\) current  & 12 & 1.28 & 0.37 & $-0.056$ & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Exploratory estimators}
+\label{sec:app-traj-exploratory}
+
+The following were computed after the confirmatory family and are reported for completeness. They are not part of it and none is used to support a claim in Section~\ref{sec:results-trajectories}. Reference distributions are design-based: condition labels are permuted among each participant's own five conversations, which is the randomisation that was actually performed.
+
+\paragraph{Between-person spread.}
+A mean of zero is also produced by a population in which the advertisement moves some participants one way and others the other way. The standard deviation of the person-level crossing response is 0.469 against a randomisation null of 0.493 (\(p=.73\)), so the observed spread is what shuffling condition labels within a participant already produces. The same randomisation reproduces the confirmatory mean, \(+0.046\) with a two-sided \(p=.53\), against the parametric \(p=.47\).
+
+\paragraph{The transition matrix as a whole.}
+The confirmatory test summarises the \(k=2\) matrix by whether the genre changed. Comparing the full joint distribution over the 65 observed \((\text{from},\text{to})\) cells between advertised and \(a^{\emptyset}\) conversations gives a total-variation distance of 0.537 against a randomisation null averaging 0.526 (\(p=.44\)).
+
+\paragraph{Subgroup grid.}
+Every subgroup that could reasonably be requested --- arm, task, session position, and task genre, on both the advertised and the control side --- was crossed with the three treatment contrasts, giving 81 cells across 27 distinct subgroups on the crossing outcome. No cell reaches \(p<.05\), against 4.0 expected by chance alone; the smallest is \(p=.056\), for implicit-early against \(a^{\emptyset}\) among the sixteen participants whose control conversation sat second in the session. Recomputing the entire grid under within-participant randomisation and retaining only the largest \(|t|\) anywhere in it gives a family-wise \(p=.79\) for that best cell.
+
+% NOTE (23 Aug, Walter): a continuous version of Definition 6, on the change
+% in posterior mass assigned to the advertised genre, was computed and is
+% deliberately NOT reported. The runtime logged only the argmax, so those
+% posteriors were recomputed offline; that is the same provenance objection
+% that removed Jensen--Shannon from the analysis. The paper stays on logged
+% hard labels throughout. Numbers, if ever needed:
+% analysis/trajectories/outputs/exploratory/exploratory.md, section 1.
+\paragraph{Relaxing the timing of Definition~6.}
+Definition~6 requires the advertised genre to arrive in the immediately following utterance. Relaxing it to either of the two remaining turns leaves the comparison unchanged: the advertised genre appears at turn~3 or~4 in 24 of the 108 early-advertisement conversations against 22 of the matched \(a^{\emptyset}\) conversations, giving 15 discordant pairs with an advertisement against 13 without (\(p=.85\)).

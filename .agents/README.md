@@ -13,6 +13,10 @@ Project-specific material for AI agents and collaborators:
   theoretical framing decisions. Prefer the newest dated entry there for writing
   work.
 - `context/data-analysis/` covers behavioural and EEG analysis decisions.
+  EEG channel-set / literature-ROI averages:
+  `context/data-analysis/eeg/2026-08-24-channel-set-policy.md`
+  and `eeg/2026-08-24-literature-roi-from-angela.md`. Hardcoded lists;
+  appendix `sec:app-eeg-channel-sets` only.
 - `skills/` is reserved for reusable project-specific agent procedures.
 
 **Manuscript source of truth:** only the Overleaf Git repositories under
@@ -20,3 +24,7 @@ Project-specific material for AI agents and collaborators:
 
 Read the newest relevant document under `context/` before changing study analysis,
 experiment data, or Overleaf sources.
+
+Live sprint (27 August): five pending analyses, thesis first, paper
+optional, presentation starts now.
+`.agents/context/data-analysis/2026-08-27-backlog-and-timeline.md`.

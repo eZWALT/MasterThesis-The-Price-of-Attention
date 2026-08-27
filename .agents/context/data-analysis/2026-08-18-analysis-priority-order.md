@@ -27,5 +27,10 @@ Do not invert this in the paper, the thesis, or future analysis work.
    When it is a good moment to insert; feature importance. Last. The
    present sample is not a training corpus for \(\pi\).
 
+**Superseded 23 August** for anything still open. Canonical list
+(adds Goal 5 = all behavioural × trajectory × EEG combos, Goal 9 =
+presentation; policy is now Goal 6):
+`2026-08-23-goal-list.md`.
+
 Crossable leftover items:
 `../writing/2026-08-18-remaining-work-checklist.md`.

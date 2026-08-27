@@ -10,8 +10,13 @@ Discussion (§7) interprets. Do not put design implications, H1–H3 claims,
 “what this means for ads/trust,” “precise null vs dead pipeline,” or
 “do not put this in the abstract” into Results.
 
-EEG 6.3 (`sec:results-eeg`) is confirmatory numbers, tables, forests.
-EEG interpretation lives in 7.3 (`Heterogeneity, EEG, and trajectories`).
-Limitations stay in 7.5.
+EEG Results (`sec:results-eeg`) is confirmatory numbers, tables, forests.
+EEG interpretation lives in Discussion `sec:disc-eeg` (paper and thesis).
+A literature-ROI / channel-set rebuild is sensitivity only; do not put
+it in confirmatory Results or the abstract. Appendix
+`sec:app-eeg-channel-sets` (paper and thesis) is the allowed mention.
+Trajectory theory, Results, and Discussion are **thesis-only**
+(`chp:theory`, `sec:results-trajectories`, `sec:disc-trajectories`).
+Do not put them back in the paper.
 
 Full lock: `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`

@@ -18,11 +18,31 @@
 - **Results ≠ Discussion.** Results report estimands and numbers.
   Discussion interprets (precise null vs dead pipeline, Dataset B not
   absence, abstract placement, design implications, H1–H3). EEG 6.3 is
-  confirmatory; 7.3 is the EEG read. Lock:
+  confirmatory; Discussion `sec:disc-eeg` is the EEG read. Lock:
   `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
 - Canonical ad labels: **implicit** vs **explicit**; early = turn 2; late =
   turn 4; five-condition repeated-measures (+ no-ad control). Implicit does
   not mean subliminal.
+- Genre classifier: \(f_{\mathrm{genre}}\), not \(f_\theta\). Lock:
+  `.agents/context/writing/2026-08-23-f-genre-notation.md`.
+- **Trajectories are thesis-only** (24 August). Do not put Defs 1–6,
+  Results 6.4, or trajectory Discussion/appendix back in the paper.
+  Lock: `.agents/context/writing/2026-08-24-trajectories-thesis-only.md`.
+
+## Goals until the thesis is in
+
+Canonical list:
+`.agents/context/data-analysis/2026-08-23-goal-list.md`.
+
+Science 1–5 (do not invert): behavioural battery → personality → EEG →
+trajectories → **all combos** (behaviour × EEG, behaviour × trajectory,
+trajectory × EEG, three-way). The insertion-policy model is dropped
+(24 August). Delivery: thesis (17 September), paper, **presentation**.
+Combos are trajectory stage 5; lab \(n=18\) wherever EEG is in;
+association, not mediation. **Opened 27 August** as a joined dataset;
+tests that need behavioural composites still wait on Goal 1. Sprint
+board: `.agents/context/data-analysis/2026-08-27-backlog-and-timeline.md`.
+Paper is optional this sprint if it fights the thesis. Start slides now.
 
 ## Data analysis
 
@@ -40,6 +60,14 @@
   Depth audit (MDE, compatibility, exploratory lock):
   `.agents/context/data-analysis/eeg/2026-08-20-paper-depth-audit.md`.
   Confirmatory is 4 s + median + ICA. C1 is blocked on Goal 1.
+  Channel-set / literature-ROI averages are a sensitivity only
+  (`eeg/2026-08-24-channel-set-policy.md`,
+  `eeg/2026-08-24-literature-roi-from-angela.md`,
+  `eeg/2026-08-25-wang-zone-sensitivity.md`). George nine-site and
+  Wang-zone lists are hardcoded in `channel_sets`. Appendix only
+  (`sec:app-eeg-channel-sets`). Do not write them into primary Gold.
+  Do not treat them as a second confirmatory family. Cleaning stays
+  on all 32 channels.
 
 ### Where the EEG datasets live
 
@@ -56,8 +84,9 @@ Medallion zones under `src/project/logs/xdf/` (Bronze is immutable):
   participant × advertisement, with onset estimator and uncertainty.
 - `gold/features/task_state/task_state_person_features.csv` — the
   writing-versus-reading positive control.
-- `gold/features/sensitivity/`, `gold/windows/sensitivity/` — epoch-width
-  and no-ICA branches.
+- `gold/features/sensitivity/`, `gold/windows/sensitivity/` — epoch-width,
+  no-ICA, and channel-set branches
+  (`sensitivity/channel_sets/<version>/`).
 - `*_epoch_features.csv` are epoch-grain. Participants are the
   inferential unit, so never test on those rows directly.
 
@@ -89,6 +118,41 @@ Only the laboratory arm has EEG, so a merged table has 18 people, not
 behaviour × EEG family is laboratory-only and an association rather
 than a mediation claim. `lab_subject_4_crowdfail` is already excluded
 from both sides.
+
+### Where the trajectory datasets live
+
+Bronze / Silver / Gold, same contract as EEG. Bronze is the tracked JSONL
+(`src/project/logs/tracked/{lab,crowd}/`, prefer `*export*`). Silver is the
+rebuildable pass in `build_trajectory_dataset.py` (roster filter, parse,
+genre inference \(f_{\mathrm{genre}}\)). It materializes two tables:
+`classifier_inputs.csv` (1,080) and `transition_matrices.csv` (715).
+Gold is the four tables the analysis reads, two grains:
+
+- Turn: `utterances.csv` (2,160; labels live here) and `transitions.csv`
+  (1,620; Family A crossing tests).
+- Conversation: `conversations.csv` (540; Defs 3–5) and
+  `advertisements.csv` (216; \(g^{(a)}\) for Definition 6).
+
+Off Gold, do not query the Silver tables for tests. Heatmaps rebuild from
+`transitions.csv`. Statistics live under `outputs/eda/`, `stages_2_4/`,
+`exploratory/` — not Gold.
+
+`conversation_id` is the spine. Join to the rest of the project on
+`experiment_id` and `condition`, participant × condition. Both arms, so
+\(N=54\). Always select one `genre_source` before counting: `utterance`
+is primary (Definition 1); `contextual` is sensitivity (runtime match
+1,080/1,080). Details:
+`.agents/context/data-analysis/trajectories/2026-08-21-trajectory-dataset-and-first-descriptives.md`.
+Medallion lock:
+`.agents/context/data-analysis/trajectories/2026-08-23-trajectory-medallion.md`.
+Figure: `src/project/docs/trajectory_pipeline/trajectory_pipeline.py`.
+
+The trajectory × EEG merge is verified working. Filter a Gold table to
+one `genre_source`, then inner-join `condition_features.csv` on
+`["experiment_id", "condition"]`; this yields exactly 90 rows, 18 lab
+subjects × 5 conditions. EEG `baseline` does not join. Run
+`analysis/trajectories/validate_trajectory_dataset.py` after any rebuild;
+it asserts this join among its 79 checks.
 
 ## General
 

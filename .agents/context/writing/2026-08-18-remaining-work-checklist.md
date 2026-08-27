@@ -3,16 +3,27 @@
 High-level items only. Cross them when the artefact exists (script +
 numbers, or Overleaf prose), not when they have been discussed.
 
-Hard deadline: **thesis 17 September 2026**. Paper after that.
-Analysis feeds the paper. The paper feeds the thesis.
+Hard deadline: **thesis 17 September 2026**. Paper after that if it
+fights the thesis (27 August: paper optional this sprint).
+
+Canonical goals (23 August):
+`../data-analysis/2026-08-23-goal-list.md`.
+Live sprint (27 August):
+`../data-analysis/2026-08-27-backlog-and-timeline.md`.
 
 Order of analysis (do not invert):
 
 1. behavioural battery
 2. personality / demographics
 3. EEG
-4. genre / intent
-5. insertion-policy model (drop first if time is short)
+4. genre / trajectories
+5. **all combos**: behavioural × EEG, behavioural × trajectory,
+   trajectory × EEG, and the three-way (lab \(n=18\) wherever EEG
+   is in; association, not mediation; blocked until 1 and 4 are frozen)
+
+Insertion-policy model: **dropped 24 August**. Do not write it.
+
+Delivery (also goals): thesis (17 September), paper, **presentation**.
 
 ---
 
@@ -22,13 +33,16 @@ Order of analysis (do not invert):
 
 - [x] Finished roster: \(N=54\) (\(L=18\), \(C=36\)); unfocused kept if complete
 - [x] Descriptive notice + cued recall (first pass; refresh on frozen ETL)
-- [ ] Freeze one behavioural ETL (old `export.jsonl`, numeric conditions, no doubles)
+- [ ] Freeze one behavioural ETL (old `export.jsonl`, numeric conditions, no doubles). **Katerina missing (27 Aug); Walter owns this.**
 - [ ] Goal 1: trust, credibility, manipulation, notice by condition / format / \(a^{\emptyset}\)
 - [ ] Goal 2: same outcomes × BFI-10 and demographics (no personality clusters)
+- [ ] Free-form text: findings + `recall_reaction` (descriptive / coding)
 
 ### EEG
 
-- [x] Goal 3: primary spectral contrasts written (condition + ad-locked vs \(a^{\emptyset}\)) — tables exist; manuscript Results still unwritten
+- [x] Goal 3: primary spectral contrasts (4 s + median + ICA). Results 6.3 / thesis EEG Results are on Overleaf. Interpretation is Discussion, not Results.
+- [ ] Angela / literature-ROI sensor retry (sensitivity; appendix only; boards exist)
+- [ ] EEG post-hoc restructure (Sebastian; **not** confirmatory 6.3)
 - [x] Human signoff: ICA vs no-ICA as primary (ICA primary as of 2026-08-19)
 - [x] Human signoff: filter / interpolation figures (2026-08-19)
 - [x] Mean-of-epoch dB vs median (Y_A still 0/48 Holm; keep median)
@@ -40,10 +54,24 @@ Order of analysis (do not invert):
   (exploratory; lab \(n=18\); after Goal 1 freeze). See
   `../data-analysis/eeg/2026-08-19-eeg-analysis-menu-and-tickets.md`
 
-### Later, if 1–3 are stable
+### Trajectories (Goal 4)
 
-- [ ] Goal 4: freeze genre classifier; \(\delta^{(a)}_k\) for early ads only
-- [ ] Goal 5: multi-output insertion model + feature importance (optional)
+- [x] Dataset + first pass of stages 1–4 (bare utterance primary)
+- [x] Paper-shaped write-up of stages 1–4 (thesis only, 24 August)
+
+### Cross-arm combos (Goal 5) — opened 27 August (joined dataset)
+
+Honest tests that use behavioural composites still wait on Goal 1.
+
+- [ ] Person × condition Gold join (behaviour + trajectory + EEG columns)
+- [ ] Behavioural × EEG (\(n=18\))
+- [ ] Behavioural × trajectory (\(N=54\))
+- [ ] Trajectory × EEG (\(n=18\))
+- [ ] Behavioural × trajectory × EEG (\(n=18\))
+
+### Last science
+
+- ~~Goal 6: multi-output insertion model~~ **Dropped 24 August.**
 
 ---
 
@@ -60,7 +88,8 @@ Future Work skeleton, notice/recall slice in prose.
 - [ ] When rewriting EEG Method: use the 2026-08-19 comments in
   `publication/main.tex` (shapes \(Y_A,Y_B,D\); Smulders median;
   Kislov estimand hedge; ICA now primary). Do not dump extra EEG cites.
-- [ ] Cut or rewrite the 14 RQs and H1–H3 so they match the five-goal order
+- [ ] Cut or rewrite the remaining RQs (1–11) and H1–H3 so they match
+  science 1–5. Predictive Analysis / RQ12–RQ14 dropped 24 August.
 - [ ] Related Work / Research Gap polish (Heineking ≠ implicit/explicit)
 - [ ] Admin: author roles, funding, ethics number, broken cites
 - [ ] Appendices, or drop them
@@ -71,12 +100,32 @@ Future Work skeleton, notice/recall slice in prose.
 
 Port the paper. Do not invent a second analysis.
 
-- [ ] Method / procedure (from the paper)
-- [ ] Results / discussion (from the paper, once numbers exist)
-- [ ] Theory / RQs aligned with the paper
-- [ ] Extra dissertation chapters: system, RAG, catalog, deployment
-- [ ] Conclusion + future work
-- [ ] Presentation skeleton
+- [x] Dataset § Experimental data: ingestion + trajectory Bronze/Silver/Gold
+  + EEG preprocessing and Dataset A/B Gold (paper 5.6; pushed 23 Aug).
+  Behavioural Gold still pending.
+- [x] Method / procedure from the paper (design, IVs/DVs, EEG stats;
+  pushed 23 Aug). Behavioural family still specified-not-estimated.
+- [x] EEG Results 6.3 + sample descriptives into thesis Results (numbers
+  only; Discussion 7.3 not ported).
+- [x] Theory chapter (`chapters/theory.tex`, after Related Work).
+- [x] EEG appendix D + Conclusion Future Work.
+- [ ] Results / discussion for behavioural.
+- [x] Trajectory results + discussion ported to thesis (24 August). Paper
+  no longer carries Defs 1–6 / 6.4 / trajectory appendix.
+- [ ] Theory / RQs: thesis keeps trajectory RQs; paper no longer does.
+- [ ] Extra dissertation chapters: system, RAG, catalog, deployment.
+  **27 Aug:** Walter is hand-polishing Ch 5–6 (quality pass; more owed).
+- [ ] Conclusion summary (write last).
+
+---
+
+## Presentation (Overleaf `presentation/`) — Goal 8
+
+**Start now (27 August).** Skeleton from thesis Methods; fill numbers when they exist.
+
+- [ ] Slide skeleton (design, five conditions, \(N=54\) / EEG \(n=18\))
+- [ ] Goal 1 / 3 / 4 takeaways
+- [ ] Combo slide only if Goal 5 ran
 
 ---
 

@@ -326,8 +326,19 @@ first.**
   descriptives, the condition-blind quality profile, the per-channel
   evidence for the three interpolations, the exact ICA thresholds, and
   the status of the two engineering thresholds.
-- Next up per Walter: **trajectory analysis**. 5.8 has a table row and
-  a sentence waiting for it; fill those rather than restructuring.
+- **Trajectory analysis: dataset and first-pass inference now exist**
+  (21 Aug). 5.8's table row and sentence can be filled from
+  `.agents/context/data-analysis/trajectories/2026-08-21-trajectory-dataset-and-first-descriptives.md`;
+  fill those rather than restructuring. What the Method needs to state:
+  participant as the unit at \(N=54\) (both arms, unlike EEG), the genre
+  space is the 13 ThradBERT classes, exact paired tests for shift
+  outcomes because shifts are rare, Jensen-Shannon divergence as the
+  continuous companion, Holm within family, and task as a covariate.
+  Two things the Theory section will need to absorb: Definition 1 says
+  \(f_\theta(u_k)\) but the deployed classifier was given the task prompt
+  and recent history as well, and Definition 6's \(\tilde\delta\) is
+  empirically empty. Results are a bounded null with a passing positive
+  control, so this family is reportable rather than a placeholder.
 - §4 Research Questions and Hypotheses needs a revision pass "at the
   end" (Walter's call, not started).
 - Methods figure is still `eeg_preprocessing.png` and the montage is

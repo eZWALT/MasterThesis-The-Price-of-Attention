@@ -24,12 +24,80 @@ ignores their contents. Run `git` commands inside the relevant mirror.
 
 **Results ≠ Discussion (standing).** Results report numbers. Discussion
 interprets. EEG 6.3 is confirmatory; 7.3 is the EEG read. Lock:
-`2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`. That note is
-the **newest entry**: it also holds the anti-redundancy layout (which
-EEG artefact lives in Results vs appendix) and the open Method items.
+`2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
+
+Channel-set / literature-ROI EEG is sensitivity, not confirmatory
+Results. George nine-site and Wang-zone branches stay appendix-only.
+Lock: `2026-08-24-channel-set-sensitivity-not-confirmatory.md`.
+
+Genre classifier notation (23 August): \(f_{\mathrm{genre}}\), not
+\(f_\theta\). Lock: `2026-08-23-f-genre-notation.md`.
+
+Thesis experimental-data section (Ingestion / Trajectories Gold /
+EEG lake) drafted locally 23 August, **not pushed**:
+`2026-08-23-thesis-experimental-data-drafted.md`.
+EEG preprocessing + Dataset A/B Gold tables ported from paper 5.6:
+`2026-08-23-thesis-eeg-gold-ported.md`.
+Broader paper→thesis ports (theory chapter, Methods, EEG Results,
+appendix, Future Work), pushed 23 August:
+`2026-08-23-thesis-paper-ports.md`.
+Trajectory `head(5)` examples + EEG construction math restored
+in Dataset (local thesis, not pushed):
+`2026-08-23-thesis-examples-and-eeg-math.md`.
+Thesis EEG Preprocessing / Epoching rewritten to the paper's register
+(named paragraphs, purpose of each transform stated; numbers and locks
+unchanged), **pushed 25 August (thesis `28c22c8`)**:
+`2026-08-25-thesis-eeg-preprocessing-rewritten.md`.
+Thesis Methods **Statistical Framework** rewritten: estimator primer with
+each null before the table, no "as above", 14 families, every formula
+checked against the analysis code, **pushed 27 August (thesis `041e1d5`)**:
+`2026-08-27-statistical-framework-rewritten.md`. Cut hard the same day
+(`1a3df60`): the estimator glossary is gone, the section opens with a
+six-bullet design/sample/unit/status/threshold/reporting itemize, \(D_i\)
+is a named planned contrast introduced through a worked instance, and the
+prose after the table is ~400 words holding the two equations and the
+Dataset A weight vectors.
+
+Thesis **Results §7 and Discussion §8 skeletons** now mirror each other
+section for section, with three distinct summaries (Results 7.7 table,
+Discussion 8.1 prose, Conclusion still empty). Do not reorder one
+without the other or without `tab:analysis-families`:
+`2026-08-27-results-discussion-skeleton.md`.
+
+Front matter audited and three files pushed the same day (`c34f9e2`):
+the Descartes epigraph said "functions" where the Latin is *chimerae*,
+the companion note promised publication pre-review, and `abbr.tex` still
+shipped the template's "FTC, Fundamental Theorem of Calculus" as its only
+acronym. `thanks.tex` is **held** — Walter writes it live on Overleaf and
+the merged draft is stored in the note, not in the repo. `abstract.tex`
+still reads `LOREM IPSUM LACKING AN ABSTRACT`:
+`2026-08-27-front-matter-pass.md`.
 
 EEG Results 6.3 is on Overleaf (pushed 21 August). Local-draft history:
 `2026-08-20-eeg-results-section-drafted.md`.
+
+Trajectory Results 6.4 + a new trajectory appendix, **pushed to the
+publication Overleaf 23 August (`eef01b5`)**. Walter retouches in
+Overleaf from here; the thesis port waits until the paper version is
+agreed. Reference copy of the draft, with the provenance comments:
+`2026-08-23-trajectory-results-draft.tex`. That commit also carried the
+`f_theta` → `f_genre` rename, which had been sitting uncommitted.
+
+6.4 replaces the old SKELETON block: descriptives summarised in three
+paragraphs, the confirmatory family in four, one table, two figures.
+The appendix (`sec:app-trajectories`) carries the full per-condition
+tables, the bare-versus-contextual trade-off, the six-window context
+sweep, and the exploratory estimators. Four figures already copied into
+`publication/Figures/` as `s24_crossing_forest`, `s24_depth_versus_ad`,
+`traj_heatmap_both`, `traj_label_validity`.
+
+Two standing constraints in that text. Hard labels only: the continuous
+posterior version of Definition 6 was cut for the same provenance reason
+as Jensen--Shannon (runtime logged argmax; posteriors were recomputed
+offline), and a comment in `main.tex` records that. And nothing in 6.4
+interprets — the bounded-null reading, the advertising implications,
+Definition 6 as a weak instrument, and classifier stickiness as a
+limitation are all still owed to 7.3 and 7.5.
 
 EEG paper figure cut and Results sentences (20 August):
 `../data-analysis/eeg/2026-08-20-paper-figures-and-narrative.md`.
@@ -40,7 +108,41 @@ Monday agenda (Katerina + Sebastian):
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
 
-Crossable leftover items (paper / thesis / analysis):
+**27 August:** Walter is hand-polishing thesis Ch 5–6. Five analyses
+are the remaining science this window (Angela sensors, EEG post-hoc,
+behavioural EDA, free-text, joined dataset). Thesis first; paper
+optional; start the presentation. Board:
+`../data-analysis/2026-08-27-backlog-and-timeline.md`.
+Writing track: `2026-08-27-writing-push-and-delivery.md`.
+
+**25 August:** experiment flow / questionnaire order / why-this-order
+assumptions for thesis Methods **Flow Design** (empty `\item` in
+`models.tex`). Live source is `controller.py`, not leftover survey
+lists. `2026-08-25-experiment-flow-design.md`.
+
+**24 August:** Trajectories are thesis-only. Paper keeps taxonomy and
+\(\pi\); no Defs 1–6, no 6.4, no trajectory Discussion/appendix.
+Thesis order: Dataset → System → Methods → Results → Discussion →
+Conclusion. A short front-matter note (`frontmatter/companion.tex`)
+states that discrepancy (pushed 25 August, thesis `3dc42f5`). Lock:
+`2026-08-24-trajectories-thesis-only.md`.
+
+**24 August:** Discussion split into the four analyses
+(`sec:disc-behaviour`, `sec:disc-eeg`, `sec:disc-trajectories`,
+`sec:disc-combos`). Trajectory lock: Holm-null \(\neq\) theory is
+wrong; refine with what is fed to \(f_{\mathrm{genre}}\).
+`2026-08-24-discussion-four-analyses.md`.
+
+**24 August:** erase the insertion-policy model from paper and thesis
+(contribution, Predictive Analysis / RQ12–RQ14, Results skeleton,
+Discussion / Future Work apology). Keep \(\pi\) as theory and timing.
+Locks: `2026-08-24-insertion-policy-model-dropped.md` and
+`../data-analysis/2026-08-24-insertion-policy-model-dropped.md`.
+
+Canonical goals until the thesis is in (science 1–5 + thesis / paper /
+presentation). List: `../data-analysis/2026-08-23-goal-list.md`.
+
+Crossable leftover items (paper / thesis / analysis / slides):
 `2026-08-18-remaining-work-checklist.md`.
 
 EEG Method comments parked in Overleaf (median / \(Y_A,Y_B,D\) / short cite

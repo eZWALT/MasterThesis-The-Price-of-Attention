@@ -14,8 +14,7 @@ Pushed to Overleaf after Walter asked (23 Aug evening).
 |---|---|
 | Theoretical Foundations (Defs 1–6, taxonomy, \(\Pi/\pi\)) | **Chapter** `chapters/theory.tex` (`chp:theory`; alias `sec:theoretical-foundations`). \(f_{\mathrm{genre}}\) kept. |
 | EEG Acquisition + montage | Dataset, `\subsubsection{Acquisition}` |
-| EEG 5.7 induced / onset jitter / why 4 s as a cell | Dataset, after shared measurement |
-| EEG 5.7 frozen-before-grid; 2 s vs 8 s | Methods, `EEG epoch width` |
+| EEG 5.7 induced / onset jitter / why 4 s / 2 s vs 8 s | Dataset, `\subsubsection{Epoching}` (moved out of Methods 23 Aug) |
 | Lab/crowd design, IVs, DVs, flow + UI figures | Methods, Study Design |
 | Statistical Analysis (EEG \(D_i\), Holm, families) | Methods, Statistical Framework |
 | Sample 6.1 + EEG Results 6.3 | Results (numbers only; no 7.3) |
@@ -23,7 +22,8 @@ Pushed to Overleaf after Walter asked (23 Aug evening).
 | Future Work | Conclusion |
 
 Not ported: Discussion 7.3, behavioural results, trajectory Results
-numbers, insertion-policy results, paper Introduction, the 14 RQs.
+numbers, paper Introduction, remaining RQs (1–11). Insertion-policy
+model dropped 24 August (not a port target).
 
 Figures: `figures/ui/` and `figures/results/`. Bib:
 `rainie2025llmusers`, `holm1979simple`, `gramfort2013mne`,

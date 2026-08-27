@@ -11,6 +11,27 @@ pipelines, generated manifests, and participant-level outputs remain under
 
 ## Current entries
 
+- `2026-08-27-backlog-and-timeline.md` (parent dir)
+  Angela sensor retry + post-hoc restructure are in this week's
+  five analyses. Both stay non-confirmatory. Do not overwrite ICA.
+- `2026-08-25-teaching-atlas-band-regions.md`
+  AES introductory atlas (Britton et al. 2016) regions mapped
+  onto this 32-channel cap. The atlas names regions, not
+  electrode tuples. Sensitivity proposal only.
+- `2026-08-25-george-wang-heatmap-run.md`
+  4 s ICA Holm boards for primary vs George nine-site vs Wang zones.
+  Dataset A still null. Dataset B exploratory cells move; not confirmatory.
+- `2026-08-25-wang-zone-sensitivity.md`
+  second channel-set branch: Wang §2.2 geography on this cap
+  (`wang2022_v0`). Not an electrode list from that paper. Heatmaps:
+  `analysis/eeg/analysis/plot_channel_set_heatmaps.py`.
+- `2026-08-24-channel-set-policy.md`
+  feature-only electrode lists, now wired through Dataset A/B, task-state,
+  and contrasts. Default `current_v1` is primary Gold. Literature ROI
+  is George 2025 nine-site (`2026-08-24-literature-roi-from-angela.md`).
+  Wang zone branch is separate. Appendix: `sec:app-eeg-channel-sets`.
+  Runner: `analysis/eeg/preprocessing/run_channel_set_sensitivity.py`.
+  Cleaning stays full-montage. Not confirmatory.
 - `2026-08-20-paper-depth-audit.md`
   independent recomputation, MDE, Dataset A \(\pm 0.3\) dB compatibility,
   bootstrap-vs-\(t\) leans, six ICA-only exploratory hits locked.
@@ -28,11 +49,11 @@ pipelines, generated manifests, and participant-level outputs remain under
 - `2026-08-20-paper-4s-primary-and-epoch-sensitivity.md`
   frozen paper story: 4 s confirmatory + both off-width Dataset B cells
   as sensitivity. Full means, 95% CIs, \(d_z\), Holm, Wilcoxon.
-- `2026-08-20-what-path-b-onset-is.md`
+- `2026-08-20-what-dataset-b-onset-is.md`
   Dataset B \(t=0\) is when the ad becomes visible, not “they noticed it”
   and not “message finished.” Read this before arguing about locks.
   (Referenced from the after-reply note; keep the golden lock.)
-- `2026-08-20-path-b-after-reply-lock.md`
+- `2026-08-20-dataset-b-after-reply-lock.md`
   tried locking after the finished reply. **Rejected as primary.**
   Golden visual-onset lock stays. Do not overwrite golden Gold.
 - `2026-08-20-pipeline-sanity-audit.md`
