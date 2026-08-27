@@ -1,8 +1,9 @@
 # Architecture & Pipeline Diagrams
 
-Two figures, both generated with the [diagrams](https://diagrams.mingrammer.com/) library
-(a Graphviz wrapper) and sharing one visual language: rounded colored clusters, white
-icon "cards", muted slate-gray arrows, orthogonal routing.
+Figures generated with the [diagrams](https://diagrams.mingrammer.com/) library
+(a Graphviz wrapper), sharing one visual language: rounded colored clusters, white
+icon "cards", muted slate-gray arrows. The online retrieval figure is matplotlib
+so the candidate pool can taper; everything else is Graphviz.
 
 - **`architecture.png`** (from `arch.py`) shows the experiment platform: the two study arms
   (in-person lab, remote crowdsourced), the `192.168.1.0/24` lab subnet as a dashed
@@ -22,6 +23,21 @@ icon "cards", muted slate-gray arrows, orthogonal routing.
   sequential pipeline; each card names its operation plus the resulting artifact
   (file/size) instead of splitting every micro-step into its own node, which keeps a
   6-stage pipeline as one paper-friendly horizontal strip instead of a tall column.
+- **`retrieval_pipeline.png`** (from `retrieval_pipeline/retrieval_pipeline.py`) is the
+  matching *online* figure: what runs on an advertised turn. Query is a left
+  column (user text → HyDE → embedding model); the rest is a tapering funnel
+  (117k → 30 → 10 → 1 ad). Hybrid retrieval is two incoming arrows into the
+  merge node: dense FAISS on the shortlist, BM25 dashed from the original
+  user query. Defaults from `build_default_stages()`: HyDE on, hybrid on,
+  reranker on; context-summary, ad-summarizer, and ThradBERT are omitted
+  because they do not gate serving. The figure shows the one injected ad,
+  not the internal top-3 formatter pool. Matplotlib rather than Graphviz
+  so the funnel can actually taper.
+- **`trajectory_pipeline.png`** (from `trajectory_pipeline.py`) is the same strip for
+  the genre-trajectory dataset, in Bronze / Silver / Gold. Silver tables use
+  the grid icon; Gold uses the cylinder. Gold is two grains (turn:
+  utterances + transitions; conversation: conversations + advertisements).
+  Thesis copy: `docs/overleaf/thesis/figures/preprocessing/trajectory_preprocessing.png`.
 
 ## Regenerating
 
@@ -31,7 +47,9 @@ sudo apt-get install graphviz           # provides the `dot` binary diagrams dep
 sudo apt-get install fonts-urw-base35   # provides Nimbus Sans (see below)
 python3 arch.py                 # architecture.png + .pdf
 python3 participant_flow.py     # flow_lab.png/.pdf + flow_crowd.png/.pdf
-python3 catalog_pipeline.py     # catalog_pipeline.png + .pdf
+python3 catalog_pipeline.py                              # catalog_pipeline.png + .pdf
+python3 ../retrieval_pipeline/retrieval_pipeline.py      # retrieval_pipeline.png + .pdf
+python3 ../trajectory_pipeline/trajectory_pipeline.py    # trajectory_pipeline.png + .pdf
 ```
 
 Each script writes a PNG and a PDF. Use the PDF in LaTeX so the figures stay sharp at any
@@ -109,7 +127,7 @@ Counts in the detail lines were read off the code, not the docstrings:
   dedup/stack). Each is pre-processed (cropped/centered/resized onto a square
   transparent canvas) so `imagepos=tc` + `labelloc=b` renders icon-on-top,
   label-below with no overlap, at a consistent visual size across both diagrams.
-- `arch.py` / `catalog_pipeline.py`: each is the single source of truth for its
-  diagram; edit the style dicts at the top (`graph_attr`, `node_attr`,
-  `cluster_attr`, `IMG`/`CARD`/size presets) rather than per-node attributes, to
-  keep the look consistent if new nodes are added.
+- `arch.py` / `catalog_pipeline.py` / `trajectory_pipeline.py`: each is the
+  single source of truth for its diagram; edit the style dicts at the top
+  (`graph_attr`, `node_attr`, `cluster_attr`, `IMG`/`CARD`/size presets) rather
+  than per-node attributes, to keep the look consistent if new nodes are added.
