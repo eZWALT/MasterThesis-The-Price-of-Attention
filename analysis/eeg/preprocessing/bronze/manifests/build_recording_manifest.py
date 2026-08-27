@@ -161,7 +161,7 @@ def discover_logs(log_root: Path) -> list[LogSession]:
             LogSession(
                 subject_dir=directory.name,
                 subject_number=int(match.group(1)),
-                dataset=dataset,
+                path=path,
                 experiment_id=str(
                     events[0].get("experiment_id", path.name.split("_events")[0])
                 ),
@@ -245,7 +245,7 @@ def load_xdf(path: Path) -> XdfRecording:
             eeg_duration = float(eeg_timestamps[-1] - eeg_timestamps[0])
 
         return XdfRecording(
-            dataset=dataset,
+            path=path,
             folder_subject_number=folder_subject,
             filename_subject_number=filename_subject,
             file_size_bytes=path.stat().st_size,
@@ -269,7 +269,7 @@ def load_xdf(path: Path) -> XdfRecording:
         )
     except Exception as exc:  # Manifest must retain unreadable files for review.
         return XdfRecording(
-            dataset=dataset,
+            path=path,
             folder_subject_number=folder_subject,
             filename_subject_number=filename_subject,
             file_size_bytes=path.stat().st_size,

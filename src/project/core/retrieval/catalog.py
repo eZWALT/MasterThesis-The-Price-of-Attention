@@ -97,14 +97,14 @@ class AdCatalog:
     # ─────────────────────────────────────────────
 
     @staticmethod
-    def _catalog_files(dataset: str | Path) -> List[Path]:
+    def _catalog_files(path: str | Path) -> List[Path]:
         catalog_path = Path(path)
         if catalog_path.is_dir():
             return sorted(catalog_path.glob("*.jsonl"))
         return [catalog_path]
 
     @staticmethod
-    def _load_catalog(dataset: str | Path, adapter: DatasetAdapter | None = None):
+    def _load_catalog(path: str | Path, adapter: DatasetAdapter | None = None):
         items: Dict[str, CatalogItem] = {}
         id_map: List[str] = []
         adapter = adapter or build_adapter()
