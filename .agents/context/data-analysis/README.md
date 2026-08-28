@@ -20,11 +20,26 @@ The top level is reserved for documents that govern both analysis arms:
   (Goal 5 = all behavioural × trajectory × EEG combos) plus thesis,
   paper, presentation. Insertion-policy model dropped 24 August:
   `2026-08-24-insertion-policy-model-dropped.md`.
+- `eeg/2026-08-28-channel-set-closed.md` — **28 August save.**
+  Angela / channel-set retry closed. Primary 32-ch stays
+  confirmatory. Do not pick electrodes by \(p\).
+- `eeg/2026-08-28-posthoc-pairwise.md` — backlog item 2 bounded:
+  exhaustive pairwise sweep (Dataset A 10 pairs, Dataset B 6 in
+  \(\Delta\) space + raw companion). Exploratory; nothing promoted.
+  Rests on `eeg/2026-08-28-dataset-b-control-audit.md`, which is the
+  source of truth for the matched controls and shows Dataset B
+  `early_vs_late` is raw-space only.
 - `2026-08-27-backlog-and-timeline.md` — **live sprint (27 Aug)**:
-  five pending analyses (Angela sensors, EEG post-hoc, behavioural
-  EDA, free-text, joined dataset / combos opened). Thesis first,
-  paper optional, presentation starts now. Goal 1 still gates honest
-  combo tests.
+  five pending analyses (item 1 closed 28 Aug; EEG post-hoc,
+  behavioural EDA, free-text, joined dataset / combos still open).
+  Thesis first, paper optional, presentation starts now. Goal 1
+  still gates honest combo tests.
+- `eeg/2026-08-27-dataset-a-b-rename.md` — Path A/B is dead; Dataset A
+  = condition state, Dataset B = ad-onset contrast. Figures rebuilt
+  the same day so pixels match (`3fe3243`). Catch-up:
+  `../writing/2026-08-27-afternoon-save.md`.
+- `behavioral/2026-08-27-crowd-age-prolific-estimate.md` — Results 7.1
+  crowd age is a prose-only Prolific snapshot, **not Gold**.
 - `2026-08-18-analysis-priority-order.md` — older five-item list;
   superseded for open work.
 - `eeg/2026-08-20-paper-figures-and-narrative.md` — paper/thesis EEG
@@ -33,9 +48,11 @@ The top level is reserved for documents that govern both analysis arms:
   16 spectral formulas. Default `current_v1` is primary Gold.
   Literature ROI (`literature_roi_v0`) is the nine sites George and
   Gulia 2025 recorded, same list for every band; Wang zone
-  (`wang2022_v0`) is a second sensitivity. Do not overwrite Gold.
+  (`wang2022_v0`), AES regions, and Angela's code lists
+  (`angela_code_v0`) are extra sensitivities. Do not overwrite Gold.
   `eeg/2026-08-24-literature-roi-from-angela.md`,
-  `eeg/2026-08-25-wang-zone-sensitivity.md`.
+  `eeg/2026-08-25-wang-zone-sensitivity.md`,
+  `eeg/2026-08-27-angela-code-channel-set.md`.
 - Crossable leftover list (analysis + manuscripts):
   `../writing/2026-08-18-remaining-work-checklist.md`.
 

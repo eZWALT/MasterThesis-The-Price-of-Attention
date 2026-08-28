@@ -1,0 +1,7 @@
+family_definition,n_families,family_sizes,n_tests,n_significant_holm,n_significant_bh,n_significant_by,significant_cells_bh
+none (uncorrected),320,1,320,8,8,8,beta_relative_power/inline_early__minus__block_early/delta_matched_control | delta_power_db_uv2/inline_early__minus__block_early/delta_matched_control | delta_relative_power/inline_early__minus__block_early/delta_matched_control | fz_theta_power_db_uv2/block_early__minus__block_late/condition_median | fz_theta_power_db_uv2/inline_early__minus__inline_late/delta_matched_control | fz_theta_power_db_uv2/inline_early__minus__inline_late/raw_post_minus_pre | fz_theta_power_db_uv2/inline_late__minus__block_early/delta_matched_control | theta_relative_power/inline_early__minus__block_early/delta_matched_control
+"within measure, within dataset and space (AS RUN)",48,4;6;10,320,0,0,0,none
+"within measure, within dataset, spaces pooled",32,10,320,0,0,0,none
+"within measure, both datasets pooled",16,20,320,0,0,0,none
+"within dataset, all 16 measures pooled",3,64;96;160,320,0,0,0,none
+one family over the entire sweep,1,320,320,0,0,0,none

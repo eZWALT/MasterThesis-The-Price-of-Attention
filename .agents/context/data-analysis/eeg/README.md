@@ -11,6 +11,38 @@ pipelines, generated manifests, and participant-level outputs remain under
 
 ## Current entries
 
+- `2026-08-28-posthoc-pairwise.md`
+  Backlog item 2 bounded and run. Exhaustive pairwise sweep: Dataset A
+  10 pairs, Dataset B 6 pairs in \(\Delta\) space with a raw companion.
+  All 16 measures, **Holm + BH + BY all reported**, within measure
+  within dataset. 352 tests, **0 significant under any method**, under
+  every family definition and every one of the 65,535 feature subsets.
+  Records why BH is not valid here (relative powers sum to one) and
+  why BY, the dependence-robust FDR, is stricter than Holm.
+  **Exploratory only**; confirmatory 4 s · median · ICA is untouched,
+  stays on Holm, and no cell is promoted. Also records why feature
+  reduction cannot help when families are within-measure. Outputs in
+  `outputs/posthoc/`; 29-page report under
+  `analysis/outputs/figures/posthoc/`.
+- `2026-08-28-dataset-b-control-audit.md`
+  What `no_ads_early` / `no_ads_late` actually are (turn 2 and turn 4
+  replies of the one no-ad conversation, one control shared by two ad
+  conditions), the exact formula of every existing Dataset B contrast,
+  and the finding that `early_vs_late` is raw-space only while every
+  other contrast is space-invariant. Dataset B secondary weights were
+  never pre-specified: open Methods item.
+- `2026-08-28-channel-set-closed.md`
+  Session save. Backlog item 1 closed. Primary (`current_v1`, all
+  32) stays confirmatory. Do not pick a montage by Holm. Five-column
+  board is appendix only.
+- `2026-08-27-angela-code-channel-set.md`
+  Fifth sensitivity: Angela's `BAND_CHANNELS` from cognitive-mllm,
+  intersected with this cap (`angela_code_v0`). Not a paper. FCz /
+  CP3 / CPz / CP4 / PO7 / PO8 dropped, not replaced. Appendix only.
+- `2026-08-27-dataset-a-b-rename.md`
+  Path A/B → Dataset A/B. Do not write "Dataset A tests whether…".
+  Figures regenerated the same afternoon (`3fe3243`); pixels now
+  match. `../../writing/2026-08-27-afternoon-save.md`.
 - `2026-08-27-backlog-and-timeline.md` (parent dir)
   Angela sensor retry + post-hoc restructure are in this week's
   five analyses. Both stay non-confirmatory. Do not overwrite ICA.

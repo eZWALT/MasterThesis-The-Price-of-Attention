@@ -1,9 +1,26 @@
 # Experiment flow design — assumptions for Methods §Flow Design
 
-Date: 25 August 2026.
-Thesis hole: `chapters/models.tex` subsection **Flow Design**
-(`sec:methods:study-design`) is an empty `\item`. Walter is writing it.
-Do not push LaTeX from this note until he asks.
+Date: 25 August 2026; **27 August addendum** (prose is now on Overleaf,
+not an empty `\item`).
+
+Thesis subsection **Flow Design** (`chapters/models.tex`, under
+`sec:methods:study-design`). Walter is still polishing. Do not
+overwrite his live edits.
+
+**27 August structure (do not flatten):**
+
+- Study Design now opens with **Conditions and Independent Variables**
+  (`sec:methods:ivs`). Experimental Design points there. The
+  \(2\times 2\) factorial wording (implicit/explicit × early/late, plus
+  \(a^{\emptyset}\)) lives in that opener. Section title stayed
+  **Laboratory conditions**.
+- Flow Design is two subsubsections: biases *ordering can mitigate*
+  (cover story, warm-up, baseline once, independence warning, findings
+  before Likert, gated quality→notice→manipulation, cued recall after
+  the loop, BFI/demographics last) versus confounds *ordering cannot*
+  (disclosure confounded with \(\lambda\); \(\delta^{(a)}_k\) undefined
+  after turn 4; inattention is not an exclusion; EEG is lab-only).
+  That split was a `% AI:` comment, not optional styling.
 
 **Source of truth is the live state machine**, not stale docstrings,
 not leftover survey lists in `surveys.py`, and not the consent/debrief

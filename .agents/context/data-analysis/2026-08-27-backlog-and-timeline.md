@@ -22,8 +22,8 @@ but honest tests still need Goal 1 scores.
 
 | # | Walter | Maps to | Grain / n | Status 27 Aug |
 |---|---|---|---|---|
-| 1 | EEG sensors retry (Angela subset) | Channel-set sensitivity (`literature_roi_v0` George nine-site; `wang2022_v0`; teaching-atlas proposal) | Dataset A/B, \(n=18\) | Code + Holm boards exist. Retry / close the Angela list. **Appendix only.** |
-| 2 | EEG restructure (post-hoc) | Exploratory restructure of the 16 measures / Dataset A–B read. Sebastian. | \(n=18\) | Not built as a named family. **Not EEG 6.3.** Bound it before fishing. |
+| 1 | EEG sensors retry (Angela subset) | Channel-set sensitivity (`literature_roi_v0` George nine-site; `wang2022_v0`; `teaching_atlas_v0`; `angela_code_v0`) | Dataset A/B, \(n=18\) | **Closed 28 August.** Primary 32-ch stays confirmatory. `eeg/2026-08-28-channel-set-closed.md`. **Appendix only.** |
+| 2 | EEG restructure (post-hoc) | Exploratory restructure of the 16 measures / Dataset A–B read. Sebastian. | \(n=18\) | **Bounded 28 August**, then run as an exhaustive pairwise sweep (Dataset A 10 pairs, Dataset B 6). Still **not EEG 6.3**, still exploratory, no manuscript text yet. `eeg/2026-08-28-posthoc-pairwise.md`, audit `eeg/2026-08-28-dataset-b-control-audit.md`. |
 | 3 | Behavioural EDA | **Goal 1** (trust, credibility, manipulation, notice × condition / format / \(a^{\emptyset}\)) | \(N=54\) | **Gate.** Katerina is missing; Walter owns the freeze. ETL still unfrozen. |
 | 4 | Behavioural free-form text | Findings (≤256 chars × 5, 270 texts, has \(a^{\emptyset}\)) + cued-recall `recall_reaction` (216 texts, **no control**) | \(N=54\) | Not scored. Plan is codebook → LLM-as-judge assignment → prevalence / co-occurrence / length / quotes / word cloud: `behavioral/2026-08-27-free-text-codebook-and-llm-judge.md`. Not a second Likert battery. |
 | 5 | Behavioural against the rest → **one final dataset** | Goal 2 (BFI-10, demographics) + Goal 5 combos + free-text columns | person × condition; EEG cells lab \(n=18\) | Join design exists (`eeg/2026-08-19-eeg-behavioural-merge-tables.md`); **no builder**. Trajectory × EEG join already validates (90 rows). |
@@ -112,5 +112,7 @@ thesis Results, a slide skeleton.
 - Goals: `2026-08-23-goal-list.md`
 - Checklist: `../writing/2026-08-18-remaining-work-checklist.md`
 - Writing track: `../writing/2026-08-27-writing-push-and-delivery.md`
+- Afternoon catch-up (figures, Dataset A/B, crowd age, Rainie):
+  `../writing/2026-08-27-afternoon-save.md`
 - EEG × behaviour joins: `eeg/2026-08-19-eeg-behavioural-merge-tables.md`
 - EEG tickets C1–C9: `eeg/2026-08-19-eeg-analysis-menu-and-tickets.md`

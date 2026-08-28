@@ -148,7 +148,13 @@ conclusion screen.
 
 **Pipeline v2 (Methods).** Laboratory preprocessing. Recorded set is 19;
 Subject 4 is out of Gold (\(n=18\)). Silver applies ICA; Gold measures
-4 s epochs and 16 spectral features. Paths A and B are parallel.
+4 s epochs and 16 spectral features. Dataset A and Dataset B are
+parallel reductions, not two recordings.
+
+**27 August:** titles inside the PDFs were regenerated to say Dataset
+A/B (they still said Path after the rename). Parent `3fe3243`; thesis
+Overleaf `16e6ff8`; paper Overleaf `030471f`.
+`../../writing/2026-08-27-afternoon-save.md`.
 
 ## Do not claim
 

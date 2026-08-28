@@ -27,5 +27,6 @@ explicit-early theta does not survive. Derived Holm still matches
 primary to 0.0.
 
 Figures: `analysis/eeg/analysis/outputs/figures/channel_sets/`
-(four columns: primary, George, Wang, AES).
+(five columns as of 27 August: primary, George, Wang, AES, Angela
+code). Angela close-out: `2026-08-27-angela-code-channel-set.md`.
 Table: `analysis/eeg/statistics/outputs/sensitivity/channel_sets/comparison/channel_set_contrast_comparison.csv`.

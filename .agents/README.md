@@ -28,3 +28,7 @@ experiment data, or Overleaf sources.
 Live sprint (27 August): five pending analyses, thesis first, paper
 optional, presentation starts now.
 `.agents/context/data-analysis/2026-08-27-backlog-and-timeline.md`.
+Newest analysis save (28 August): channel-set closed, primary stays.
+`.agents/context/data-analysis/eeg/2026-08-28-channel-set-closed.md`.
+Newest writing catch-up (Dataset A/B figures, 7.1 crowd age, Methods
+comments): `.agents/context/writing/2026-08-27-afternoon-save.md`.

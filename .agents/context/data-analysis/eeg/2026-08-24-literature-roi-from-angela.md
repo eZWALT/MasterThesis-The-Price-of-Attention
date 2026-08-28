@@ -24,8 +24,11 @@ Wang & Mengoni, *Brain Inform* 2022, doi:10.1186/s40708-022-00159-3:
 - Their method maps clinical-report keywords onto 10–20 *zones*
   (Fp, F, C, P, T, O) per patient. Not one fixed five-band list.
 
-Angela still computes band power on every recorded channel. Zheng /
-Cochran stay as Hz edges only.
+Angela's *manuscript* treats band power as a channel-wise feature and
+cites Zheng / Cochran only for band names (Newson for Hz). Her *code*
+has a separate `BAND_CHANNELS` ROI dict; that is now
+`angela_code_v0` (`2026-08-27-angela-code-channel-set.md`). Do not
+mix that dict into this George nine-site branch.
 
 ## What we fill (`literature_roi_v0`)
 

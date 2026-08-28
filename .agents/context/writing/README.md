@@ -108,6 +108,21 @@ Monday agenda (Katerina + Sebastian):
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
 
+**28 August:** EEG framing locked as three tiers (confirmatory /
+exploratory / post hoc). Report the six Dataset B cells as a
+**format-specific** result, do not lead with caveats, and never write
+"approached significance": use the minimum detectable effect instead.
+Methods, Results and Discussion updated in the thesis.
+`2026-08-28-eeg-three-tier-framing.md`.
+
+**28 August (newest analysis save):** channel-set retry closed;
+primary 32-ch stays confirmatory. Do not pick a montage by Holm.
+`../data-analysis/eeg/2026-08-28-channel-set-closed.md`.
+
+**27 August:** afternoon catch-up so figure regen, Dataset A/B
+pixels, Rainie/WildChat, Flow Design split, and crowd age in 7.1 are
+not chat-only: `2026-08-27-afternoon-save.md`.
+
 **27 August:** Walter is hand-polishing thesis Ch 5–6. Five analyses
 are the remaining science this window (Angela sensors, EEG post-hoc,
 behavioural EDA, free-text, joined dataset). Thesis first; paper
@@ -116,9 +131,10 @@ optional; start the presentation. Board:
 Writing track: `2026-08-27-writing-push-and-delivery.md`.
 
 **25 August:** experiment flow / questionnaire order / why-this-order
-assumptions for thesis Methods **Flow Design** (empty `\item` in
-`models.tex`). Live source is `controller.py`, not leftover survey
-lists. `2026-08-25-experiment-flow-design.md`.
+assumptions for thesis Methods **Flow Design**. Live source is
+`controller.py`. 27 August addendum: IVs first, two-subsubsection
+split (mitigable biases vs remaining confounds).
+`2026-08-25-experiment-flow-design.md`.
 
 **24 August:** Trajectories are thesis-only. Paper keeps taxonomy and
 \(\pi\); no Defs 1–6, no 6.4, no trajectory Discussion/appendix.

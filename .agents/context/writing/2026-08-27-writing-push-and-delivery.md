@@ -21,5 +21,10 @@ editing; show text; push only when asked.
 Analysis board (five pending items, timeline):
 `../data-analysis/2026-08-27-backlog-and-timeline.md`.
 
+Late-day catch-up (five `% AI:` comments, Dataset A/B figure regen,
+crowd age in 7.1, Overleaf hashes):
+`2026-08-27-afternoon-save.md`.
+
 Standing locks: Results ≠ Discussion; channel-set appendix-only;
-trajectories thesis-only; insertion-policy dropped; \(f_{\mathrm{genre}}\).
+trajectories thesis-only; insertion-policy dropped; \(f_{\mathrm{genre}}\);
+Dataset A/B not Path A/B.

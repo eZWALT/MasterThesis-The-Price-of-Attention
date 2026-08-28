@@ -42,7 +42,14 @@ Delivery (also goals): thesis (17 September), paper, **presentation**.
 
 - [x] Goal 3: primary spectral contrasts (4 s + median + ICA). Results 6.3 / thesis EEG Results are on Overleaf. Interpretation is Discussion, not Results.
 - [ ] Angela / literature-ROI sensor retry (sensitivity; appendix only; boards exist)
-- [ ] EEG post-hoc restructure (Sebastian; **not** confirmatory 6.3)
+- [x] EEG post-hoc restructure (Sebastian; **not** confirmatory 6.3).
+  Bounded and run 28 August as a pairwise sweep:
+  `../data-analysis/eeg/2026-08-28-posthoc-pairwise.md`. Analysis only;
+  no manuscript text yet.
+- [ ] **Methods gap:** Dataset B *secondary* contrast weights are not
+  written down, so raw-space `early_vs_late` is an implementation
+  choice. Decide the estimand and state it.
+  `../data-analysis/eeg/2026-08-28-dataset-b-control-audit.md`
 - [x] Human signoff: ICA vs no-ICA as primary (ICA primary as of 2026-08-19)
 - [x] Human signoff: filter / interpolation figures (2026-08-19)
 - [x] Mean-of-epoch dB vs median (Y_A still 0/48 Holm; keep median)

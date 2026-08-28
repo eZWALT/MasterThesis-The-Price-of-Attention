@@ -1,0 +1,17 @@
+dataset,contrast_space,pair_id,basis,all_basis_terms_exist_in_code,coefficient__any_ad_vs_no_ads,coefficient__inline_vs_block,coefficient__early_vs_late,coefficient__format_x_timing,reconstructs_exactly
+dataset_a,condition_median,inline_early__minus__inline_late,planned_dataset_a_contrasts,yes,0.0,0.0,1.0,0.5,yes
+dataset_a,condition_median,inline_early__minus__block_early,planned_dataset_a_contrasts,yes,0.0,1.0,-0.0,0.5,yes
+dataset_a,condition_median,inline_early__minus__block_late,planned_dataset_a_contrasts,yes,0.0,1.0,1.0,-0.0,yes
+dataset_a,condition_median,inline_early__minus__no_ads,planned_dataset_a_contrasts,yes,1.0,0.5,0.5,0.25,yes
+dataset_a,condition_median,inline_late__minus__block_early,planned_dataset_a_contrasts,yes,0.0,1.0,-1.0,-0.0,yes
+dataset_a,condition_median,inline_late__minus__block_late,planned_dataset_a_contrasts,yes,0.0,1.0,0.0,-0.5,yes
+dataset_a,condition_median,inline_late__minus__no_ads,planned_dataset_a_contrasts,yes,1.0,0.5,-0.5,-0.25,yes
+dataset_a,condition_median,block_early__minus__block_late,planned_dataset_a_contrasts,yes,0.0,0.0,1.0,-0.5,yes
+dataset_a,condition_median,block_early__minus__no_ads,planned_dataset_a_contrasts,yes,1.0,-0.5,0.5,-0.25,yes
+dataset_a,condition_median,block_late__minus__no_ads,planned_dataset_a_contrasts,yes,1.0,-0.5,-0.5,0.25,yes
+dataset_b,delta_and_raw,inline_early__minus__inline_late,"inline_vs_block, early_vs_late, format_x_timing",raw_yes__delta_no_timing_term,not_in_basis,0.0,1.0,0.5,yes
+dataset_b,delta_and_raw,inline_early__minus__block_early,"inline_vs_block, early_vs_late, format_x_timing",yes,not_in_basis,1.0,-0.0,0.5,yes
+dataset_b,delta_and_raw,inline_early__minus__block_late,"inline_vs_block, early_vs_late, format_x_timing",raw_yes__delta_no_timing_term,not_in_basis,1.0,1.0,0.0,yes
+dataset_b,delta_and_raw,inline_late__minus__block_early,"inline_vs_block, early_vs_late, format_x_timing",raw_yes__delta_no_timing_term,not_in_basis,1.0,-1.0,-0.0,yes
+dataset_b,delta_and_raw,inline_late__minus__block_late,"inline_vs_block, early_vs_late, format_x_timing",yes,not_in_basis,1.0,0.0,-0.5,yes
+dataset_b,delta_and_raw,block_early__minus__block_late,"inline_vs_block, early_vs_late, format_x_timing",raw_yes__delta_no_timing_term,not_in_basis,0.0,1.0,-0.5,yes

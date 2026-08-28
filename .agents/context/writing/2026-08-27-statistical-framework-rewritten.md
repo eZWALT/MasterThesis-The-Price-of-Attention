@@ -50,8 +50,17 @@ posterior alpha x trust, credibility, manipulation. Positive control now
 replicates the estimator with `D_i = y_write − y_read`.
 
 Channel-set / Angela ROI is a **caption sentence** pointing at
-`sec:app-eeg-channel-sets`, not a fifteenth row. EEG post-hoc (Sebastian)
-is **not a row**; it is not a declared family until it is bounded.
+`sec:app-eeg-channel-sets`, not a fifteenth row.
+
+**28 August update.** EEG post-hoc (Sebastian) was "not a row until it
+is bounded". It is now bounded and run, so it **is** a row:
+"Exhaustive pairwise, post hoc", after the positive control. The
+Threshold bullet now also states that Holm controls FWER under
+arbitrary dependence, that exploratory families additionally report BH
+\(q\), and that BH's assumption fails on the relative powers while the
+dependence-valid variant is stricter than Holm. New bib keys
+`benjamini1995fdr`, `benjamini2001dependency`. Lock:
+`../data-analysis/eeg/2026-08-28-posthoc-pairwise.md`.
 Both locks unchanged: `2026-08-24-channel-set-sensitivity-not-confirmatory.md`,
 `../data-analysis/2026-08-27-backlog-and-timeline.md`.
 

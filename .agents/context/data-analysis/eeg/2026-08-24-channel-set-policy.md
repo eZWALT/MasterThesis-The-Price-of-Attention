@@ -28,9 +28,14 @@ drift. Same nine for every global band. Derived measures stay on
 `channel_set_policy_wang2022.json` is a second sensitivity
 (`wang2022_v0`). It maps Wang & Mengoni 2022 §2.2 zone prose onto this
 cap. Wang does not publish those electrode tuples. Lock:
-`2026-08-25-wang-zone-sensitivity.md`. Appendix:
-`sec:app-eeg-channel-sets`. Do not treat either branch as a second
-confirmatory family.
+`2026-08-25-wang-zone-sensitivity.md`.
+
+`channel_set_policy_angela_code.json` is a fifth sensitivity
+(`angela_code_v0`): Angela's code lists, minus sites this cap does
+not record. Not a paper. Lock:
+`2026-08-27-angela-code-channel-set.md`. Appendix:
+`sec:app-eeg-channel-sets`. Do not treat any of these branches as a
+second confirmatory family.
 
 ## How to run
 

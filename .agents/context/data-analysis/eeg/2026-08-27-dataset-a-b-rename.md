@@ -42,8 +42,20 @@ estimand". Keep that convention when writing new text.
   filesystem path. The selector is now `dataset`; genuine filesystem
   arguments in `src/project/core/retrieval/` were left as `path`.
 - Output filenames were renamed to match the stems the plotting scripts
-  emit, verified stem by stem. **Nothing was re-executed and no ICA
-  model was touched.**
+  emit, verified stem by stem. The rename commit itself **did not
+  re-execute** matplotlib. **ICA models were not touched.**
+- Follow-up the same day: leftover `path` filesystem arguments restored
+  (`c53ff85`); leftover links to `what-path-b-onset-is.md` (`a366cdf`);
+  `plot_eeg_only_heatmaps.py` `matrix()` crashed because it still
+  compared `grid["path"]` to a removed `path` name — filter is now
+  `grid["path"] == dataset`. The epoch-grid CSV column is still
+  `"path"` with values `"A"` / `"B"`.
+- **Figures were then regenerated** (`3fe3243`) so pixels match the
+  names: Holm heatmaps (incl. after-reply), channel-set boards,
+  publication suite, `eeg_pipeline_v2`. Copied to thesis Overleaf
+  (`16e6ff8`) and paper Overleaf (`030471f`, also Path→Dataset in
+  `main.tex`). Full copy table:
+  `../../writing/2026-08-27-afternoon-save.md`.
 - `analysis/eeg/analysis/outputs/paper_depth/summary.json` is generated;
   its keys were edited in place to match the script. Re-run
   `run_paper_depth_audit.py` if you want it authentic.
@@ -52,5 +64,6 @@ estimand". Keep that convention when writing new text.
 
 Nineteen of the touched files carried unrelated uncommitted work. The
 rename commit was built by staging "HEAD plus the substitution" rather
-than the working tree, so that work stayed unstaged. It is still
-uncommitted; it was never part of `333f903`.
+than the working tree. That pile was later split the same day:
+channel-set `0870525`, trajectories `017f1f8`, retrieval/pipeline
+figures `fd5dac5`, agent locks `8e60c1e`.

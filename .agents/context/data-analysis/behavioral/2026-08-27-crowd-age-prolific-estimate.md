@@ -53,5 +53,11 @@ Among the 26 of 36 finished crowd participants with a numeric age:
 - \(\mathrm{Mdn}=34.5\)
 
 Thesis sentence is in `docs/overleaf/thesis/chapters/results.tex`
-`sec:results-sample`. Figure `fig:sample-demo` stays questionnaire-only
-(age still omitted there).
+`sec:results-sample`, first pushed as Overleaf `b503482`. Later figure
+commits the same day may have shortened 7.1 — pull before rewriting.
+The long form (nine sessions after the zip; one revoked consent) lives
+in this note even if the PDF trims it.
+
+Figure `fig:sample-demo` stays questionnaire-only (age still omitted
+there). Zip path (local, not git):
+`/home/wtroi/tmp/repriceofattentionaugustgoalsplanning.zip`.

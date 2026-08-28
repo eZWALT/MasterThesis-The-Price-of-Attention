@@ -28,6 +28,13 @@
 - **Trajectories are thesis-only** (24 August). Do not put Defs 1–6,
   Results 6.4, or trajectory Discussion/appendix back in the paper.
   Lock: `.agents/context/writing/2026-08-24-trajectories-thesis-only.md`.
+- **Dataset A / Dataset B**, never Path A/B. A dataset is not the
+  subject of a test ("the Dataset A **contrasts** test…"). Lock:
+  `.agents/context/data-analysis/eeg/2026-08-27-dataset-a-b-rename.md`.
+  27 August catch-up (figure regen, crowd age, Methods comments):
+  `.agents/context/writing/2026-08-27-afternoon-save.md`.
+  28 August save: channel-set retry closed; primary 32-ch stays.
+  `.agents/context/data-analysis/eeg/2026-08-28-channel-set-closed.md`.
 
 ## Goals until the thesis is in
 
@@ -63,11 +70,22 @@ Paper is optional this sprint if it fights the thesis. Start slides now.
   Channel-set / literature-ROI averages are a sensitivity only
   (`eeg/2026-08-24-channel-set-policy.md`,
   `eeg/2026-08-24-literature-roi-from-angela.md`,
-  `eeg/2026-08-25-wang-zone-sensitivity.md`). George nine-site and
-  Wang-zone lists are hardcoded in `channel_sets`. Appendix only
-  (`sec:app-eeg-channel-sets`). Do not write them into primary Gold.
-  Do not treat them as a second confirmatory family. Cleaning stays
-  on all 32 channels.
+  `eeg/2026-08-25-wang-zone-sensitivity.md`,
+  `eeg/2026-08-27-angela-code-channel-set.md`). George nine-site,
+  Wang-zone, AES-region, and Angela-code lists are hardcoded in
+  `channel_sets`. Appendix only (`sec:app-eeg-channel-sets`). Do not
+  write them into primary Gold. Do not treat them as a second
+  confirmatory family. Cleaning stays on all 32 channels.
+- Post-hoc pairwise sweep (Dataset A 10 pairs, Dataset B 6 pairs) is
+  **exploratory only** and writes to `statistics/outputs/posthoc/`.
+  352 tests, 0 significant under Holm, BH **or** BY, under every family
+  definition and all 65,535 feature subsets. Do not re-litigate the
+  correction or propose dropping features to gain power: families are
+  within-measure, so a subset deletes families rather than shrinking
+  them. Nothing there is promoted to confirmatory, whatever its \(p\).
+  `eeg/2026-08-28-posthoc-pairwise.md`. How the matched controls
+  actually work, and why Dataset B `early_vs_late` is raw-space only:
+  `eeg/2026-08-28-dataset-b-control-audit.md`.
 
 ### Where the EEG datasets live
 
