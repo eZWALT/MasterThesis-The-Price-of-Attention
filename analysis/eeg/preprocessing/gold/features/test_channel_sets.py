@@ -22,6 +22,11 @@ from build_condition_features import (  # noqa: E402
     spectral_features,
 )
 from channel_sets import (  # noqa: E402
+    ANGELA_CODE_AS_WRITTEN,
+    ANGELA_CODE_BAND_CHANNELS,
+    ANGELA_CODE_DROPPED,
+    ANGELA_CODE_PATH,
+    ANGELA_CODE_VERSION,
     DEFAULT_CHANNEL_SET_PATH,
     GEORGE2025_NINE,
     LITERATURE_ROI_BAND_CHANNELS,
@@ -72,6 +77,7 @@ CHANNELS = [
     "T7",
     "T8",
     "P7",
+    "P8",
     "CP1",
     "CP2",
 ]
@@ -191,6 +197,74 @@ class ChannelSetPolicyTests(unittest.TestCase):
         payload["bands"]["alpha"]["channels"] = ["O1"]
         with self.assertRaises(ValueError):
             policy_from_mapping(payload, path=TEACHING_ATLAS_PATH)
+
+    def test_angela_code_is_ready_and_drops_missing_sites(self) -> None:
+        policy = load_channel_set_policy(ANGELA_CODE_PATH)
+        self.assertEqual(policy.status, "ready")
+        self.assertEqual(policy.policy_version, ANGELA_CODE_VERSION)
+        self.assertFalse(policy.is_primary)
+        require_ready(policy)
+        self.assertEqual(
+            ANGELA_CODE_DROPPED,
+            ("FCz", "CP3", "CPz", "CP4", "PO7", "PO8"),
+        )
+        self.assertEqual(
+            set(ANGELA_CODE_AS_WRITTEN["theta"]),
+            {"Fz", "FCz", "Cz", "F3", "F4"},
+        )
+        self.assertEqual(
+            set(ANGELA_CODE_BAND_CHANNELS["theta"]),
+            set(ANGELA_CODE_AS_WRITTEN["theta"]) - set(ANGELA_CODE_DROPPED),
+        )
+        self.assertEqual(
+            set(ANGELA_CODE_BAND_CHANNELS["beta"]),
+            set(ANGELA_CODE_AS_WRITTEN["beta"]) - set(ANGELA_CODE_DROPPED),
+        )
+        self.assertEqual(
+            set(ANGELA_CODE_BAND_CHANNELS["gamma"]),
+            set(ANGELA_CODE_AS_WRITTEN["gamma"]) - set(ANGELA_CODE_DROPPED),
+        )
+        self.assertEqual(
+            ANGELA_CODE_BAND_CHANNELS["delta"],
+            ("Fz", "F3", "F4", "Cz"),
+        )
+        self.assertEqual(
+            ANGELA_CODE_BAND_CHANNELS["theta"],
+            ("Fz", "F3", "F4", "Cz"),
+        )
+        self.assertEqual(
+            ANGELA_CODE_BAND_CHANNELS["beta"],
+            ("C3", "Cz", "C4"),
+        )
+        self.assertEqual(
+            ANGELA_CODE_BAND_CHANNELS["gamma"],
+            ("O1", "Oz", "O2", "P7", "P8"),
+        )
+        for name, channels in ANGELA_CODE_BAND_CHANNELS.items():
+            self.assertEqual(policy.bands[name].channels, channels)
+            self.assertTrue(set(ANGELA_CODE_DROPPED).isdisjoint(channels))
+        self.assertEqual(policy.fz_theta_channels, LOCKED_FZ_THETA)
+        self.assertEqual(
+            policy.posterior_alpha_channels,
+            LOCKED_POSTERIOR_ALPHA,
+        )
+        self.assertEqual(
+            policy.bands["alpha"].channels,
+            LOCKED_POSTERIOR_ALPHA,
+        )
+        features = spectral_features(
+            identical_channels(sine(10.0, 10.0)),
+            sfreq=SAMPLING_RATE,
+            channel_names=CHANNELS,
+            channel_set=policy,
+        )
+        self.assertIn("alpha_power_db_uv2", features)
+
+    def test_angela_code_lock_rejects_drift(self) -> None:
+        payload = json.loads(ANGELA_CODE_PATH.read_text(encoding="utf-8"))
+        payload["bands"]["theta"]["channels"] = ["Fz", "FCz", "Cz", "F3", "F4"]
+        with self.assertRaises(ValueError):
+            policy_from_mapping(payload, path=ANGELA_CODE_PATH)
 
     def test_default_spectral_call_matches_explicit_current_policy(self) -> None:
         data = identical_channels(sine(10.0, 10.0))

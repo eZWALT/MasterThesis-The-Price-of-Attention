@@ -1,0 +1,80 @@
+{
+  "policy_version": "angela_code_v0",
+  "status": "ready",
+  "role": "sensitivity_only",
+  "description": "Ten global band powers averaged on the per-band electrode lists hardcoded in Angela's cognitive-mllm eeg_analysis.py, intersected with this 32-channel cap. Those lists are not cited to a paper. Sites we do not record were dropped, not replaced. Derived measures stay on current_v1. Not confirmatory. Cleaning stays full-montage. Hz edges stay 0.5–4 / 4–8 / 8–13 / 13–30 / 30–40.",
+  "provenance": {
+    "source": "scripts/cognitive-mllm/eeg_preprocessing/eeg_analysis.py BAND_CHANNELS (also eeg_analysis_testing_Sebastian.py). Not a published montage.",
+    "angela_paper_cites": "Zheng 2015 and Cochran 1967 for band names; Newson 2019 for Hz edges; Smith 2017 for F3–F4 FAA. No per-band electrode citation.",
+    "lists_as_written": {
+      "delta": ["Fz", "F3", "F4", "Cz"],
+      "theta": ["Fz", "FCz", "Cz", "F3", "F4"],
+      "alpha": ["O1", "Oz", "O2", "P3", "Pz", "P4"],
+      "beta": ["C3", "Cz", "C4", "CP3", "CPz", "CP4"],
+      "gamma": ["O1", "Oz", "O2", "P7", "P8", "PO7", "PO8"]
+    },
+    "dropped_not_on_this_cap": {
+      "FCz": "theta; acquisition_contract.md: FCz is not a recorded data channel",
+      "CP3": "beta",
+      "CPz": "beta",
+      "CP4": "beta",
+      "PO7": "gamma",
+      "PO8": "gamma"
+    },
+    "what_this_file_does": "Uses the intersection with the recorded 32 sites. Does not invent nearest-neighbour replacements. Alpha on this list is the same six sites as confirmatory posterior alpha.",
+    "not_used": "George nine-site, Wang zones, AES-region map. Do not mix."
+  },
+  "welch": {
+    "nperseg_seconds": 2.0,
+    "overlap": 0.5
+  },
+  "bands": {
+    "delta": {
+      "low_hz": 0.5,
+      "high_hz": 4.0,
+      "channels": ["Fz", "F3", "F4", "Cz"]
+    },
+    "theta": {
+      "low_hz": 4.0,
+      "high_hz": 8.0,
+      "channels": ["Fz", "F3", "F4", "Cz"]
+    },
+    "alpha": {
+      "low_hz": 8.0,
+      "high_hz": 13.0,
+      "channels": ["O1", "Oz", "O2", "P3", "Pz", "P4"]
+    },
+    "beta": {
+      "low_hz": 13.0,
+      "high_hz": 30.0,
+      "channels": ["C3", "Cz", "C4"]
+    },
+    "gamma": {
+      "low_hz": 30.0,
+      "high_hz": 40.0,
+      "channels": ["O1", "Oz", "O2", "P7", "P8"]
+    }
+  },
+  "derived": {
+    "fz_theta": {"band": "theta", "channels": ["Fz"]},
+    "posterior_alpha": {
+      "band": "alpha",
+      "channels": ["O1", "Oz", "O2", "P3", "Pz", "P4"]
+    },
+    "faa": {"band": "alpha", "left": ["F3"], "right": ["F4"]},
+    "engagement_pope_global": {"channels": "all"},
+    "engagement_pope_frontocentral": {
+      "channels": ["F3", "F4", "Fz", "FC1", "FC2", "C3", "C4", "Cz"]
+    },
+    "engagement_kislov": {
+      "channels": ["Cz", "Pz", "P3", "P4"],
+      "alpha_hz": [8.0, 12.0],
+      "beta_hz": [16.0, 24.0]
+    }
+  },
+  "epoch_rejection_channels": "all",
+  "cleaning": {
+    "scope": "full_montage",
+    "note": "Do not subset channels before notch, average reference, interpolation, or ICA."
+  }
+}

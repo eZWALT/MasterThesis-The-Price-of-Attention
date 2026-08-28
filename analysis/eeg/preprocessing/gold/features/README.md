@@ -10,8 +10,9 @@ Electrode lists for the 16 spectral formulas live in
 uses the full montage. `channel_set_policy_literature_roi.json` is filled
 (`literature_roi_v0`, George 2025 nine-site). 
 `channel_set_policy_wang2022.json` is the Wang-zone sensitivity
-(`wang2022_v0`). Both are hardcoded; the JSON must match.
-They change the ten global band powers only.
+(`wang2022_v0`). `channel_set_policy_angela_code.json` is Angela's
+code lists on this cap (`angela_code_v0`). All are hardcoded; the
+JSON must match. They change the ten global band powers only.
 
 ```bash
 python analysis/eeg/preprocessing/run_channel_set_sensitivity.py \

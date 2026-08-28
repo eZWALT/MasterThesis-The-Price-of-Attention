@@ -32,6 +32,7 @@ sys.path.insert(0, str(PREPROCESSING))
 
 from channel_sets import (  # noqa: E402
     ChannelSetPolicy,
+    ANGELA_CODE_PATH,
     LITERATURE_ROI_PATH,
     WANG2022_PATH,
     assert_output_allowed,
@@ -359,7 +360,8 @@ def main() -> None:
         help=(
             "One or more non-primary channel-set JSON files. "
             f"Defaults to {LITERATURE_ROI_PATH.name}. "
-            f"Wang zone branch: {WANG2022_PATH}."
+            f"Wang zone branch: {WANG2022_PATH}. "
+            f"Angela code lists: {ANGELA_CODE_PATH}."
         ),
     )
     parser.add_argument(

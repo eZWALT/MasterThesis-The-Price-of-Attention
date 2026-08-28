@@ -1,4 +1,4 @@
-"""Holm heatmaps for primary vs George vs Wang vs AES-region channel sets.
+"""Holm heatmaps for primary vs George vs Wang vs AES vs Angela-code.
 
 4 s ICA only. Sensitivity, not a second confirmatory family.
 
@@ -95,6 +95,12 @@ BRANCHES = (
         "AES 2016 · regions",
         STATS / "sensitivity/channel_sets/teaching_atlas_v0/eeg_condition_contrasts.csv",
         STATS / "sensitivity/channel_sets/teaching_atlas_v0/eeg_ad_response_contrasts.csv",
+    ),
+    (
+        "angela_code_v0",
+        "Angela code · cap ∩",
+        STATS / "sensitivity/channel_sets/angela_code_v0/eeg_condition_contrasts.csv",
+        STATS / "sensitivity/channel_sets/angela_code_v0/eeg_ad_response_contrasts.csv",
     ),
 )
 
@@ -280,7 +286,7 @@ def plot_holm_board(path_name: str, contrasts: list, stem: str) -> None:
     figure, axes = plt.subplots(
         1,
         n_branch,
-        figsize=(4.4 * n_branch, 8.8),
+        figsize=(3.7 * n_branch, 8.8),
         gridspec_kw={"wspace": 0.16},
     )
     for axis, (version, label, condition_path, ad_path) in zip(axes, BRANCHES):
@@ -324,7 +330,7 @@ def plot_combined_board() -> None:
     figure, axes = plt.subplots(
         2,
         n_branch,
-        figsize=(4.4 * n_branch, 13.2),
+        figsize=(3.7 * n_branch, 13.2),
         gridspec_kw={"wspace": 0.16, "hspace": 0.22},
     )
     for col, (version, label, condition_path, ad_path) in enumerate(BRANCHES):
@@ -352,7 +358,7 @@ def plot_combined_board() -> None:
     )
     cbar.set_label("Holm p")
     figure.suptitle(
-        "Channel-set sensitivity · Holm p · 4 s · ICA · four montages",
+        "Channel-set sensitivity · Holm p · 4 s · ICA · five montages",
         y=0.995,
         color=INK,
     )
@@ -361,6 +367,7 @@ def plot_combined_board() -> None:
         0.006,
         "George: same nine Methods sites, every band. "
         "Wang and AES: region words mapped onto this cap; neither source published these electrode strings. "
+        "Angela: BAND_CHANNELS from her code, minus FCz/CP3/CPz/CP4/PO7/PO8 (not on this cap). "
         "Derived rows should match primary. Orange = Holm < 0.05. Not confirmatory. n=18.",
         fontsize=8,
         color=SLATE,
@@ -380,7 +387,7 @@ def plot_mean_diff_board(path_name: str, contrasts: list, stem: str) -> None:
     figure, axes = plt.subplots(
         1,
         n_branch,
-        figsize=(4.4 * n_branch, 6.6),
+        figsize=(3.7 * n_branch, 6.6),
         gridspec_kw={"wspace": 0.16},
     )
     for axis, values, (_, label, _, _) in zip(axes, matrices, BRANCHES):

@@ -3,9 +3,9 @@
 Cleaning stays on the full 32-channel montage. These policies only choose
 which electrodes enter each of the 16 Gold spectral formulas. The current
 primary contract is `channel_set_policy.json`. The literature-ROI file (`literature_roi_v0`, George 2025 nine-site)
-the Wang-zone file (`wang2022_v0`), and the AES-region file
-(`teaching_atlas_v0`) are filled sensitivities and must not write
-primary Gold.
+the Wang-zone file (`wang2022_v0`), the AES-region file
+(`teaching_atlas_v0`), and Angela's code lists (`angela_code_v0`)
+are filled sensitivities and must not write primary Gold.
 """
 
 from __future__ import annotations
@@ -25,6 +25,7 @@ LITERATURE_ROI_PATH = FEATURE_DIR / "channel_set_policy_literature_roi.json"
 GEORGE2025_PATH = LITERATURE_ROI_PATH
 WANG2022_PATH = FEATURE_DIR / "channel_set_policy_wang2022.json"
 TEACHING_ATLAS_PATH = FEATURE_DIR / "channel_set_policy_teaching_atlas.json"
+ANGELA_CODE_PATH = FEATURE_DIR / "channel_set_policy_angela_code.json"
 BAND_ORDER = ("delta", "theta", "alpha", "beta", "gamma")
 READY_STATUSES = frozenset({"frozen", "ready"})
 PRIMARY_ROLE = "primary_gold"
@@ -34,6 +35,7 @@ LITERATURE_ROI_VERSION = "literature_roi_v0"
 GEORGE2025_VERSION = LITERATURE_ROI_VERSION
 WANG2022_VERSION = "wang2022_v0"
 TEACHING_ATLAS_VERSION = "teaching_atlas_v0"
+ANGELA_CODE_VERSION = "angela_code_v0"
 
 # Locked electrode lists. JSON policies must match these tuples.
 # Primary Gold: the five global powers average the whole montage.
@@ -118,6 +120,32 @@ TEACHING_ATLAS_BAND_CHANNELS: dict[str, tuple[str, ...]] = {
     "alpha": TEACHING_ATLAS_ALPHA,
     "beta": TEACHING_ATLAS_BETA,
     "gamma": TEACHING_ATLAS_GAMMA,
+}
+# Sensitivity only. Angela's BAND_CHANNELS from cognitive-mllm,
+# intersected with the recorded 32 sites. Not a paper. Missing
+# FCz / CP3 / CPz / CP4 / PO7 / PO8 were dropped, not replaced.
+# Do not write into primary Gold.
+ANGELA_CODE_AS_WRITTEN: dict[str, tuple[str, ...]] = {
+    "delta": ("Fz", "F3", "F4", "Cz"),
+    "theta": ("Fz", "FCz", "Cz", "F3", "F4"),
+    "alpha": ("O1", "Oz", "O2", "P3", "Pz", "P4"),
+    "beta": ("C3", "Cz", "C4", "CP3", "CPz", "CP4"),
+    "gamma": ("O1", "Oz", "O2", "P7", "P8", "PO7", "PO8"),
+}
+ANGELA_CODE_DROPPED: tuple[str, ...] = (
+    "FCz",
+    "CP3",
+    "CPz",
+    "CP4",
+    "PO7",
+    "PO8",
+)
+ANGELA_CODE_BAND_CHANNELS: dict[str, tuple[str, ...]] = {
+    "delta": ("Fz", "F3", "F4", "Cz"),
+    "theta": ("Fz", "F3", "F4", "Cz"),
+    "alpha": ("O1", "Oz", "O2", "P3", "Pz", "P4"),
+    "beta": ("C3", "Cz", "C4"),
+    "gamma": ("O1", "Oz", "O2", "P7", "P8"),
 }
 LOCKED_FZ_THETA = ("Fz",)
 LOCKED_POSTERIOR_ALPHA = ("O1", "Oz", "O2", "P3", "Pz", "P4")
@@ -511,6 +539,8 @@ def _assert_locked_lists(policy: ChannelSetPolicy) -> None:
         expected = WANG2022_BAND_CHANNELS
     elif policy.policy_version == TEACHING_ATLAS_VERSION:
         expected = TEACHING_ATLAS_BAND_CHANNELS
+    elif policy.policy_version == ANGELA_CODE_VERSION:
+        expected = ANGELA_CODE_BAND_CHANNELS
     else:
         return
     for name in BAND_ORDER:
