@@ -1,0 +1,3 @@
+analysis_type,score,condition_set,condition_pair,statistic,p_value,holm_adjusted_p
+wilcoxon_holm,credibility,,block_late vs inline_early,,0.0036885342441012013,0.022131205464607208
+friedman,relevance,"block_early, block_late, inline_early, inline_late",,8.735294117647069,0.033025401396014856,
