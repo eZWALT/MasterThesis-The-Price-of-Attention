@@ -33,7 +33,32 @@
   `.agents/context/data-analysis/eeg/2026-08-27-dataset-a-b-rename.md`.
   27 August catch-up (figure regen, crowd age, Methods comments):
   `.agents/context/writing/2026-08-27-afternoon-save.md`.
-  28 August save: channel-set retry closed; primary 32-ch stays.
+- Defence deck flow pass (29 August). Rollback presentation `d5d42ab`.
+  `.agents/context/writing/2026-08-29-presentation-flow-pass.md`.
+- Defence title page (29 August). UniPD top; UPC+Telefónica footer;
+two-column people, name flush left. Do not put a `tabular` in
+`\institute`. `.agents/context/writing/2026-08-29-presentation-title-page.md`.
+- High-level discussion (31 August). Slow-power = one
+explicit-early low-frequency tilt (global \(\delta/\theta\) +
+compositional relatives), not Fz \(\theta\). Any-ad Dataset A
+stays Holm-null; early vs late posterior alpha does not.
+Do **not** say that the tilt is active processing, or that
+the ad is registered before the text (explicit onset is
+reply \(+0.49\) s). Do not rewrite his slide.
+Experience / Combos WIP.
+`.agents/context/writing/2026-08-31-slow-power-and-high-level-discussion.md`.
+- Equal-n Dataset A \(k=37\) (31 August). Confirmatory. Discussion
+read in `2026-08-31-equal-n-k37-manuscript.md`. Do not push.
+- Thesis EEG MDE (31 August). Formula in Methods (`eq:mde`);
+dB MDEs and observed power in Results; interpretation in
+`sec:disc-eeg`. Holm-within-4 is \(0.86\), not \(0.87\).
+`.agents/context/writing/2026-08-31-thesis-eeg-mde.md`.
+- Defence save (31 August). Five-band appendix slide + trump-card
+`images/misc/waves.jpg`. EEG power is post-hoc Holm MDE / observed
+power on \(D_i\), \(n=18\): Dataset A 0.22–0.44 dB, Dataset B
+1.7–3.7 dB. Do not write “approached significance”.
+`.agents/context/writing/2026-08-31-presentation-eeg-waves-and-power.md`.
+28 August save: channel-set retry closed; primary 32-ch stays.
   `.agents/context/data-analysis/eeg/2026-08-28-channel-set-closed.md`.
 
 ## Goals until the thesis is in
@@ -67,6 +92,11 @@ Paper is optional this sprint if it fights the thesis. Start slides now.
   Depth audit (MDE, compatibility, exploratory lock):
   `.agents/context/data-analysis/eeg/2026-08-20-paper-depth-audit.md`.
   Confirmatory is 4 s + median + ICA. C1 is blocked on Goal 1.
+  Equal-n Dataset A aggregation (\(k=37\) tiles nearest visual onset)
+  is the confirmatory Dataset A summary (shortest chat, not a \(k\)
+  picked by \(p\)). Gold whole-window median is not overwritten.
+  Applied locally to thesis / paper / presentation 31 August.
+  `eeg/2026-08-31-equal-n-k37.md`.
   Channel-set / literature-ROI averages are a sensitivity only
   (`eeg/2026-08-24-channel-set-policy.md`,
   `eeg/2026-08-24-literature-roi-from-angela.md`,
@@ -78,14 +108,22 @@ Paper is optional this sprint if it fights the thesis. Start slides now.
   confirmatory family. Cleaning stays on all 32 channels.
 - Post-hoc pairwise sweep (Dataset A 10 pairs, Dataset B 6 pairs) is
   **exploratory only** and writes to `statistics/outputs/posthoc/`.
-  352 tests, 0 significant under Holm, BH **or** BY, under every family
-  definition and all 65,535 feature subsets. Do not re-litigate the
-  correction or propose dropping features to gain power: families are
-  within-measure, so a subset deletes families rather than shrinking
-  them. Nothing there is promoted to confirmatory, whatever its \(p\).
+  After equal-n \(k=37\), one Dataset A cell is Holm/BH/BY significant
+  (implicit-early minus explicit-late Fz \(\theta\)); Dataset B stays
+  Holm-null. Do not promote. The whole-window feature-subset screen
+  (352 tests / 65,535 subsets, 0 Holm) is a separate artefact of the
+  old estimator. Families are within-measure, so a subset deletes
+  families rather than shrinking them.
   `eeg/2026-08-28-posthoc-pairwise.md`. How the matched controls
   actually work, and why Dataset B `early_vs_late` is raw-space only:
   `eeg/2026-08-28-dataset-b-control-audit.md`.
+- Ad-local averaging (\(k\) tiles around ads instead of ~95 per
+  condition) is exploratory. Dataset A at \(k=5\) and \(k=10\) stays
+  Holm-null on the planned features. Exhaustive \(k=1\ldots 90\) lights
+  up early vs late at large \(k\), not any-ad; still exploratory.
+  Do not pick a \(k\) by \(p\). The confirmatory equal-n \(k=37\) is
+  the shortest chat, not a search hit.
+  `eeg/2026-08-29-ad-local-epochs.md`.
 
 ### Where the EEG datasets live
 
@@ -96,8 +134,11 @@ Medallion zones under `src/project/logs/xdf/` (Bronze is immutable):
   timelines; `silver/audits/` — channel and recording QC;
   `silver/ica/candidate_v1/` — fitted ICA models, see the banner above.
 - `gold/windows/condition_windows.csv` — window definitions.
-- `gold/features/condition_features.csv` — **Dataset A**, one row per
-  participant × condition, 18 subjects, all `primary_analysis_eligible`.
+- `gold/features/condition_features.csv` — **Dataset A** Gold, one row
+  per participant × condition, 18 subjects, all
+  `primary_analysis_eligible`. Whole-window median. Confirmatory
+  Dataset A tests use the equal-n \(k=37\) neighbourhood in
+  `analysis/eeg/statistics/outputs/eeg_condition_contrasts.csv`.
 - `gold/features/ad_response_features.csv` — **Dataset B**, one row per
   participant × advertisement, with onset estimator and uncertainty.
 - `gold/features/task_state/task_state_person_features.csv` — the

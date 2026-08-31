@@ -130,8 +130,13 @@ Port the paper. Do not invent a second analysis.
 
 **Start now (27 August).** Skeleton from thesis Methods; fill numbers when they exist.
 
-- [ ] Slide skeleton (design, five conditions, \(N=54\) / EEG \(n=18\))
-- [ ] Goal 1 / 3 / 4 takeaways
+- [x] Slide skeleton (28 August). Six sections, five conditions,
+      \(N=54\) / EEG \(n=18\). `2026-08-28-presentation-skeleton.md`.
+- [x] Appendix EEG bands slide + `waves.jpg` (31 August).
+      Power/MDE write-up:
+      `2026-08-31-presentation-eeg-waves-and-power.md`.
+- [ ] Goal 1 takeaways into the grey Results block
+- [ ] Goal 3 / 4 spoken polish (EEG and trajectories are already in)
 - [ ] Combo slide only if Goal 5 ran
 
 ---

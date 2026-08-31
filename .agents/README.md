@@ -32,3 +32,9 @@ Newest analysis save (28 August): channel-set closed, primary stays.
 `.agents/context/data-analysis/eeg/2026-08-28-channel-set-closed.md`.
 Newest writing catch-up (Dataset A/B figures, 7.1 crowd age, Methods
 comments): `.agents/context/writing/2026-08-27-afternoon-save.md`.
+29 August defence-deck flow (rollback `d5d42ab`):
+`.agents/context/writing/2026-08-29-presentation-flow-pass.md`.
+31 August defence save (waves slide + EEG power / MDE numbers):
+`.agents/context/writing/2026-08-31-presentation-eeg-waves-and-power.md`.
+31 August slow-power / High-level discussion lock:
+`.agents/context/writing/2026-08-31-slow-power-and-high-level-discussion.md`.

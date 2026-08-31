@@ -26,6 +26,10 @@ ignores their contents. Run `git` commands inside the relevant mirror.
 interprets. EEG 6.3 is confirmatory; 7.3 is the EEG read. Lock:
 `2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
 
+Equal-n Dataset A \(k=37\) (31 August). **Applied** locally to
+thesis, paper, and presentation. Do not push until Walter asks.
+`2026-08-31-equal-n-k37-manuscript.md`.
+
 Channel-set / literature-ROI EEG is sensitivity, not confirmatory
 Results. George nine-site and Wang-zone branches stay appendix-only.
 Lock: `2026-08-24-channel-set-sensitivity-not-confirmatory.md`.
@@ -107,6 +111,41 @@ Monday agenda (Katerina + Sebastian):
 
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
+
+**31 August (newest writing):** equal-n Dataset A \(k=37\)
+applied locally to thesis, paper, and presentation. Do not push.
+`2026-08-31-equal-n-k37-manuscript.md`.
+
+**31 August:** “slow-power response” lock for
+the High-level discussion slide. Five explicit-early cells are
+one low-frequency tilt, not five findings. Dataset A any-ad is the
+“no overall condition difference.” Do not rewrite his wording.
+`2026-08-31-slow-power-and-high-level-discussion.md`.
+
+**31 August:** thesis EEG MDE. Formula
+`eq:mde` in Methods; dB / observed power / \(n_{80}\) in
+Results; “precise A / underpowered B” stays Discussion.
+`2026-08-31-thesis-eeg-mde.md`.
+
+**31 August:** defence save. Appendix EEG now
+opens on the five bands + `images/misc/waves.jpg`. How Holm MDE
+and observed power are computed, and the \(n=18\) numbers
+(Dataset A 0.22–0.44 dB after equal-n \(k=37\); Dataset B 1.7–3.7 dB):
+`2026-08-31-presentation-eeg-waves-and-power.md`.
+
+**29 August:** defence **title page** (UniPD top;
+UPC+Telefónica footer; two-column people, name flush left, colons,
+type below the titles smaller than the titles).
+`2026-08-29-presentation-title-page.md`.
+
+**29 August:** defence-deck flow pass. Intro is the live spoken
+thread. Rollback SHA `d5d42ab`. Iteration commits `deck-iter-N:`.
+`2026-08-29-presentation-flow-pass.md`.
+
+**28 August:** defence Beamer skeleton in `docs/overleaf/presentation/`.
+Six spoken sections (Intro, RQs, Methods, Results, Discussion,
+Conclusions). Theory off the clock. Goal 1 / combos are grey blocks.
+`2026-08-28-presentation-skeleton.md`.
 
 **28 August:** EEG framing locked as three tiers (confirmatory /
 exploratory / post hoc). Report the six Dataset B cells as a

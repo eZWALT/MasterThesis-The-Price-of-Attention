@@ -15,8 +15,9 @@ editing; show text; push only when asked.
    behavioural Gold paragraph still empty.
 2. **Paper optional.** Do not invent Goal 1 tables. Trajectories stay
    thesis-only.
-3. **Start the presentation now** (`docs/overleaf/presentation/`).
-   Skeleton from Methods; numbers when they exist.
+3. **Presentation skeleton is open** (`docs/overleaf/presentation/`,
+   28 August). Six spoken sections; fill Goal 1 / combos when they
+   exist. `2026-08-28-presentation-skeleton.md`.
 
 Analysis board (five pending items, timeline):
 `../data-analysis/2026-08-27-backlog-and-timeline.md`.

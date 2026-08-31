@@ -70,9 +70,9 @@ Suggested **analysis order inside this window** (still 1 before 5):
    `docs/overleaf/thesis/`.
 2. **Paper is optional** this sprint. Do not invent Goal 1 tables.
    Trajectories stay thesis-only.
-3. **Start the presentation** (`docs/overleaf/presentation/`). Skeleton
-   from thesis Methods (five conditions, \(N=54\), EEG \(n=18\)) even
-   before Goal 1 numbers. Combo slide only if item 5 produced a number.
+3. **Presentation skeleton is open** (`docs/overleaf/presentation/`).
+   Six spoken sections, 28 August. Fill Goal 1 / combos when they exist.
+   `../writing/2026-08-28-presentation-skeleton.md`.
 
 ---
 

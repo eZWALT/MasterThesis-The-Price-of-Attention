@@ -11,6 +11,29 @@ pipelines, generated manifests, and participant-level outputs remain under
 
 ## Current entries
 
+- Power / MDE (not new science; 31 August write-up for the deck):
+  Holm-80% MDE is first-step \(\alpha=0.05/m\) on the frozen \(D_i\).
+  Dataset A \(\approx 0.22\)–\(0.44\) dB (equal-n \(k=37\)); Dataset B \(\approx 1.7\)–\(3.7\) dB.
+  Runner still `analysis/run_paper_depth_audit.py`.
+  `../../writing/2026-08-31-presentation-eeg-waves-and-power.md`.
+- `2026-08-31-equal-n-k37.md`
+  Dataset A test summaries: median \(k=37\) tiles nearest visual
+  onset so every advertisement condition has the same epoch count.
+  \(k=37\) is the shortest conversation in the cohort (tile counts
+  37–251, median 95). Gold whole-window median is not overwritten.
+  Applied to Overleaf locally 31 August.
+- `2026-08-29-ad-local-epochs.md`
+  Exploratory. Median \(k\) tiles around / before / after each visual
+  onset instead of Dataset A's ~95-tile condition median. Confirmatory
+  untouched. Sparse grid then exhaustive \(k=1\ldots 90\) (117 min).
+  Dataset A at \(k=5\) and \(k=10\) around ads stays Holm-null on
+  planned features. The grid lights up **early vs late** at large
+  \(k\) (search \(p \approx .02\)–\(.045\)), not any-ad. Dataset B
+  late posterior alpha at \(k=3\)–\(5\) is the same 8 s-width story.
+  Nothing promoted. Outputs:
+  `statistics/outputs/sensitivity/ad_local_epochs/`
+  (exhaustive under `exhaustive/`; equal-n \(k=30\ldots 70\) under
+  `balanced_k/`: max \(k\) with \(n=18\) is 37, not 50).
 - `2026-08-28-posthoc-pairwise.md`
   Backlog item 2 bounded and run. Exhaustive pairwise sweep: Dataset A
   10 pairs, Dataset B 6 pairs in \(\Delta\) space with a raw companion.

@@ -29,6 +29,16 @@ The top level is reserved for documents that govern both analysis arms:
   Rests on `eeg/2026-08-28-dataset-b-control-audit.md`, which is the
   source of truth for the matched controls and shows Dataset B
   `early_vs_late` is raw-space only.
+- `eeg/2026-08-31-equal-n-k37.md` — confirmatory Dataset A is the
+  median of \(k=37\) tiles nearest visual onset (shortest chat).
+  Applied locally to Overleaf 31 August. Gold whole-window is not
+  overwritten.
+- `eeg/2026-08-29-ad-local-epochs.md` — exploratory. Median \(k\)
+  tiles around ads instead of Dataset A's whole-condition average.
+  \(k=5\) and \(k=10\) do not create Dataset A hits. Not confirmatory.
+- EEG Holm MDE / observed power (numbers for the deck, 31 August):
+  `../writing/2026-08-31-presentation-eeg-waves-and-power.md`.
+  Not a new analysis. Do not write “approached significance”.
 - `2026-08-27-backlog-and-timeline.md` — **live sprint (27 Aug)**:
   five pending analyses (item 1 closed 28 Aug; EEG post-hoc,
   behavioural EDA, free-text, joined dataset / combos still open).
