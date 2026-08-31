@@ -18,9 +18,10 @@ from condition_labels import DATASET_A_LABELS, DATASET_B_LABELS
 
 
 ROOT = Path(__file__).resolve().parents[3]
-GRID = ROOT / (
-    "analysis/eeg/statistics/outputs/sensitivity/epoch_length_grid_comparison.csv"
-)
+STATS = ROOT / "analysis/eeg/statistics/outputs"
+GRID = STATS / "sensitivity/epoch_length_grid_comparison.csv"
+CONDITION_CONTRASTS = STATS / "eeg_condition_contrasts.csv"
+AD_CONTRASTS = STATS / "eeg_ad_response_contrasts.csv"
 OUT = Path(__file__).resolve().parent / "outputs" / "figures" / "eeg_only" / "heatmaps"
 
 NAVY = "#1B3A4B"
@@ -215,9 +216,30 @@ def plot_board(grid: pd.DataFrame) -> None:
     save(figure, "board_dataset_a_b_2_4_8s")
 
 
+def matrix_from_contrasts(
+    tests: pd.DataFrame,
+    contrasts: list[tuple[str, str]],
+) -> np.ndarray:
+    values = np.full((len(FEATURES), len(contrasts)), np.nan)
+    primary = tests[tests["contrast_tier"] == "primary"]
+    for i, (feature, _) in enumerate(FEATURES):
+        for j, (contrast, _) in enumerate(contrasts):
+            hit = primary[
+                (primary["feature"] == feature)
+                & (primary["contrast_id"] == contrast)
+            ]
+            if hit.empty or pd.isna(hit.iloc[0]["p_t_holm"]):
+                continue
+            values[i, j] = float(hit.iloc[0]["p_t_holm"])
+    return values
+
+
 def plot_board_4s(grid: pd.DataFrame) -> None:
-    """Frozen 4 s ICA board: Dataset A (3) + Dataset B (4), all 16 features."""
+    """Reported 4 s ICA board: Dataset A equal-n k=37 + Dataset B onset-locked."""
+    del grid
     style()
+    condition = pd.read_csv(CONDITION_CONTRASTS)
+    ad = pd.read_csv(AD_CONTRASTS)
     figure, axes = plt.subplots(
         1,
         2,
@@ -226,14 +248,14 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
     )
     draw(
         axes[0],
-        matrix(grid, dataset="A", seconds=4.0, contrasts=DATASET_A),
+        matrix_from_contrasts(condition, DATASET_A),
         DATASET_A,
         title="Dataset A · 4 s · ICA",
         show_ylabels=True,
     )
     draw(
         axes[1],
-        matrix(grid, dataset="B", seconds=4.0, contrasts=DATASET_B),
+        matrix_from_contrasts(ad, DATASET_B),
         DATASET_B,
         title="Dataset B · 4 s · ICA",
         show_ylabels=False,
@@ -253,10 +275,11 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
     figure.text(
         0.01,
         0.008,
-        "Rows 1–2 (above the line) are confirmatory and Holm-null. "
-        "Orange cells are exploratory Dataset B hits, ICA-only; they are not a second primary. "
-        "Holm is within feature across the 3 (A) or 4 (B) contrasts at 4 s, not across the 16 features. "
-        "n=18. Source: epoch_length_grid_comparison.csv.",
+        "Rows 1–2 (above the line) are confirmatory. Orange = Holm < 0.05. "
+        "Dataset A medians the 37 retained 4 s tiles nearest visual onset. "
+        "Dataset B is onset-locked post−pre versus matched no-ad. "
+        "Holm is within feature across the 3 (A) or 4 (B) contrasts, not across the 16 features. "
+        "n=18.",
         fontsize=8,
         color=SLATE,
     )

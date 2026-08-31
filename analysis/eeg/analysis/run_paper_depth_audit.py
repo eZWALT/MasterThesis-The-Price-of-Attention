@@ -188,13 +188,13 @@ def main() -> None:
                 check = verify_t(diffs, stored)
                 people = loo_people(scores, contrast_id, feature)
                 people["people"] = people["people"].assign(
-                    dataset=dataset,
+                    dataset=path,
                     contrast_id=contrast_id,
                     feature=feature,
                 )
                 loo_frames.append(people["people"])
                 diag = diagnostics[
-                    (diagnostics["analysis"] == ("condition" if dataset == "A" else "ad"))
+                    (diagnostics["analysis"] == ("condition" if path == "A" else "ad"))
                     & (diagnostics["contrast_id"] == contrast_id)
                     & (diagnostics["feature"] == feature)
                 ]

@@ -1,0 +1,1 @@
+Whole-window Dataset A contrast tables (median over every retained 4 s tile in the condition). Copied before equal-n k=37 became the reported Dataset A summary. Gold `condition_features.csv` is still this aggregation.

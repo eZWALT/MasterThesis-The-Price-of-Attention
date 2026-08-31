@@ -184,7 +184,7 @@ def plot_confirmatory_forests(
                 & (condition["contrast_id"].isin(DATASET_A_LABELS))
             ],
             DATASET_A_LABELS,
-            "Dataset A · sustained condition",
+            "Dataset A · equal-n neighbourhood of onset",
         ),
         (
             axes[1],
@@ -244,7 +244,8 @@ def plot_confirmatory_forests(
     caption(
         figure,
         "Navy = Fz theta; teal = posterior alpha. Asterisks mark Holm p < 0.05 "
-        "within each feature’s primary family. Primary is 4 s + median + ICA.",
+        "within each feature’s primary family. Dataset A medians the 37 tiles "
+        "nearest visual onset; Dataset B is onset-locked 4 s post−pre.",
     )
     save(figure, "figure_08_confirmatory_forests")
 
