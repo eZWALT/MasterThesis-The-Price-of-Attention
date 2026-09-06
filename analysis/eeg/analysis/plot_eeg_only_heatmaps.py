@@ -33,20 +33,21 @@ CMAP = LinearSegmentedColormap.from_list(
     ["#C45C26", "#F0D5B8", "#F4F6F7", "#9BB0BC"],
 )
 
+# Greek symbols, to match the manuscript prose (Fz θ, posterior α, ...).
 FEATURES = [
-    ("fz_theta_power_db_uv2", "Fz theta *"),
-    ("posterior_alpha_power_db_uv2", "Post. alpha *"),
-    ("theta_power_db_uv2", "Theta"),
-    ("alpha_power_db_uv2", "Alpha"),
-    ("beta_power_db_uv2", "Beta"),
+    ("fz_theta_power_db_uv2", "Fz θ *"),
+    ("posterior_alpha_power_db_uv2", "Posterior α *"),
+    ("theta_power_db_uv2", "θ (global)"),
+    ("alpha_power_db_uv2", "α (global)"),
+    ("beta_power_db_uv2", "β (global)"),
     ("faa_log_f4_minus_f3", "FAA"),
-    ("delta_power_db_uv2", "Delta"),
-    ("gamma_power_db_uv2", "Gamma"),
-    ("delta_relative_power", "Rel. delta"),
-    ("theta_relative_power", "Rel. theta"),
-    ("alpha_relative_power", "Rel. alpha"),
-    ("beta_relative_power", "Rel. beta"),
-    ("gamma_relative_power", "Rel. gamma"),
+    ("delta_power_db_uv2", "δ (global)"),
+    ("gamma_power_db_uv2", "γ (global)"),
+    ("delta_relative_power", "Relative δ"),
+    ("theta_relative_power", "Relative θ"),
+    ("alpha_relative_power", "Relative α"),
+    ("beta_relative_power", "Relative β"),
+    ("gamma_relative_power", "Relative γ"),
     ("engagement_beta_over_alpha_theta", "Pope"),
     ("engagement_pope_frontocentral_beta_over_alpha_theta", "Pope FC"),
     ("engagement_kislov_central_beta16_24_over_alpha8_12", "Kislov"),
@@ -133,13 +134,19 @@ def draw(
                 axis.text(
                     x,
                     y,
-                    f"{value:.2f}" if value >= 0.1 else f"{value:.3f}",
+                    apa_p(value),
                     ha="center",
                     va="center",
                     color="white" if value < 0.05 else INK,
                     fontsize=fontsize,
                     fontweight="semibold" if value < 0.05 else "normal",
                 )
+
+
+def apa_p(value: float) -> str:
+    """APA-style p: no leading zero, two decimals above .10, three below."""
+    text = f"{value:.2f}" if value >= 0.1 else f"{value:.3f}"
+    return text[1:] if text.startswith("0.") else text
 
 
 def plot_one(
@@ -250,14 +257,14 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
         axes[0],
         matrix_from_contrasts(condition, DATASET_A),
         DATASET_A,
-        title="Dataset A · 4 s · ICA",
+        title="Dataset A: condition aggregation",
         show_ylabels=True,
     )
     draw(
         axes[1],
         matrix_from_contrasts(ad, DATASET_B),
         DATASET_B,
-        title="Dataset B · 4 s · ICA",
+        title="Dataset B: onset-locked, versus matched no-ad",
         show_ylabels=False,
     )
     cbar = figure.colorbar(
@@ -267,22 +274,7 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
         pad=0.02,
     )
     cbar.set_label("Holm p")
-    figure.suptitle(
-        "4 s Holm p · ICA · 16 features (Dataset A + Dataset B)",
-        y=0.995,
-        color=INK,
-    )
-    figure.text(
-        0.01,
-        0.008,
-        "Rows 1–2 (above the line) are confirmatory. Orange = Holm < 0.05. "
-        "Dataset A medians the 37 retained 4 s tiles nearest visual onset. "
-        "Dataset B is onset-locked post−pre versus matched no-ad. "
-        "Holm is within feature across the 3 (A) or 4 (B) contrasts, not across the 16 features. "
-        "n=18.",
-        fontsize=8,
-        color=SLATE,
-    )
+    # No suptitle or in-figure footnote: the manuscript caption carries them.
     save(figure, "board_dataset_a_b_4s")
 
 

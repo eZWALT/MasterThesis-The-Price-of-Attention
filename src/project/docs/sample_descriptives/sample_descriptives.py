@@ -184,7 +184,7 @@ def grouped_bars(ax, levels, lab, crowd, ylabel="Percent of arm"):
     ax.bar(x - w / 2, lab, w, color=LAB_C, label="Lab  $n=18$", zorder=3)
     ax.bar(x + w / 2, crowd, w, color=CR_C, label="Crowd  $n=36$", zorder=3)
     ax.set_xticks(x)
-    ax.set_xticklabels(levels, fontsize=7.5)
+    ax.set_xticklabels(levels, fontsize=7)
     ax.set_ylabel(ylabel, fontsize=8.5, color=INK)
     ax.set_ylim(0, 108)
     ax.set_yticks([0, 25, 50, 75, 100])
@@ -215,7 +215,8 @@ def style_axes():
 
 
 def draw_demographics(people: list[dict], out_stem: Path) -> None:
-    fig, axes = plt.subplots(2, 2, figsize=(6.0, 5.15))
+    # Wide enough that six single-line education labels do not collide.
+    fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.6))
     panels = [
         (axes[0, 0], "Sex", "sex", SEX_LEVELS),
         (axes[0, 1], "Highest education", "edu", EDU_LEVELS),

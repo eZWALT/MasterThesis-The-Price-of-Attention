@@ -83,13 +83,13 @@ Conversational depth occurred in every conversation. If the labels
 cannot move with it, an advertisement null is uninformative.
 
 ```
-academic_help                        turn1 0.130 -> turn4 0.078  diff -0.052  dz -0.25  p_wilcoxon 0.0756  p_holm 0.1511
-general_guidance_and_info            turn1 0.478 -> turn4 0.211  diff -0.267  dz -1.00  p_wilcoxon 0.0000  p_holm 0.0000
-other                                turn1 0.022 -> turn4 0.089  diff +0.067  dz +0.48  p_wilcoxon 0.0011  p_holm 0.0044
-other_obscene_or_illegal             turn1 0.019 -> turn4 0.111  diff +0.093  dz +0.57  p_wilcoxon 0.0003  p_holm 0.0015
-personal_writing_or_communication    turn1 0.048 -> turn4 0.119  diff +0.070  dz +0.38  p_wilcoxon 0.0062  p_holm 0.0186
-relationships_and_personal_reflection turn1 0.152 -> turn4 0.178  diff +0.026  dz +0.11  p_wilcoxon 0.4442  p_holm 0.4442
-(6 genres at or above 5% prevalence, Holm across them)
+academic_help                        turn1 0.130 -> turn4 0.078  diff -0.052  dz -0.25  p_t 0.0751  p_holm 0.1502  p_wilcoxon 0.0756
+general_guidance_and_info            turn1 0.478 -> turn4 0.211  diff -0.267  dz -1.00  p_t 0.0000  p_holm 0.0000  p_wilcoxon 0.0000
+other                                turn1 0.022 -> turn4 0.089  diff +0.067  dz +0.48  p_t 0.0010  p_holm 0.0038  p_wilcoxon 0.0011
+other_obscene_or_illegal             turn1 0.019 -> turn4 0.111  diff +0.093  dz +0.57  p_t 0.0001  p_holm 0.0006  p_wilcoxon 0.0003
+personal_writing_or_communication    turn1 0.048 -> turn4 0.119  diff +0.070  dz +0.38  p_t 0.0066  p_holm 0.0198  p_wilcoxon 0.0062
+relationships_and_personal_reflection turn1 0.152 -> turn4 0.178  diff +0.026  dz +0.11  p_t 0.4112  p_holm 0.4112  p_wilcoxon 0.4442
+(6 genres at or above 5% prevalence, Holm on the paired t tests)
 
 Cumulative drift from the opening genre:
   turn 2 differs from turn 1 in 0.789 of conversations

@@ -39,11 +39,13 @@ CONDITION_TEXT = {
     "a_exp_4": "Explicit late",
 }
 POSITION_ORDER = ["no_ad", "pre_ad", "crosses_ad", "post_ad"]
+# Tick labels name the step(s) each bar pools, so the bar can be read
+# without the caption. Early ads sit after turn 2, late ads after turn 4.
 POSITION_TEXT = {
-    "no_ad": r"No-ad $\delta_2$",
-    "pre_ad": "Before the ad",
-    "crosses_ad": "Crosses the ad",
-    "post_ad": "After the ad",
+    "no_ad": "No ad\n" r"$\tau_2$ only",
+    "pre_ad": "Before the ad\n" r"$\tau_1$ (early), $\tau_1$–$\tau_3$ (late)",
+    "crosses_ad": "Crosses the ad\n" r"$\tau_2$ (early) $=\delta^{(a)}_2$",
+    "post_ad": "After the ad\n" r"$\tau_3$ (early)",
 }
 PRIMARY_SOURCE = "utterance"
 
@@ -157,9 +159,9 @@ def plot_shift_by_position(transitions: pd.DataFrame) -> None:
         )
     axis.set_ylim(0, max(rates) * 1.28)
     axis.set_xticks(range(len(POSITION_ORDER)))
-    axis.set_xticklabels([POSITION_TEXT[p] for p in POSITION_ORDER])
+    axis.set_xticklabels([POSITION_TEXT[p] for p in POSITION_ORDER], fontsize=8.5)
     axis.set_ylabel("Shift rate $\\Pr(\\delta_k=1)$")
-    axis.set_title("Shift rate by position relative to the advertisement", color=INK)
+    # No in-figure title: the manuscript caption carries it.
     save(figure, "shift_by_position")
 
 

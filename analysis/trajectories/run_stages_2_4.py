@@ -81,6 +81,10 @@ CONTRAST_SHORT = {
     "explicit late - no ad": "Explicit late − no ad",
 }
 
+# The two residual classes of f_genre. Hollow markers in the depth figure so
+# the reader can separate a content shift from a fallback-label rise.
+FALLBACK_SHORT = {short("other"), short("other_obscene_or_illegal")}
+
 LIVE_DESTINATIONS = [
     "relationships_and_personal_reflection",
     "general_guidance_and_info",
@@ -541,23 +545,27 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
         rows.append(result)
     depth = pd.DataFrame(rows)
     depth["p_holm"] = holm(depth.p_t.tolist())
+    del hard  # the δ^(a)_2 contrast is already tabulated in the manuscript
 
-    figure, axes = plt.subplots(1, 2, figsize=(10.8, 4.6), sharex=False)
-
-    axis = axes[0]
+    # Single panel. The right-hand δ^(a)_2 dot that used to sit beside it
+    # duplicated the crossing table; the manuscript now cross-references it.
+    figure, axis = plt.subplots(figsize=(6.8, 4.2))
     order = depth.sort_values("mean")
     for index, row in enumerate(order.itertuples()):
+        fallback = row.label in FALLBACK_SHORT
         axis.errorbar(
             row.mean,
             index,
             xerr=[[row.mean - row.ci_low], [row.ci_high - row.mean]],
             fmt="o",
-            color=NAVY,
+            color=SLATE if fallback else NAVY,
+            mfc="white" if fallback else None,
             capsize=3.2,
             markersize=6,
             elinewidth=1.3,
         )
-        p_text = f"{row.mean:+.2f}, Holm $p$={row.p_holm:.3f}"
+        holm_text = f"{row.p_holm:.3f}"[1:] if row.p_holm < 1 else "1.00"
+        p_text = f"{row.mean:+.2f}, Holm $p$={holm_text}"
         if row.p_holm < 0.001:
             p_text = f"{row.mean:+.2f}, Holm $p<.001$"
         axis.text(
@@ -573,44 +581,8 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
     axis.set_yticks(range(len(order)))
     axis.set_yticklabels(order.label)
     axis.set_xlim(-0.40, 0.36)
-    axis.set_xlabel(r"Turn 4 share $-$ turn 1 share (95\% paired $t$, $N=54$)")
-    axis.set_title(
-        r"Does $\hat g_k$ change from turn 1 to turn 4?",
-        color=INK,
-        loc="left",
-    )
-
-    axis = axes[1]
-    row = hard.set_index("contrast").loc["early ads pooled - no ad"]
-    axis.errorbar(
-        row["mean"],
-        0,
-        xerr=[[row["mean"] - row["ci_low"]], [row["ci_high"] - row["mean"]]],
-        fmt="o",
-        color=NAVY,
-        capsize=4,
-        markersize=8,
-        elinewidth=1.6,
-    )
-    axis.axvline(0, color=INK, linewidth=0.8)
-    axis.set_yticks([0])
-    axis.set_yticklabels([r"Early pooled $-$ $a^{\emptyset}$"])
-    axis.set_xlabel(r"$\Pr(\delta_2=1)$ with an early ad $-$ without (95\% paired $t$, $N=54$)")
-    axis.set_xlim(-0.40, 0.36)
-    axis.set_ylim(-1.4, 1.4)
-    axis.set_title(
-        r"Does $\delta^{(a)}_2$ rise with an early ad?",
-        color=INK,
-        loc="left",
-    )
-    axis.text(
-        0.02,
-        0.55,
-        f"{row['mean']:+.3f}, Holm $p$={row['p_holm']:.2f}",
-        ha="left",
-        color=SLATE,
-        fontsize=8,
-    )
+    axis.set_xlabel(r"Turn 4 share $-$ turn 1 share (95% paired $t$, $N=54$)")
+    # No in-figure title: the manuscript caption carries it.
     return save(figure, "s24_depth_versus_ad")
 
 

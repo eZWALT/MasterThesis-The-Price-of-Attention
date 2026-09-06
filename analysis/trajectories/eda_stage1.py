@@ -623,8 +623,8 @@ def figure_examples(conversations: pd.DataFrame) -> Path:
             candidates = frame[frame.condition_label == condition]
         picks.append((candidates.iloc[0], caption))
 
-    figure, axis = plt.subplots(figsize=(11.2, 4.6))
-    axis.set_xlim(-0.4, TURNS + 1.5)
+    figure, axis = plt.subplots(figsize=(9.6, 4.6))
+    axis.set_xlim(-0.4, TURNS + 0.8)
     axis.set_ylim(-0.7, len(picks) - 0.3)
     axis.axis("off")
 
@@ -691,18 +691,7 @@ def figure_examples(conversations: pd.DataFrame) -> Path:
             )
     for turn in range(1, TURNS + 1):
         axis.text(turn, len(picks) - 0.55, f"turn {turn}", fontsize=8, color=SLATE, ha="center")
-    axis.set_title(
-        "Six observed genre trajectories", color=INK, loc="left", pad=14
-    )
-    figure.text(
-        0.005,
-        -0.02,
-        "Real conversations under the bare-utterance labelling. Filled boxes mark a genre shift "
-        "from the previous turn;\nthe orange rule marks where the advertisement was inserted. A "
-        "turn-4 advertisement has no following utterance.",
-        fontsize=7.5,
-        color=SLATE,
-    )
+    # No in-figure title or footnote: the manuscript caption carries them.
     return save(figure, "eda_example_trajectories")
 
 

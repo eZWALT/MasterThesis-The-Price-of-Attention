@@ -37,8 +37,8 @@ SLATE = "#5C6B73"
 MIST = "#D5DDE3"
 INK = "#12202A"
 PRIMARY = {
-    "fz_theta_power_db_uv2": "Fz theta (dB µV²)",
-    "posterior_alpha_power_db_uv2": "Posterior alpha (dB µV²)",
+    "fz_theta_power_db_uv2": "Fz θ (dB µV²)",
+    "posterior_alpha_power_db_uv2": "Posterior α (dB µV²)",
 }
 CONDITIONS = [
     "no_ads",
@@ -184,7 +184,7 @@ def plot_confirmatory_forests(
                 & (condition["contrast_id"].isin(DATASET_A_LABELS))
             ],
             DATASET_A_LABELS,
-            "Dataset A · equal-n neighbourhood of onset",
+            "Dataset A: condition aggregation",
         ),
         (
             axes[1],
@@ -193,7 +193,7 @@ def plot_confirmatory_forests(
                 & (ad["contrast_id"].isin(DATASET_B_LABELS))
             ],
             DATASET_B_LABELS,
-            "Dataset B · ad-locked post−pre vs matched no-ad",
+            "Dataset B: onset-locked, versus matched no-ad",
         ),
     )
     for axis, frame, labels, title in panels:
@@ -221,13 +221,17 @@ def plot_confirmatory_forests(
             )
             star = holm_star(float(row["p_t_holm"]) if row["p_t_holm"] != "" else math.nan)
             if star:
+                # One marker, large enough to survive print; the caption
+                # states what it means.
                 axis.text(
-                    row["ci_upper"] + 0.04 * max(abs(frame["ci_upper"]).max(), 1),
+                    row["ci_upper"] + 0.05 * abs(frame["ci_upper"]).max(),
                     positions[index],
-                    star,
+                    "*",
                     va="center",
+                    ha="left",
                     color=CLAY,
-                    fontsize=11,
+                    fontsize=22,
+                    fontweight="bold",
                 )
         axis.axvline(0, color=INK, linewidth=0.8)
         axis.set_yticks(
@@ -238,15 +242,9 @@ def plot_confirmatory_forests(
             ],
         )
         axis.invert_yaxis()
-        axis.set_xlabel("Mean within-person difference (95% t CI)")
+        axis.set_xlabel("Mean within-person difference, dB (95% t CI)")
         axis.set_title(title)
-    figure.suptitle("Confirmatory EEG contrasts at the pre-specified 4 s width", y=1.02)
-    caption(
-        figure,
-        "Navy = Fz theta; teal = posterior alpha. Asterisks mark Holm p < 0.05 "
-        "within each feature’s primary family. Dataset A medians the 37 tiles "
-        "nearest visual onset; Dataset B is onset-locked 4 s post−pre.",
-    )
+    # No suptitle or in-figure footnote: the manuscript caption carries them.
     save(figure, "figure_08_confirmatory_forests")
 
 
