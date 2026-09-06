@@ -1,7 +1,7 @@
 # Equal-n \(k=37\) Dataset A — applied (31 August 2026)
 
-Walter consented. **On Overleaf locally** (thesis, paper, presentation).
-**Do not push** until he asks.
+Walter consented. **On Overleaf** (thesis, paper, presentation;
+pushed 31 August). Parent GitHub has it after the 2 September rebase.
 
 ## Estimand
 

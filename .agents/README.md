@@ -25,13 +25,17 @@ Project-specific material for AI agents and collaborators:
 Read the newest relevant document under `context/` before changing study analysis,
 experiment data, or Overleaf sources.
 
-Live sprint (27 August): five pending analyses, thesis first, paper
-optional, presentation starts now.
-`.agents/context/data-analysis/2026-08-27-backlog-and-timeline.md`.
-Newest analysis save (28 August): channel-set closed, primary stays.
-`.agents/context/data-analysis/eeg/2026-08-28-channel-set-closed.md`.
+Live sprint (5 September): thesis 17 Sep, Katerina back, two
+behavioural Holm cells, no item-hunt, combos still gated.
+`.agents/context/writing/2026-09-05-sprint-to-deadline.md`.
+Newest analysis save (31 August): equal-n Dataset A \(k=37\)
+confirmatory, pushed Overleaf.
+`.agents/context/data-analysis/eeg/2026-08-31-equal-n-k37.md`.
 Newest writing catch-up (Dataset A/B figures, 7.1 crowd age, Methods
 comments): `.agents/context/writing/2026-08-27-afternoon-save.md`.
+4 September defence rehearsal cut (5 min intro; intent
+theory off; retrieval before system; 20 min):
+`.agents/context/writing/2026-09-04-presentation-rehearsal-cut.md`.
 29 August defence-deck flow (rollback `d5d42ab`):
 `.agents/context/writing/2026-08-29-presentation-flow-pass.md`.
 31 August defence save (waves slide + EEG power / MDE numbers):

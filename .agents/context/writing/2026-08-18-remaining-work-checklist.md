@@ -135,9 +135,11 @@ Port the paper. Do not invent a second analysis.
 - [x] Appendix EEG bands slide + `waves.jpg` (31 August).
       Power/MDE write-up:
       `2026-08-31-presentation-eeg-waves-and-power.md`.
-- [ ] Goal 1 takeaways into the grey Results block
-- [ ] Goal 3 / 4 spoken polish (EEG and trajectories are already in)
-- [ ] Combo slide only if Goal 5 ran
+- [ ] Goal 1 takeaways into the grey Results block (wait on Katerina
+      freeze; two Holm cells so far)
+- [ ] Record long-cut deck (30 vs 40 slides)
+- [ ] Combos slide only if Goal 5 ran
+- [x] Equal-n Dataset A \(k=37\) forests / Holm board (31 August)
 
 ---
 
