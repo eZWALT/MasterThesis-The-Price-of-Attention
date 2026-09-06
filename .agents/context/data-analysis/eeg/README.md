@@ -17,8 +17,9 @@ pipelines, generated manifests, and participant-level outputs remain under
   Runner still `analysis/run_paper_depth_audit.py`.
   `../../writing/2026-08-31-presentation-eeg-waves-and-power.md`.
 - `2026-08-31-equal-n-k37.md`
-  Dataset A test summaries: median \(k=37\) tiles nearest visual
-  onset so every advertisement condition has the same epoch count.
+  Dataset A confirmatory cell is **condition aggregation**:
+  median \(k=37\) tiles nearest visual onset so every
+  advertisement condition has the same epoch count.
   \(k=37\) is the shortest conversation in the cohort (tile counts
   37–251, median 95). Gold whole-window median is not overwritten.
   Applied to Overleaf locally 31 August.

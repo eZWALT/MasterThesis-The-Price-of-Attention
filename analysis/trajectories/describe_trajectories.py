@@ -40,7 +40,7 @@ CONDITION_TEXT = {
 }
 POSITION_ORDER = ["no_ad", "pre_ad", "crosses_ad", "post_ad"]
 POSITION_TEXT = {
-    "no_ad": "No-ad condition",
+    "no_ad": r"No-ad $\delta_2$",
     "pre_ad": "Before the ad",
     "crosses_ad": "Crosses the ad",
     "post_ad": "After the ad",
@@ -128,29 +128,34 @@ def plot_shift_by_condition(conversations: pd.DataFrame) -> None:
     save(figure, "shift_by_condition")
 
 
+def _position_block(frame: pd.DataFrame, position: str) -> pd.Series:
+    """No-ad bar is the same-step control δ2, not the pool of δ1,δ2,δ3."""
+    block = frame[frame.position == position]
+    if position == "no_ad":
+        block = block[block.k == 2]
+    return block["delta"]
+
+
 def plot_shift_by_position(transitions: pd.DataFrame) -> None:
     """Shift rate by where the transition sits relative to the advertisement."""
     style()
     frame = transitions[transitions.genre_source == PRIMARY_SOURCE]
-    grouped = frame.groupby("position")["delta"].agg(["mean", "count"])
+    rates = [_position_block(frame, p).mean() for p in POSITION_ORDER]
+    counts = [int(_position_block(frame, p).count()) for p in POSITION_ORDER]
 
     figure, axis = plt.subplots(figsize=(7.2, 4.0))
     colours = [CLAY if p == "crosses_ad" else NAVY for p in POSITION_ORDER]
-    axis.bar(
-        range(len(POSITION_ORDER)),
-        [grouped.loc[p, "mean"] for p in POSITION_ORDER],
-        color=colours,
-    )
-    for index, position in enumerate(POSITION_ORDER):
+    axis.bar(range(len(POSITION_ORDER)), rates, color=colours)
+    for index, (rate, count) in enumerate(zip(rates, counts)):
         axis.text(
             index,
-            grouped.loc[position, "mean"] + 0.004,
-            f"{grouped.loc[position, 'mean']:.3f}\n(n={int(grouped.loc[position, 'count'])})",
+            rate + 0.004,
+            f"{rate:.3f}\n(n={count})",
             ha="center",
             fontsize=8,
             color=SLATE,
         )
-    axis.set_ylim(0, grouped["mean"].max() * 1.28)
+    axis.set_ylim(0, max(rates) * 1.28)
     axis.set_xticks(range(len(POSITION_ORDER)))
     axis.set_xticklabels([POSITION_TEXT[p] for p in POSITION_ORDER])
     axis.set_ylabel("Shift rate $\\Pr(\\delta_k=1)$")
@@ -403,18 +408,13 @@ def summarise(
         lines.append("")
 
         moves = transitions[transitions.genre_source == source]
-        positions = moves.groupby("position").agg(
-            shift_rate=("delta", "mean"),
-            shifts=("delta", "sum"),
-            transitions=("delta", "count"),
-        )
         lines.append("| position | shift rate | shifts | transitions |")
         lines.append("| --- | ---: | ---: | ---: |")
         for position in POSITION_ORDER:
-            row = positions.loc[position]
+            block = _position_block(moves, position)
             lines.append(
-                f"| {POSITION_TEXT[position]} | {row.shift_rate:.4f} | "
-                f"{int(row.shifts)} | {int(row.transitions)} |"
+                f"| {POSITION_TEXT[position]} | {block.mean():.4f} | "
+                f"{int(block.sum())} | {int(block.count())} |"
             )
         lines.append("")
 

@@ -26,8 +26,13 @@ ignores their contents. Run `git` commands inside the relevant mirror.
 interprets. EEG 6.3 is confirmatory; 7.3 is the EEG read. Lock:
 `2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
 
-Equal-n Dataset A \(k=37\) (31 August). **Applied** locally to
-thesis, paper, and presentation. Do not push until Walter asks.
+Dataset A display name is **condition aggregation** (6 September).
+Estimator is still the median of \(k=37\) tiles nearest onset.
+Do not write “equal-n neighbourhood” or “condition state”.
+`2026-09-06-condition-aggregation-and-traj-position.md`.
+
+Equal-n Dataset A \(k=37\) (31 August). Applied and **pushed** to
+thesis, paper, and presentation the same day. Discussion read:
 `2026-08-31-equal-n-k37-manuscript.md`.
 
 Channel-set / literature-ROI EEG is sensitivity, not confirmatory
@@ -112,9 +117,32 @@ Monday agenda (Katerina + Sebastian):
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
 
-**31 August (newest writing):** equal-n Dataset A \(k=37\)
-applied locally to thesis, paper, and presentation. Do not push.
+**6 September (newest writing):** Results figure/table-first.
+Holm = paired \(t\) only; Wilcoxon raw. Dataset A is
+**condition aggregation**. `fig:traj-position` navy bar is
+\(\delta_2\) only. Pushed thesis `f6b7ecf` (on Walter's
+`0fb0881`) and paper `8ef03d4`.
+`2026-09-06-results-readability.md`.
+EEG MDE withdrawn from thesis, paper, and deck the same day.
+Do not restore `eq:mde`. `2026-08-31-thesis-eeg-mde.md`
+is historical only.
+
+**5 September:** sprint to 17 September. Katerina
+is back (two behavioural Holm survivors). Do not permute items to
+hunt \(p\). Combos wait on that freeze. Thesis human pass in
+progress (4.2.2, 6.3 last paragraph). Abstract 5 Sep.
+`2026-09-05-sprint-to-deadline.md`.
+
+**31 August:** equal-n Dataset A \(k=37\)
+applied and pushed to thesis, paper, and presentation.
 `2026-08-31-equal-n-k37-manuscript.md`.
+
+**4 September:** defence rehearsal cut. Intro gets ~5
+minutes. Intent theory (`Theoretical Work (2)`) off the
+spoken path. Retrieval pipeline image immediately before
+the system-architecture slide. Stay inside 20 minutes.
+Deck not edited in that pass.
+`2026-09-04-presentation-rehearsal-cut.md`.
 
 **31 August:** “slow-power response” lock for
 the High-level discussion slide. Five explicit-early cells are
@@ -150,7 +178,7 @@ Conclusions). Theory off the clock. Goal 1 / combos are grey blocks.
 **28 August:** EEG framing locked as three tiers (confirmatory /
 exploratory / post hoc). Report the six Dataset B cells as a
 **format-specific** result, do not lead with caveats, and never write
-"approached significance": use the minimum detectable effect instead.
+"approached significance". MDE is withdrawn (6 September).
 Methods, Results and Discussion updated in the thesis.
 `2026-08-28-eeg-three-tier-framing.md`.
 

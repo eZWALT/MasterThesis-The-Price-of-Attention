@@ -540,7 +540,7 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
         result["label"] = short(genre)
         rows.append(result)
     depth = pd.DataFrame(rows)
-    depth["p_holm"] = holm(depth.p_wilcoxon.tolist())
+    depth["p_holm"] = holm(depth.p_t.tolist())
 
     figure, axes = plt.subplots(1, 2, figsize=(10.8, 4.6), sharex=False)
 

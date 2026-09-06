@@ -2,8 +2,10 @@
 
 Naming lock. **Do not reintroduce "Path A" or "Path B" anywhere.**
 
-- **Dataset A** — condition state. One median spectrum per participant
-  × condition, `gold/features/condition_features.csv`. Sustained effect.
+- **Dataset A** — condition aggregation (display name from 6
+  September; was “condition state”). Confirmatory cell is the
+  median of \(k=37\) tiles nearest visual onset. Gold
+  `condition_features.csv` still stores the whole-window median.
 - **Dataset B** — advertisement onset contrast, 4 s either side of
   visibility against a timing-matched moment under \(a^{\emptyset}\),
   `gold/features/ad_response_features.csv`. Transient effect.

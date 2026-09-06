@@ -20,6 +20,12 @@
   absence, abstract placement, design implications, H1–H3). EEG 6.3 is
   confirmatory; Discussion `sec:disc-eeg` is the EEG read. Lock:
   `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
+- **Results layout.** Claim, then figure or table, then only what the
+  visual cannot say. Do not restate every CI. Holm \(p\) is the
+  Holm-adjusted paired \(t\); Wilcoxon \(p\) is raw. Never write
+  “Wilcoxon Holm”. Rule: `.cursor/rules/results-figure-first.mdc`.
+  6 September dump:
+  `.agents/context/writing/2026-09-06-results-readability.md`.
 - Canonical ad labels: **implicit** vs **explicit**; early = turn 2; late =
   turn 4; five-condition repeated-measures (+ no-ad control). Implicit does
   not mean subliminal.
@@ -33,6 +39,11 @@
   `.agents/context/data-analysis/eeg/2026-08-27-dataset-a-b-rename.md`.
   27 August catch-up (figure regen, crowd age, Methods comments):
   `.agents/context/writing/2026-08-27-afternoon-save.md`.
+- Defence rehearsal cut (4 September). Intro ~5 min; drop
+  intent theory (`Theoretical Work (2)`); put
+  `retrieval_pipeline.png` immediately before the system
+  slide. Stay inside 20 minutes. Deck not yet cut.
+  `.agents/context/writing/2026-09-04-presentation-rehearsal-cut.md`.
 - Defence deck flow pass (29 August). Rollback presentation `d5d42ab`.
   `.agents/context/writing/2026-08-29-presentation-flow-pass.md`.
 - Defence title page (29 August). UniPD top; UPC+Telefónica footer;
@@ -47,16 +58,22 @@ the ad is registered before the text (explicit onset is
 reply \(+0.49\) s). Do not rewrite his slide.
 Experience / Combos WIP.
 `.agents/context/writing/2026-08-31-slow-power-and-high-level-discussion.md`.
-- Equal-n Dataset A \(k=37\) (31 August). Confirmatory. Discussion
-read in `2026-08-31-equal-n-k37-manuscript.md`. Do not push.
-- Thesis EEG MDE (31 August). Formula in Methods (`eq:mde`);
-dB MDEs and observed power in Results; interpretation in
-`sec:disc-eeg`. Holm-within-4 is \(0.86\), not \(0.87\).
-`.agents/context/writing/2026-08-31-thesis-eeg-mde.md`.
+- Equal-n Dataset A \(k=37\) (31 August). Confirmatory. Display name
+is **condition aggregation**, not “equal-n neighbourhood” or
+“condition state”. Discussion read in
+`2026-08-31-equal-n-k37-manuscript.md`. Pushed Overleaf 31 August.
+Rename applied locally 6 September
+(`.agents/context/writing/2026-09-06-condition-aggregation-and-traj-position.md`).
+- Sprint to deadline (5 September). Thesis 17 Sep, talks 18–20,
+graduation 25. Katerina back; two behavioural Holm cells; do not
+hunt items. Combos still wait on that freeze.
+`.agents/context/writing/2026-09-05-sprint-to-deadline.md`.
+- EEG MDE withdrawn (6 September). Do not put `eq:mde`, Holm-80%
+dB ranges, or observed-power paragraphs back in thesis, paper, or
+deck. Say Dataset A intervals are tenths of a dB and Dataset B
+spans 2–4 dB. Do not write “approached significance”.
 - Defence save (31 August). Five-band appendix slide + trump-card
-`images/misc/waves.jpg`. EEG power is post-hoc Holm MDE / observed
-power on \(D_i\), \(n=18\): Dataset A 0.22–0.44 dB, Dataset B
-1.7–3.7 dB. Do not write “approached significance”.
+`images/misc/waves.jpg`.
 `.agents/context/writing/2026-08-31-presentation-eeg-waves-and-power.md`.
 28 August save: channel-set retry closed; primary 32-ch stays.
   `.agents/context/data-analysis/eeg/2026-08-28-channel-set-closed.md`.
@@ -75,6 +92,10 @@ association, not mediation. **Opened 27 August** as a joined dataset;
 tests that need behavioural composites still wait on Goal 1. Sprint
 board: `.agents/context/data-analysis/2026-08-27-backlog-and-timeline.md`.
 Paper is optional this sprint if it fights the thesis. Start slides now.
+Sprint board through 17 September:
+`.agents/context/writing/2026-09-05-sprint-to-deadline.md`
+(supersedes the 27 August calendar for open work;
+`2026-08-27-backlog-and-timeline.md` still has the five-item map).
 
 ## Data analysis
 
@@ -92,10 +113,12 @@ Paper is optional this sprint if it fights the thesis. Start slides now.
   Depth audit (MDE, compatibility, exploratory lock):
   `.agents/context/data-analysis/eeg/2026-08-20-paper-depth-audit.md`.
   Confirmatory is 4 s + median + ICA. C1 is blocked on Goal 1.
-  Equal-n Dataset A aggregation (\(k=37\) tiles nearest visual onset)
-  is the confirmatory Dataset A summary (shortest chat, not a \(k\)
-  picked by \(p\)). Gold whole-window median is not overwritten.
-  Applied locally to thesis / paper / presentation 31 August.
+  Dataset A confirmatory cell is **condition aggregation**: the
+  median of \(k=37\) tiles nearest visual onset (shortest chat, not
+  a \(k\) picked by \(p\)). Do not call it equal-n neighbourhood or
+  condition state. Gold whole-window median is not overwritten.
+  Applied and pushed to thesis / paper / presentation 31 August;
+  display name applied locally 6 September.
   `eeg/2026-08-31-equal-n-k37.md`.
   Channel-set / literature-ROI averages are a sensitivity only
   (`eeg/2026-08-24-channel-set-policy.md`,
@@ -137,7 +160,7 @@ Medallion zones under `src/project/logs/xdf/` (Bronze is immutable):
 - `gold/features/condition_features.csv` — **Dataset A** Gold, one row
   per participant × condition, 18 subjects, all
   `primary_analysis_eligible`. Whole-window median. Confirmatory
-  Dataset A tests use the equal-n \(k=37\) neighbourhood in
+  Dataset A tests use the condition-aggregation \(k=37\) summaries in
   `analysis/eeg/statistics/outputs/eeg_condition_contrasts.csv`.
 - `gold/features/ad_response_features.csv` — **Dataset B**, one row per
   participant × advertisement, with onset estimator and uncertainty.

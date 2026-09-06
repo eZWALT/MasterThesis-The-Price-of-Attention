@@ -31,21 +31,26 @@ The top level is reserved for documents that govern both analysis arms:
   `early_vs_late` is raw-space only.
 - `eeg/2026-08-31-equal-n-k37.md` — confirmatory Dataset A is the
   median of \(k=37\) tiles nearest visual onset (shortest chat).
-  Applied locally to Overleaf 31 August. Gold whole-window is not
+  Applied and pushed to Overleaf 31 August. Gold whole-window is not
   overwritten.
+- `../writing/2026-09-05-sprint-to-deadline.md` — **live sprint
+  (5 Sep).** Thesis 17 Sep. Katerina back (two Holm survivors);
+  do not permute items to hunt \(p\). Combos still wait on Goal 1
+  freeze.
 - `eeg/2026-08-29-ad-local-epochs.md` — exploratory. Median \(k\)
   tiles around ads instead of Dataset A's whole-condition average.
   \(k=5\) and \(k=10\) do not create Dataset A hits. Not confirmatory.
-- EEG Holm MDE / observed power (numbers for the deck, 31 August):
-  `../writing/2026-08-31-presentation-eeg-waves-and-power.md`.
-  Not a new analysis. Do not write “approached significance”.
+- EEG Holm MDE withdrawn 6 September. Do not put dB MDE ranges back
+  in the manuscripts. Historical write-up:
+  `../writing/2026-08-31-thesis-eeg-mde.md`.
+  Do not write “approached significance”.
 - `2026-08-27-backlog-and-timeline.md` — **live sprint (27 Aug)**:
   five pending analyses (item 1 closed 28 Aug; EEG post-hoc,
   behavioural EDA, free-text, joined dataset / combos still open).
   Thesis first, paper optional, presentation starts now. Goal 1
   still gates honest combo tests.
 - `eeg/2026-08-27-dataset-a-b-rename.md` — Path A/B is dead; Dataset A
-  = condition state, Dataset B = ad-onset contrast. Figures rebuilt
+  = condition aggregation, Dataset B = ad-onset contrast. Figures rebuilt
   the same day so pixels match (`3fe3243`). Catch-up:
   `../writing/2026-08-27-afternoon-save.md`.
 - `behavioral/2026-08-27-crowd-age-prolific-estimate.md` — Results 7.1

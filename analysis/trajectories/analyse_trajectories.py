@@ -436,16 +436,17 @@ def positive_control(utterances: pd.DataFrame, source: str = PRIMARY_SOURCE) -> 
         result["turn4"] = wide[4].mean()
         results.append(result)
     battery = pd.DataFrame(results)
-    battery["p_holm"] = holm(battery.p_wilcoxon.tolist())
+    battery["p_holm"] = holm(battery.p_t.tolist())
     for row in battery.itertuples():
         lines.append(
             f"{row.contrast:36s} turn1 {row.turn1:.3f} -> turn4 {row.turn4:.3f}  "
             f"diff {row.mean:+.3f}  dz {row.dz:+.2f}  "
-            f"p_wilcoxon {row.p_wilcoxon:.4f}  p_holm {row.p_holm:.4f}"
+            f"p_t {row.p_t:.4f}  p_holm {row.p_holm:.4f}  "
+            f"p_wilcoxon {row.p_wilcoxon:.4f}"
         )
     lines.append(
         f"({len(genres)} genres at or above {POSITIVE_CONTROL_PREVALENCE:.0%} "
-        f"prevalence, Holm across them)"
+        f"prevalence, Holm on the paired t tests)"
     )
 
     # Does the label at turn k differ from the label the same conversation

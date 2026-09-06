@@ -1,0 +1,17 @@
+---
+description: Results figures and tables come before the prose that reads them
+globs: docs/overleaf/**/*.tex
+alwaysApply: true
+---
+
+# Results: visual first
+
+In Results (thesis Ch 7, paper §6), put the figure or table immediately after the one-sentence claim, then write only what the visual cannot say.
+
+- One claim, then the artefact, then at most the high-ROI cell (the one that moves, or the number that is not on the page).
+- Do not restate every bar, CI, or table row in the body.
+- Holm \(p\) is the Holm-adjusted paired \(t\). Wilcoxon \(p\) is raw. Never write “Wilcoxon Holm”.
+- Dataset A display name is **condition aggregation**. Never Path A/B, equal-n neighbourhood, or condition state.
+- Results report numbers. Discussion interprets.
+
+This is paper UX, not decoration: a reader should be able to get the pattern from the visual without holding six CIs.
