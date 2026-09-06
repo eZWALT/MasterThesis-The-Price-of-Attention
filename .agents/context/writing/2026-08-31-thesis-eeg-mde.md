@@ -1,5 +1,9 @@
 # Thesis: EEG MDE in Methods / Results / Discussion (31 August 2026)
 
+**Superseded 6 September.** Walter withdrew MDE from the thesis,
+paper, and deck. Do not restore `eq:mde` or the Results MDE
+paragraph. Historical numbers below only.
+
 Walter asked to land the paper-depth MDE computation in the thesis
 (Results as numbers; Discussion as the read). Runner:
 `analysis/eeg/analysis/run_paper_depth_audit.py`. Lock:
