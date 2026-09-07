@@ -20,6 +20,12 @@
   absence, abstract placement, design implications, H1–H3). EEG 6.3 is
   confirmatory; Discussion `sec:disc-eeg` is the EEG read. Lock:
   `.agents/context/writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
+- **Conclusion critique + Ch 8 (6 Sep evening, HIGH).** Do not
+  overwrite live `conclusion.tex`. Discussion must not restore
+  “depends on how and when”, “greater visual processing”,
+  explicit-late-as-compromise, or a serving-rule *price of attention*.
+  No `sec:disc-summary`. Lock:
+  `.agents/context/writing/2026-09-06-conclusion-critique-and-ch8.md`.
 - **Results layout.** Claim, then figure or table, then only what the
   visual cannot say. Do not restate every CI. Holm \(p\) is the
   Holm-adjusted paired \(t\); Wilcoxon \(p\) is raw. Never write
@@ -101,6 +107,13 @@ Sprint board through 17 September:
 
 - Start with `.agents/context/data-analysis/README.md`, then the relevant arm's
   `README.md`; prefer the newest dated entry.
+- **Ad-moment scorer is a side project, not a thesis goal.** Context:
+  `.agents/context/data-analysis/policy/` (newest dated note first).
+  Live line: `policy/2026-09-06-residual-scorer-and-next-ms-qsa.md`
+  — residual ridge is locked; next is \(m(s)\) / \(q(s,a)\), not
+  another feature dump. Code: `analysis/policy/`. Do not put it in
+  thesis / paper / deck before 17 September. Do not rebuild Silver
+  unless asked.
 - Verify durable summaries against executable code and generated manifests.
 - Keep raw Bronze/XDF immutable; add versioned Silver, Gold, statistics, or
   analysis outputs instead.
