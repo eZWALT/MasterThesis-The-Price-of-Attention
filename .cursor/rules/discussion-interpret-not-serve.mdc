@@ -1,0 +1,29 @@
+---
+description: Discussion interprets finished families. No serving rule. No fused how-and-when.
+alwaysApply: true
+---
+
+# Discussion (thesis Ch 8)
+
+Interpret estimated families only. First sentence of a paragraph is the claim.
+Do not restate Chapter 7 CIs. Do not open with a summary of findings
+(`sec:disc-summary` is dead). Conclusion is the wrap; do not overwrite it.
+
+## Never write
+
+- The EEG response “depends on how and when” (fuses Dataset A state with Dataset B event)
+- Early − late = “greater visual processing”; relative \(\theta\) is not confirmatory
+- “Allocation of neural processing”, captured attention, active processing, “before the text”
+- Explicit-late as an attractive compromise / serving rule / *price of attention* as policy
+- Holm-80%, MDE, “approached significance”, powered-replication sermon
+- Holm-null on \(\delta^{(a)}\) as a verdict that Definitions 1–6 are false
+
+## Must write (if touching `sec:disc-eeg` / `sec:disc-trajectories`)
+
+- Two estimands: condition aggregation vs onset-lock
+- Write−read shows the Fz \(\theta\) pipeline is not dead
+- Slow-power = one explicit-early tilt; not Fz \(\theta\); posterior \(\alpha\) did not fall
+- Early vs late is depth-confounded
+- Trajectories: instrument + inventory failed; classifier sees depth, not the ad
+
+Full lock: `.agents/context/writing/2026-09-06-conclusion-critique-and-ch8.md`

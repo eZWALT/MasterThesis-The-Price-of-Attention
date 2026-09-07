@@ -117,6 +117,14 @@ Monday agenda (Katerina + Sebastian):
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
 
+**6 September evening (HIGH IMPORTANT):** Conclusion critique +
+Chapter 8 lock. Do not overwrite live `conclusion.tex`. Do not
+restore “depends on how and when”, “greater visual processing”,
+explicit-late-as-compromise, or MDE. Discussion has no
+`sec:disc-summary`. Note:
+`2026-09-06-conclusion-critique-and-ch8.md`.
+Rule: `.cursor/rules/discussion-interpret-not-serve.mdc`.
+
 **6 September (newest writing):** Results figure/table-first.
 Holm = paired \(t\) only; Wilcoxon raw. Dataset A is
 **condition aggregation**. `fig:traj-position` navy bar is
