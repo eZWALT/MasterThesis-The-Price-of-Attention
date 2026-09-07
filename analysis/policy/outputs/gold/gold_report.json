@@ -1,0 +1,12 @@
+{
+  "turns_clean": 1479,
+  "turns_study": 1080,
+  "anchor": 216,
+  "preference_pairs": 324,
+  "preference_pairs_same_task": 0,
+  "bandit_insert": 216,
+  "bandit_wait": 54,
+  "good_moment_rate": 0.28703703703703703,
+  "mean_delta_U_pairs": 1.1438676825390093,
+  "note": "Do not train an encoder on a need/ready/safe/fit judge of these study turns: the 4B v2 labels saturate (median 1.0). Study supervision is U_resid / pairs / bandit only. Intent-gate pretraining belongs on WildChat, not on swt_* tasks."
+}

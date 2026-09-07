@@ -1,0 +1,16 @@
+{
+  "recipe": "score = (ad_turn/8) + 0.15 * z( PCA4(Qwen3-14B last-token) @ w )",
+  "hub": "Qwen/Qwen3-14B",
+  "k": 4,
+  "mix": 0.15,
+  "explained_var": [
+    0.09465023875236511,
+    0.07341316342353821,
+    0.026140691712498665,
+    0.02534177154302597
+  ],
+  "lopo_spearman_point": 0.2149,
+  "lopo_same_timing": 0.5648,
+  "nested_k_always": 4,
+  "note": "bootstrap CI on nested text-only was 0.06-0.33; point estimate beats turn 0.167 but CI overlaps. Same-timing z=0.96 n=108."
+}

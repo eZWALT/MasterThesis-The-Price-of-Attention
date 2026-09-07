@@ -1,0 +1,23 @@
+# Qwen3-Embedding (real embedder, not last-token)
+
+- turn_plus_resid_emb_qwen3-emb-8b: Spearman 0.1633  same-t 0.4907  
+- pca8_emb_qwen3-emb-4b+turnfit: Spearman 0.109  same-t 0.4537  
+- pca8_emb_qwen3-emb-8b: Spearman 0.0676  same-t 0.4352  
+- pca8_emb_qwen3-emb-8b+turnfit: Spearman 0.0672  same-t 0.4167  
+- turn_plus_resid_emb_qwen3-emb-4b: Spearman 0.0489  same-t 0.4537  
+- pca8_emb_qwen3-emb-4b: Spearman 0.0371  same-t 0.3981  
+- pca16_emb_qwen3-emb-8b+turnfit: Spearman 0.0285  same-t 0.4815  
+- pca16_emb_qwen3-emb-4b+turnfit: Spearman 0.0207  same-t 0.4167  
+- turn_plus_resid_emb_qwen3-emb-0.6b: Spearman 0.0049  same-t 0.463  
+- pca16_emb_qwen3-emb-8b: Spearman 0.0001  same-t 0.4907  
+- pca8_emb_qwen3-emb-0.6b+turnfit: Spearman -0.0023  same-t 0.4074  
+- pca32_emb_qwen3-emb-8b+turnfit: Spearman -0.007  same-t 0.4444  
+- pca32_emb_qwen3-emb-4b+turnfit: Spearman -0.0111  same-t 0.3241  
+- pca32_emb_qwen3-emb-8b: Spearman -0.017  same-t 0.463  
+- pca16_emb_qwen3-emb-4b: Spearman -0.0278  same-t 0.4259  
+- pca16_emb_qwen3-emb-0.6b+turnfit: Spearman -0.0471  same-t 0.4352  
+- pca32_emb_qwen3-emb-4b: Spearman -0.0606  same-t 0.3519  
+- pca32_emb_qwen3-emb-0.6b+turnfit: Spearman -0.0746  same-t 0.463  
+- pca32_emb_qwen3-emb-0.6b: Spearman -0.1713  same-t 0.4444  
+- pca8_emb_qwen3-emb-0.6b: Spearman -0.188  same-t 0.3704  
+- pca16_emb_qwen3-emb-0.6b: Spearman -0.227  same-t 0.4815  

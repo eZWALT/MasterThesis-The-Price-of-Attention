@@ -1,0 +1,33 @@
+{
+  "sessions": {
+    "primary": 54,
+    "unlabeled": 13,
+    "beta": 11
+  },
+  "malformed_lines": 2,
+  "skipped": [
+    "beta_tester_5: no jsonl",
+    "exp_20260802T150349Z_7c185e94_events: no condition blocks"
+  ],
+  "trajectory_join": {
+    "rows_matched": 1080
+  },
+  "summary": {
+    "turn_rows": 1479,
+    "turn_rows_primary": 1080,
+    "conversation_rows": 361,
+    "primary_participants": 54,
+    "primary_ad_conversations": 216,
+    "turns_by_source": {
+      "primary": 1080,
+      "unlabeled": 143,
+      "beta": 256
+    },
+    "ad_turn_rows_primary": 216,
+    "tasks": 5
+  },
+  "files": {
+    "turns.csv": "932da6c70d74a4c1",
+    "conversations.csv": "2540ed43dfa10b7b"
+  }
+}

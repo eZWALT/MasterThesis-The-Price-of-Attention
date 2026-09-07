@@ -1,0 +1,101 @@
+# Candidate backbones. None of these are launched yet.
+# VRAM is fp16 weights + modest activations, one model at a time.
+
+encoders:
+  # Production-shaped: <50 ms CPU, fits every env. Primary for M_harm / ranker.
+  - id: Thrad/thrad-bert-conversation-classifier
+    kind: encoder
+    params_m: 67
+    vram_gb: 0.5
+    role: [M_harm, ranker, baseline]
+    note: Already f_genre. Tokenizer missing on the hub; fall back to bert-base-uncased.
+  - id: BAAI/bge-small-en-v1.5
+    kind: encoder
+    params_m: 33
+    vram_gb: 0.3
+    role: [M_harm, ranker, baseline]
+  - id: sentence-transformers/all-MiniLM-L6-v2
+    kind: encoder
+    params_m: 22
+    vram_gb: 0.2
+    role: [baseline]
+  - id: microsoft/deberta-v3-small
+    kind: encoder
+    params_m: 44
+    vram_gb: 0.4
+    role: [M_harm]
+  - id: answerdotai/ModernBERT-base
+    kind: encoder
+    params_m: 149
+    vram_gb: 1.2
+    role: [M_harm]
+    note: Longer context than DistilBERT; only if 512 tokens clip prefixes (p95 ~7k chars).
+
+tiny_decoders:
+  # Judge / generative policy / optional LoRA. Sequential with encoders, never together.
+  - id: Qwen/Qwen3-0.6B
+    kind: decoder
+    params_m: 600
+    vram_gb: 2
+    role: [smoke_judge]
+    envs: [smoke, cpu]
+  - id: Qwen/Qwen3-1.7B
+    kind: decoder
+    params_m: 1700
+    vram_gb: 4
+    role: [judge, generative_sft]
+    envs: [laptop16, colab, kaggle]
+  - id: Qwen/Qwen3-4B-Instruct-2507
+    kind: decoder
+    params_m: 4000
+    vram_gb: 10
+    role: [judge, generative_sft, dpo]
+    envs: [atlas, laptop16, colab, kaggle]
+    note: Already in the stack as the conversational cousin. 4B v2 judge SATURATED on study turns.
+  - id: HuggingFaceTB/SmolLM3-3B
+    kind: decoder
+    params_m: 3000
+    vram_gb: 7
+    role: [generative_sft, dpo]
+    envs: [atlas, laptop16, colab]
+    source: https://huggingface.co/HuggingFaceTB/SmolLM3-3B
+    note: Fully open recipe (Raschka-gallery class of transparent SLM). transformers>=4.53.
+  - id: microsoft/Phi-4-mini-instruct
+    kind: decoder
+    params_m: 3800
+    vram_gb: 8
+    role: [generative_sft, dpo]
+    envs: [atlas, laptop16, colab]
+    source: https://huggingface.co/microsoft/Phi-4-mini-instruct
+  - id: meta-llama/Llama-3.2-1B-Instruct
+    kind: decoder
+    params_m: 1000
+    vram_gb: 3
+    role: [generative_sft]
+    envs: [laptop16, colab, kaggle]
+    note: Gated; needs HF token. Raschka gallery lists 1B as the local-experiment size.
+  - id: google/gemma-3-1b-it
+    kind: decoder
+    params_m: 1000
+    vram_gb: 3
+    role: [generative_sft]
+    envs: [laptop16, colab]
+    note: Confirm hub id at launch; Gemma 3 1B is the toy-scale card in the gallery.
+
+rejected_for_v1:
+  - id: Qwen 3.6 35B
+    why: Judge/policy at 35B is not deployable as a retrieval gate and does not fit laptop16.
+  - id: Kimi K3 / Inkling / GLM-5.x MoE
+    why: Raschka gallery (updated Jul–Sep 2026) — 100B–2.8T class. Research, not a moment scorer.
+  - id: Qwen3.6 MoE ~3B active
+    why: Attractive later as a local generative policy; skip until the 67M encoder baseline exists.
+
+tabular:
+  - id: ridge_turn_genre
+    kind: tabular
+    role: [baseline]
+    note: turn + runtime ThradBERT label. Smoke already matches the encoder on judge labels.
+  - id: mixedlm_person_task
+    kind: tabular
+    role: [inference]
+    note: Person + task random effects on U. The honest statistical model, not a serving model.

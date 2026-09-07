@@ -1,0 +1,37 @@
+[
+  {
+    "name": "bge-small_text",
+    "spearman_U_lopo": -0.0004,
+    "auroc_good_lopo": 0.5199,
+    "spearman_U_task_grouped": 0.0245,
+    "dim": 384
+  },
+  {
+    "name": "bge-small_text+turn+fit",
+    "spearman_U_lopo": -0.0013,
+    "auroc_good_lopo": 0.5198,
+    "spearman_U_task_grouped": 0.0098,
+    "dim": 386
+  },
+  {
+    "name": "turn+fit_only",
+    "spearman_U_lopo": -0.2058,
+    "auroc_good_lopo": 0.3704,
+    "spearman_U_task_grouped": 0.0022,
+    "dim": 2
+  },
+  {
+    "name": "qwen3-8b_text",
+    "spearman_U_lopo": 0.1126,
+    "auroc_good_lopo": 0.5446,
+    "spearman_U_task_grouped": -0.0061,
+    "dim": 4096
+  },
+  {
+    "name": "qwen3-8b_text+turn+fit",
+    "spearman_U_lopo": 0.1116,
+    "auroc_good_lopo": 0.544,
+    "spearman_U_task_grouped": -0.0078,
+    "dim": 4098
+  }
+]

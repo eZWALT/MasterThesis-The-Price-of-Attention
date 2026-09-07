@@ -1,0 +1,806 @@
+[
+  {
+    "name": "fixedturn_m0.15_emb_qwen3-14b",
+    "spearman_U": 0.2149,
+    "pearson_U": 0.2212,
+    "spearman_within": 0.263,
+    "auroc_good": 0.5423,
+    "late_gt_early_rate": 0.9815,
+    "beats_turn": true,
+    "pairwise": 0.6111,
+    "pairwise_same_timing": 0.5648,
+    "pairwise_cross_timing": 0.6343,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.0889,
+      "hi": 0.3364,
+      "mean": 0.2141
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5648,
+      "z": 1.347
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_qwen3-14b",
+    "spearman_U": 0.2094,
+    "pearson_U": 0.2194,
+    "spearman_within": 0.2074,
+    "auroc_good": 0.5394,
+    "late_gt_early_rate": 0.9444,
+    "beats_turn": true,
+    "pairwise": 0.5895,
+    "pairwise_same_timing": 0.5648,
+    "pairwise_cross_timing": 0.6019,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.0785,
+      "hi": 0.3312,
+      "mean": 0.2087
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5648,
+      "z": 1.347
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_qwen3-14b",
+    "spearman_U": 0.2044,
+    "pearson_U": 0.2133,
+    "spearman_within": 0.1481,
+    "auroc_good": 0.5381,
+    "late_gt_early_rate": 0.8333,
+    "beats_turn": true,
+    "pairwise": 0.5556,
+    "pairwise_same_timing": 0.5648,
+    "pairwise_cross_timing": 0.5509,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.0693,
+      "hi": 0.3271,
+      "mean": 0.2037
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5648,
+      "z": 1.347
+    }
+  },
+  {
+    "name": "nested_emb_qwen3-14b",
+    "spearman_U": 0.1967,
+    "pearson_U": 0.2154,
+    "spearman_within": 0.137,
+    "auroc_good": 0.534,
+    "late_gt_early_rate": 0.7593,
+    "beats_turn": true,
+    "pairwise": 0.5556,
+    "pairwise_same_timing": 0.5463,
+    "pairwise_cross_timing": 0.5602,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.0611,
+      "hi": 0.3267,
+      "mean": 0.1957
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    },
+    "k_chosen": {
+      "4": 54
+    },
+    "alpha_chosen": {
+      "10": 54
+    },
+    "spearman_U_timing_stripped": 0.1515,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    }
+  },
+  {
+    "name": "fixedturn_m0.15_emb_qwen3-8b",
+    "spearman_U": 0.1638,
+    "pearson_U": 0.1607,
+    "spearman_within": 0.2185,
+    "auroc_good": 0.5207,
+    "late_gt_early_rate": 1.0,
+    "beats_turn": false,
+    "pairwise": 0.5926,
+    "pairwise_same_timing": 0.5185,
+    "pairwise_cross_timing": 0.6296,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.037,
+      "hi": 0.2919,
+      "mean": 0.164
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5185,
+      "z": 0.385
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_qwen3-8b",
+    "spearman_U": 0.1537,
+    "pearson_U": 0.1511,
+    "spearman_within": 0.1741,
+    "auroc_good": 0.5107,
+    "late_gt_early_rate": 0.9815,
+    "beats_turn": false,
+    "pairwise": 0.5679,
+    "pairwise_same_timing": 0.5185,
+    "pairwise_cross_timing": 0.5926,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.0249,
+      "hi": 0.2819,
+      "mean": 0.154
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5185,
+      "z": 0.385
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_qwen3-8b",
+    "spearman_U": 0.1416,
+    "pearson_U": 0.1435,
+    "spearman_within": 0.1481,
+    "auroc_good": 0.5036,
+    "late_gt_early_rate": 0.9444,
+    "beats_turn": false,
+    "pairwise": 0.5586,
+    "pairwise_same_timing": 0.5185,
+    "pairwise_cross_timing": 0.5787,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.012,
+      "hi": 0.2707,
+      "mean": 0.142
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5185,
+      "z": 0.385
+    }
+  },
+  {
+    "name": "nested_emb_qwen3-8b",
+    "spearman_U": 0.1514,
+    "pearson_U": 0.1677,
+    "spearman_within": 0.1741,
+    "auroc_good": 0.5069,
+    "late_gt_early_rate": 0.8704,
+    "beats_turn": false,
+    "pairwise": 0.5772,
+    "pairwise_same_timing": 0.5463,
+    "pairwise_cross_timing": 0.5926,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": 0.0197,
+      "hi": 0.2776,
+      "mean": 0.151
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    },
+    "k_chosen": {
+      "4": 51,
+      "8": 2,
+      "16": 1
+    },
+    "alpha_chosen": {
+      "10": 51,
+      "50": 2,
+      "80": 1
+    },
+    "spearman_U_timing_stripped": 0.0813,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    }
+  },
+  {
+    "name": "fixedturn_m0.15_emb_phi-4-14b",
+    "spearman_U": 0.1099,
+    "pearson_U": 0.1038,
+    "spearman_within": 0.237,
+    "auroc_good": 0.4951,
+    "late_gt_early_rate": 1.0,
+    "beats_turn": false,
+    "pairwise": 0.6019,
+    "pairwise_same_timing": 0.5463,
+    "pairwise_cross_timing": 0.6296,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0199,
+      "hi": 0.2483,
+      "mean": 0.1108
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_phi-4-14b",
+    "spearman_U": 0.0923,
+    "pearson_U": 0.0785,
+    "spearman_within": 0.1741,
+    "auroc_good": 0.4872,
+    "late_gt_early_rate": 0.963,
+    "beats_turn": false,
+    "pairwise": 0.5772,
+    "pairwise_same_timing": 0.5463,
+    "pairwise_cross_timing": 0.5926,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0432,
+      "hi": 0.2309,
+      "mean": 0.0933
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_phi-4-14b",
+    "spearman_U": 0.0644,
+    "pearson_U": 0.0633,
+    "spearman_within": 0.1444,
+    "auroc_good": 0.4756,
+    "late_gt_early_rate": 0.8704,
+    "beats_turn": false,
+    "pairwise": 0.5679,
+    "pairwise_same_timing": 0.5463,
+    "pairwise_cross_timing": 0.5787,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0726,
+      "hi": 0.2042,
+      "mean": 0.0655
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5463,
+      "z": 0.962
+    }
+  },
+  {
+    "name": "nested_emb_phi-4-14b",
+    "spearman_U": 0.0891,
+    "pearson_U": 0.0962,
+    "spearman_within": 0.1593,
+    "auroc_good": 0.4913,
+    "late_gt_early_rate": 0.8704,
+    "beats_turn": false,
+    "pairwise": 0.5648,
+    "pairwise_same_timing": 0.5278,
+    "pairwise_cross_timing": 0.5833,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0532,
+      "hi": 0.2293,
+      "mean": 0.0894
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5278,
+      "z": 0.577
+    },
+    "k_chosen": {
+      "4": 54
+    },
+    "alpha_chosen": {
+      "10": 54
+    },
+    "spearman_U_timing_stripped": 0.0105,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.5278,
+      "z": 0.577
+    }
+  },
+  {
+    "name": "fixedturn_m0.15_emb_bge-small",
+    "spearman_U": -0.0392,
+    "pearson_U": -0.0829,
+    "spearman_within": 0.0593,
+    "auroc_good": 0.4472,
+    "late_gt_early_rate": 0.9444,
+    "beats_turn": false,
+    "pairwise": 0.5278,
+    "pairwise_same_timing": 0.4537,
+    "pairwise_cross_timing": 0.5648,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.1659,
+      "hi": 0.1,
+      "mean": -0.0379
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4537,
+      "z": -0.962
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_bge-small",
+    "spearman_U": -0.1133,
+    "pearson_U": -0.1575,
+    "spearman_within": 0.0074,
+    "auroc_good": 0.4248,
+    "late_gt_early_rate": 0.7593,
+    "beats_turn": false,
+    "pairwise": 0.5062,
+    "pairwise_same_timing": 0.4537,
+    "pairwise_cross_timing": 0.5324,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.2359,
+      "hi": 0.0255,
+      "mean": -0.1115
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4537,
+      "z": -0.962
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_bge-small",
+    "spearman_U": -0.1517,
+    "pearson_U": -0.19,
+    "spearman_within": -0.0778,
+    "auroc_good": 0.4159,
+    "late_gt_early_rate": 0.7037,
+    "beats_turn": false,
+    "pairwise": 0.4691,
+    "pairwise_same_timing": 0.4537,
+    "pairwise_cross_timing": 0.4769,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.2749,
+      "hi": -0.0131,
+      "mean": -0.1496
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4537,
+      "z": -0.962
+    }
+  },
+  {
+    "name": "nested_emb_bge-small",
+    "spearman_U": -0.1821,
+    "pearson_U": -0.2222,
+    "spearman_within": -0.1815,
+    "auroc_good": 0.4117,
+    "late_gt_early_rate": 0.5,
+    "beats_turn": false,
+    "pairwise": 0.429,
+    "pairwise_same_timing": 0.4259,
+    "pairwise_cross_timing": 0.4306,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.3002,
+      "hi": -0.0544,
+      "mean": -0.1804
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4259,
+      "z": -1.54
+    },
+    "k_chosen": {
+      "32": 34,
+      "16": 19,
+      "4": 1
+    },
+    "alpha_chosen": {
+      "80": 43,
+      "50": 10,
+      "10": 1
+    },
+    "spearman_U_timing_stripped": -0.1973,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.4259,
+      "z": -1.54
+    }
+  },
+  {
+    "name": "fixedturn_m0.15_emb_thradbert",
+    "spearman_U": 0.0973,
+    "pearson_U": 0.0156,
+    "spearman_within": 0.1593,
+    "auroc_good": 0.5081,
+    "late_gt_early_rate": 0.9259,
+    "beats_turn": false,
+    "pairwise": 0.5772,
+    "pairwise_same_timing": 0.5093,
+    "pairwise_cross_timing": 0.6111,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0256,
+      "hi": 0.2233,
+      "mean": 0.0958
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5093,
+      "z": 0.192
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_thradbert",
+    "spearman_U": 0.0469,
+    "pearson_U": -0.0416,
+    "spearman_within": 0.0296,
+    "auroc_good": 0.4901,
+    "late_gt_early_rate": 0.7037,
+    "beats_turn": false,
+    "pairwise": 0.5185,
+    "pairwise_same_timing": 0.5093,
+    "pairwise_cross_timing": 0.5231,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0861,
+      "hi": 0.1768,
+      "mean": 0.0447
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5093,
+      "z": 0.192
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_thradbert",
+    "spearman_U": 0.0059,
+    "pearson_U": -0.0681,
+    "spearman_within": -0.0407,
+    "auroc_good": 0.4803,
+    "late_gt_early_rate": 0.5926,
+    "beats_turn": false,
+    "pairwise": 0.4846,
+    "pairwise_same_timing": 0.5093,
+    "pairwise_cross_timing": 0.4722,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.1294,
+      "hi": 0.1359,
+      "mean": 0.0034
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5093,
+      "z": 0.192
+    }
+  },
+  {
+    "name": "nested_emb_thradbert",
+    "spearman_U": -0.1616,
+    "pearson_U": -0.2412,
+    "spearman_within": -0.1111,
+    "auroc_good": 0.4318,
+    "late_gt_early_rate": 0.3704,
+    "beats_turn": false,
+    "pairwise": 0.463,
+    "pairwise_same_timing": 0.5093,
+    "pairwise_cross_timing": 0.4398,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.2896,
+      "hi": -0.0236,
+      "mean": -0.1637
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.5093,
+      "z": 0.192
+    },
+    "k_chosen": {
+      "8": 50,
+      "32": 3,
+      "4": 1
+    },
+    "alpha_chosen": {
+      "50": 29,
+      "20": 21,
+      "80": 3,
+      "10": 1
+    },
+    "spearman_U_timing_stripped": -0.1322,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.5093,
+      "z": 0.192
+    }
+  },
+  {
+    "name": "fixedturn_m0.15_emb_qwen3-emb-0.6b_1080",
+    "spearman_U": -0.054,
+    "pearson_U": -0.1092,
+    "spearman_within": 0.0778,
+    "auroc_good": 0.491,
+    "late_gt_early_rate": 0.963,
+    "beats_turn": false,
+    "pairwise": 0.5278,
+    "pairwise_same_timing": 0.4074,
+    "pairwise_cross_timing": 0.588,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.1806,
+      "hi": 0.093,
+      "mean": -0.0518
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4074,
+      "z": -1.925
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_qwen3-emb-0.6b_1080",
+    "spearman_U": -0.1501,
+    "pearson_U": -0.1893,
+    "spearman_within": -0.1259,
+    "auroc_good": 0.462,
+    "late_gt_early_rate": 0.7593,
+    "beats_turn": false,
+    "pairwise": 0.4444,
+    "pairwise_same_timing": 0.4074,
+    "pairwise_cross_timing": 0.463,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.2761,
+      "hi": -0.0071,
+      "mean": -0.1475
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4074,
+      "z": -1.925
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_qwen3-emb-0.6b_1080",
+    "spearman_U": -0.1871,
+    "pearson_U": -0.2224,
+    "spearman_within": -0.137,
+    "auroc_good": 0.4497,
+    "late_gt_early_rate": 0.6852,
+    "beats_turn": false,
+    "pairwise": 0.4444,
+    "pairwise_same_timing": 0.4074,
+    "pairwise_cross_timing": 0.463,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.3089,
+      "hi": -0.0483,
+      "mean": -0.1845
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4074,
+      "z": -1.925
+    }
+  },
+  {
+    "name": "nested_emb_qwen3-emb-0.6b_1080",
+    "spearman_U": -0.2496,
+    "pearson_U": -0.2416,
+    "spearman_within": -0.1593,
+    "auroc_good": 0.3956,
+    "late_gt_early_rate": 0.5185,
+    "beats_turn": false,
+    "pairwise": 0.4414,
+    "pairwise_same_timing": 0.4167,
+    "pairwise_cross_timing": 0.4537,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.3756,
+      "hi": -0.1182,
+      "mean": -0.2484
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4167,
+      "z": -1.732
+    },
+    "k_chosen": {
+      "32": 36,
+      "8": 17,
+      "16": 1
+    },
+    "alpha_chosen": {
+      "80": 37,
+      "20": 12,
+      "50": 5
+    },
+    "spearman_U_timing_stripped": -0.2747,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.4167,
+      "z": -1.732
+    }
+  },
+  {
+    "name": "fixedturn_m0.15_emb_qwen3-emb-4b_1080",
+    "spearman_U": 0.1189,
+    "pearson_U": 0.0672,
+    "spearman_within": 0.163,
+    "auroc_good": 0.5682,
+    "late_gt_early_rate": 0.9259,
+    "beats_turn": false,
+    "pairwise": 0.5679,
+    "pairwise_same_timing": 0.4722,
+    "pairwise_cross_timing": 0.6157,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0194,
+      "hi": 0.2543,
+      "mean": 0.1185
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4722,
+      "z": -0.577
+    }
+  },
+  {
+    "name": "fixedturn_m0.3_emb_qwen3-emb-4b_1080",
+    "spearman_U": 0.0807,
+    "pearson_U": 0.0225,
+    "spearman_within": 0.0481,
+    "auroc_good": 0.5715,
+    "late_gt_early_rate": 0.7593,
+    "beats_turn": false,
+    "pairwise": 0.5185,
+    "pairwise_same_timing": 0.4722,
+    "pairwise_cross_timing": 0.5417,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0603,
+      "hi": 0.2163,
+      "mean": 0.0803
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4722,
+      "z": -0.577
+    }
+  },
+  {
+    "name": "fixedturn_m0.5_emb_qwen3-emb-4b_1080",
+    "spearman_U": 0.0637,
+    "pearson_U": -0.0008,
+    "spearman_within": -0.0037,
+    "auroc_good": 0.5722,
+    "late_gt_early_rate": 0.6296,
+    "beats_turn": false,
+    "pairwise": 0.5031,
+    "pairwise_same_timing": 0.4722,
+    "pairwise_cross_timing": 0.5185,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.0763,
+      "hi": 0.2025,
+      "mean": 0.0635
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4722,
+      "z": -0.577
+    }
+  },
+  {
+    "name": "nested_emb_qwen3-emb-4b_1080",
+    "spearman_U": 0.0001,
+    "pearson_U": -0.0503,
+    "spearman_within": -0.0407,
+    "auroc_good": 0.5155,
+    "late_gt_early_rate": 0.5556,
+    "beats_turn": false,
+    "pairwise": 0.4815,
+    "pairwise_same_timing": 0.4259,
+    "pairwise_cross_timing": 0.5093,
+    "n_pairs": 324,
+    "n_same": 108,
+    "n_cross": 216,
+    "bootstrap_spearman": {
+      "lo": -0.1298,
+      "hi": 0.129,
+      "mean": -0.0011
+    },
+    "same_timing": {
+      "n": 108,
+      "acc": 0.4259,
+      "z": -1.54
+    },
+    "k_chosen": {
+      "8": 42,
+      "16": 12
+    },
+    "alpha_chosen": {
+      "50": 24,
+      "20": 20,
+      "80": 10
+    },
+    "spearman_U_timing_stripped": -0.0185,
+    "same_timing_stripped": {
+      "n": 108,
+      "acc": 0.4259,
+      "z": -1.54
+    }
+  }
+]

@@ -1,0 +1,127 @@
+[
+  {
+    "name": "baseline_turn",
+    "spearman_U_lopo": 0.1669,
+    "auroc_good_lopo": 0.5339,
+    "pairwise_acc": 0.4228,
+    "mean_U_high_minus_low": 0.4232,
+    "auroc_null_mean": 0.5067,
+    "ope_ips_tau0": {
+      "n": 270,
+      "ips": -0.5244104825804167
+    },
+    "ope_ips_tau_median": {
+      "n": 162,
+      "ips": -0.2959391818522086
+    }
+  },
+  {
+    "name": "baseline_fit",
+    "spearman_U_lopo": 0.0572,
+    "auroc_good_lopo": 0.5534,
+    "pairwise_acc": 0.5247,
+    "mean_U_high_minus_low": 0.1909,
+    "auroc_null_mean": 0.4992,
+    "ope_ips_tau0": {
+      "n": 270,
+      "ips": -0.5244104825804167
+    },
+    "ope_ips_tau_median": {
+      "n": 160,
+      "ips": -0.38393277802563686
+    }
+  },
+  {
+    "name": "baseline_turn_plus_fit",
+    "spearman_U_lopo": 0.1476,
+    "auroc_good_lopo": 0.564,
+    "pairwise_acc": 0.5833,
+    "mean_U_high_minus_low": 0.3682,
+    "auroc_null_mean": 0.5044,
+    "ope_ips_tau0": {
+      "n": 270,
+      "ips": -0.5244104825804167
+    },
+    "ope_ips_tau_median": {
+      "n": 162,
+      "ips": -0.32114400493309575
+    }
+  },
+  {
+    "name": "baseline_always_late_score",
+    "spearman_U_lopo": 0.1669,
+    "auroc_good_lopo": 0.5339,
+    "pairwise_acc": 0.4228,
+    "mean_U_high_minus_low": 0.4232,
+    "auroc_null_mean": 0.5067,
+    "ope_ips_tau0": {
+      "n": 162,
+      "ips": -0.2959391818522086
+    },
+    "ope_ips_tau_median": {
+      "n": 162,
+      "ips": -0.2959391818522086
+    }
+  },
+  {
+    "name": "probe_thradbert_lopo",
+    "spearman_U_lopo": -0.2647,
+    "auroc_good_lopo": 0.4018,
+    "pairwise_acc": 0.3951,
+    "mean_U_high_minus_low": -0.4331,
+    "auroc_null_mean": 0.4988,
+    "ope_ips_tau0": {
+      "n": 64,
+      "ips": -0.32199073732470157
+    },
+    "ope_ips_tau_median": {
+      "n": 108,
+      "ips": -0.9577381365101841
+    },
+    "spearman_U_task_grouped": -0.0658,
+    "auroc_good_from_logit_lopo": 0.4755,
+    "dim": 768
+  },
+  {
+    "name": "lora_qwen3-8b_5fold",
+    "spearman_U_lopo": 0.0011,
+    "auroc_good_lopo": 0.4962,
+    "pairwise_acc": 0.5093,
+    "mean_U_high_minus_low": -0.2317,
+    "auroc_null_mean": 0.5036,
+    "ope_ips_tau0": {
+      "n": 126,
+      "ips": -0.4024977555684007
+    },
+    "ope_ips_tau_median": {
+      "n": 108,
+      "ips": -0.7182404804020065
+    },
+    "lora": {
+      "name": "lora_qwen3-8b",
+      "hub": "Qwen/Qwen3-8B",
+      "folds": [
+        {
+          "fold": 0,
+          "n_te": 44
+        },
+        {
+          "fold": 1,
+          "n_te": 44
+        },
+        {
+          "fold": 2,
+          "n_te": 44
+        },
+        {
+          "fold": 3,
+          "n_te": 44
+        },
+        {
+          "fold": 4,
+          "n_te": 40
+        }
+      ]
+    }
+  }
+]

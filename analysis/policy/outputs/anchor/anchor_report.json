@@ -1,0 +1,103 @@
+{
+  "rows": 216,
+  "participants": 54,
+  "by_condition": {
+    "inline_late": 54,
+    "block_early": 54,
+    "inline_early": 54,
+    "block_late": 54
+  },
+  "good_moment_rate": 0.28703703703703703,
+  "ux_retention_mean": -0.584619341563786,
+  "ux_retention_by_timing": {
+    "early": -0.81,
+    "late": -0.359
+  },
+  "ux_retention_by_presentation": {
+    "explicit": -0.701,
+    "implicit": -0.468
+  },
+  "residualisation_coefficients": {
+    "intercept": -0.6555131032255208,
+    "presentation_implicit": 0.20753010479317502,
+    "task_id_swt_gardening_birthday_gift": -0.23027671646952727,
+    "task_id_swt_laptop_budget": -0.16439317954386892,
+    "task_id_swt_pet_decision_and_setup": 0.00947751942796703,
+    "task_id_swt_study_environment": 0.20619538740546658
+  },
+  "post_ad_text_rows": 108,
+  "composites": {
+    "credibility": {
+      "positive": [
+        "llm_reliable"
+      ],
+      "reversed": [
+        "llm_false",
+        "llm_made_up"
+      ]
+    },
+    "helpfulness": {
+      "positive": [
+        "llm_helpful",
+        "llm_addressed"
+      ],
+      "reversed": [
+        "llm_not_aid"
+      ]
+    },
+    "convincingness": {
+      "positive": [
+        "llm_convincing",
+        "llm_changed_mind"
+      ],
+      "reversed": [
+        "llm_skeptical"
+      ]
+    },
+    "relevance": {
+      "positive": [
+        "llm_relevant",
+        "llm_suggestions"
+      ],
+      "reversed": [
+        "llm_not_useful"
+      ]
+    },
+    "neutrality": {
+      "positive": [
+        "llm_neutral",
+        "llm_impartial"
+      ],
+      "reversed": [
+        "llm_opinionated"
+      ]
+    },
+    "manipulation": {
+      "positive": [
+        "behaviour_pushing",
+        "behaviour_manipulate"
+      ],
+      "reversed": []
+    },
+    "trust": {
+      "positive": [
+        "personality_trust"
+      ],
+      "reversed": []
+    },
+    "notice_sponsored": {
+      "positive": [
+        "personality_sponsored"
+      ],
+      "reversed": []
+    },
+    "notice_brands": {
+      "positive": [
+        "personality_brands"
+      ],
+      "reversed": []
+    }
+  },
+  "note": "composites provisional until the Goal 1 freeze; rebuild against frozen scoring",
+  "sha256_16": "949605816c501b72"
+}

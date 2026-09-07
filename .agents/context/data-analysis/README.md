@@ -71,6 +71,14 @@ The top level is reserved for documents that govern both analysis arms:
 - Crossable leftover list (analysis + manuscripts):
   `../writing/2026-08-18-remaining-work-checklist.md`.
 
+- `policy/` — **side project, not a thesis goal.** 6 September produced
+  a human-\(U\) residual scorer, not \(m(s)\) or \(q(s,a)\). Start at
+  `policy/README.md`, then
+  `policy/2026-09-06-residual-scorer-and-next-ms-qsa.md`
+  (done vs not done; next estimands). Winner numbers:
+  `policy/2026-09-06-evening-handoff.md`. Code under `analysis/policy/`.
+  Nothing enters thesis / paper / deck before 17 September.
+
 ## Analysis arms
 
 - `behavioral/`: behavioural ETL, scoring, outcome definitions, exclusions,

@@ -1,0 +1,24 @@
+# Policy / ad-moment scorer (side project)
+
+**Not a thesis goal.** Insertion-policy \(\pi\) stays dropped from the
+manuscripts (`../2026-08-24-insertion-policy-model-dropped.md`).
+Nothing here enters thesis, paper, or deck before 17 September.
+
+Start here, then the newest dated note in this directory.
+
+- **Live research line:** `2026-09-06-residual-scorer-and-next-ms-qsa.md`
+  (what the 6 Sep ridge is, done vs not done, next is \(m(s)\) / \(q(s,a)\),
+  not another residual). Numbers:
+  `2026-09-06-evening-handoff.md`.
+- Live winner: `analysis/policy/outputs/experiments/full/BEST.md`
+  (Spearman 0.309, CI 0.20–0.41, same-timing 0.639)
+- Original scorer design (judge → calibrator; superseded as the
+  training story): `2026-09-06-ad-moment-scorer.md`
+- Code: `analysis/policy/`
+  - preprocess (CPU): `build_policy_dataset.ipynb` wraps
+    `build_policy_silver.py` + `build_human_anchor.py`
+  - locked serve: `freeze_best.py`, `score_moment.py`
+  - artefacts: `outputs/silver/`, `outputs/gold/`,
+    `outputs/experiments/full/`
+
+Do not overwrite EEG ICA models. Do not put this model in Results.

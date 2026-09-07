@@ -1,0 +1,136 @@
+# Learning paradigms. Nothing here is launched.
+# Study supervision is the 216-row human anchor and the 324 pairs.
+# Do not put the saturated 4B judge labels of swt_* turns into any loss.
+
+data:
+  gold: analysis/policy/outputs/gold/
+  turns: turns_clean.csv
+  anchor: human_anchor.csv          # 216
+  pairs: preference_pairs.csv       # 324, all cross-task (Latin square)
+  bandit: bandit_rows.csv           # 216 INSERT + 54 WAIT
+  folds: leave_one_participant_out  # 54
+  secondary_folds: group_by_task    # 5 tasks; this is the generalisation test
+
+# ---------------------------------------------------------------------------
+# P0  Supervised harm model  (the study's unique industrial artefact)
+# ---------------------------------------------------------------------------
+P0_supervised_harm:
+  name: M_harm
+  y: ux_retention_resid              # continuous; also report good_moment_human AUROC
+  x: prefix_text                     # encoder; z = (turn/8, fit) in a second head or late fusion
+  forbidden_x: [presentation, condition, task_id, participant_key, eeg]
+  loss: mse                          # primary; huber as robustness
+  models: [Thrad/thrad-bert-conversation-classifier, BAAI/bge-small-en-v1.5, microsoft/deberta-v3-small]
+  grid:
+    lr: [1.0e-5, 3.0e-5, 1.0e-4]
+    weight_decay: [0.01, 0.1]
+    epochs: [5, 10, 20]
+    max_len: [256, 384]
+    dropout: [0.1, 0.3]
+    freeze_encoder: [true, false]    # freeze-then-head is the n=216 default
+  eval:
+    - lopo_spearman_U
+    - lopo_auroc_good_moment
+    - task_grouped_spearman_U
+    - shuffle_within_person_null
+  industrial: "UX-harm / brand-safety score. Constrains Gamma. Not a CTR model."
+
+# ---------------------------------------------------------------------------
+# P1  Pairwise ranking / ListNet  (same 216 states, ranking loss)
+# ---------------------------------------------------------------------------
+P1_pairwise_rank:
+  name: ranker
+  y: preference_pairs.chosen_vs_rejected
+  x: prefix_text of each side
+  loss: [bce_on_score_diff, listnet]
+  models: [Thrad/thrad-bert-conversation-classifier, BAAI/bge-small-en-v1.5]
+  grid:
+    lr: [1.0e-5, 3.0e-5]
+    margin: [0.0, 0.2]
+    freeze_encoder: [true]
+    epochs: [5, 10]
+  eval:
+    - lopo_pairwise_accuracy
+    - kendall_tau_within_person   # 4 ads ranked
+    - task_grouped_pairwise_acc
+  caveat: "All 324 pairs are cross-task (same_task=0). Task-grouped eval is mandatory."
+  industrial: "Ranks candidate moments. Combined with M_intent at serve time."
+
+# ---------------------------------------------------------------------------
+# P2  Offline contextual bandit  (evaluation, not PPO)
+# ---------------------------------------------------------------------------
+P2_offline_bandit:
+  name: ope
+  y: reward = U_resid on INSERT, 0 on WAIT
+  action: [WAIT, INSERT]
+  propensity: 0.2                    # uniform 5-arm assignment
+  estimators: [ips, snips, dr]
+  policies_to_score:
+    - always_wait
+    - always_insert
+    - always_late                    # structural baseline; turn-only AUROC was 0.53
+    - always_early
+    - M_harm_threshold               # insert iff predicted U > tau
+  grid:
+    tau: [-1.0, -0.5, 0.0, 0.25]
+  eval:
+    - ips_value
+    - regret_vs_person_oracle        # best of that person's 4 ads
+  do_not: "PPO / REINFORCE / GRPO on 216 rows. That is theatre."
+  industrial: "How a serving rule would have scored under the RCT. Exact IPS."
+
+# ---------------------------------------------------------------------------
+# P3  DPO on a tiny decoder  (optional, atlas-only first)
+# ---------------------------------------------------------------------------
+P3_dpo_tiny_llm:
+  name: generative_pi
+  y: preference_pairs (chosen prefix preferred over rejected)
+  prompt: "Should an ad be inserted after this conversation? Answer YES/NO and one sentence."
+  models: [HuggingFaceTB/SmolLM3-3B, microsoft/Phi-4-mini-instruct, Qwen/Qwen3-4B-Instruct-2507]
+  method: lora_dpo
+  grid:
+    lora_r: [8, 16]
+    lora_alpha: [16, 32]
+    lr: [5.0e-5, 1.0e-4]
+    beta_dpo: [0.1, 0.3]
+    epochs: [1, 2]
+    max_len: [512]
+  eval:
+    - lopo_pairwise_accuracy_on_YES
+    - format_valid_rate
+  envs: [atlas]
+  industrial: "Decision + rationale. Slower than DistilBERT. Only if P0/P1 are null and we still want a readable policy."
+
+# ---------------------------------------------------------------------------
+# P4  Intent gate on EXTERNAL text only  (not the study)
+# ---------------------------------------------------------------------------
+P4_intent_external:
+  name: M_intent
+  y: "commercial vs not, labelled on WildChat/OASST1 with a binary rubric (not the 4-item 0-9 that saturated here)"
+  x: prefix_text
+  models: [Thrad/thrad-bert-conversation-classifier, Qwen/Qwen3-1.7B]
+  data: outputs/rescued/external_prefixes.csv   # 8000 WildChat already on disk
+  do_not_use: "outputs/rescued/labels_real_v2_logprob_0to9.csv as Y"
+  grid:
+    lr: [3.0e-5]
+    epochs: [2, 3]
+  eval:
+    - held_out_external_auroc
+    - sanity_study_turns_should_score_high
+    - sanity_demo_emotional_and_coding_should_score_low
+  industrial: "The ChatGPT-shaped gate. This is what saves HyDE+FAISS. Train it off-study."
+
+# ---------------------------------------------------------------------------
+# Serving composition (not a fifth trainer)
+# ---------------------------------------------------------------------------
+serve:
+  insert_iff: "M_intent(x) > tau_int AND M_harm(x,z) > tau_harm AND not Gamma_veto"
+  output: {moment_score: "calibrated M_harm or ranker", receptivity: M_intent, veto: Gamma}
+  latency_budget_ms: 50
+  default_backbone: Thrad/thrad-bert-conversation-classifier
+
+envs:
+  atlas:    {gpu: "A100 40GB #1", parallel: 1, note: "GPU 0 is another user's job. Do not touch."}
+  laptop16: {gpu: "16GB", parallel: 1, skip: [P3_dpo_tiny_llm]}
+  colab:    {gpu: "T4 16GB", parallel: 1, skip: [P3_dpo_tiny_llm]}
+  kaggle:   {gpu: "P100/T4", parallel: 1, skip: [P3_dpo_tiny_llm], external: oasst1}

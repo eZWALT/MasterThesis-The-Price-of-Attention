@@ -227,3 +227,8 @@ analysis/eeg/scratch/
 /docs/overleaf/*
 !/docs/overleaf/.gitkeep
 /scripts/cognitive-mllm
+
+# ad-moment scorer: notebook dumps, regenerable embedding caches, external corpora
+analysis/policy/outputs/notebook_runs/
+analysis/policy/outputs/experiments/**/emb_*.npy
+analysis/policy/outputs/rescued/external_prefixes.csv
