@@ -1,3 +1,5 @@
 analysis_type,score,condition_set,condition_pair,statistic,p_value,holm_adjusted_p
-wilcoxon_holm,credibility,,block_late vs inline_early,,0.0036885342441012013,0.022131205464607208
-friedman,relevance,"block_early, block_late, inline_early, inline_late",,8.735294117647069,0.033025401396014856,
+friedman,credibility,"block_early, block_late, inline_early, inline_late, no_ads",,10.19819819819821,0.03721817627468871,
+wilcoxon_holm,credibility,,block_late vs inline_early,,0.0036885342441012013,0.03688534244101201
+friedman,behaviour_pushing,"block_early, block_late, inline_early, inline_late, no_ads",,10.570570570570547,0.03183865845579278,
+wilcoxon_holm,behaviour_pushing,,block_early vs no_ads,,0.0018960076696369203,0.0189600766963692
