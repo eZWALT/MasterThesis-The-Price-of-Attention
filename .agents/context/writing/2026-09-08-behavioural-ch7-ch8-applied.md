@@ -43,7 +43,9 @@ the two working trees did not collide.
   relevance .87, neutrality .63 (`outputs/confirmatory/cronbach_alpha.csv`,
   `tab:beh-alpha`; one sentence in Methods §Behavioral Measures).
 - Both her survivors replicate on Gold \(N=54\): credibility implicit
-  early − explicit late is Wilcoxon-only (Holm-10 .041, \(t\) .054);
+  early − explicit late is \(t\) Holm-10 .054 with raw Wilcoxon .004
+  (never write "Wilcoxon Holm" in the thesis; her engine is described
+  as raw Wilcoxon beside the Holm \(t\));
   manipulation explicit early − no ads Holm \(<.001\). Her folder is
   untouched; nothing in the thesis reads from it.
 

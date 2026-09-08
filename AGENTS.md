@@ -42,9 +42,11 @@ the 5 September “Combos wait on that freeze” paragraph, or
 - Do not put the ad-moment scorer in thesis / paper / deck before
   17 September. Do not rebuild its Silver unless asked.
 - Do not pick a \(k\), montage, or questionnaire item by \(p\) or
-  by item–item correlation. Katerina's 8 Sep ask to drop
-  `llm_reliable` / `llm_opinionated` / `llm_skeptical` is **held**:
-  `.agents/context/data-analysis/behavioral/2026-09-08-item-correlations-held.md`.
+ by item–item correlation. Katerina's 8 Sep ask to drop
+ `llm_reliable` / `llm_opinionated` / `llm_skeptical` is **held**;
+ answered as a sensitivity-only appendix (thesis `sec:app-beh-items`),
+ composites unchanged:
+ `.agents/context/data-analysis/behavioral/2026-09-08-item-correlations-held.md`.
 - Leave `src/project/` application code alone unless the task is the
   platform itself.
 - **`analysis/behavioural/` is Katerina’s tree. Do not open, edit, run,

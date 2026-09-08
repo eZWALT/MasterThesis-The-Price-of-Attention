@@ -13,7 +13,13 @@ re-open a closed lock.
    paragraphs with signs and variable names. Do not paste into
    `conclusion.tex`.
 2. **Do not drop** `llm_reliable` / `llm_opinionated` /
-   `llm_skeptical` from the battery. Item-correlation rerun is held:
+   `llm_skeptical` from the battery. Item-correlation rerun is held;
+   answered 8 Sep evening as **sensitivity only** (Appendix F
+   `sec:app-beh-items`: odd-polarity artefact; credibility early − late
+   is carried by `llm_reliable`; LOO grid 4/45 verdicts move both ways).
+   Also new that evening: `fig:beh-holm-board`, `fig:beh-d-rainclouds`,
+   `fig:beh-item-forest`, 8.2 personality declared gap, Results opener
+   fixed for combos, Appendix C marks the four secondary reversals.
    `../data-analysis/behavioral/2026-09-08-item-correlations-held.md`.
 3. **Calendar (read first).** Thesis still due **Thu 17 Sep**. Defence
    is **Wed 23 Sep morning** in Padova, not 18–20. Fri 18 morning →
