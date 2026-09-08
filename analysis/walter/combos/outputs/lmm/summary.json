@@ -1,0 +1,142 @@
+{
+  "tilt_loadings": {
+    "eeg_fz_theta": 0.235,
+    "eeg_posterior_alpha": -0.172,
+    "eeg_theta": 0.492,
+    "eeg_alpha": -0.047,
+    "eeg_beta": -0.643,
+    "eeg_faa": 0.099,
+    "eeg_delta": 0.582,
+    "eeg_gamma": -0.625,
+    "eeg_rel_delta": 0.789,
+    "eeg_rel_theta": -0.1,
+    "eeg_rel_alpha": -0.295,
+    "eeg_rel_beta": -0.909,
+    "eeg_rel_gamma": -0.909,
+    "eeg_engagement": -0.853,
+    "eeg_pope": -0.837,
+    "eeg_kislov": -0.691
+  },
+  "tilt_var_explained": 0.36000268737825264,
+  "hits_holm": {
+    "A_state_association": 0,
+    "B_moderation": 0,
+    "B0_main_within_ads": 0
+  },
+  "min_p_raw": {
+    "A_state_association": 0.05896702039215085,
+    "B_moderation": 0.017054494153637977,
+    "B0_main_within_ads": 0.11880036529512036
+  },
+  "n_tests": {
+    "A_state_association": 18,
+    "B_moderation": 36,
+    "B0_main_within_ads": 18
+  },
+  "n_not_converged": 0,
+  "permutation_maxT": {
+    "A": {
+      "observed_max_abs_t": 1.888440431752249,
+      "p_perm_family": 0.6896551724137931,
+      "null_95pct_max_abs_t": 3.109096139622383,
+      "n_perm": 2000,
+      "method": "Freedman-Lane, residuals permuted within person"
+    },
+    "B0": {
+      "observed_max_abs_t": 1.7769054599748566,
+      "p_perm_family": 0.736631684157921,
+      "null_95pct_max_abs_t": 3.033603770753022,
+      "n_perm": 2000,
+      "method": "Freedman-Lane, residuals permuted within person"
+    },
+    "B": {
+      "observed_max_abs_t": 1.8778485863665835,
+      "p_perm_family": 0.8935532233883059,
+      "null_95pct_max_abs_t": 3.3415742075104826,
+      "n_perm": 2000,
+      "method": "Freedman-Lane, residuals permuted within person"
+    }
+  },
+  "top": [
+    {
+      "family": "B_moderation",
+      "outcome": "notice",
+      "eeg": "eeg_tilt",
+      "term": "late:eeg_tilt_wc",
+      "beta": 1.2145,
+      "se": 0.5091,
+      "p_raw": 0.0171,
+      "p_holm_family": 0.614
+    },
+    {
+      "family": "B_moderation",
+      "outcome": "manipulation",
+      "eeg": "eeg_tilt",
+      "term": "late:eeg_tilt_wc",
+      "beta": 1.052,
+      "se": 0.4655,
+      "p_raw": 0.0238,
+      "p_holm_family": 0.8332
+    },
+    {
+      "family": "B_moderation",
+      "outcome": "notice",
+      "eeg": "eeg_tilt",
+      "term": "explicit:eeg_tilt_wc",
+      "beta": 1.1755,
+      "se": 0.5271,
+      "p_raw": 0.0257,
+      "p_holm_family": 0.875
+    },
+    {
+      "family": "A_state_association",
+      "outcome": "log_latency",
+      "eeg": "eeg_tilt",
+      "term": "eeg_tilt_wc",
+      "beta": 0.0913,
+      "se": 0.0483,
+      "p_raw": 0.059,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "A_state_association",
+      "outcome": "log_latency",
+      "eeg": "eeg_fz_theta",
+      "term": "eeg_fz_theta_wc",
+      "beta": 0.0929,
+      "se": 0.0497,
+      "p_raw": 0.0614,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B0_main_within_ads",
+      "outcome": "log_latency",
+      "eeg": "eeg_tilt",
+      "term": "eeg_tilt_wc",
+      "beta": 0.0876,
+      "se": 0.0562,
+      "p_raw": 0.1188,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B0_main_within_ads",
+      "outcome": "credibility",
+      "eeg": "eeg_tilt",
+      "term": "eeg_tilt_wc",
+      "beta": 0.1952,
+      "se": 0.126,
+      "p_raw": 0.1214,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B0_main_within_ads",
+      "outcome": "log_latency",
+      "eeg": "eeg_fz_theta",
+      "term": "eeg_fz_theta_wc",
+      "beta": 0.0786,
+      "se": 0.056,
+      "p_raw": 0.1605,
+      "p_holm_family": 1.0
+    }
+  ]
+}

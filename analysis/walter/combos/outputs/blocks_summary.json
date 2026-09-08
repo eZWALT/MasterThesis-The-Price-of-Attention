@@ -1,0 +1,939 @@
+{
+  "map_tests": 2560,
+  "new_tests_blocks_1_7": 336,
+  "new_hits_holm": 0,
+  "new_hits_bh_within_table": 0,
+  "new_hits_bh_pooled": 0,
+  "n_pooled_new": 336,
+  "all_hits_bh_pooled_blocks_plus_map": 0,
+  "n_pooled_all": 2896,
+  "new_hits_raw": 10,
+  "expected_raw_hits_under_null": 16.8,
+  "familywise_permutation_p": {
+    "A_state_association": 0.6896551724137931,
+    "B0_main_within_ads": 0.736631684157921,
+    "B_moderation": 0.8935532233883059,
+    "events_all_exploratory": 0.3553223388305847,
+    "events_headline": 0.23388305847076463
+  },
+  "reliability": {
+    "k": 37,
+    "n_cells": 90,
+    "tiles_per_ad_cell": 37,
+    "tiles_per_no_ad_cell_range": [
+      46,
+      74
+    ],
+    "tiles_all_window_median": 95.0,
+    "eeg_feature_rel_within_SB_median": {
+      "random": 0.6489393599206446,
+      "odd_even": 0.7105490284267464,
+      "first_second": 0.31774723916497005,
+      "random_all_tiles": 0.7444823367638973
+    },
+    "eeg_D_rel_median": {
+      "random": 0.7009821093034247,
+      "odd_even": 0.7395054057821908,
+      "first_second": 0.43318063553195,
+      "random_all_tiles": 0.7523766885060033
+    },
+    "eeg_D_rel_headline": [
+      {
+        "scheme": "first_second",
+        "feature": "eeg_fz_theta",
+        "contrast": "any_ad_vs_no_ads",
+        "r_halves": 0.047,
+        "r_halves_ci_lo": -0.429,
+        "r_halves_ci_hi": 0.503,
+        "rel_D_SB": 0.09,
+        "rel_D_SB_ci_hi": 0.669
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_fz_theta",
+        "contrast": "inline_vs_block",
+        "r_halves": -0.094,
+        "r_halves_ci_lo": -0.537,
+        "r_halves_ci_hi": 0.39,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.561
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_fz_theta",
+        "contrast": "early_vs_late",
+        "r_halves": 0.422,
+        "r_halves_ci_lo": -0.055,
+        "r_halves_ci_hi": 0.743,
+        "rel_D_SB": 0.594,
+        "rel_D_SB_ci_hi": 0.852
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_fz_theta",
+        "contrast": "pair_inline_early_minus_block_late",
+        "r_halves": -0.128,
+        "r_halves_ci_lo": -0.561,
+        "r_halves_ci_hi": 0.361,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.53
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "any_ad_vs_no_ads",
+        "r_halves": 0.249,
+        "r_halves_ci_lo": -0.247,
+        "r_halves_ci_hi": 0.641,
+        "rel_D_SB": 0.398,
+        "rel_D_SB_ci_hi": 0.781
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "inline_vs_block",
+        "r_halves": -0.017,
+        "r_halves_ci_lo": -0.48,
+        "r_halves_ci_hi": 0.454,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.624
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "early_vs_late",
+        "r_halves": -0.353,
+        "r_halves_ci_lo": -0.704,
+        "r_halves_ci_hi": 0.136,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.24
+      },
+      {
+        "scheme": "first_second",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "pair_inline_early_minus_block_late",
+        "r_halves": -0.232,
+        "r_halves_ci_lo": -0.631,
+        "r_halves_ci_hi": 0.263,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.417
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_fz_theta",
+        "contrast": "any_ad_vs_no_ads",
+        "r_halves": 0.005,
+        "r_halves_ci_lo": -0.463,
+        "r_halves_ci_hi": 0.471,
+        "rel_D_SB": 0.009,
+        "rel_D_SB_ci_hi": 0.64
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_fz_theta",
+        "contrast": "early_vs_late",
+        "r_halves": 0.333,
+        "r_halves_ci_lo": -0.158,
+        "r_halves_ci_hi": 0.693,
+        "rel_D_SB": 0.5,
+        "rel_D_SB_ci_hi": 0.818
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_fz_theta",
+        "contrast": "inline_vs_block",
+        "r_halves": 0.0,
+        "r_halves_ci_lo": -0.467,
+        "r_halves_ci_hi": 0.467,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.637
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_fz_theta",
+        "contrast": "pair_inline_early_minus_block_late",
+        "r_halves": -0.141,
+        "r_halves_ci_lo": -0.57,
+        "r_halves_ci_hi": 0.349,
+        "rel_D_SB": 0.0,
+        "rel_D_SB_ci_hi": 0.517
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "any_ad_vs_no_ads",
+        "r_halves": 0.634,
+        "r_halves_ci_lo": 0.237,
+        "r_halves_ci_hi": 0.849,
+        "rel_D_SB": 0.776,
+        "rel_D_SB_ci_hi": 0.919
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "early_vs_late",
+        "r_halves": 0.146,
+        "r_halves_ci_lo": -0.345,
+        "r_halves_ci_hi": 0.574,
+        "rel_D_SB": 0.254,
+        "rel_D_SB_ci_hi": 0.729
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "inline_vs_block",
+        "r_halves": 0.556,
+        "r_halves_ci_lo": 0.12,
+        "r_halves_ci_hi": 0.812,
+        "rel_D_SB": 0.715,
+        "rel_D_SB_ci_hi": 0.896
+      },
+      {
+        "scheme": "random",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "pair_inline_early_minus_block_late",
+        "r_halves": 0.36,
+        "r_halves_ci_lo": -0.128,
+        "r_halves_ci_hi": 0.708,
+        "rel_D_SB": 0.53,
+        "rel_D_SB_ci_hi": 0.829
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_fz_theta",
+        "contrast": "any_ad_vs_no_ads",
+        "r_halves": 0.287,
+        "r_halves_ci_lo": -0.208,
+        "r_halves_ci_hi": 0.665,
+        "rel_D_SB": 0.446,
+        "rel_D_SB_ci_hi": 0.799
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_fz_theta",
+        "contrast": "early_vs_late",
+        "r_halves": 0.439,
+        "r_halves_ci_lo": -0.035,
+        "r_halves_ci_hi": 0.752,
+        "rel_D_SB": 0.61,
+        "rel_D_SB_ci_hi": 0.858
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_fz_theta",
+        "contrast": "inline_vs_block",
+        "r_halves": 0.213,
+        "r_halves_ci_lo": -0.282,
+        "r_halves_ci_hi": 0.618,
+        "rel_D_SB": 0.351,
+        "rel_D_SB_ci_hi": 0.764
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_fz_theta",
+        "contrast": "pair_inline_early_minus_block_late",
+        "r_halves": 0.306,
+        "r_halves_ci_lo": -0.187,
+        "r_halves_ci_hi": 0.677,
+        "rel_D_SB": 0.469,
+        "rel_D_SB_ci_hi": 0.807
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "any_ad_vs_no_ads",
+        "r_halves": 0.693,
+        "r_halves_ci_lo": 0.335,
+        "r_halves_ci_hi": 0.877,
+        "rel_D_SB": 0.819,
+        "rel_D_SB_ci_hi": 0.934
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "early_vs_late",
+        "r_halves": 0.4,
+        "r_halves_ci_lo": -0.083,
+        "r_halves_ci_hi": 0.73,
+        "rel_D_SB": 0.571,
+        "rel_D_SB_ci_hi": 0.844
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "inline_vs_block",
+        "r_halves": 0.448,
+        "r_halves_ci_lo": -0.024,
+        "r_halves_ci_hi": 0.756,
+        "rel_D_SB": 0.618,
+        "rel_D_SB_ci_hi": 0.861
+      },
+      {
+        "scheme": "random_all_tiles",
+        "feature": "eeg_posterior_alpha",
+        "contrast": "pair_inline_early_minus_block_late",
+        "r_halves": 0.486,
+        "r_halves_ci_lo": 0.025,
+        "r_halves_ci_hi": 0.777,
+        "rel_D_SB": 0.655,
+        "rel_D_SB_ci_hi": 0.874
+      }
+    ],
+    "behavioural_D_alpha": [
+      {
+        "composite": "credibility",
+        "n_items": 3,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.773
+      },
+      {
+        "composite": "credibility",
+        "n_items": 3,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.336
+      },
+      {
+        "composite": "credibility",
+        "n_items": 3,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.705
+      },
+      {
+        "composite": "credibility",
+        "n_items": 3,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.877
+      },
+      {
+        "composite": "helpfulness",
+        "n_items": 3,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.833
+      },
+      {
+        "composite": "helpfulness",
+        "n_items": 3,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.835
+      },
+      {
+        "composite": "helpfulness",
+        "n_items": 3,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.861
+      },
+      {
+        "composite": "helpfulness",
+        "n_items": 3,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.933
+      },
+      {
+        "composite": "convincingness",
+        "n_items": 3,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.631
+      },
+      {
+        "composite": "convincingness",
+        "n_items": 3,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.672
+      },
+      {
+        "composite": "convincingness",
+        "n_items": 3,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.666
+      },
+      {
+        "composite": "convincingness",
+        "n_items": 3,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.769
+      },
+      {
+        "composite": "relevance",
+        "n_items": 3,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.829
+      },
+      {
+        "composite": "relevance",
+        "n_items": 3,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.721
+      },
+      {
+        "composite": "relevance",
+        "n_items": 3,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.789
+      },
+      {
+        "composite": "relevance",
+        "n_items": 3,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.934
+      },
+      {
+        "composite": "neutrality",
+        "n_items": 3,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.76
+      },
+      {
+        "composite": "neutrality",
+        "n_items": 3,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.47
+      },
+      {
+        "composite": "neutrality",
+        "n_items": 3,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.372
+      },
+      {
+        "composite": "neutrality",
+        "n_items": 3,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.737
+      },
+      {
+        "composite": "manipulation",
+        "n_items": 2,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.84
+      },
+      {
+        "composite": "manipulation",
+        "n_items": 2,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.796
+      },
+      {
+        "composite": "manipulation",
+        "n_items": 2,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.73
+      },
+      {
+        "composite": "manipulation",
+        "n_items": 2,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.926
+      },
+      {
+        "composite": "notice",
+        "n_items": 2,
+        "contrast": "any_ad_vs_no_ads",
+        "n_people": 54,
+        "alpha": 0.524
+      },
+      {
+        "composite": "notice",
+        "n_items": 2,
+        "contrast": "inline_vs_block",
+        "n_people": 54,
+        "alpha": 0.7
+      },
+      {
+        "composite": "notice",
+        "n_items": 2,
+        "contrast": "early_vs_late",
+        "n_people": 54,
+        "alpha": 0.471
+      },
+      {
+        "composite": "notice",
+        "n_items": 2,
+        "contrast": "level",
+        "n_people": 54,
+        "alpha": 0.465
+      }
+    ],
+    "trajectory_D_source_agreement": [
+      {
+        "metric": "traj_n_shift",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.324,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": -0.026,
+        "r_D_inline_vs_block": 0.256,
+        "r_D_early_vs_late": -0.033
+      },
+      {
+        "metric": "traj_shift_rate",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.322,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": -0.022,
+        "r_D_inline_vs_block": 0.246,
+        "r_D_early_vs_late": -0.031
+      },
+      {
+        "metric": "traj_diversity",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.215,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": 0.012,
+        "r_D_inline_vs_block": 0.247,
+        "r_D_early_vs_late": -0.132
+      },
+      {
+        "metric": "traj_entropy_nats",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.261,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": 0.019,
+        "r_D_inline_vs_block": 0.269,
+        "r_D_early_vs_late": -0.116
+      },
+      {
+        "metric": "traj_entropy_normalised",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.246,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": 0.015,
+        "r_D_inline_vs_block": 0.289,
+        "r_D_early_vs_late": -0.105
+      },
+      {
+        "metric": "traj_max_persistence",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.336,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": -0.067,
+        "r_D_inline_vs_block": 0.3,
+        "r_D_early_vs_late": 0.022
+      },
+      {
+        "metric": "traj_mean_js_divergence",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": -0.038,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": 0.193,
+        "r_D_inline_vs_block": 0.231,
+        "r_D_early_vs_late": 0.126
+      },
+      {
+        "metric": "traj_max_js_divergence",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": -0.064,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": -0.045,
+        "r_D_inline_vs_block": 0.13,
+        "r_D_early_vs_late": 0.197
+      },
+      {
+        "metric": "traj_mean_total_variation",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": 0.09,
+        "note": "",
+        "r_D_any_ad_vs_no_ads": 0.324,
+        "r_D_inline_vs_block": 0.282,
+        "r_D_early_vs_late": 0.103
+      },
+      {
+        "metric": "traj_shifted_into_purchasable",
+        "n_people": 54,
+        "r_level_utterance_vs_contextual": NaN,
+        "note": "contextual source constant (never fires); agreement undefined",
+        "r_D_any_ad_vs_no_ads": NaN,
+        "r_D_inline_vs_block": NaN,
+        "r_D_early_vs_late": NaN
+      }
+    ],
+    "attenuation_ceiling_headline": [
+      {
+        "contrast": "any_ad_vs_no_ads",
+        "behaviour": "credibility",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.773,
+        "rel_eeg_D_k37_random": 0.009,
+        "rel_eeg_D_k37_first_second": 0.09,
+        "rel_eeg_D_all_tiles": 0.446,
+        "max_observable_rho_k37_random": 0.086,
+        "max_observable_rho_k37_first_second": 0.263,
+        "max_observable_rho_all_tiles": 0.587,
+        "max_observable_rho_best": 0.587,
+        "true_rho_needed_raw05_n18_best": 0.801,
+        "true_rho_needed_holm16_n18_best": 1.124
+      },
+      {
+        "contrast": "any_ad_vs_no_ads",
+        "behaviour": "manipulation",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.84,
+        "rel_eeg_D_k37_random": 0.009,
+        "rel_eeg_D_k37_first_second": 0.09,
+        "rel_eeg_D_all_tiles": 0.446,
+        "max_observable_rho_k37_random": 0.089,
+        "max_observable_rho_k37_first_second": 0.275,
+        "max_observable_rho_all_tiles": 0.612,
+        "max_observable_rho_best": 0.612,
+        "true_rho_needed_raw05_n18_best": 0.768,
+        "true_rho_needed_holm16_n18_best": 1.079
+      },
+      {
+        "contrast": "any_ad_vs_no_ads",
+        "behaviour": "notice",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.524,
+        "rel_eeg_D_k37_random": 0.009,
+        "rel_eeg_D_k37_first_second": 0.09,
+        "rel_eeg_D_all_tiles": 0.446,
+        "max_observable_rho_k37_random": 0.07,
+        "max_observable_rho_k37_first_second": 0.217,
+        "max_observable_rho_all_tiles": 0.483,
+        "max_observable_rho_best": 0.483,
+        "true_rho_needed_raw05_n18_best": 0.972,
+        "true_rho_needed_holm16_n18_best": 1.365
+      },
+      {
+        "contrast": "any_ad_vs_no_ads",
+        "behaviour": "credibility",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.773,
+        "rel_eeg_D_k37_random": 0.776,
+        "rel_eeg_D_k37_first_second": 0.398,
+        "rel_eeg_D_all_tiles": 0.819,
+        "max_observable_rho_k37_random": 0.774,
+        "max_observable_rho_k37_first_second": 0.555,
+        "max_observable_rho_all_tiles": 0.795,
+        "max_observable_rho_best": 0.795,
+        "true_rho_needed_raw05_n18_best": 0.591,
+        "true_rho_needed_holm16_n18_best": 0.83
+      },
+      {
+        "contrast": "any_ad_vs_no_ads",
+        "behaviour": "manipulation",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.84,
+        "rel_eeg_D_k37_random": 0.776,
+        "rel_eeg_D_k37_first_second": 0.398,
+        "rel_eeg_D_all_tiles": 0.819,
+        "max_observable_rho_k37_random": 0.807,
+        "max_observable_rho_k37_first_second": 0.578,
+        "max_observable_rho_all_tiles": 0.829,
+        "max_observable_rho_best": 0.829,
+        "true_rho_needed_raw05_n18_best": 0.567,
+        "true_rho_needed_holm16_n18_best": 0.796
+      },
+      {
+        "contrast": "any_ad_vs_no_ads",
+        "behaviour": "notice",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.524,
+        "rel_eeg_D_k37_random": 0.776,
+        "rel_eeg_D_k37_first_second": 0.398,
+        "rel_eeg_D_all_tiles": 0.819,
+        "max_observable_rho_k37_random": 0.638,
+        "max_observable_rho_k37_first_second": 0.457,
+        "max_observable_rho_all_tiles": 0.655,
+        "max_observable_rho_best": 0.655,
+        "true_rho_needed_raw05_n18_best": 0.717,
+        "true_rho_needed_holm16_n18_best": 1.007
+      },
+      {
+        "contrast": "inline_vs_block",
+        "behaviour": "credibility",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.336,
+        "rel_eeg_D_k37_random": 0.0,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.351,
+        "max_observable_rho_k37_random": 0.006,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.343,
+        "max_observable_rho_best": 0.343,
+        "true_rho_needed_raw05_n18_best": 1.369,
+        "true_rho_needed_holm16_n18_best": 1.922
+      },
+      {
+        "contrast": "inline_vs_block",
+        "behaviour": "manipulation",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.796,
+        "rel_eeg_D_k37_random": 0.0,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.351,
+        "max_observable_rho_k37_random": 0.009,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.529,
+        "max_observable_rho_best": 0.529,
+        "true_rho_needed_raw05_n18_best": 0.889,
+        "true_rho_needed_holm16_n18_best": 1.248
+      },
+      {
+        "contrast": "inline_vs_block",
+        "behaviour": "notice",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.7,
+        "rel_eeg_D_k37_random": 0.0,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.351,
+        "max_observable_rho_k37_random": 0.008,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.496,
+        "max_observable_rho_best": 0.496,
+        "true_rho_needed_raw05_n18_best": 0.948,
+        "true_rho_needed_holm16_n18_best": 1.331
+      },
+      {
+        "contrast": "inline_vs_block",
+        "behaviour": "credibility",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.336,
+        "rel_eeg_D_k37_random": 0.715,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.618,
+        "max_observable_rho_k37_random": 0.49,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.456,
+        "max_observable_rho_best": 0.49,
+        "true_rho_needed_raw05_n18_best": 0.96,
+        "true_rho_needed_holm16_n18_best": 1.348
+      },
+      {
+        "contrast": "inline_vs_block",
+        "behaviour": "manipulation",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.796,
+        "rel_eeg_D_k37_random": 0.715,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.618,
+        "max_observable_rho_k37_random": 0.754,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.702,
+        "max_observable_rho_best": 0.754,
+        "true_rho_needed_raw05_n18_best": 0.623,
+        "true_rho_needed_holm16_n18_best": 0.875
+      },
+      {
+        "contrast": "inline_vs_block",
+        "behaviour": "notice",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.7,
+        "rel_eeg_D_k37_random": 0.715,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.618,
+        "max_observable_rho_k37_random": 0.707,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.658,
+        "max_observable_rho_best": 0.707,
+        "true_rho_needed_raw05_n18_best": 0.664,
+        "true_rho_needed_holm16_n18_best": 0.933
+      },
+      {
+        "contrast": "early_vs_late",
+        "behaviour": "credibility",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.705,
+        "rel_eeg_D_k37_random": 0.5,
+        "rel_eeg_D_k37_first_second": 0.594,
+        "rel_eeg_D_all_tiles": 0.61,
+        "max_observable_rho_k37_random": 0.594,
+        "max_observable_rho_k37_first_second": 0.647,
+        "max_observable_rho_all_tiles": 0.656,
+        "max_observable_rho_best": 0.656,
+        "true_rho_needed_raw05_n18_best": 0.716,
+        "true_rho_needed_holm16_n18_best": 1.006
+      },
+      {
+        "contrast": "early_vs_late",
+        "behaviour": "manipulation",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.73,
+        "rel_eeg_D_k37_random": 0.5,
+        "rel_eeg_D_k37_first_second": 0.594,
+        "rel_eeg_D_all_tiles": 0.61,
+        "max_observable_rho_k37_random": 0.604,
+        "max_observable_rho_k37_first_second": 0.658,
+        "max_observable_rho_all_tiles": 0.667,
+        "max_observable_rho_best": 0.667,
+        "true_rho_needed_raw05_n18_best": 0.704,
+        "true_rho_needed_holm16_n18_best": 0.989
+      },
+      {
+        "contrast": "early_vs_late",
+        "behaviour": "notice",
+        "eeg": "eeg_fz_theta",
+        "rel_beh_alpha": 0.471,
+        "rel_eeg_D_k37_random": 0.5,
+        "rel_eeg_D_k37_first_second": 0.594,
+        "rel_eeg_D_all_tiles": 0.61,
+        "max_observable_rho_k37_random": 0.485,
+        "max_observable_rho_k37_first_second": 0.529,
+        "max_observable_rho_all_tiles": 0.536,
+        "max_observable_rho_best": 0.536,
+        "true_rho_needed_raw05_n18_best": 0.877,
+        "true_rho_needed_holm16_n18_best": 1.231
+      },
+      {
+        "contrast": "early_vs_late",
+        "behaviour": "credibility",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.705,
+        "rel_eeg_D_k37_random": 0.254,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.571,
+        "max_observable_rho_k37_random": 0.423,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.635,
+        "max_observable_rho_best": 0.635,
+        "true_rho_needed_raw05_n18_best": 0.741,
+        "true_rho_needed_holm16_n18_best": 1.04
+      },
+      {
+        "contrast": "early_vs_late",
+        "behaviour": "manipulation",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.73,
+        "rel_eeg_D_k37_random": 0.254,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.571,
+        "max_observable_rho_k37_random": 0.431,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.645,
+        "max_observable_rho_best": 0.645,
+        "true_rho_needed_raw05_n18_best": 0.728,
+        "true_rho_needed_holm16_n18_best": 1.023
+      },
+      {
+        "contrast": "early_vs_late",
+        "behaviour": "notice",
+        "eeg": "eeg_posterior_alpha",
+        "rel_beh_alpha": 0.471,
+        "rel_eeg_D_k37_random": 0.254,
+        "rel_eeg_D_k37_first_second": 0.0,
+        "rel_eeg_D_all_tiles": 0.571,
+        "max_observable_rho_k37_random": 0.346,
+        "max_observable_rho_k37_first_second": 0.0,
+        "max_observable_rho_all_tiles": 0.518,
+        "max_observable_rho_best": 0.518,
+        "true_rho_needed_raw05_n18_best": 0.906,
+        "true_rho_needed_holm16_n18_best": 1.273
+      }
+    ],
+    "resolution": [
+      {
+        "n": 18,
+        "criterion": "raw .05",
+        "min_abs_rho": 0.468
+      },
+      {
+        "n": 18,
+        "criterion": "Holm within 16",
+        "min_abs_rho": 0.656
+      },
+      {
+        "n": 18,
+        "criterion": "Holm within 64",
+        "min_abs_rho": 0.719
+      },
+      {
+        "n": 18,
+        "criterion": "first BH hit of 2560",
+        "min_abs_rho": 0.831
+      },
+      {
+        "n": 18,
+        "criterion": "80% power at raw .05",
+        "min_abs_rho": 0.619
+      },
+      {
+        "n": 36,
+        "criterion": "raw .05",
+        "min_abs_rho": 0.329
+      },
+      {
+        "n": 36,
+        "criterion": "Holm within 16",
+        "min_abs_rho": 0.479
+      },
+      {
+        "n": 36,
+        "criterion": "Holm within 64",
+        "min_abs_rho": 0.535
+      },
+      {
+        "n": 36,
+        "criterion": "first BH hit of 2560",
+        "min_abs_rho": 0.648
+      },
+      {
+        "n": 36,
+        "criterion": "80% power at raw .05",
+        "min_abs_rho": 0.452
+      },
+      {
+        "n": 54,
+        "criterion": "raw .05",
+        "min_abs_rho": 0.268
+      },
+      {
+        "n": 54,
+        "criterion": "Holm within 16",
+        "min_abs_rho": 0.395
+      },
+      {
+        "n": 54,
+        "criterion": "Holm within 64",
+        "min_abs_rho": 0.444
+      },
+      {
+        "n": 54,
+        "criterion": "first BH hit of 2560",
+        "min_abs_rho": 0.546
+      },
+      {
+        "n": 54,
+        "criterion": "80% power at raw .05",
+        "min_abs_rho": 0.373
+      }
+    ]
+  },
+  "concordance": {
+    "beh_traj": {
+      "mean_tau": -0.20135231383473648,
+      "mean_abs_tau": 0.36588078458684126,
+      "n_pairs": 16
+    },
+    "beh_eeg": {
+      "mean_tau": 0.175,
+      "mean_abs_tau": 0.375,
+      "n_pairs": 16
+    },
+    "traj_eeg": {
+      "mean_tau": -0.47770462766947297,
+      "mean_abs_tau": 0.47770462766947297,
+      "n_pairs": 16
+    }
+  }
+}

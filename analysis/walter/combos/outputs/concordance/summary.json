@@ -1,0 +1,105 @@
+{
+  "blocks": {
+    "beh_traj": {
+      "mean_tau": -0.20135231383473648,
+      "mean_abs_tau": 0.36588078458684126,
+      "n_pairs": 16
+    },
+    "beh_eeg": {
+      "mean_tau": 0.175,
+      "mean_abs_tau": 0.375,
+      "n_pairs": 16
+    },
+    "traj_eeg": {
+      "mean_tau": -0.47770462766947297,
+      "mean_abs_tau": 0.47770462766947297,
+      "n_pairs": 16
+    }
+  },
+  "profiles": {
+    "trust": {
+      "no_ads": 0.223,
+      "inline_early": -0.139,
+      "inline_late": 0.148,
+      "block_early": -0.334,
+      "block_late": 0.102
+    },
+    "credibility": {
+      "no_ads": 0.14,
+      "inline_early": -0.298,
+      "inline_late": 0.147,
+      "block_early": -0.183,
+      "block_late": 0.193
+    },
+    "manipulation": {
+      "no_ads": -0.614,
+      "inline_early": 0.113,
+      "inline_late": -0.178,
+      "block_early": 0.543,
+      "block_late": 0.135
+    },
+    "notice": {
+      "no_ads": -0.881,
+      "inline_early": -0.03,
+      "inline_late": -0.139,
+      "block_early": 0.608,
+      "block_late": 0.441
+    },
+    "traj_n_shift": {
+      "no_ads": 0.046,
+      "inline_early": 0.16,
+      "inline_late": 0.017,
+      "block_early": -0.069,
+      "block_late": -0.154
+    },
+    "traj_entropy_nats": {
+      "no_ads": 0.005,
+      "inline_early": 0.118,
+      "inline_late": -0.176,
+      "block_early": 0.039,
+      "block_late": 0.014
+    },
+    "traj_mean_js_divergence": {
+      "no_ads": 0.002,
+      "inline_early": 0.079,
+      "inline_late": -0.032,
+      "block_early": 0.025,
+      "block_late": -0.075
+    },
+    "traj_shifted_into_purchasable": {
+      "no_ads": 0.115,
+      "inline_early": 0.019,
+      "inline_late": -0.173,
+      "block_early": 0.019,
+      "block_late": 0.019
+    },
+    "eeg_fz_theta": {
+      "no_ads": 0.105,
+      "inline_early": -0.5,
+      "inline_late": 0.161,
+      "block_early": -0.256,
+      "block_late": 0.49
+    },
+    "eeg_posterior_alpha": {
+      "no_ads": -0.156,
+      "inline_early": -0.115,
+      "inline_late": 0.322,
+      "block_early": -0.287,
+      "block_late": 0.237
+    },
+    "eeg_theta": {
+      "no_ads": 0.09,
+      "inline_early": -0.398,
+      "inline_late": 0.445,
+      "block_early": -0.142,
+      "block_late": 0.005
+    },
+    "eeg_beta": {
+      "no_ads": 0.056,
+      "inline_early": -0.159,
+      "inline_late": 0.168,
+      "block_early": -0.15,
+      "block_late": 0.085
+    }
+  }
+}

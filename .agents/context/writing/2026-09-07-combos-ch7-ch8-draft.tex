@@ -1,0 +1,138 @@
+% Proposed text for thesis Ch 7.5 (Results) and Ch 8.5 (Discussion), 7 September.
+% Not applied to docs/overleaf/thesis; shown to Walter first.
+% Numbers: analysis/walter/combos/run_thesis_families.py -> outputs/thesis/summary.json
+% Figures to copy: outputs/thesis/combos_declared_forests.pdf, combos_trust_alpha.pdf
+%   -> docs/overleaf/thesis/figures/results/
+% Lock: .agents/context/writing/2026-09-07-combos-ch7-ch8.md
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/results.tex : replace everything from \section{Associations across
+%% the three families} down to (not including) \section{Summary of outcomes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Associations across the three families}
+\label{sec:results-combos}
+
+% Goal 5. Each association pairs person-level D's from two of the sections
+% above. Association only, never mediation (Methods). Wherever EEG is in,
+% the sample is the laboratory eighteen, not 54. Declared pairs:
+% analysis/walter/combos/run_thesis_families.py (outputs/thesis/). Map:
+% run_combos.py. Reduced blocks: run_reliability.py ... summarise_blocks.py.
+Each association pairs person-level scores from two of the preceding sections, joined on participant. They are the Spearman pairs declared in \autoref{tab:analysis-families}, association and not mediation, Holm-adjusted within each declared family; a Holm \(p\) in this section is therefore a Holm-adjusted Spearman \(p\), not a paired \(t\). Wherever EEG enters, the sample is the laboratory eighteen rather than the full \(N=54\), because only that arm was recorded. For behaviour \(\times\) EEG the score on both sides is the any ad minus no ad \(D_i\) of \autoref{eq:person-contrast}. Methods defines two EEG person-level scores, \(D^{A}_{i}\) under condition aggregation and \(D^{B}_{i}\) locked to onset, and does not say which fills the pair; both are reported, each Holm-corrected within the six, and the one cell that survives is also given Holm-corrected across the twelve. The trajectory pairs use the two scores Methods declares, \(\delta^{(a)}_2\) (early pooled minus \(a^{\emptyset}\)) and late \(N_{\mathrm{shift}}\) (late pooled minus \(a^{\emptyset}\)), with the same pooled weights on the behavioural or EEG side. An exploratory map of every score on every planned contrast closes the section and is summarised in \autoref{tab:results-checks}.
+
+\subsection{Behaviour and EEG}
+\label{sec:results-combos-behaviour-eeg}
+
+Under condition aggregation none of the six declared pairs covaries; locked to onset, trust covaries with posterior \(\alpha\), and nothing else does.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/results/combos_declared_forests.pdf}
+\caption{The declared association families, Spearman \(\rho\) with 95\% intervals (Fisher \(z\), Bonett--Wright variance). (a) Behaviour \(\times\) EEG, the six pairs of \autoref{tab:analysis-families} on the any ad minus no ad \(D_i\), for both EEG scores Methods defines: Dataset~A condition aggregation (filled) and Dataset~B onset-locked minus the matched no-advertisement reply (open); \(n=18\), Holm within six for each score. (b) Behaviour \(\times\) trajectory (\(N=54\), Holm within six) and trajectory \(\times\) EEG on Dataset~A (\(n=18\), Holm within two); the trajectory score is \(\delta^{(a)}_2\) early pooled minus \(a^{\emptyset}\) or late \(N_{\mathrm{shift}}\) pooled minus \(a^{\emptyset}\), with the same pooled weights on the other side.}
+\label{fig:combos-declared}
+\end{figure}
+
+On Dataset~A the largest of the six is trust \(\times\) posterior \(\alpha\), \(\rho=.24\), 95\% CI \([-.26,\,.64]\), raw \(p=.34\). On Dataset~B the same pair is \(\rho=.80\), \([.48,\,.93]\), raw \(p=6\times10^{-5}\), Holm \(p=.0004\) within the six and \(.0007\) across the twelve; Pearson \(r=.78\) and Kendall \(\tau=.65\) agree, and leaving any one participant out keeps \(\rho\) between \(.77\) and \(.86\). The sign is positive: participants whose trust fell further below their own \(a^{\emptyset}\) rating when advertisements were present are the participants whose posterior \(\alpha\) fell further in the four seconds after onset than at the matched moment. Neither mean differs from zero (trust \(-0.38\) points, \(p=.38\); posterior \(\alpha\) \(-0.33\)~dB, \(p=.61\)); eleven of the fifteen participants with a non-zero trust change sit in a concordant quadrant. The other five Dataset~B pairs have \(|\rho|\le.41\) and Holm \(p\ge.44\). The implicit minus explicit and early minus late \(D\) pairs, six on each score for each contrast, return no Holm cell (smallest raw \(p=.12\)).
+
+The association is specific to \(\alpha\) and to the onset-locked score.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[width=\linewidth]{figures/results/combos_trust_alpha.pdf}
+\caption{The surviving pair and its specificity. (a) Trust any ad minus no ad against the onset-locked posterior \(\alpha\) score \(D^{B}_{i}\), one point per laboratory participant. (b) Trust any ad minus no ad against all sixteen EEG measures on the same two scores, Spearman \(\rho\) with 95\% intervals, Holm within sixteen; onset-locked filled, condition aggregation open.}
+\label{fig:combos-trust-alpha}
+\end{figure}
+
+Of the sixteen onset-locked measures, posterior \(\alpha\) (Holm \(p=.001\)) and whole-scalp \(\alpha\) (\(\rho=.69\), \([.27,\,.89]\), Holm \(p=.025\)) survive; relative \(\alpha\) does not (\(\rho=.50\), raw \(p=.034\), Holm \(p=.48\)), Fz \(\theta\) is \(\rho=-.07\), and the three engagement indices are \(|\rho|\le.09\). Under condition aggregation no measure passes raw \(.05\). The onset-locked score rests on four advertisements and two matched replies per person; split into early and late halves it reproduces itself at Spearman--Brown \(.56\) for posterior \(\alpha\) and \(.11\) for Fz \(\theta\).
+
+\subsection{Behaviour and genre trajectories}
+\label{sec:results-combos-behaviour-traj}
+
+None of the six declared pairs covaries at \(N=54\) (\autoref{fig:combos-declared}b). The largest is manipulation \(\times\) late \(N_{\mathrm{shift}}\), \(\rho=.22\), \([-.05,\,.46]\), Holm \(p=.67\). Under the contextual labelling the largest of the six is \(\rho=.19\) (trust \(\times\) \(\delta^{(a)}_2\), raw \(p=.18\)).
+
+\subsection{Genre trajectories and EEG}
+\label{sec:results-combos-traj-eeg}
+
+Neither declared pair survives Holm within two (\autoref{fig:combos-declared}b). Fz \(\theta\) early pooled minus \(a^{\emptyset}\) against \(\delta^{(a)}_2\) is \(\rho=.47\), \([-.02,\,.78]\), raw \(p=.048\), Holm \(p=.095\); posterior \(\alpha\) is \(\rho=.05\). The \(\delta^{(a)}_2\) score takes four values, and twelve of the eighteen laboratory participants sit at zero. The Fz \(\theta\) cell does not hold: under the contextual labelling it reverses to \(\rho=-.46\), \([-.77,\,.04]\); on the whole-window EEG medians it is \(.27\); on the onset-locked early score it is \(.12\).
+
+\subsection{The three-way association}
+\label{sec:results-combos-three-way}
+
+The three pairwise associations Methods names are the three rows above. The three-way adds the behaviour \(\times\) trajectory side on the same eighteen people, so that the triangle closes on one sample, and the partial associations. On the laboratory arm the three composites against \(\delta^{(a)}_2\) give \(|\rho|\le.34\) (manipulation, \([-.17,\,.70]\), Holm \(p=.52\)) and against late \(N_{\mathrm{shift}}\) \(|\rho|\le.31\). Partialling the trajectory score out of trust \(\times\) posterior \(\alpha\) leaves it where it was, \(\rho=.80\) given \(\delta^{(a)}_2\) and \(.83\) given late \(N_{\mathrm{shift}}\); \(\delta^{(a)}_2\) itself is \(\rho=-.19\) with trust and \(-.13\) with the onset-locked posterior \(\alpha\) score on those eighteen.
+
+\paragraph{Exploratory sweep.}
+Outside the declared pairs, every behavioural, process, trajectory, and EEG person-level score was crossed on each planned contrast, at the person grain and at the person-centred condition grain: 2,560 tests in 21 families, Holm within family and Benjamini--Hochberg across the map. 105 reach raw \(.05\) where 128 are expected under the null; none survives either correction. A further 336 planned tests (one score per modality, within-person mixed models at the chat, turn, and advertisement grain, and the writing-minus-reading trait) give 10 raw hits where 17 are expected, no Holm or BH cell, and Freedman--Lane family permutation \(p\ge.23\). The one coherent raw cluster is at implicit minus explicit: all 21 process \(\times\) fast-band cells are negative (\(\rho\) from \(-.15\) to \(-.69\)), and the largest, reply latency \(\times\) the Pope engagement index, is \(\rho=-.69\), \([-.89,\,-.28]\), raw \(p=.0014\), Holm \(p=.35\) within its family of 240. The split-half reliability of the scores entering these tests is in \autoref{tab:results-checks}: the Fz \(\theta\) any ad minus no ad and implicit minus explicit \(D_i\) at \(k=37\) have no detectable between-person reliability (point estimates \(.01\) and \(.00\); the eighteen-person upper bound is about \(.64\)), posterior \(\alpha\) any ad minus no ad is \(.78\), and the trajectory \(D_i\) agrees between the two labellings at \(-.07\) to \(.32\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/results.tex : tab:results-summary, caption clause + the four
+%% association rows (replace the existing four "not yet estimated" rows)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% caption: after "...Holm-adjusted \(t\) unless the estimator named in Methods is another)." add:
+% For behaviour \(\times\) EEG the two counts are the two EEG scores Methods defines, condition aggregation then onset-locked.
+
+\multicolumn{6}{@{}l}{\emph{Associations, Spearman}} \\
+Behaviour \(\times\) EEG & 18 & 6 & 0; 1 & condition aggregation: nearest trust \(\times\) posterior \(\alpha\) \(\rho=.24\) \([-.26,\,.64]\), Holm \(p=1.00\); onset-locked: the same pair \(\rho=.80\) \([.48,\,.93]\), Holm \(p=.0004\) & Fig.~\ref{fig:combos-declared} \\
+Behaviour \(\times\) trajectory & 54 & 6 & 0 & manipulation \(\times\) late \(N_{\mathrm{shift}}\) \(\rho=.22\) \([-.05,\,.46]\), Holm \(p=.67\) & Fig.~\ref{fig:combos-declared} \\
+Trajectory \(\times\) EEG & 18 & 2 & 0 & Fz \(\theta\) \(\times\) \(\delta^{(a)}_2\) \(\rho=.47\) \([-.02,\,.78]\), Holm \(p=.095\); reverses sign under the contextual labelling & Fig.~\ref{fig:combos-declared} \\
+Behaviour \(\times\) trajectory \(\times\) EEG & 18 & 3 & 0 & laboratory manipulation \(\times\) \(\delta^{(a)}_2\) \(\rho=.34\) \([-.17,\,.70]\), Holm \(p=.52\); trust \(\times\) posterior \(\alpha\) given \(\delta^{(a)}_2\), partial \(\rho=.80\) & \S\ref{sec:results-combos-three-way} \\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/results.tex : tab:results-checks, six rows to add before \bottomrule
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Trust against all sixteen EEG measures & 18 & 16 & 2 & Spearman, Holm within sixteen, onset-locked: posterior \(\alpha\) \(\rho=.80\), Holm \(p=.001\); \(\alpha\) \(\rho=.69\) \([.27,\,.89]\), Holm \(p=.025\). None under condition aggregation & Fig.~\ref{fig:combos-trust-alpha} \\
+Behaviour \(\times\) EEG, implicit \(-\) explicit and early \(-\) late & 18 & 24 & 0 & six pairs per contrast on each EEG score; smallest raw \(p=.12\) & \S\ref{sec:results-combos-behaviour-eeg} \\
+Contextual labelling, trajectory pairs & 54; 18 & 8 & 0 & Fz \(\theta\) \(\times\) \(\delta^{(a)}_2\) reverses to \(\rho=-.46\) \([-.77,\,.04]\), raw \(p=.055\) & \S\ref{sec:results-combos-traj-eeg} \\
+Exploratory association map & 18; 54 & 2{,}560 & 0 & Spearman, Holm within 21 families and BH across the map: 105 raw hits where 128 are expected; implicit \(-\) explicit reply latency \(\times\) Pope \(\rho=-.69\) \([-.89,\,-.28]\), Holm \(p=.35\) & \S\ref{sec:results-combos} \\
+Composite, mixed-model, turn, event, and trait families & 18; 54 & 336 & 0 & 10 raw hits where 17 are expected; Freedman--Lane family \(p\ge.23\) & \S\ref{sec:results-combos} \\
+Split-half reliability of the person-level \(D_i\) & 18 & -- & -- & Fz \(\theta\) any ad \(-\) no ad and implicit \(-\) explicit at \(k=37\): no detectable reliability (upper bound \(\approx.64\)); posterior \(\alpha\) any ad \(-\) no ad \(.78\); onset-locked posterior \(\alpha\), early against late halves, \(.56\) & \S\ref{sec:results-combos} \\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/discussion.tex : chapter opening paragraph (replace)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This chapter interprets the families that Chapter~\ref{chp:results} estimated. The behavioural battery, personality moderation, and free text are specified and not estimated in this draft; nothing below draws a design implication from them. The four cross-family associations are estimated in \autoref{sec:results-combos} and read in \autoref{sec:disc-combos}. Implications that need a user-cost measure wait with the behavioural rows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/discussion.tex : replace \section{Associations across the three
+%% families} ... down to (not including) \section{Implications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Associations across the three families}
+\label{sec:disc-combos}
+
+Wherever EEG enters, these are eighteen people, and every association below is covariation between two person-level difference scores: not mediation, and not a direction of effect.
+
+\paragraph{The condition-aggregation nulls are weak nulls.}
+The six declared behaviour \(\times\) EEG pairs are null on Dataset~A, and the split-half check says what such a null can carry. The Fz \(\theta\) any ad minus no ad and implicit minus explicit \(D_i\) at \(k=37\) have no detectable between-person reliability; a score that does not reproduce itself across halves of the same window cannot correlate strongly with anything, whatever the true coupling. Posterior \(\alpha\) is the score that could have shown something, and its association with trust under condition aggregation is small. Eighteen people resolve \(|\rho|>.47\) at raw \(.05\) and nothing smaller. This is a statement about the scores, not about power, and it is why the Dataset~A nulls of \autoref{sec:results-combos} are not read as evidence that behaviour and the sustained EEG state are unrelated.
+
+\paragraph{Trust and posterior \(\alpha\) covary at the onset, not in the state.}
+Same eighteen people, same trust score; the only change between \(\rho=.24\) and \(\rho=.80\) is whether the EEG is averaged over the condition or locked to the advertisement. That is the lesson of \autoref{sec:disc-eeg} arriving from the behavioural side: the variance advertisements produce in the EEG is an event, and the behavioural correlate of that variance is found at the event. Neither mean moves, so this is not a group effect that a condition contrast missed; it is between-person coupling with no mean shift. Participants whose posterior \(\alpha\) dropped more in the four seconds after an advertisement than at the matched moment are the participants who trusted the assistant less with advertisements than without. Posterior \(\alpha\) is the marker Methods declares for visual engagement with the display. On that reading, the participants whose visual cortex responded most to the insertion penalised trust most. The dependence can run either way, or through a third variable: a participant who distrusts may look, a participant who looks may distrust, and a saccade to a new object on screen lowers posterior \(\alpha\) on its own. The design cannot separate those.
+
+\paragraph{It is an \(\alpha\) result.}
+Whole-scalp \(\alpha\) survives with posterior \(\alpha\); relative \(\alpha\), Fz \(\theta\), and the three engagement indices do not. The consumer-neuroscience indices that were silent by condition in \autoref{sec:disc-eeg} are silent against trust as well. What tracks the self-report is absolute \(\alpha\) power, weighted to posterior sites, in the classical direction. Frontal-midline control is not part of it: the marker that passed writing versus reading does not move with trust here, and the marker that failed that check is the one that does. The two markers index different things; that they part company here is consistent with it.
+
+\paragraph{One cell in eighteen people is a bounded hypothesis.}
+The interval's lower bound, \(.48\), is the number to carry, not the point estimate. A selected cell at \(n=18\) inflates; the onset-locked posterior \(\alpha\) score reproduces itself across early and late halves at \(.56\), and trust is a single item per condition, so \(.80\) is above what the two reliabilities would let a true correlation show. The family was declared in Methods, but which EEG score fills it was not, and reporting both scores with Holm across the twelve is the accounting that follows. The finding is therefore a hypothesis with a floor: at onset, the posterior \(\alpha\) response to an advertisement and the trust cost of that advertisement move together across people. A study that fixes the onset-locked pair in advance, records more than eighteen people, and asks for trust per advertisement rather than per condition is its test.
+
+\paragraph{The process cluster is one exploratory pattern.}
+At implicit minus explicit, longer and slower chats go with a lower fast-band engagement index in every one of 21 cells; the largest is reply latency against the Pope index. The process variables are correlated with one another and the indices share bands, so this is one pattern, not 21 replications, and it survives no correction in a family of 240. Read as a hypothesis, it says that under an implicit mention the people who slowed down are the people whose \(\beta\)-to-slow-band ratio fell. Nothing in the design licenses more than that.
+
+\paragraph{Trajectories do not join the triangle.}
+Behaviour \(\times\) trajectory is null at \(N=54\), and the one trajectory \(\times\) EEG cell that reaches raw \(.05\) reverses sign when the contextual labelling replaces the bare-utterance one. The \(\delta^{(a)}_2\) score takes four values and puts twelve of eighteen participants at zero: the instrument that failed the advertisement contrasts in \autoref{sec:disc-trajectories} fails again at the person-difference grain, where the two labellings agree at \(.32\) at best. Partialling the trajectory score out of trust \(\times\) posterior \(\alpha\) changes nothing. Whatever links trust to the onset response does not run through the genre sequence as \(f_{\mathrm{genre}}\) reads it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/discussion.tex : Implications, append two sentences to the paragraph
+%% "Advertisement versus none is the wrong EEG question if the variance is an event."
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% after "...should lock to onset, not only to condition aggregation." add:
+The one cross-family association that survives correction says the same from the behavioural side: trust covaries with the onset-locked posterior \(\alpha\) response and not with the condition-aggregated one (\autoref{sec:results-combos-behaviour-eeg}). A design that wants to relate a neural response to trust should lock to onset and ask for trust per advertisement.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% chapters/discussion.tex : Limitations, one sentence after "...no participant
+%% clicked through an advertisement."
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Trust is a single item per condition, so its person-level \(D_i\) carries no internal reliability estimate, and the one surviving association inherits that.

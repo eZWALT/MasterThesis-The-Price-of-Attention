@@ -1,0 +1,166 @@
+{
+  "n_ads": 72,
+  "n_persons": 18,
+  "n_early_ads": 36,
+  "tilt_loadings": {
+    "eeg_fz_theta": 0.235,
+    "eeg_posterior_alpha": 0.289,
+    "eeg_theta": 0.833,
+    "eeg_alpha": 0.415,
+    "eeg_beta": 0.251,
+    "eeg_faa": 0.471,
+    "eeg_delta": 0.98,
+    "eeg_gamma": 0.235,
+    "eeg_rel_delta": 0.928,
+    "eeg_rel_theta": -0.711,
+    "eeg_rel_alpha": -0.737,
+    "eeg_rel_beta": -0.898,
+    "eeg_rel_gamma": -0.557,
+    "eeg_engagement": -0.152
+  },
+  "tilt_var_explained": 0.38256637240596625,
+  "hits_holm": {
+    "events_headline": 0,
+    "events_all_exploratory": 0
+  },
+  "hits_bh_global": 0,
+  "min_p_raw": {
+    "events_headline": 0.005300514312285622,
+    "events_all_exploratory": 0.02095642555591901
+  },
+  "n_tests": {
+    "events_headline": 27,
+    "events_all_exploratory": 108
+  },
+  "permutation_headline": {
+    "observed_max_abs_t": 2.7869628890273024,
+    "p_perm_family": 0.23388305847076463,
+    "null_95pct_max_abs_t": 3.3483210901850913,
+    "n_perm": 2000,
+    "method": "Freedman-Lane, residuals permuted within person"
+  },
+  "permutation_all_exploratory": {
+    "observed_max_abs_t": 3.0933553559089395,
+    "p_perm_family": 0.3553223388305847,
+    "null_95pct_max_abs_t": 3.8976963251388708,
+    "n_perm": 2000,
+    "method": "Freedman-Lane, residuals permuted within person"
+  },
+  "hit_audit": [
+    {
+      "target": "notice",
+      "eeg": "eeg_fz_theta",
+      "n_obs": 72,
+      "n_persons": 18,
+      "fe_ols_t": 2.7869628890273024,
+      "p_perm_cell_within_person": 0.018899055047247638,
+      "n_distinct_null_t": 19999,
+      "loo_t_min": 2.150762670617544,
+      "loo_t_max": 3.6453161846948996
+    }
+  ],
+  "wald_vs_permutation": {
+    "n_cells": 135,
+    "n_raw_wald_lt_05": 2,
+    "n_perm_cell_lt_05": 4,
+    "spearman_wald_perm": 0.8262195531050132
+  },
+  "top": [
+    {
+      "family": "events_headline",
+      "target": "notice",
+      "eeg": "eeg_fz_theta",
+      "n_obs": 72,
+      "beta": 0.6809,
+      "se": 0.2442,
+      "p_raw": 0.0053,
+      "p_perm_cell": 0.0195,
+      "p_holm_family": 0.1431,
+      "p_bh_global": 0.7156
+    },
+    {
+      "family": "events_all_exploratory",
+      "target": "recall_memory",
+      "eeg": "eeg_alpha",
+      "n_obs": 72,
+      "beta": 0.4857,
+      "se": 0.2104,
+      "p_raw": 0.021,
+      "p_perm_cell": 0.0255,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    },
+    {
+      "family": "events_all_exploratory",
+      "target": "next_turn_log_chars",
+      "eeg": "eeg_rel_delta",
+      "n_obs": 36,
+      "beta": -0.3018,
+      "se": 0.155,
+      "p_raw": 0.0516,
+      "p_perm_cell": 0.1379,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    },
+    {
+      "family": "events_all_exploratory",
+      "target": "manipulation",
+      "eeg": "eeg_engagement",
+      "n_obs": 72,
+      "beta": 0.4194,
+      "se": 0.2208,
+      "p_raw": 0.0574,
+      "p_perm_cell": 0.2734,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    },
+    {
+      "family": "events_headline",
+      "target": "recall_memory",
+      "eeg": "eeg_posterior_alpha",
+      "n_obs": 72,
+      "beta": 0.3998,
+      "se": 0.221,
+      "p_raw": 0.0704,
+      "p_perm_cell": 0.0975,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    },
+    {
+      "family": "events_all_exploratory",
+      "target": "manipulation",
+      "eeg": "eeg_faa",
+      "n_obs": 72,
+      "beta": 0.4006,
+      "se": 0.2236,
+      "p_raw": 0.0732,
+      "p_perm_cell": 0.0355,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    },
+    {
+      "family": "events_all_exploratory",
+      "target": "next_turn_log_chars",
+      "eeg": "eeg_rel_beta",
+      "n_obs": 36,
+      "beta": 0.2737,
+      "se": 0.1538,
+      "p_raw": 0.0752,
+      "p_perm_cell": 0.1104,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    },
+    {
+      "family": "events_headline",
+      "target": "recall_trust_shift",
+      "eeg": "eeg_fz_theta",
+      "n_obs": 72,
+      "beta": 0.3385,
+      "se": 0.1904,
+      "p_raw": 0.0754,
+      "p_perm_cell": 0.072,
+      "p_holm_family": 1.0,
+      "p_bh_global": 0.9566
+    }
+  ]
+}

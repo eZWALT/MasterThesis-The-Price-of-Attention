@@ -1,0 +1,25 @@
+block,family,n_tests,min_p_raw,hits_raw,hits_holm_family,hits_bh_global_in_table,p_perm_familywise,source
+map (run_combos),beh_eeg|D,720,0.0014476080524246,33,0,0,,outputs/combos_all_tests.csv
+map (run_combos),beh_eeg|RM,240,0.0026833465457228,11,0,0,,outputs/combos_all_tests.csv
+map (run_combos),beh_traj|D,450,0.0046408488736599,15,0,0,,outputs/combos_all_tests.csv
+map (run_combos),beh_traj|RM,150,0.0096938019991415,15,0,0,,outputs/combos_all_tests.csv
+map (run_combos),threeway|D,360,0.0080649662269633,21,0,0,,outputs/combos_all_tests.csv
+map (run_combos),traj_eeg|D,480,0.006251762730934,10,0,0,,outputs/combos_all_tests.csv
+map (run_combos),traj_eeg|RM,160,0.0645390304517331,0,0,0,,outputs/combos_all_tests.csv
+1 headline PC1,headline_PC1,9,0.0630102910638672,0,0,0,,outputs/headline/headline_tests.csv
+1 headline PC1,planned_primaries,12,0.2573753757323143,0,0,0,,outputs/headline/headline_tests.csv
+1 headline PC1,process_PC1,9,0.0724469106428581,0,0,0,,outputs/headline/headline_tests.csv
+1 headline PC1,sensitivity_lab_only,3,0.236143297296641,0,0,0,,outputs/headline/headline_tests.csv
+1 headline PC1,sensitivity_partial_arm,3,0.0696750250595083,0,0,0,,outputs/headline/headline_tests.csv
+1 headline PC1,sensitivity_wholewindow_eeg,21,0.032693733377739,1,0,0,,outputs/headline/headline_tests.csv
+1 headline PC1,sensitivity_zmean,9,0.052491912852462,0,0,0,,outputs/headline/headline_tests.csv
+3 LMM state / moderation,A_state_association,18,0.0589670203921508,0,0,0,0.6896551724137931,outputs/lmm/lmm_tests.csv
+3 LMM state / moderation,B0_main_within_ads,18,0.1188003652951203,0,0,0,0.736631684157921,outputs/lmm/lmm_tests.csv
+3 LMM state / moderation,B_moderation,36,0.0170544941536379,3,0,0,0.8935532233883059,outputs/lmm/lmm_tests.csv
+4 turn grain,A_shift_x_process,4,0.1606212900877325,0,0,0,,outputs/turns/turn_tests.csv
+4 turn grain,B2_post_ad_by_format,10,0.2860171178310984,0,0,0,,outputs/turns/turn_tests.csv
+4 turn grain,B_post_ad_turn,5,0.2621748722016802,0,0,0,,outputs/turns/turn_tests.csv
+5 event grain (Dataset B),events_all_exploratory,108,0.020956425555919,1,0,0,0.3553223388305847,outputs/events/event_tests.csv
+5 event grain (Dataset B),events_headline,27,0.0053005143122856,1,0,0,0.23388305847076463,outputs/events/event_tests.csv
+7 task-state trait,task_state_x_behaviour,32,0.0034691079455719,3,0,0,,outputs/task_state/task_state_tests.csv
+7 task-state trait,task_state_x_trajectory,12,0.0469952514880147,1,0,0,,outputs/task_state/task_state_tests.csv

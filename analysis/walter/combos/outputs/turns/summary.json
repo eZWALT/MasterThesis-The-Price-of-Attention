@@ -1,0 +1,188 @@
+{
+  "n_user_turns": 1080,
+  "n_persons": 54,
+  "n_chats": 270,
+  "hits_holm": {
+    "A_shift_x_process": 0,
+    "B_post_ad_turn": 0,
+    "B2_post_ad_by_format": 0
+  },
+  "min_p_raw": {
+    "A_shift_x_process": 0.16062129008773252,
+    "B_post_ad_turn": 0.26217487220168023,
+    "B2_post_ad_by_format": 0.2860171178310984
+  },
+  "tests": [
+    {
+      "family": "A_shift_x_process",
+      "outcome": "log_chars",
+      "term": "delta_in",
+      "beta": -0.061,
+      "se": 0.0665,
+      "p_raw": 0.3593,
+      "p_holm_family": 0.8449
+    },
+    {
+      "family": "A_shift_x_process",
+      "outcome": "log_chars",
+      "term": "js_in",
+      "beta": -0.1574,
+      "se": 0.1462,
+      "p_raw": 0.2816,
+      "p_holm_family": 0.8449
+    },
+    {
+      "family": "A_shift_x_process",
+      "outcome": "log_latency",
+      "term": "delta_in",
+      "beta": -0.0123,
+      "se": 0.0493,
+      "p_raw": 0.8035,
+      "p_holm_family": 0.8449
+    },
+    {
+      "family": "A_shift_x_process",
+      "outcome": "log_latency",
+      "term": "js_in",
+      "beta": -0.152,
+      "se": 0.1083,
+      "p_raw": 0.1606,
+      "p_holm_family": 0.6425
+    },
+    {
+      "family": "B_post_ad_turn",
+      "outcome": "js_in",
+      "term": "post_ad",
+      "beta": 0.0151,
+      "se": 0.0214,
+      "p_raw": 0.4803,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "js_in",
+      "term": "post_ad_implicit",
+      "beta": 0.0175,
+      "se": 0.0247,
+      "p_raw": 0.4782,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "js_in",
+      "term": "post_ad_explicit",
+      "beta": 0.0127,
+      "se": 0.0248,
+      "p_raw": 0.6097,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B_post_ad_turn",
+      "outcome": "log_chars",
+      "term": "post_ad",
+      "beta": -0.006,
+      "se": 0.0853,
+      "p_raw": 0.9437,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "log_chars",
+      "term": "post_ad_implicit",
+      "beta": -0.0145,
+      "se": 0.0984,
+      "p_raw": 0.8826,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "log_chars",
+      "term": "post_ad_explicit",
+      "beta": 0.0027,
+      "se": 0.0992,
+      "p_raw": 0.978,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B_post_ad_turn",
+      "outcome": "log_latency",
+      "term": "post_ad",
+      "beta": 0.0698,
+      "se": 0.0623,
+      "p_raw": 0.2622,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "log_latency",
+      "term": "post_ad_implicit",
+      "beta": 0.0766,
+      "se": 0.0718,
+      "p_raw": 0.286,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "log_latency",
+      "term": "post_ad_explicit",
+      "beta": 0.0628,
+      "se": 0.0724,
+      "p_raw": 0.3853,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B_post_ad_turn",
+      "outcome": "logit_purchasable",
+      "term": "post_ad",
+      "beta": -0.1222,
+      "se": 0.1989,
+      "p_raw": 0.5389,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "logit_purchasable",
+      "term": "post_ad_implicit",
+      "beta": -0.0889,
+      "se": 0.229,
+      "p_raw": 0.698,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "logit_purchasable",
+      "term": "post_ad_explicit",
+      "beta": -0.1566,
+      "se": 0.2307,
+      "p_raw": 0.4972,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B_post_ad_turn",
+      "outcome": "delta_in (log-odds)",
+      "term": "post_ad",
+      "beta": 0.309,
+      "se": 0.3219,
+      "p_raw": 0.337,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "delta_in (log-odds)",
+      "term": "post_ad_implicit",
+      "beta": 0.3715,
+      "se": 0.4384,
+      "p_raw": 0.3969,
+      "p_holm_family": 1.0
+    },
+    {
+      "family": "B2_post_ad_by_format",
+      "outcome": "delta_in (log-odds)",
+      "term": "post_ad_explicit",
+      "beta": 0.2452,
+      "se": 0.3418,
+      "p_raw": 0.473,
+      "p_holm_family": 1.0
+    }
+  ]
+}

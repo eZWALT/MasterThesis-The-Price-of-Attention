@@ -1,0 +1,117 @@
+{
+  "n": 18,
+  "trait_descriptives": {
+    "ts_fz_theta": {
+      "count": 18.0,
+      "mean": 0.597,
+      "std": 0.749,
+      "min": -1.06,
+      "25%": 0.133,
+      "50%": 0.728,
+      "75%": 1.013,
+      "max": 2.044
+    },
+    "ts_posterior_alpha": {
+      "count": 18.0,
+      "mean": 0.078,
+      "std": 1.03,
+      "min": -1.503,
+      "25%": -0.649,
+      "50%": -0.285,
+      "75%": 1.115,
+      "max": 1.653
+    }
+  },
+  "hits_holm": {
+    "task_state_x_behaviour": 0,
+    "task_state_x_trajectory": 0
+  },
+  "min_p_raw": {
+    "task_state_x_behaviour": 0.003469107945571975,
+    "task_state_x_trajectory": 0.04699525148801476
+  },
+  "n_tests": {
+    "task_state_x_behaviour": 32,
+    "task_state_x_trajectory": 12
+  },
+  "top": [
+    {
+      "family": "task_state_x_behaviour",
+      "trait": "ts_fz_theta",
+      "target": "notice",
+      "contrast": "early_vs_late",
+      "n": 18,
+      "rho": 0.65,
+      "ci_lo": 0.216,
+      "ci_hi": 0.87,
+      "p_raw": 0.003,
+      "p_holm_family": 0.111,
+      "loo_sign_stable": true
+    },
+    {
+      "family": "task_state_x_behaviour",
+      "trait": "ts_fz_theta",
+      "target": "manipulation",
+      "contrast": "early_vs_late",
+      "n": 18,
+      "rho": 0.6,
+      "ci_lo": 0.143,
+      "ci_hi": 0.846,
+      "p_raw": 0.008,
+      "p_holm_family": 0.262,
+      "loo_sign_stable": true
+    },
+    {
+      "family": "task_state_x_behaviour",
+      "trait": "ts_posterior_alpha",
+      "target": "credibility",
+      "contrast": "any_ad_vs_no_ads",
+      "n": 18,
+      "rho": -0.545,
+      "ci_lo": -0.819,
+      "ci_hi": -0.068,
+      "p_raw": 0.019,
+      "p_holm_family": 0.583,
+      "loo_sign_stable": true
+    },
+    {
+      "family": "task_state_x_trajectory",
+      "trait": "ts_posterior_alpha",
+      "target": "traj_n_shift",
+      "contrast": "inline_vs_block",
+      "n": 18,
+      "rho": 0.474,
+      "ci_lo": -0.019,
+      "ci_hi": 0.781,
+      "p_raw": 0.047,
+      "p_holm_family": 0.564,
+      "loo_sign_stable": true
+    },
+    {
+      "family": "task_state_x_behaviour",
+      "trait": "ts_fz_theta",
+      "target": "trust",
+      "contrast": "any_ad_vs_no_ads",
+      "n": 18,
+      "rho": -0.398,
+      "ci_lo": -0.738,
+      "ci_hi": 0.104,
+      "p_raw": 0.102,
+      "p_holm_family": 1.0,
+      "loo_sign_stable": true
+    },
+    {
+      "family": "task_state_x_behaviour",
+      "trait": "ts_posterior_alpha",
+      "target": "manipulation",
+      "contrast": "level",
+      "n": 18,
+      "rho": 0.388,
+      "ci_lo": -0.114,
+      "ci_hi": 0.733,
+      "p_raw": 0.111,
+      "p_holm_family": 1.0,
+      "loo_sign_stable": true
+    }
+  ]
+}

@@ -1,0 +1,3398 @@
+{
+  "r_bar_pearson_spearman_n18": 0.4682773054452068,
+  "tau_bar_kendall_n18": 0.3382057831841883,
+  "A_D_k37": {
+    "n_cells": 784,
+    "n_people": 18,
+    "pearson": {
+      "n_raw_05": 25,
+      "n_abs_above_bar": 25,
+      "expected_raw_05": 39.2,
+      "max_abs_r": 0.6081213597290166,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.608,
+          "pearson_p": 0.007,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.595,
+          "pearson_p": 0.009,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.588,
+          "pearson_p": 0.01,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_kislov",
+          "pearson_r": -0.574,
+          "pearson_p": 0.013,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_kislov",
+          "pearson_r": -0.558,
+          "pearson_p": 0.016,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "pearson_r": -0.555,
+          "pearson_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.55,
+          "pearson_p": 0.018,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "notice_brands",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": -0.55,
+          "pearson_p": 0.018,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_rel_gamma",
+          "pearson_r": 0.544,
+          "pearson_p": 0.019,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.541,
+          "pearson_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "helpfulness",
+          "eeg": "eeg_engagement",
+          "pearson_r": 0.531,
+          "pearson_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.516,
+          "pearson_p": 0.028,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "pearson_r": -0.514,
+          "pearson_p": 0.029,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": 0.506,
+          "pearson_p": 0.032,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "notice_brands",
+          "eeg": "eeg_theta",
+          "pearson_r": 0.503,
+          "pearson_p": 0.033,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_beta",
+          "pearson_r": 0.499,
+          "pearson_p": 0.035,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_pope",
+          "pearson_r": -0.498,
+          "pearson_p": 0.035,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.498,
+          "pearson_p": 0.035,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": -0.492,
+          "pearson_p": 0.038,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_pope",
+          "pearson_r": -0.491,
+          "pearson_p": 0.038,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "helpfulness",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": -0.489,
+          "pearson_p": 0.039,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": -0.48,
+          "pearson_p": 0.044,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.478,
+          "pearson_p": 0.045,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "duration_sec",
+          "eeg": "eeg_gamma",
+          "pearson_r": -0.477,
+          "pearson_p": 0.045,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": 0.474,
+          "pearson_p": 0.047,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        }
+      ]
+    },
+    "spearman": {
+      "n_raw_05": 35,
+      "n_abs_above_bar": 35,
+      "expected_raw_05": 39.2,
+      "max_abs_r": 0.6924664602683178,
+      "above_bar": [
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.692,
+          "spearman_p": 0.001,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.68,
+          "spearman_p": 0.002,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.678,
+          "spearman_p": 0.002,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_rel_gamma",
+          "spearman_r": 0.676,
+          "spearman_p": 0.002,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.639,
+          "spearman_p": 0.004,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.608,
+          "spearman_p": 0.007,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "spearman_r": -0.603,
+          "spearman_p": 0.008,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.602,
+          "spearman_p": 0.008,
+          "beh_family": "process",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.584,
+          "spearman_p": 0.011,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.574,
+          "spearman_p": 0.013,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": 0.572,
+          "spearman_p": 0.013,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "duration_sec",
+          "eeg": "eeg_gamma",
+          "spearman_r": -0.564,
+          "spearman_p": 0.015,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.564,
+          "spearman_p": 0.015,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.56,
+          "spearman_p": 0.016,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_faa",
+          "spearman_r": 0.554,
+          "spearman_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_theta",
+          "spearman_r": -0.554,
+          "spearman_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "notice_brands",
+          "eeg": "eeg_theta",
+          "spearman_r": 0.553,
+          "spearman_p": 0.017,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_faa",
+          "spearman_r": 0.553,
+          "spearman_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_gamma",
+          "spearman_r": 0.552,
+          "spearman_p": 0.018,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_manipulate",
+          "eeg": "eeg_rel_theta",
+          "spearman_r": 0.551,
+          "spearman_p": 0.018,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_faa",
+          "spearman_r": 0.54,
+          "spearman_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_theta",
+          "spearman_r": -0.537,
+          "spearman_p": 0.022,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.535,
+          "spearman_p": 0.022,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.534,
+          "spearman_p": 0.023,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.515,
+          "spearman_p": 0.029,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "notice_brands",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": -0.506,
+          "spearman_p": 0.032,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.505,
+          "spearman_p": 0.032,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_beta",
+          "spearman_r": 0.501,
+          "spearman_p": 0.034,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_gamma",
+          "spearman_r": -0.494,
+          "spearman_p": 0.037,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "helpfulness",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.491,
+          "spearman_p": 0.038,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.484,
+          "spearman_p": 0.042,
+          "beh_family": "process",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_theta",
+          "spearman_r": -0.482,
+          "spearman_p": 0.043,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_gamma",
+          "spearman_r": 0.48,
+          "spearman_p": 0.044,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.478,
+          "spearman_p": 0.045,
+          "beh_family": "recall",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_beta",
+          "spearman_r": 0.475,
+          "spearman_p": 0.046,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "spearman"
+        }
+      ]
+    },
+    "kendall": {
+      "n_raw_05": 32,
+      "n_abs_above_bar": 34,
+      "expected_raw_05": 39.2,
+      "max_abs_r": 0.5032679738562092,
+      "above_bar": [
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.503,
+          "kendall_p": 0.003,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_pope",
+          "kendall_r": -0.503,
+          "kendall_p": 0.003,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.49,
+          "kendall_p": 0.004,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_rel_gamma",
+          "kendall_r": 0.49,
+          "kendall_p": 0.004,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.451,
+          "kendall_p": 0.009,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.451,
+          "kendall_p": 0.009,
+          "beh_family": "process",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_pope",
+          "kendall_r": -0.438,
+          "kendall_p": 0.011,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.433,
+          "kendall_p": 0.012,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.42,
+          "kendall_p": 0.015,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.417,
+          "kendall_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_gamma",
+          "kendall_r": -0.412,
+          "kendall_p": 0.017,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.407,
+          "kendall_p": 0.019,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_theta",
+          "kendall_r": -0.404,
+          "kendall_p": 0.02,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_manipulate",
+          "eeg": "eeg_rel_theta",
+          "kendall_r": 0.416,
+          "kendall_p": 0.021,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "notice_brands",
+          "eeg": "eeg_theta",
+          "kendall_r": 0.401,
+          "kendall_p": 0.021,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_beta",
+          "kendall_r": -0.399,
+          "kendall_p": 0.021,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_pope",
+          "kendall_r": -0.399,
+          "kendall_p": 0.021,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.396,
+          "kendall_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "kendall_r": -0.393,
+          "kendall_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.393,
+          "kendall_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.391,
+          "kendall_p": 0.025,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.386,
+          "kendall_p": 0.026,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.386,
+          "kendall_p": 0.026,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "duration_sec",
+          "eeg": "eeg_gamma",
+          "kendall_r": -0.386,
+          "kendall_p": 0.026,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_beta",
+          "kendall_r": 0.391,
+          "kendall_p": 0.031,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.373,
+          "kendall_p": 0.032,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.367,
+          "kendall_p": 0.034,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "helpfulness",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.354,
+          "kendall_p": 0.041,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.346,
+          "kendall_p": 0.048,
+          "beh_family": "process",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.343,
+          "kendall_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "relevance",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.341,
+          "kendall_p": 0.049,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.341,
+          "kendall_p": 0.049,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.35,
+          "kendall_p": 0.05,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.341,
+          "kendall_p": 0.058,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        }
+      ]
+    }
+  },
+  "B_D_onset": {
+    "n_cells": 816,
+    "n_people": 18,
+    "pearson": {
+      "n_raw_05": 43,
+      "n_abs_above_bar": 43,
+      "expected_raw_05": 40.8,
+      "max_abs_r": 0.7843813626985693,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.784,
+          "pearson_p": 0.0,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.712,
+          "pearson_p": 0.001,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.636,
+          "pearson_p": 0.005,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": 0.631,
+          "pearson_p": 0.005,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_gamma",
+          "pearson_r": -0.627,
+          "pearson_p": 0.005,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "pearson_r": -0.612,
+          "pearson_p": 0.007,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_beta",
+          "pearson_r": 0.593,
+          "pearson_p": 0.01,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "convincingness",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.587,
+          "pearson_p": 0.01,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "convincingness",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": -0.572,
+          "pearson_p": 0.013,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": 0.571,
+          "pearson_p": 0.013,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_gamma",
+          "pearson_r": -0.565,
+          "pearson_p": 0.015,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.555,
+          "pearson_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "recall_memory",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.555,
+          "pearson_p": 0.017,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.548,
+          "pearson_p": 0.018,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.546,
+          "pearson_p": 0.019,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_engagement",
+          "pearson_r": 0.546,
+          "pearson_p": 0.019,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_delta",
+          "pearson_r": 0.536,
+          "pearson_p": 0.022,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "behaviour_manipulate",
+          "eeg": "eeg_fz_theta",
+          "pearson_r": 0.529,
+          "pearson_p": 0.024,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.521,
+          "pearson_p": 0.027,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_gamma",
+          "pearson_r": -0.517,
+          "pearson_p": 0.028,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.516,
+          "pearson_p": 0.028,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.516,
+          "pearson_p": 0.028,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_beta",
+          "pearson_r": 0.512,
+          "pearson_p": 0.03,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": -0.512,
+          "pearson_p": 0.03,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "relevance",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.51,
+          "pearson_p": 0.031,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_pope",
+          "pearson_r": -0.509,
+          "pearson_p": 0.031,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.504,
+          "pearson_p": 0.033,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_pushing",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.503,
+          "pearson_p": 0.033,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "recall_memory",
+          "eeg": "eeg_beta",
+          "pearson_r": 0.5,
+          "pearson_p": 0.035,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_theta",
+          "pearson_r": 0.499,
+          "pearson_p": 0.035,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_kislov",
+          "pearson_r": 0.496,
+          "pearson_p": 0.036,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.496,
+          "pearson_p": 0.036,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_fz_theta",
+          "pearson_r": 0.493,
+          "pearson_p": 0.038,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_fz_theta",
+          "pearson_r": 0.49,
+          "pearson_p": 0.039,
+          "beh_family": "recall",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.487,
+          "pearson_p": 0.04,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_rel_gamma",
+          "pearson_r": 0.476,
+          "pearson_p": 0.046,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.476,
+          "pearson_p": 0.046,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_memory",
+          "eeg": "eeg_kislov",
+          "pearson_r": -0.475,
+          "pearson_p": 0.047,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "pearson_r": 0.472,
+          "pearson_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "pearson_r": 0.472,
+          "pearson_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_brands",
+          "eeg": "eeg_fz_theta",
+          "pearson_r": 0.47,
+          "pearson_p": 0.049,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_gamma",
+          "pearson_r": -0.469,
+          "pearson_p": 0.05,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_rel_gamma",
+          "pearson_r": -0.468,
+          "pearson_p": 0.05,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "pearson"
+        }
+      ]
+    },
+    "spearman": {
+      "n_raw_05": 45,
+      "n_abs_above_bar": 45,
+      "expected_raw_05": 40.8,
+      "max_abs_r": 0.8026981794140211,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_posterior_alpha",
+          "spearman_r": 0.803,
+          "spearman_p": 0.0,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": 0.709,
+          "spearman_p": 0.001,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.687,
+          "spearman_p": 0.002,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_gamma",
+          "spearman_r": -0.684,
+          "spearman_p": 0.002,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_gamma",
+          "spearman_r": -0.651,
+          "spearman_p": 0.003,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": -0.649,
+          "spearman_p": 0.004,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_memory",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.592,
+          "spearman_p": 0.01,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": 0.571,
+          "spearman_p": 0.013,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.569,
+          "spearman_p": 0.014,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_beta",
+          "spearman_r": -0.569,
+          "spearman_p": 0.014,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.566,
+          "spearman_p": 0.014,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.562,
+          "spearman_p": 0.015,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_gamma",
+          "spearman_r": -0.556,
+          "spearman_p": 0.017,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.554,
+          "spearman_p": 0.017,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_brands",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.551,
+          "spearman_p": 0.018,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice",
+          "eeg": "eeg_gamma",
+          "spearman_r": 0.539,
+          "spearman_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_posterior_alpha",
+          "spearman_r": 0.538,
+          "spearman_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_gamma",
+          "spearman_r": -0.534,
+          "spearman_p": 0.023,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "convincingness",
+          "eeg": "eeg_rel_theta",
+          "spearman_r": -0.529,
+          "spearman_p": 0.024,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.529,
+          "spearman_p": 0.024,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_rel_gamma",
+          "spearman_r": 0.527,
+          "spearman_p": 0.024,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_rel_gamma",
+          "spearman_r": -0.523,
+          "spearman_p": 0.026,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "behaviour_manipulate",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.523,
+          "spearman_p": 0.026,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.511,
+          "spearman_p": 0.03,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "spearman_r": -0.509,
+          "spearman_p": 0.031,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_beta",
+          "spearman_r": -0.507,
+          "spearman_p": 0.032,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.505,
+          "spearman_p": 0.033,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": 0.501,
+          "spearman_p": 0.034,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_delta",
+          "spearman_r": 0.498,
+          "spearman_p": 0.035,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_pushing",
+          "eeg": "eeg_theta",
+          "spearman_r": 0.496,
+          "spearman_p": 0.036,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "spearman_r": 0.495,
+          "spearman_p": 0.037,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_pushing",
+          "eeg": "eeg_posterior_alpha",
+          "spearman_r": 0.495,
+          "spearman_p": 0.037,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.494,
+          "spearman_p": 0.037,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.493,
+          "spearman_p": 0.038,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_theta",
+          "spearman_r": 0.486,
+          "spearman_p": 0.041,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_brands",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.483,
+          "spearman_p": 0.042,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_theta",
+          "spearman_r": 0.479,
+          "spearman_p": 0.044,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_memory",
+          "eeg": "eeg_pope",
+          "spearman_r": -0.477,
+          "spearman_p": 0.045,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "helpfulness",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.476,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.476,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.475,
+          "spearman_p": 0.046,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_kislov",
+          "spearman_r": 0.475,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "trust",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.475,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_theta",
+          "spearman_r": 0.474,
+          "spearman_p": 0.047,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.471,
+          "spearman_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        }
+      ]
+    },
+    "kendall": {
+      "n_raw_05": 43,
+      "n_abs_above_bar": 46,
+      "expected_raw_05": 40.8,
+      "max_abs_r": 0.6467960388129379,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_posterior_alpha",
+          "kendall_r": 0.647,
+          "kendall_p": 0.0,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.563,
+          "kendall_p": 0.001,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.527,
+          "kendall_p": 0.003,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_rel_gamma",
+          "kendall_r": -0.503,
+          "kendall_p": 0.003,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_gamma",
+          "kendall_r": -0.477,
+          "kendall_p": 0.005,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": -0.472,
+          "kendall_p": 0.006,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_memory",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.44,
+          "kendall_p": 0.014,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_brands",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.42,
+          "kendall_p": 0.016,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.42,
+          "kendall_p": 0.016,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_pope",
+          "kendall_r": -0.412,
+          "kendall_p": 0.017,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_gamma",
+          "kendall_r": -0.412,
+          "kendall_p": 0.017,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.409,
+          "kendall_p": 0.019,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "behaviour_manipulate",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.41,
+          "kendall_p": 0.02,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.404,
+          "kendall_p": 0.02,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.399,
+          "kendall_p": 0.021,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_gamma",
+          "kendall_r": -0.399,
+          "kendall_p": 0.021,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "duration_sec",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.399,
+          "kendall_p": 0.021,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_posterior_alpha",
+          "kendall_r": 0.391,
+          "kendall_p": 0.025,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "kendall_r": -0.388,
+          "kendall_p": 0.025,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_beta",
+          "kendall_r": -0.386,
+          "kendall_p": 0.026,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_pope",
+          "kendall_r": -0.386,
+          "kendall_p": 0.026,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_theta",
+          "kendall_r": 0.397,
+          "kendall_p": 0.027,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.391,
+          "kendall_p": 0.028,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_pushing",
+          "eeg": "eeg_posterior_alpha",
+          "kendall_r": 0.388,
+          "kendall_p": 0.029,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "relevance",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.378,
+          "kendall_p": 0.03,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_memory",
+          "eeg": "eeg_pope",
+          "kendall_r": -0.385,
+          "kendall_p": 0.032,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "trust",
+          "eeg": "eeg_faa",
+          "kendall_r": -0.383,
+          "kendall_p": 0.033,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_rel_gamma",
+          "kendall_r": 0.383,
+          "kendall_p": 0.033,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.37,
+          "kendall_p": 0.034,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "behaviour_pushing",
+          "eeg": "eeg_theta",
+          "kendall_r": 0.374,
+          "kendall_p": 0.035,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice_brands",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.367,
+          "kendall_p": 0.036,
+          "beh_family": "item",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "behaviour_pushing",
+          "eeg": "eeg_rel_gamma",
+          "kendall_r": -0.367,
+          "kendall_p": 0.036,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "notice_brands",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.362,
+          "kendall_p": 0.037,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_delta",
+          "kendall_r": 0.362,
+          "kendall_p": 0.037,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "user_msg_len_median",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.359,
+          "kendall_p": 0.039,
+          "beh_family": "process",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "reply_latency_ms_median",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": -0.359,
+          "kendall_p": 0.039,
+          "beh_family": "process",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice_brands",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.369,
+          "kendall_p": 0.04,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.356,
+          "kendall_p": 0.04,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_pope",
+          "kendall_r": 0.356,
+          "kendall_p": 0.04,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.353,
+          "kendall_p": 0.044,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "recall_memory",
+          "eeg": "eeg_rel_theta",
+          "kendall_r": 0.351,
+          "kendall_p": 0.044,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.351,
+          "kendall_p": 0.044,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "trust",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.355,
+          "kendall_p": 0.049,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "recall_memory",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.35,
+          "kendall_p": 0.05,
+          "beh_family": "recall",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "notice_sponsored",
+          "eeg": "eeg_kislov",
+          "kendall_r": 0.342,
+          "kendall_p": 0.052,
+          "beh_family": "item",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "recall_trust_shift",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.349,
+          "kendall_p": 0.053,
+          "beh_family": "recall",
+          "primary_eeg": true,
+          "engine": "kendall"
+        }
+      ]
+    }
+  },
+  "A_survey_only": {
+    "n_cells": 384,
+    "n_people": 18,
+    "pearson": {
+      "n_raw_05": 13,
+      "n_abs_above_bar": 13,
+      "expected_raw_05": 19.2,
+      "max_abs_r": 0.6081213597290166,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.608,
+          "pearson_p": 0.007,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.595,
+          "pearson_p": 0.009,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.588,
+          "pearson_p": 0.01,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "pearson_r": -0.555,
+          "pearson_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.55,
+          "pearson_p": 0.018,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.541,
+          "pearson_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "helpfulness",
+          "eeg": "eeg_engagement",
+          "pearson_r": 0.531,
+          "pearson_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_faa",
+          "pearson_r": 0.516,
+          "pearson_p": 0.028,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "pearson_r": -0.514,
+          "pearson_p": 0.029,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.498,
+          "pearson_p": 0.035,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": -0.492,
+          "pearson_p": 0.038,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "helpfulness",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": -0.489,
+          "pearson_p": 0.039,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.478,
+          "pearson_p": 0.045,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        }
+      ]
+    },
+    "spearman": {
+      "n_raw_05": 11,
+      "n_abs_above_bar": 11,
+      "expected_raw_05": 19.2,
+      "max_abs_r": 0.6029944014721925,
+      "above_bar": [
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "spearman_r": -0.603,
+          "spearman_p": 0.008,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "spearman_r": -0.584,
+          "spearman_p": 0.011,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.574,
+          "spearman_p": 0.013,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.56,
+          "spearman_p": 0.016,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_faa",
+          "spearman_r": 0.554,
+          "spearman_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_theta",
+          "spearman_r": -0.554,
+          "spearman_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_faa",
+          "spearman_r": 0.553,
+          "spearman_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_faa",
+          "spearman_r": 0.54,
+          "spearman_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.535,
+          "spearman_p": 0.022,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.505,
+          "spearman_p": 0.032,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "helpfulness",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.491,
+          "spearman_p": 0.038,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        }
+      ]
+    },
+    "kendall": {
+      "n_raw_05": 13,
+      "n_abs_above_bar": 13,
+      "expected_raw_05": 19.2,
+      "max_abs_r": 0.4327892114505486,
+      "above_bar": [
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "kendall_r": -0.433,
+          "kendall_p": 0.012,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.417,
+          "kendall_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.407,
+          "kendall_p": 0.019,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_theta",
+          "kendall_r": -0.404,
+          "kendall_p": 0.02,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.396,
+          "kendall_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "kendall_r": -0.393,
+          "kendall_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_faa",
+          "kendall_r": 0.393,
+          "kendall_p": 0.023,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "relevance",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.391,
+          "kendall_p": 0.025,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.367,
+          "kendall_p": 0.034,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "helpfulness",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.354,
+          "kendall_p": 0.041,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "helpfulness",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.343,
+          "kendall_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_no_ads",
+          "beh": "convincingness",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.341,
+          "kendall_p": 0.049,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "relevance",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.341,
+          "kendall_p": 0.049,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        }
+      ]
+    }
+  },
+  "A_primary_eeg_survey": {
+    "n_cells": 48,
+    "n_people": 18,
+    "pearson": {
+      "n_raw_05": 0,
+      "n_abs_above_bar": 0,
+      "expected_raw_05": 2.4,
+      "max_abs_r": 0.41564019512917466,
+      "above_bar": []
+    },
+    "spearman": {
+      "n_raw_05": 0,
+      "n_abs_above_bar": 0,
+      "expected_raw_05": 2.4,
+      "max_abs_r": 0.4522458011041444,
+      "above_bar": []
+    },
+    "kendall": {
+      "n_raw_05": 0,
+      "n_abs_above_bar": 0,
+      "expected_raw_05": 2.4,
+      "max_abs_r": 0.32787061473526413,
+      "above_bar": []
+    }
+  },
+  "B_survey_only": {
+    "n_cells": 384,
+    "n_people": 18,
+    "pearson": {
+      "n_raw_05": 23,
+      "n_abs_above_bar": 23,
+      "expected_raw_05": 19.2,
+      "max_abs_r": 0.7843813626985693,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.784,
+          "pearson_p": 0.0,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.712,
+          "pearson_p": 0.001,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.636,
+          "pearson_p": 0.005,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "pearson_r": -0.612,
+          "pearson_p": 0.007,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_beta",
+          "pearson_r": 0.593,
+          "pearson_p": 0.01,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "convincingness",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.587,
+          "pearson_p": 0.01,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "convincingness",
+          "eeg": "eeg_rel_theta",
+          "pearson_r": -0.572,
+          "pearson_p": 0.013,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "convincingness",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.555,
+          "pearson_p": 0.017,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.548,
+          "pearson_p": 0.018,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.546,
+          "pearson_p": 0.019,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_delta",
+          "pearson_r": 0.536,
+          "pearson_p": 0.022,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_alpha",
+          "pearson_r": 0.521,
+          "pearson_p": 0.027,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.516,
+          "pearson_p": 0.028,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.516,
+          "pearson_p": 0.028,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_alpha",
+          "pearson_r": -0.512,
+          "pearson_p": 0.03,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "relevance",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.51,
+          "pearson_p": 0.031,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_theta",
+          "pearson_r": 0.499,
+          "pearson_p": 0.035,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_kislov",
+          "pearson_r": 0.496,
+          "pearson_p": 0.036,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_posterior_alpha",
+          "pearson_r": 0.496,
+          "pearson_p": 0.036,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "pearson_r": 0.487,
+          "pearson_p": 0.04,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "pearson_r": 0.472,
+          "pearson_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_engagement",
+          "pearson_r": 0.472,
+          "pearson_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_gamma",
+          "pearson_r": -0.469,
+          "pearson_p": 0.05,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "pearson"
+        }
+      ]
+    },
+    "spearman": {
+      "n_raw_05": 19,
+      "n_abs_above_bar": 19,
+      "expected_raw_05": 19.2,
+      "max_abs_r": 0.8026981794140211,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_posterior_alpha",
+          "spearman_r": 0.803,
+          "spearman_p": 0.0,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.687,
+          "spearman_p": 0.002,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": -0.649,
+          "spearman_p": 0.004,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": 0.571,
+          "spearman_p": 0.013,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_kislov",
+          "spearman_r": -0.566,
+          "spearman_p": 0.014,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice",
+          "eeg": "eeg_gamma",
+          "spearman_r": 0.539,
+          "spearman_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_posterior_alpha",
+          "spearman_r": 0.538,
+          "spearman_p": 0.021,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "convincingness",
+          "eeg": "eeg_rel_theta",
+          "spearman_r": -0.529,
+          "spearman_p": 0.024,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "spearman_r": -0.509,
+          "spearman_p": 0.031,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_rel_alpha",
+          "spearman_r": 0.501,
+          "spearman_p": 0.034,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_delta",
+          "spearman_r": 0.498,
+          "spearman_p": 0.035,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "spearman_r": 0.495,
+          "spearman_p": 0.037,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_alpha",
+          "spearman_r": 0.493,
+          "spearman_p": 0.038,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "helpfulness",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.476,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_fz_theta",
+          "spearman_r": 0.476,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_kislov",
+          "spearman_r": 0.475,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "trust",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.475,
+          "spearman_p": 0.046,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_theta",
+          "spearman_r": 0.474,
+          "spearman_p": 0.047,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_delta",
+          "spearman_r": 0.471,
+          "spearman_p": 0.048,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "spearman"
+        }
+      ]
+    },
+    "kendall": {
+      "n_raw_05": 17,
+      "n_abs_above_bar": 17,
+      "expected_raw_05": 19.2,
+      "max_abs_r": 0.6467960388129379,
+      "above_bar": [
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_posterior_alpha",
+          "kendall_r": 0.647,
+          "kendall_p": 0.0,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.527,
+          "kendall_p": 0.003,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "neutrality",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": -0.472,
+          "kendall_p": 0.006,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "notice",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.42,
+          "kendall_p": 0.016,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.409,
+          "kendall_p": 0.019,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_kislov",
+          "kendall_r": -0.404,
+          "kendall_p": 0.02,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "neutrality",
+          "eeg": "eeg_posterior_alpha",
+          "kendall_r": 0.391,
+          "kendall_p": 0.025,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_beta",
+          "kendall_r": -0.388,
+          "kendall_p": 0.025,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "relevance",
+          "eeg": "eeg_gamma",
+          "kendall_r": 0.378,
+          "kendall_p": 0.03,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "trust",
+          "eeg": "eeg_faa",
+          "kendall_r": -0.383,
+          "kendall_p": 0.033,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_alpha",
+          "kendall_r": 0.37,
+          "kendall_p": 0.034,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "credibility",
+          "eeg": "eeg_rel_delta",
+          "kendall_r": 0.362,
+          "kendall_p": 0.037,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "credibility",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.356,
+          "kendall_p": 0.04,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "helpfulness",
+          "eeg": "eeg_pope",
+          "kendall_r": 0.356,
+          "kendall_p": 0.04,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "any_ad_vs_matched",
+          "beh": "trust",
+          "eeg": "eeg_rel_alpha",
+          "kendall_r": 0.353,
+          "kendall_p": 0.044,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "inline_vs_block",
+          "beh": "notice",
+          "eeg": "eeg_fz_theta",
+          "kendall_r": 0.351,
+          "kendall_p": 0.044,
+          "beh_family": "survey",
+          "primary_eeg": true,
+          "engine": "kendall"
+        },
+        {
+          "contrast": "early_vs_late",
+          "beh": "trust",
+          "eeg": "eeg_delta",
+          "kendall_r": 0.355,
+          "kendall_p": 0.049,
+          "beh_family": "survey",
+          "primary_eeg": false,
+          "engine": "kendall"
+        }
+      ]
+    }
+  },
+  "note": "Sweep, not confirmatory. Dataset A: 0 Holm in 784 / 384 survey. Dataset B survey family (384): one Holm cell \u2014 trust any-ad D \u00d7 (posterior alpha_ad \u2212 posterior alpha_matched), Spearman \u03c1=.80, Holm=.023; Pearson r=.78, Holm=.045; Kendall \u03c4=.65, Holm=.085. LOO Spearman .77\u2013.86. Same pair on Dataset A is \u03c1=.24. Do not put in Results.",
+  "B_survey_holm_cell": {
+    "contrast": "any_ad_vs_matched",
+    "beh": "trust",
+    "eeg": "eeg_posterior_alpha",
+    "spearman_r": 0.803,
+    "spearman_p_raw": 6.09e-05,
+    "spearman_holm_in_384": 0.023,
+    "pearson_r": 0.784,
+    "pearson_holm_in_384": 0.045,
+    "kendall_r": 0.647,
+    "kendall_holm_in_384": 0.085,
+    "loo_spearman": [
+      0.766,
+      0.86
+    ]
+  }
+}
