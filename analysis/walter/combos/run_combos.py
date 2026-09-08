@@ -1,4 +1,7 @@
-"""Goal 5 combos. Association, not mediation.
+"""Goal 5 combos — exploratory map (2,560 tests). Not Results.
+
+Thesis entry is ``run_thesis_families.py``. Reduced blocks 0–7 are
+Discussion-only. Association, not mediation.
 
 Four families, the four rows of the goal-list table:
 

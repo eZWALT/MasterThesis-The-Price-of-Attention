@@ -5,6 +5,9 @@ Context: `.agents/context/data-analysis/policy/` (newest dated note).
 Live research line:
 `.agents/context/data-analysis/policy/2026-09-06-residual-scorer-and-next-ms-qsa.md`.
 
+Goal 1 composites froze 7 September. The human-\(U\) anchor still
+says “provisional”; rebuild only if Walter asks.
+
 **Stop line (6 Sep night):** the human-\(U\) residual ridge is locked
 (`outputs/experiments/full/BEST.md`). Do not restack features on the
 216 ads. Next estimands are \(m(s)\) and \(q(s,a)\) (OPE on

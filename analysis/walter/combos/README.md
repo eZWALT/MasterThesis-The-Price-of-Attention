@@ -1,11 +1,17 @@
 # Combos (Goal 5)
 
+Thesis entry (declared Methods families):
+
 ```bash
-python analysis/walter/combos/run_combos.py
+python analysis/walter/combos/run_thesis_families.py
 ```
 
 Reads only `analysis/walter/behavioural/outputs/gold/combo_threeway*.csv`.
 Nothing is re-joined here.
+
+`run_combos.py` is the 2,560-test **exploratory map**. Do not quote it
+in Results. Reduced blocks 0–7 (`07_combos_reduced.ipynb`) are
+Discussion-only.
 
 | Notebook | Family | \(n\) |
 |---|---|---|
@@ -75,12 +81,12 @@ surviving cell across all sixteen EEG measures, format / timing pairs,
 contextual labelling and whole-window EEG sensitivities, and a timing
 split-half reliability of \(D^B\). Result: Dataset A 0/6; Dataset B
 trust × posterior \(\alpha\) \(\rho=.80\) \([.48,.93]\), Holm .0004;
-everything else null. `\delta^{(a)}_2` is rebuilt from
+everything else null. In the thesis as Results 7.5 / Discussion 8.5 since
+8 Sep (`d206df3`). `\delta^{(a)}_2` is rebuilt from
 `analysis/trajectories/outputs/conversations.csv` (\(u_3\ne u_2\)) and
 reproduces `tab:traj-crossing` (0.824 / 0.778).
 
-**Alignment warning.** `combokit.spearman_ci` pairs by *position*. Pass
-two Series in the same row order or align on `experiment_id` first
-(`run_thesis_families.cell` does). A misaligned pair once produced a
-spurious \(\rho=.71\) here.
+**Alignment.** `combokit.spearman_ci` aligns pandas Series on their
+index (`experiment_id`). Numpy arrays still pair by position — align
+first. A misaligned pair once produced a spurious \(\rho=.71\) here.
 Note: `.agents/context/writing/2026-09-07-combos-ch7-ch8.md`.

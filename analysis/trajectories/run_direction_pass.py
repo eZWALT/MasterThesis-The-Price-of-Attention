@@ -1,6 +1,7 @@
 """Full direction pass: heatmaps, EDA, then stages 2-4.
 
-Stage 5 (EEG x behavioural) is blocked and is not run.
+Stage 5 (combos) is a separate tree: ``analysis/walter/combos/``.
+This script does not run it.
 
     python analysis/trajectories/run_direction_pass.py
 """

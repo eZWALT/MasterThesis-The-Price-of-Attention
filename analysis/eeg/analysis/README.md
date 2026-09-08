@@ -130,5 +130,6 @@ The runner operationalizes the literature decisions documented in
 This is a publication-oriented initial analysis, not a final manuscript result.
 The cohort has 18 participants. Lead with confidence intervals,
 participant-level plots, and sensitivity analyses. Never interpret
-non-significance as proof of no effect. Behavioral covariates should be joined
-only after the behavioral data contract and subject mapping are frozen.
+non-significance as proof of no effect. Behavioural Gold and the
+`experiment_id` map froze 7 September; joins live in
+`analysis/walter/behavioural/outputs/gold/combo_threeway*.csv`.
