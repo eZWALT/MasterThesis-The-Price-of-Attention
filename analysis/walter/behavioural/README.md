@@ -33,6 +33,13 @@ Notebooks:
   in the EEG-suite style (profiles, confirmatory forests, localisation,
   Likert stacks, estimator concordance) and `.tex` tables + figure
   environments for Results 7.2.
+- `stats/run_omnibus_pairwise.py` → `outputs/confirmatory/omnibus_friedman.csv`,
+  `omnibus_pairwise.csv`, `cronbach_alpha.csv`: Katerina's design on Gold
+  (\(N=54\), correct roster) — Friedman over five conditions + ten pairs,
+  paired \(t\) and Wilcoxon, Holm-10 and BH-10 within outcome, eight
+  composites; plus Cronbach α (items reversed once) with arm splits.
+  Post hoc; thesis Appendix F (`tab:beh-friedman`, `tab:beh-pairwise`,
+  `tab:beh-alpha`).
 - `stats/run_assumptions.py` → `outputs/assumptions/`: Shapiro / skew /
   kurtosis / QQ on every planned \(D_i\); paired \(t\) vs Wilcoxon vs sign
   vs bootstrap CI on the same cells; Katerina's 10-pair design on Gold with

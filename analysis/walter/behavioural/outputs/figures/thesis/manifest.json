@@ -9,7 +9,9 @@
   "tables": [
     "tab_beh_planned",
     "tab_beh_localisation",
-    "tab_beh_descriptives"
+    "tab_beh_descriptives",
+    "tab_beh_omnibus",
+    "tab_beh_alpha"
   ],
   "sources": [
     "gold/condition_features.csv",

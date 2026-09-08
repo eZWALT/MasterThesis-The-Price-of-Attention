@@ -1,0 +1,29 @@
+{
+  "friedman_raw_lt_05": [
+    "trust",
+    "manipulation",
+    "notice",
+    "convincingness",
+    "relevance",
+    "neutrality"
+  ],
+  "n_pairwise_tests": 80,
+  "pairwise_t_holm10_hits": 13,
+  "pairwise_wilcoxon_holm10_hits": 14,
+  "pairwise_t_bh10_hits": 13,
+  "verdicts": {
+    "neither": 65,
+    "both": 12,
+    "Wilcoxon only": 2,
+    "t only": 1
+  },
+  "alpha_all": {
+    "credibility": 0.784,
+    "helpfulness": 0.904,
+    "convincingness": 0.735,
+    "relevance": 0.874,
+    "neutrality": 0.633,
+    "manipulation": 0.857,
+    "notice": 0.613
+  }
+}

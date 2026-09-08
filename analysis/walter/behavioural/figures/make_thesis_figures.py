@@ -44,7 +44,7 @@ SECONDARY = ["helpfulness", "convincingness", "relevance", "neutrality"]
 RECALL = ["recall_memory", "recall_trust_shift"]
 NAME = {"trust": "Trust", "credibility": "Credibility", "manipulation": "Perceived manipulation", "notice": "Notice",
         "helpfulness": "Helpfulness", "convincingness": "Convincingness", "relevance": "Relevance", "neutrality": "Neutrality",
-        "recall_memory": "Cued memory", "recall_trust_shift": "Trust shift on re-exposure"}
+        "recall_memory": "Cued memory", "recall_trust_shift": "Trust after re-exposure"}
 ITEMS = [("trust", "Trust"), ("llm_reliable", "Reliable information"), ("llm_false", "False information (R)"),
          ("llm_made_up", "Made-up content (R)"), ("behaviour_pushing", "Pushing / marketing"), ("behaviour_manipulate", "Steering, not assisting"),
          ("notice_brands", "Brand or product mention"), ("notice_sponsored", "Sponsored button")]
@@ -203,7 +203,7 @@ def estimator_concordance(planned: pd.DataFrame, lmm: pd.DataFrame) -> None:
     fig, ax = plt.subplots(figsize=(7.5, 6))
     ax.axvline(-np.log10(0.05), color=CLAY, lw=1, ls="--")
     ax.text(-np.log10(0.05) + 0.03, y[0] + 0.6, "p = .05", color=CLAY, fontsize=8)
-    for col, lab, mk, colr in (("p_holm", "Paired t, Holm (primary)", "o", NAVY), ("p_holm_lmm", "Random-intercept LMM, Holm (declared)", "s", TEAL),
+    for col, lab, mk, colr in (("p_holm", "Paired t, Holm (primary)", "o", NAVY), ("p_holm_lmm", "Random-intercept LMM, Holm (adjusted check)", "s", TEAL),
                                ("p_wilcoxon", "Wilcoxon, raw (sensitivity)", "^", SLATE)):
         ax.scatter(-np.log10(m[col].clip(lower=1e-6)), y, marker=mk, s=42, color=colr, label=lab, zorder=3, alpha=0.9)
     ax.set_yticks(y, [f"{NAME[o]} · {CONTRAST[c]}" for o, c in zip(m.outcome, m.contrast)], fontsize=8)
@@ -242,7 +242,7 @@ def table_localisation(posthoc: pd.DataFrame) -> str:
     lines = [r"\begin{table}[!htb]", r"\centering", r"\small",
              r"\caption{Post hoc localisation: each advertisement condition against \(a^{\emptyset}\) (\(N=54\)). Paired \(t\) on the ordinary difference, Holm across the four comparisons within outcome. Added after the planned contrasts were read; it says which condition carries a marginal and is not confirmatory.}",
              r"\label{tab:beh-localisation}", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}ll r c r r r@{}}", r"\toprule",
-             r"Outcome & Condition − no ads & \(\overline{D}\) & 95\% CI & \(d_z\) & Holm \(p\) & Wilcoxon \(p\) \\", r"\midrule"]
+             r"Outcome & Condition \(-\) \(a^{\emptyset}\) & \(\overline{D}\) & 95\% CI & \(d_z\) & Holm \(p\) & Wilcoxon \(p\) \\", r"\midrule"]
     for o in PRIMARY:
         first = True
         for c in sk.AD_CONDITIONS:
@@ -268,6 +268,56 @@ def table_descriptives(condition: pd.DataFrame, ads: pd.DataFrame) -> str:
     for o in RECALL:
         g = ads.groupby("condition")[o].agg(["mean", "std"]).reindex(list(sk.CONDITIONS))
         lines.append(f"{NAME[o]} & " + " & ".join("--" if pd.isna(r["mean"]) else f"{r['mean']:.2f} ({r['std']:.2f})" for _, r in g.iterrows()) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    return "\n".join(lines)
+
+
+def table_omnibus(friedman: pd.DataFrame, pairs: pd.DataFrame) -> str:
+    """Appendix: Friedman over five conditions per composite, then every pair that
+    reaches Holm-10 < .05 under the paired t or the Wilcoxon test. The full
+    80-pair grid stays in outputs/confirmatory/omnibus_pairwise.csv."""
+    order = PRIMARY + SECONDARY
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
+             r"\caption{Omnibus test per composite (\(N=54\)): Friedman \(\chi^2\) over the five conditions with Kendall's \(W\). Post hoc; \(p\) is raw. The planned contrasts of \autoref{tab:beh-planned} are the confirmatory tests.}",
+             r"\label{tab:beh-friedman}", r"\begin{tabular}{@{}l r r r@{}}", r"\toprule",
+             r"Outcome & Friedman \(\chi^2_4\) & Kendall's \(W\) & \(p\) \\", r"\midrule"]
+    for o in order:
+        r = friedman[friedman.outcome == o].iloc[0]
+        lines.append(f"{NAME[o]} & ${r['stat']:.2f}$ & ${r.kendall_w:.3f}$ & {fmt_p(r.p_raw)} \\\\")
+        if o == "notice":
+            lines.append(r"\midrule")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]
+    hits = pairs[(pairs.p_t_holm10 < 0.05) | (pairs.p_wilcoxon_holm10 < 0.05)].copy()
+    hits["o"] = pd.Categorical(hits.outcome, list(order))
+    hits = hits.sort_values(["o", "p_t_holm10"])
+    lines += [r"\begin{table}[H]", r"\centering", r"\small",
+              r"\caption{Pairwise sweep over the ten condition pairs within each of the eight composites (\(80\) tests, \(N=54\)), post hoc. Paired \(t\) on the ordinary within-person difference with Holm and Benjamini--Hochberg across the ten pairs of an outcome; the Wilcoxon signed-rank test on the same differences is Holm-adjusted across the same ten as a sensitivity engine. Only pairs below \(.05\) under either Holm are listed; the full grid is in the released tables. Differences read first condition minus second.}",
+              r"\label{tab:beh-pairwise}", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}ll r c r r r r@{}}", r"\toprule",
+              r"Outcome & Pair & \(\overline{D}\) & 95\% CI & \(d_z\) & Holm \(p\) & BH \(q\) & Wilcoxon Holm \(p\) \\", r"\midrule"]
+    last = None
+    for _, r in hits.iterrows():
+        name = NAME[r.outcome] if r.outcome != last else ""
+        if last is not None and r.outcome != last:
+            lines.append(r"\addlinespace[2pt]")
+        last = r.outcome
+        pair = f"{COND[r.a]} \\(-\\) {COND[r.b].lower()}"
+        lines.append(f"{name} & {pair} & {fmt_num(r['mean'])} & {fmt_ci(r.ci95_lo, r.ci95_hi)} & {fmt_num(r.dz)} & {fmt_p(r.p_t_holm10)} & {fmt_p(r.q_t_bh10)} & {fmt_p(r.p_wilcoxon_holm10)} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    return "\n".join(lines)
+
+
+def table_alpha(alpha: pd.DataFrame) -> str:
+    a = alpha[alpha.arm == "all"].set_index("scale")
+    lab = alpha[alpha.arm == "lab"].set_index("scale")
+    crowd = alpha[alpha.arm == "crowd"].set_index("scale")
+    lines = [r"\begin{table}[H]", r"\centering", r"\small",
+             r"\caption{Internal consistency of the multi-item composites on the 270 condition rows (\(N=54\), five conditions each), items reversed once before averaging. Cronbach's \(\alpha\) with the mean inter-item Spearman \(\rho\); the arm columns repeat \(\alpha\) on the laboratory (90 rows) and crowd (180 rows) subsets. Trust is a single item and has no \(\alpha\).}",
+             r"\label{tab:beh-alpha}", r"\begin{tabular}{@{}l c r r r r@{}}", r"\toprule",
+             r"Composite & Items & \(\alpha\) & mean \(\rho\) & \(\alpha\) lab & \(\alpha\) crowd \\", r"\midrule"]
+    for o in ["credibility", "manipulation", "notice", "helpfulness", "convincingness", "relevance", "neutrality"]:
+        lines.append(f"{NAME[o]} & {int(a.loc[o, 'k_items'])} & ${a.loc[o, 'alpha']:.2f}$ & ${a.loc[o, 'mean_interitem_rho']:.2f}$ & ${lab.loc[o, 'alpha']:.2f}$ & ${crowd.loc[o, 'alpha']:.2f}$ \\\\")
+        if o == "notice":
+            lines.append(r"\midrule")
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
     return "\n".join(lines)
 
@@ -331,10 +381,15 @@ def run() -> None:
     (OUT / "tab_beh_planned.tex").write_text(table_planned(planned, lmm) + "\n")
     (OUT / "tab_beh_localisation.tex").write_text(table_localisation(posthoc) + "\n")
     (OUT / "tab_beh_descriptives.tex").write_text(table_descriptives(condition, ads) + "\n")
+    friedman = pd.read_csv(CONF / "omnibus_friedman.csv")
+    pairs = pd.read_csv(CONF / "omnibus_pairwise.csv")
+    alpha = pd.read_csv(CONF / "cronbach_alpha.csv")
+    (OUT / "tab_beh_omnibus.tex").write_text(table_omnibus(friedman, pairs) + "\n")
+    (OUT / "tab_beh_alpha.tex").write_text(table_alpha(alpha) + "\n")
     (OUT / "fig_beh_environments.tex").write_text(FIGURE_ENVIRONMENTS)
     manifest = {
         "figures": ["beh_condition_profiles", "beh_confirmatory_forests", "beh_localisation_forest", "beh_likert_distributions", "beh_estimator_concordance"],
-        "tables": ["tab_beh_planned", "tab_beh_localisation", "tab_beh_descriptives"],
+        "tables": ["tab_beh_planned", "tab_beh_localisation", "tab_beh_descriptives", "tab_beh_omnibus", "tab_beh_alpha"],
         "sources": ["gold/condition_features.csv", "gold/advertisement_features.csv", "confirmatory/confirmatory_planned_D.csv",
                     "confirmatory/lmm_declared.csv", "confirmatory/posthoc_vs_control.csv"],
     }
