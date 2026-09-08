@@ -1,5 +1,16 @@
 # Behavioural analysis context
 
+## Live now (8 September)
+
+- **Item correlations held.** Katerina flagged `llm_reliable`,
+  `llm_opinionated`, `llm_skeptical` as low-correlation and asked
+  for a rerun without them. **Do not rerun. Do not drop items.**
+  `2026-09-08-item-correlations-held.md`.
+- Canonical Gold and confirmatory α stay on Walter's tree
+  (`analysis/walter/behavioural/`). Her `Cronbach_alpha.py` was
+  one-reverse-fixed this evening (parse no longer `8-x`); do not
+  edit `analysis/behavioural/` again unless asked.
+
 **7 September (night):** combos, reduced (blocks 0–7 in
 `analysis/walter/combos/`, viewer `07_combos_reduced.ipynb`). 336
 tests, 0 Holm / BH, Freedman–Lane family \(p > .23\). Block 0 is the

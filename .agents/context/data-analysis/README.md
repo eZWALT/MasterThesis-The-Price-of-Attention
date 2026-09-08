@@ -9,6 +9,9 @@ Code map: `analysis/README.md`. Do not invert science order 1→5.
 
 ## Live now (8 September)
 
+- **Item correlations held (do not rerun):** Katerina asked to drop
+  `llm_reliable`, `llm_opinionated`, `llm_skeptical`. Do not.
+  `behavioral/2026-09-08-item-correlations-held.md`.
 - **Gold catalog (read first):** `2026-09-07-gold-catalog-and-lineage.md`.
 - Goal 1 is **frozen**. Combos (Goal 5) are **run** — declared
   families + reduced blocks. Stage 5 is not blocked.

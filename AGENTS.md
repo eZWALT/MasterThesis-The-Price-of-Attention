@@ -41,12 +41,17 @@ the 5 September “Combos wait on that freeze” paragraph, or
 - Do not overwrite live `conclusion.tex`.
 - Do not put the ad-moment scorer in thesis / paper / deck before
   17 September. Do not rebuild its Silver unless asked.
-- Do not pick a \(k\), montage, or questionnaire item by \(p\).
+- Do not pick a \(k\), montage, or questionnaire item by \(p\) or
+  by item–item correlation. Katerina's 8 Sep ask to drop
+  `llm_reliable` / `llm_opinionated` / `llm_skeptical` is **held**:
+  `.agents/context/data-analysis/behavioral/2026-09-08-item-correlations-held.md`.
 - Leave `src/project/` application code alone unless the task is the
   platform itself.
 - **`analysis/behavioural/` is Katerina’s tree. Do not open, edit, run,
-  quote, or rebuild anything in it.** Canonical behavioural Gold and
-  Results numbers come only from `analysis/walter/behavioural/`.
+  quote, or rebuild anything in it.** Exception, 8 Sep only:
+  `Cronbach_alpha.py` no longer reverse-codes at parse (α still
+  does `8-x` once). Canonical behavioural Gold and Results numbers
+  come only from `analysis/walter/behavioural/`.
 - **Never run** `python analysis/eeg/preprocessing/run_pipeline.py`.
   Default order rebuilds whole-window feature Gold. Dataset A tables:
   only `run_equal_n_dataset_a.py`, and only if asked.
@@ -96,7 +101,10 @@ Walter’s spoken slides.
 ## Current science state (8 September)
 
 Science 1→5 is done as *analyses*. Thesis write-up is in progress
-(deadline 17 September). Live now boxes override this table.
+(deadline **17 September**). Defence is **23 September** morning
+in Padova, not 18–20. Calendar:
+`.agents/context/writing/2026-09-08-travel-and-delivery-calendar.md`.
+Live now boxes override this table.
 
 | Goal | Status | Where |
 |---|---|---|

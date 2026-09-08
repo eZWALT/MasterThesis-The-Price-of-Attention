@@ -1,5 +1,8 @@
 # Sprint to the deadline (5 September 2026)
 
+**Superseded for dates:** defence is 23 September, not 18–20.
+Live calendar: `2026-09-08-travel-and-delivery-calendar.md`.
+
 Pokemon save. Last context dump was **31 August** (equal-n \(k=37\),
 slow-power, MDE, waves slide). Four calendar days and a human thesis
 pass later; this is the board until 17 September.

@@ -8,24 +8,37 @@ handovers for thesis and publication prose.
 Newest first. Dated notes below this box are history; they do not
 re-open a closed lock.
 
-1. Behavioural Ch 7.2 / 8.1 + Methods row + Appendix F — **applied and
+1. Four-family narrative example (register only, **not** live LaTeX):
+   `2026-09-08-four-family-narrative-example.md`. Implication-first
+   paragraphs with signs and variable names. Do not paste into
+   `conclusion.tex`.
+2. **Do not drop** `llm_reliable` / `llm_opinionated` /
+   `llm_skeptical` from the battery. Item-correlation rerun is held:
+   `../data-analysis/behavioral/2026-09-08-item-correlations-held.md`.
+3. **Calendar (read first).** Thesis still due **Thu 17 Sep**. Defence
+   is **Wed 23 Sep morning** in Padova, not 18–20. Fri 18 morning →
+   Madrid HackSpain (weekend there). Mon 21 midday fly Padova. Tue 22
+   rehearse. Fri 25 graduation. Paper after that, before SF.
+   Barcelona Grok bot meetup he hosts: **Tue 29 Sep**. Full board:
+   `2026-09-08-travel-and-delivery-calendar.md`.
+4. Behavioural Ch 7.2 / 8.1 + Methods row + Appendix F — **applied and
    pushed 8 Sep, thesis `15cf438`**. Paired \(t\) primary (LMM adjusted
    check), 16 confirmatory tests, Katerina's omnibus/pairwise design on
    Gold \(N=54\) as post hoc appendix, her `fb7e426` reviewed (n = 19 incl.
    crowdfail; α double-reversal bug). Abstract / Conclusion comments only.
    `2026-09-08-behavioural-ch7-ch8-applied.md`.
-2. Combos into Ch 7.5 / 8.5 — **applied and pushed 8 Sep, `d206df3`**:
+5. Combos into Ch 7.5 / 8.5 — **applied and pushed 8 Sep, `d206df3`**:
    `2026-09-07-combos-ch7-ch8.md`.
-3. (history) Behavioural readiness inventory:
+6. (history) Behavioural readiness inventory:
    `2026-09-07-ch7-ch8-behavioural-ready.md`. Its open decision is closed.
-4. Gold catalog for Ch 4 (`gold_tables.png` not included; §4.2.2 stub):
+7. Gold catalog for Ch 4 (`gold_tables.png` not included; §4.2.2 stub):
    `../data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
-5. Do **not** overwrite live `conclusion.tex`. Chapter 8 must not
+8. Do **not** overwrite live `conclusion.tex`. Chapter 8 must not
    restore fused how-and-when / serving-rule / MDE language:
    `2026-09-06-conclusion-critique-and-ch8.md`.
-6. Results figure-first; Dataset A is **condition aggregation**;
+9. Results figure-first; Dataset A is **condition aggregation**;
    EEG MDE withdrawn: `2026-09-06-results-readability.md`.
-7. Standing: Results ≠ Discussion; trajectories thesis-only;
+10. Standing: Results ≠ Discussion; trajectories thesis-only;
    \(f_{\mathrm{genre}}\); implicit / explicit.
 
 ## Source of truth
@@ -194,9 +207,8 @@ EEG MDE withdrawn from thesis, paper, and deck the same day.
 Do not restore `eq:mde`. `2026-08-31-thesis-eeg-mde.md`
 is historical only.
 
-**5 September (historical):** sprint calendar. Combos no longer
-wait — Goal 1 froze 7 Sep and Ch 7.5 was applied 8 Sep (see Live
-now). Do not permute items to hunt \(p\).
+**5 September (historical):** sprint calendar. Defence 18–20 is
+**wrong** — see the 8 Sep travel board. Combos no longer wait.
 `2026-09-05-sprint-to-deadline.md`.
 
 **31 August:** equal-n Dataset A \(k=37\)
