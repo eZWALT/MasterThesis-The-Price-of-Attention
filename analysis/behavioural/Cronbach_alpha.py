@@ -99,8 +99,7 @@ def parse_jsonl_event_rows(root: Path) -> list[dict[str, float]]:
                         numeric = float(value)
                     except (TypeError, ValueError):
                         continue
-                    if key in {item for cfg in SCALE_GROUPS.values() for item in cfg["items"] if item in cfg["reverse"]}:
-                        numeric = reverse_code(numeric)
+                    # Keep answers as logged. Reverse once, in cronbach_alpha_for_items.
                     item_values[key] = numeric
 
                 if item_values:
@@ -115,9 +114,10 @@ def cronbach_alpha_for_items(frame: pd.DataFrame, item_names: list[str], reverse
         return None, len(frame), "Cronbach's alpha is undefined for a single-item scale."
 
     sub = frame[valid_items].copy()
+    # Reverse once here (8-x). Do not also reverse in parse_jsonl_event_rows.
     for item in reverse_items:
         if item in sub.columns:
-            sub[item] = 8.0 - sub[item]
+            sub[item] = reverse_code(sub[item])
 
     complete = sub.dropna()
     if complete.empty:
