@@ -33,10 +33,29 @@ The top level is reserved for documents that govern both analysis arms:
   median of \(k=37\) tiles nearest visual onset (shortest chat).
   Applied and pushed to Overleaf 31 August. Gold whole-window is not
   overwritten.
+- `2026-09-07-gold-catalog-and-lineage.md` —
+  **7 Sep evening. Read this first for Gold.** Three grains, two
+  arms, three data types. Paper names (`ratings`, `shifts`,
+  `joined chat`, …); files are provenance. Figure:
+  `src/project/docs/behavioural_pipeline/behavioural_grains.png`
+  (Overleaf `gold_tables.png`, not yet included).
+- `behavioral/2026-09-07-combos-reduced-blocks.md` — **7 Sep night.
+  Combos, reduced (blocks 0–7).** 336 tests, 0 Holm / BH. Block 0:
+  Fz \(\theta\) \(D_i\) reliability at \(k=37\) not detectable
+  (upper bound ≈ .6; \(k=37\) costs reliability vs whole-window),
+  trajectory \(D_i\) inter-classifier agreement < .33, \(n=18\)
+  resolves \(|\rho|>.47\) only. Post-hoc Fz \(\theta\) pair is mostly
+  a mean shift. GEE cells in `events/` are not hits.
+- `behavioral/2026-09-07-walter-behavioural-gold.md` —
+  **7 Sep afternoon.** Canonical Gold is
+  `analysis/walter/behavioural/`. Composites + both item pairs.
+  Katerina's folder is not Gold.
+- `behavioral/2026-09-07-behavioural-gold-and-combos.md` —
+  **7 Sep morning.** First join pass (since moved).
 - `../writing/2026-09-05-sprint-to-deadline.md` — **live sprint
   (5 Sep).** Thesis 17 Sep. Katerina back (two Holm survivors);
-  do not permute items to hunt \(p\). Combos still wait on Goal 1
-  freeze.
+  do not permute items to hunt \(p\). Combos no longer wait:
+  Goal 1 freeze + reduced blocks are in (7 Sep).
 - `eeg/2026-08-29-ad-local-epochs.md` — exploratory. Median \(k\)
   tiles around ads instead of Dataset A's whole-condition average.
   \(k=5\) and \(k=10\) do not create Dataset A hits. Not confirmatory.

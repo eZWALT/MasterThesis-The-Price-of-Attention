@@ -11,6 +11,11 @@ pipelines, generated manifests, and participant-level outputs remain under
 
 ## Current entries
 
+- Shared Gold catalog (7 Sep): EEG is **Dataset A**, **Dataset A
+  window**, **Dataset B** at chat; **contrasts** and **write − read**
+  at person; no message table. Confirmatory A is \(k=37\), not the
+  stored whole-window Gold.
+  `../2026-09-07-gold-catalog-and-lineage.md`.
 - Power / MDE (not new science; 31 August write-up for the deck):
   Holm-80% MDE is first-step \(\alpha=0.05/m\) on the frozen \(D_i\).
   Dataset A \(\approx 0.22\)–\(0.44\) dB (equal-n \(k=37\)); Dataset B \(\approx 1.7\)–\(3.7\) dB.

@@ -45,6 +45,16 @@
   `.agents/context/data-analysis/eeg/2026-08-27-dataset-a-b-rename.md`.
   27 August catch-up (figure regen, crowd age, Methods comments):
   `.agents/context/writing/2026-08-27-afternoon-save.md`.
+- **Gold catalog / lineage (7 Sep evening).** Three grains
+  (message / chat / person), two arms, three data types. Paper
+  names on the figure; filenames are provenance. Thesis Ch 4.2
+  is the prose home; §4.2.2 is still a stub. Do not call
+  `advertisements.csv` “ad shifts” (that file is **ad genre**).
+  Shift counts live on `conversations.csv` (**shifts**).
+  Demographics sit on **BFI + demo**, not a fourth person table.
+  Lock: `.agents/context/data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
+  Figure: `src/project/docs/behavioural_pipeline/`; Overleaf
+  `gold_tables.png` (not included).
 - Defence rehearsal cut (4 September). Intro ~5 min; drop
   intent theory (`Theoretical Work (2)`); put
   `retrieval_pipeline.png` immediately before the system
@@ -190,23 +200,86 @@ group results; `*_contrast_scores.csv` are the person-level difference
 scores \(D_i\); branches under
 `sensitivity/epoch_{2,4,8,16,32}s/{ica,no_ica}/` and `task_state/`.
 
-### Merging EEG with behavioural
+### Where the behavioural datasets live
 
-Behavioural sessions are JSONL, not a database:
-`src/project/logs/tracked/{lab,crowd}/<subject>/<experiment_id>_export.jsonl`.
-Prefer `*export*.jsonl` over `*events*.jsonl` when both exist, or rows
-double. `tracked/beta/` is sensitivity only. Roster, exclusion tags, and
-the ETL contract (finished \(L=18\), \(C=36\), \(N=54\)):
+Bronze is the tracked JSONL
+(`src/project/logs/tracked/{lab,crowd}/`, prefer `*export*`).
+Roster: drop `synthetic` / `unfinished` / `crowdfail`; keep
+`unfocused`. ETL contract (finished \(L=18\), \(C=36\), \(N=54\)):
 `.agents/context/data-analysis/behavioral/2026-08-18-behavioural-roster-and-log-schemes.md`.
 
-**The join key is `experiment_id`.** It is a column in the EEG Gold
-tables and is both a field and the filename stem on the behavioural
-side. Verified example: `lab_subject_10` carries
-`exp_20260728T091433Z_242026ac` in `condition_features.csv` and in
+Gold (7 September, Walter) lives under
+`analysis/walter/behavioural/outputs/gold/`.
+Rebuild with `analysis/walter/behavioural/build_gold.py`.
+**Catalog / lineage (read this):**
+`.agents/context/data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
+Three grains: message (2,160) → chat (270) → person (54).
+Lab / crowd is an arm. 4-ad and contrast \(D\) are views.
+Paper names (figure titles): **turns**, **ratings**, **recall**,
+**BFI + demo**, **contrasts**. Files stay as provenance
+(`messages.csv`, `condition_features.csv`, …). Demographics live
+on `person_features.csv` with BFI; `id_map.csv` and
+`conclusions.csv` are siblings, not extra cards. `n_ad_clicked`
+is 0; `demo_age` is empty. Joins: **joined chat** /
+**joined contrasts** (`combo_threeway*.csv`); EEG empty on crowd.
+Do not rename EEG or trajectory Gold. Figure:
+`src/project/docs/behavioural_pipeline/behavioural_grains.png`
+(Overleaf `gold_tables.png`, not included).
+Notebook: `analysis/walter/behavioural/Behavioural_EDA.ipynb`.
+Katerina's folder is not Gold.
+**Goal 1 freeze (7 Sep, later):**
+`analysis/walter/behavioural/outputs/confirmatory/confirmatory_planned_D.csv`
+(paired \(t\), Holm within outcome; 6/12 survey + 2/4 recall cells
+survive; trust is null). Exploratory sweep (1,755 tests, three
+corrections side by side): `outputs/exploratory/`. Assumption check
+(`outputs/assumptions/`, notebook 01 §2c): bootstrap CI within 3 % of
+the \(t\) CI everywhere; \(t\) / Wilcoxon / sign / bootstrap agree in
+14/16 planned cells, the two exceptions are trust; Katerina's 10-pair
+design on Gold agrees 38/40 between \(t\) and Wilcoxon. Paired \(t\)
+stays primary; do not switch statistic by a normality pre-test.
+**Ch 7.2 / 8.1 ready (7 Sep evening):** thesis figures + `.tex` tables
+in `analysis/walter/behavioural/outputs/figures/thesis/`
+(`make_thesis_figures.py`, EEG-suite style). Open decision: Methods
+row declares LMM, framework is paired \(t\); identical estimates, one
+cell differs (trust early − late, LMM Holm .048 vs \(t\) .063).
+`.agents/context/writing/2026-09-07-ch7-ch8-behavioural-ready.md`.
+Localisation stream (each ad − no ad, Holm-4) is post-hoc:
+`outputs/confirmatory/posthoc_vs_control.csv`. Process variables are
+closed (36 planned tests, 0 raw hits, max \(|d_z|=0.24\)). Combos
+(`analysis/walter/combos/`, 2,560 tests): zero Holm / BH hits in every
+family. Free text is discarded. Shared stats: `analysis/walter/statkit.py`.
+`.agents/context/data-analysis/behavioral/2026-09-07-goal1-freeze-sweep-and-combos.md`.
+**Combos reduced (7 Sep, night):** blocks 0–7 in `analysis/walter/combos/`
+(`run_reliability.py` … `summarise_blocks.py`, viewer
+`07_combos_reduced.ipynb`). 336 tests, 0 Holm / BH, Freedman–Lane
+family \(p > .23\); verdict unchanged with whole-window EEG. Fz
+\(\theta\) \(D_i\) split-half reliability at \(k=37\) is **not
+detectable** (point 0, 18-person upper bound ≈ .6; .35–.61 with all
+tiles) — write "no detectable", never "zero"; trajectory \(D_i\)
+agree < .33 across genre classifiers; the post-hoc implicit-early −
+explicit-late Fz \(\theta\) pair is mostly a mean shift (pair-\(D\)
+reliability 0 at \(k=37\), .47 whole-window). Do not report the GEE
+γ/β cells in `events/event_tests.csv` as hits. Nothing from these
+blocks goes in Results.
+`.agents/context/data-analysis/behavioral/2026-09-07-combos-reduced-blocks.md`.
+**Declared combo families (7 Sep, evening):** Methods declares
+**6** behaviour × EEG pairs and does not fix \(D^A\) vs \(D^B\);
+`analysis/walter/combos/run_thesis_families.py` estimates all four
+Methods rows on both EEG scores. Dataset A 0/6; Dataset B trust ×
+posterior \(\alpha\) \(\rho=.80\) \([.48,.93]\), Holm .0004, survives
+Holm-12/16/48; trajectory pairs and three-way null. Ch 7.5 / 8.5 draft
+shown, **not applied, not pushed**:
+`.agents/context/writing/2026-09-07-combos-ch7-ch8.md`.
+`combokit.spearman_ci` pairs by position — align on `experiment_id`
+first.
+
+### Merging EEG with behavioural
+
+**The join key is `experiment_id`.** Verified example:
+`lab_subject_10` carries `exp_20260728T091433Z_242026ac` in EEG
+Gold and in
 `tracked/lab/lab_subject_10/exp_20260728T091433Z_242026ac_export.jsonl`.
-`condition`, `ad_mode`, and `trial_index` exist on both sides, so the
-merge grain is participant × condition — the same grain the EEG
-difference scores already use.
+Read the combo views above rather than re-joining by hand.
 
 Only the laboratory arm has EEG, so a merged table has 18 people, not
 54; the 36 crowd participants remain behavioural-only. That is why the
@@ -221,12 +294,14 @@ Bronze / Silver / Gold, same contract as EEG. Bronze is the tracked JSONL
 rebuildable pass in `build_trajectory_dataset.py` (roster filter, parse,
 genre inference \(f_{\mathrm{genre}}\)). It materializes two tables:
 `classifier_inputs.csv` (1,080) and `transition_matrices.csv` (715).
-Gold is the four tables the analysis reads, two grains:
+Gold is the four tables the analysis reads. In the shared catalog
+those are **labels**, **turn pairs**, **shifts**, **ad genre**
+(message + chat; no person table):
 
-- Turn: `utterances.csv` (2,160; labels live here) and `transitions.csv`
-  (1,620; Family A crossing tests).
-- Conversation: `conversations.csv` (540; Defs 3–5) and
-  `advertisements.csv` (216; \(g^{(a)}\) for Definition 6).
+- Message: `utterances.csv` (2,160; **labels**) and `transitions.csv`
+  (1,620; **turn pairs**, Family A).
+- Chat: `conversations.csv` (540; **shifts**, Defs 3–5) and
+  `advertisements.csv` (216; **ad genre**, \(g^{(a)}\) for Definition 6).
 
 Off Gold, do not query the Silver tables for tests. Heatmaps rebuild from
 `transitions.csv`. Statistics live under `outputs/eda/`, `stages_2_4/`,

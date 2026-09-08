@@ -5,10 +5,15 @@ code, generated tables, and figures stay under `analysis/trajectories/`.
 
 ## Current entries
 
+- Shared catalog (7 Sep): trajectory Gold is **labels**, **turn pairs**,
+  **shifts**, **ad genre** on the three-grain figure. No person table.
+  `advertisements.csv` is ad genre, not ad shifts.
+  `../2026-09-07-gold-catalog-and-lineage.md`.
 - `2026-08-23-trajectory-medallion.md`
   **Canonical Bronze / Silver / Gold lock.** Gold is the four tables
-  analysis reads, two grains. Silver tables are provenance / kernels,
-  not inferential. Files stay flat under `analysis/trajectories/outputs/`.
+  analysis reads, two grains (message + chat in the shared figure).
+  Silver tables are provenance / kernels, not inferential. Files stay
+  flat under `analysis/trajectories/outputs/`.
 - `2026-08-23-trajectory-pipeline-figure.md`
   Diagrams-as-code figure of that lock. Rebuild:
   `src/project/docs/trajectory_pipeline/trajectory_pipeline.py`.

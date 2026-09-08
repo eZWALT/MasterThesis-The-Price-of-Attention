@@ -2,7 +2,13 @@
 
 Date: 19 August 2026
 
-Design only. No builder script yet. Behavioural composites below for
+**7 September (evening):** do not re-join by hand. Read
+`joined chat` / `joined contrasts` from
+`analysis/walter/behavioural/outputs/gold/`. Catalog:
+`../2026-09-07-gold-catalog-and-lineage.md`. The 19 August
+builder path below is stale (Katerina's folder is not Gold).
+
+Design only (original). Behavioural composites below for
 `lab_subject_10` use the **planned** credibility / helpfulness /
 manipulation formulas and are illustrative until Goal 1 scoring is
 frozen.

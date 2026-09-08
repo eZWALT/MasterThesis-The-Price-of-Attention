@@ -13,6 +13,19 @@ below. Do not invent Goal 1 tables. Do not overwrite ICA.
 
 ## What landed since 31 August
 
+- **7 September:** behavioural Gold + combo joins exist
+  (`analysis/walter/behavioural/outputs/gold/`). Process variables
+  are in. Catalog / lineage locked the same evening:
+  `../data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
+  Figure on Overleaf as `gold_tables.png` (not included). Thesis
+  §4.2.2 is still the stub. Combo *tests* are in
+  (`analysis/walter/combos/`, 0 Holm / BH); Goal 1 freeze:
+  `../data-analysis/behavioral/2026-09-07-goal1-freeze-sweep-and-combos.md`.
+  Reduced blocks 0–7 (same night, four reviewer passes):
+  `../data-analysis/behavioral/2026-09-07-combos-reduced-blocks.md`
+  — 336 tests, 0 Holm / BH; Block 0 is the finding. Nothing from
+  those blocks goes in Results.
+
 - Equal-n Dataset A \(k=37\) is confirmatory and **on Overleaf**
   (thesis `4310044`, paper `8a6d9e2`, presentation `8a72e61`,
   31 August). Parent GitHub has it after a linear rebase onto
@@ -49,12 +62,14 @@ already specified in Methods / Tang scoring, report the two Holm
 cells, put the rest as Holm-null with CIs. Item-level descriptives
 are appendix, not a second confirmatory family.
 
-Combos (Goal 5) open **only** on those frozen scores. Association,
-not mediation. Lab \(n=18\) wherever EEG enters. Join
-`experiment_id` + `condition`. EEG side is \(D_i\) from equal-n
-\(k=37\) (`eeg_condition_contrast_scores.csv`), not Gold
-whole-window medians. Trajectory side: one `genre_source`
-(`utterance` primary). Do not invert 1 → 5.
+Combos (Goal 5) ran on those frozen scores (7 Sep night).
+Association, not mediation. Lab \(n=18\) wherever EEG enters.
+Join `experiment_id` + `condition`. EEG side is \(D_i\) from
+condition aggregation \(k=37\), not Gold whole-window medians
+(whole-window is a sensitivity only). Trajectory side: one
+`genre_source` (`utterance` primary). Lock:
+`../data-analysis/behavioral/2026-09-07-combos-reduced-blocks.md`.
+Do not invert 1 → 5.
 
 Free-text (item 4) is still not a second Likert battery.
 

@@ -232,3 +232,6 @@ analysis/eeg/scratch/
 analysis/policy/outputs/notebook_runs/
 analysis/policy/outputs/experiments/**/emb_*.npy
 analysis/policy/outputs/rescued/external_prefixes.csv
+
+# Local private notes (never commit)
+.private/

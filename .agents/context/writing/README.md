@@ -26,6 +26,25 @@ ignores their contents. Run `git` commands inside the relevant mirror.
 interprets. EEG 6.3 is confirmatory; 7.3 is the EEG read. Lock:
 `2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`.
 
+**Ch 7.2 / 8.1 behavioural ready (7 September, evening).** Thesis-grade
+figures + LaTeX tables in
+`analysis/walter/behavioural/outputs/figures/thesis/`; inventory,
+Results sentences, Discussion claims, and the one open decision
+(Methods row says LMM; framework says paired \(t\); they differ on
+one cell, trust early − late) in
+`2026-09-07-ch7-ch8-behavioural-ready.md`. Not applied to Overleaf.
+
+Behavioural Gold / combo joins (7 September):
+`../data-analysis/behavioral/2026-09-07-behavioural-gold-and-combos.md`.
+Catalog and lineage (same evening, **read this for Ch 4**):
+`../data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
+Thesis §4.2.2 is still the stub; `gold_tables.png` is on Overleaf
+and not included. Draft plan (not applied):
+`2026-09-07-ch4-gold-tables.md`. Combo tests are in (0 Holm / BH).
+Reduced blocks (7 Sep night):
+`../data-analysis/behavioral/2026-09-07-combos-reduced-blocks.md`
+— 336 tests, Block 0 is the finding; Discussion only, not Results.
+
 Dataset A display name is **condition aggregation** (6 September).
 Estimator is still the median of \(k=37\) tiles nearest onset.
 Do not write “equal-n neighbourhood” or “condition state”.
@@ -116,6 +135,17 @@ Monday agenda (Katerina + Sebastian):
 
 Newest snapshot (completion %, STATUS map):
 `2026-08-19-completion-snapshot.md`.
+
+**7 September evening (newest writing):** combos into Ch 7.5 / 8.5.
+Methods declares **6** behaviour × EEG pairs (not 8) and does not fix
+\(D^A\) vs \(D^B\); both reported, Holm within six each. Dataset A
+0/6; Dataset B trust × posterior \(\alpha\) \(\rho=.80\) \([.48,.93]\),
+Holm .0004 (also Holm-12 .0007, Holm-16 .001). Trajectory pairs and
+three-way null; Fz \(\theta\) × \(\delta^{(a)}_2\) is .47, Holm .095,
+reverses under the contextual labelling. Draft **shown, not applied,
+not pushed**: `2026-09-07-combos-ch7-ch8-draft.tex`. Lock and the
+`spearman_ci` positional-alignment bug: `2026-09-07-combos-ch7-ch8.md`.
+Conclusion untouched.
 
 **6 September evening (HIGH IMPORTANT):** Conclusion critique +
 Chapter 8 lock. Do not overwrite live `conclusion.tex`. Do not
