@@ -47,8 +47,7 @@ demographics → EEG → genre trajectories → all combos. The
 insertion-policy model is dropped (24 August).
 See `../2026-08-18-analysis-priority-order.md`.
 
-**5 September:** Katerina is back. A Goal 1 pass exists (two Holm
-survivors). Walter helps this weekend; freeze before combos.
+**5 September (superseded 7 Sep):** freeze-before-combos is done.
 Do not permute items to hunt \(p\).
 `../writing/2026-09-05-sprint-to-deadline.md`.
 

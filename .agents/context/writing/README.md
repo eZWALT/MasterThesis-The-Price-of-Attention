@@ -3,6 +3,31 @@
 This directory holds durable writing decisions, Overleaf workflow notes, and
 handovers for thesis and publication prose.
 
+## Live now (8 September)
+
+Newest first. Dated notes below this box are history; they do not
+re-open a closed lock.
+
+1. Behavioural Ch 7.2 / 8.1 + Methods row + Appendix F — **applied and
+   pushed 8 Sep, thesis `15cf438`**. Paired \(t\) primary (LMM adjusted
+   check), 16 confirmatory tests, Katerina's omnibus/pairwise design on
+   Gold \(N=54\) as post hoc appendix, her `fb7e426` reviewed (n = 19 incl.
+   crowdfail; α double-reversal bug). Abstract / Conclusion comments only.
+   `2026-09-08-behavioural-ch7-ch8-applied.md`.
+2. Combos into Ch 7.5 / 8.5 — **applied and pushed 8 Sep, `d206df3`**:
+   `2026-09-07-combos-ch7-ch8.md`.
+3. (history) Behavioural readiness inventory:
+   `2026-09-07-ch7-ch8-behavioural-ready.md`. Its open decision is closed.
+4. Gold catalog for Ch 4 (`gold_tables.png` not included; §4.2.2 stub):
+   `../data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
+5. Do **not** overwrite live `conclusion.tex`. Chapter 8 must not
+   restore fused how-and-when / serving-rule / MDE language:
+   `2026-09-06-conclusion-critique-and-ch8.md`.
+6. Results figure-first; Dataset A is **condition aggregation**;
+   EEG MDE withdrawn: `2026-09-06-results-readability.md`.
+7. Standing: Results ≠ Discussion; trajectories thesis-only;
+   \(f_{\mathrm{genre}}\); implicit / explicit.
+
 ## Source of truth
 
 **The only source of truth for manuscript content is the Overleaf Git
@@ -142,10 +167,14 @@ Methods declares **6** behaviour × EEG pairs (not 8) and does not fix
 0/6; Dataset B trust × posterior \(\alpha\) \(\rho=.80\) \([.48,.93]\),
 Holm .0004 (also Holm-12 .0007, Holm-16 .001). Trajectory pairs and
 three-way null; Fz \(\theta\) × \(\delta^{(a)}_2\) is .47, Holm .095,
-reverses under the contextual labelling. Draft **shown, not applied,
-not pushed**: `2026-09-07-combos-ch7-ch8-draft.tex`. Lock and the
-`spearman_ci` positional-alignment bug: `2026-09-07-combos-ch7-ch8.md`.
-Conclusion untouched.
+reverses under the contextual labelling. **Applied and pushed 8 Sep,
+thesis `d206df3`** (7.5, 8.5, Methods 6.1 association rows, two summary
+tables, figures); abstract and conclusion got `% [TODO combos]` comment
+drafts only, nothing live. The push also carried the 6 Sep Ch 8 rewrite.
+Text: `2026-09-07-combos-ch7-ch8-draft.tex`. Lock and the `spearman_ci`
+positional-alignment bug: `2026-09-07-combos-ch7-ch8.md`. Behavioural
+agent's 7.2 / Methods-row edits were in the same working tree and were
+**not** staged; they sit on top of `d206df3`.
 
 **6 September evening (HIGH IMPORTANT):** Conclusion critique +
 Chapter 8 lock. Do not overwrite live `conclusion.tex`. Do not
@@ -165,10 +194,9 @@ EEG MDE withdrawn from thesis, paper, and deck the same day.
 Do not restore `eq:mde`. `2026-08-31-thesis-eeg-mde.md`
 is historical only.
 
-**5 September:** sprint to 17 September. Katerina
-is back (two behavioural Holm survivors). Do not permute items to
-hunt \(p\). Combos wait on that freeze. Thesis human pass in
-progress (4.2.2, 6.3 last paragraph). Abstract 5 Sep.
+**5 September (historical):** sprint calendar. Combos no longer
+wait — Goal 1 froze 7 Sep and Ch 7.5 was applied 8 Sep (see Live
+now). Do not permute items to hunt \(p\).
 `2026-09-05-sprint-to-deadline.md`.
 
 **31 August:** equal-n Dataset A \(k=37\)

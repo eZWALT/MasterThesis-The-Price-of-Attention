@@ -5,6 +5,23 @@
 
 This directory holds durable analysis decisions and audit summaries.
 
+Code map: `analysis/README.md`. Do not invert science order 1→5.
+
+## Live now (8 September)
+
+- **Gold catalog (read first):** `2026-09-07-gold-catalog-and-lineage.md`.
+- Goal 1 is **frozen**. Combos (Goal 5) are **run** — declared
+  families + reduced blocks. Stage 5 is not blocked.
+  `behavioral/2026-09-07-goal1-freeze-sweep-and-combos.md`,
+  `behavioral/2026-09-07-combos-reduced-blocks.md`.
+- Dataset A confirmatory cell is **condition aggregation** \(k=37\).
+  `eeg/2026-08-31-equal-n-k37.md`.
+- EEG Holm MDE withdrawn. Do not restore dB MDE ranges.
+- `policy/` is a side project, not a thesis goal.
+- `2026-08-27-backlog-and-timeline.md` and
+  `2026-08-18-analysis-priority-order.md` are **historical**. They
+  still say Goal 1 gates combos; that gate closed on 7 September.
+
 ## Shared planning
 
 The top level is reserved for documents that govern both analysis arms:
@@ -52,10 +69,9 @@ The top level is reserved for documents that govern both analysis arms:
   Katerina's folder is not Gold.
 - `behavioral/2026-09-07-behavioural-gold-and-combos.md` —
   **7 Sep morning.** First join pass (since moved).
-- `../writing/2026-09-05-sprint-to-deadline.md` — **live sprint
-  (5 Sep).** Thesis 17 Sep. Katerina back (two Holm survivors);
-  do not permute items to hunt \(p\). Combos no longer wait:
-  Goal 1 freeze + reduced blocks are in (7 Sep).
+- `../writing/2026-09-05-sprint-to-deadline.md` — calendar through
+  17 Sep. Combos no longer wait: Goal 1 freeze + reduced blocks
+  are in (7 Sep). Do not permute items to hunt \(p\).
 - `eeg/2026-08-29-ad-local-epochs.md` — exploratory. Median \(k\)
   tiles around ads instead of Dataset A's whole-condition average.
   \(k=5\) and \(k=10\) do not create Dataset A hits. Not confirmatory.
@@ -63,11 +79,9 @@ The top level is reserved for documents that govern both analysis arms:
   in the manuscripts. Historical write-up:
   `../writing/2026-08-31-thesis-eeg-mde.md`.
   Do not write “approached significance”.
-- `2026-08-27-backlog-and-timeline.md` — **live sprint (27 Aug)**:
-  five pending analyses (item 1 closed 28 Aug; EEG post-hoc,
-  behavioural EDA, free-text, joined dataset / combos still open).
-  Thesis first, paper optional, presentation starts now. Goal 1
-  still gates honest combo tests.
+- `2026-08-27-backlog-and-timeline.md` — **historical (27 Aug)**.
+  Five-item map only. Open-work calendar was the 5 Sep sprint
+  note; science gates closed 7 Sep (see Live now).
 - `eeg/2026-08-27-dataset-a-b-rename.md` — Path A/B is dead; Dataset A
   = condition aggregation, Dataset B = ad-onset contrast. Figures rebuilt
   the same day so pixels match (`3fe3243`). Catch-up:

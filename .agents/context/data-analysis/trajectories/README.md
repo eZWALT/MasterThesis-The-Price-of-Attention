@@ -40,10 +40,11 @@ code, generated tables, and figures stay under `analysis/trajectories/`.
   `analysis/trajectories/trajectory-eda-stage1.canvas.tsx`.
 - `2026-08-23-direction-pass.md`
   first run of stages 1–4. Heatmaps and report live under
-  `analysis/trajectories/outputs/`. Recovery for the paper is open.
-  Stage 5 still blocked.
-- Stage 5 (EEG × behavioural × all combos) is blocked. That stage is
-  science Goal 5 in `../2026-08-23-goal-list.md`.
+  `analysis/trajectories/outputs/`.
+- Stage 5 (EEG × behavioural × all combos) **ran 7 September**.
+  Thesis entry: `analysis/walter/combos/run_thesis_families.py`.
+  This August note still says “blocked”; ignore that sentence.
+  Goal list: `../2026-08-23-goal-list.md`.
 - `2026-08-21-trajectory-dataset-and-first-descriptives.md`
   dataset build, schema lock (`conversation_id` spine, long on
   `genre_source`), Walter's call that \(f_{\mathrm{genre}}\) is the bare utterance,

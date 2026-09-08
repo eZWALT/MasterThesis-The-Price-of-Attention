@@ -16,10 +16,10 @@ pipelines, generated manifests, and participant-level outputs remain under
   at person; no message table. Confirmatory A is \(k=37\), not the
   stored whole-window Gold.
   `../2026-09-07-gold-catalog-and-lineage.md`.
-- Power / MDE (not new science; 31 August write-up for the deck):
-  Holm-80% MDE is first-step \(\alpha=0.05/m\) on the frozen \(D_i\).
-  Dataset A \(\approx 0.22\)–\(0.44\) dB (equal-n \(k=37\)); Dataset B \(\approx 1.7\)–\(3.7\) dB.
-  Runner still `analysis/run_paper_depth_audit.py`.
+- Power / MDE **withdrawn from manuscripts** (6 September). The
+  31 August deck write-up is historical only. Do not restore
+  `eq:mde` or Holm-80% dB ranges. Depth-audit runner:
+  `analysis/eeg/analysis/run_paper_depth_audit.py`.
   `../../writing/2026-08-31-presentation-eeg-waves-and-power.md`.
 - `2026-08-31-equal-n-k37.md`
   Dataset A confirmatory cell is **condition aggregation**:
@@ -100,9 +100,12 @@ pipelines, generated manifests, and participant-level outputs remain under
 - `2026-08-20-paper-figures-and-narrative.md`
   statistician lock for paper/thesis figures and the EEG Results
   paragraph. Canvas:
-  `paper-eeg-figures-narrative.canvas.tsx`. 2/3 EEG points frozen;
-  C1 blocked on Goal 1. Prose is now on Overleaf: 6.3 numbers, 7.3
-  interpretation (`../../writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`).
+  `paper-eeg-figures-narrative.canvas.tsx`. 2/3 EEG points frozen.
+  C1 (behaviour × EEG) is no longer blocked: Goal 1 froze 7 Sep;
+  declared families live in
+  `analysis/walter/combos/run_thesis_families.py`. Prose is on
+  Overleaf: 6.3 numbers, 7.3 interpretation
+  (`../../writing/2026-08-21-results-vs-discussion-and-eeg-6-3-pushed.md`).
 - `../2026-08-20-implicit-explicit-names.md`
   paper names: implicit / explicit. Log keys stay `inline_*` / `block_*`.
 - `CRITICAL-do-not-overwrite-ica-models.md`
