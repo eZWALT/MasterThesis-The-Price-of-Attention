@@ -25,7 +25,7 @@ import statkit as sk  # noqa: E402,F401
 GOLD = WALTER / "behavioural" / "outputs" / "gold"
 EEG_GOLD = REPO / "src/project/logs/xdf/gold/features"
 EEG_STATS = REPO / "analysis/eeg/statistics/outputs"
-TRAJ_GOLD = REPO / "analysis/trajectories/outputs/gold"
+TRAJ_GOLD = REPO / "analysis/trajectories/outputs"
 OUT = HERE / "outputs"
 
 BEH_SURVEY = ["trust", "credibility", "manipulation", "notice", "helpfulness", "convincingness", "relevance", "neutrality"]
@@ -77,10 +77,40 @@ def dcols(block: list[str], contrast: str) -> list[str]:
 # --------------------------------------------------------------------------- #
 # statistics
 # --------------------------------------------------------------------------- #
+def _aligned_pair(x, y) -> pd.DataFrame:
+    """Pair on the Series index when it is not a default RangeIndex.
+
+    Numpy arrays and default-index Series stay positional. A previous
+    version always used ``np.asarray``, which dropped ``experiment_id``
+    and once produced a spurious rho.
+    """
+    if isinstance(x, pd.Series) and isinstance(y, pd.Series):
+        positional = (
+            isinstance(x.index, pd.RangeIndex)
+            and isinstance(y.index, pd.RangeIndex)
+        )
+        if not positional:
+            return pd.concat(
+                [x.astype(float).rename("x"), y.astype(float).rename("y")],
+                axis=1,
+            ).dropna()
+    return pd.concat(
+        [
+            pd.Series(np.asarray(x, dtype=float), name="x"),
+            pd.Series(np.asarray(y, dtype=float), name="y"),
+        ],
+        axis=1,
+    ).dropna()
+
+
 def spearman_ci(x, y, alpha: float = 0.05) -> dict:
     """Spearman rho with Bonett-Wright (2000) Fisher-z interval and
-    leave-one-out range. Returns {} when n < 5."""
-    pair = pd.concat([pd.Series(np.asarray(x, dtype=float)), pd.Series(np.asarray(y, dtype=float))], axis=1).dropna()
+    leave-one-out range. Returns {} when n < 5.
+
+    Aligns pandas Series on their index (``experiment_id``). Pass
+    already-aligned numpy arrays if you have stripped the index.
+    """
+    pair = _aligned_pair(x, y)
     n = len(pair)
     if n < 5:
         return {"n": int(n)}

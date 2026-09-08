@@ -109,11 +109,11 @@ def trajectory_D(genre_source: str = "utterance") -> pd.DataFrame:
 # tests
 # --------------------------------------------------------------------------- #
 def cell(x: pd.Series, y: pd.Series, **meta) -> dict:
-    """Align on experiment_id first: ck.spearman_ci pairs by position, so two
-    Series in different row orders would be correlated row-for-row otherwise."""
+    """Pair on experiment_id (Series index), then add Pearson / Kendall."""
     m = pd.concat([x, y], axis=1).dropna()
-    a, b = m.iloc[:, 0].to_numpy(float), m.iloc[:, 1].to_numpy(float)
+    a, b = m.iloc[:, 0], m.iloc[:, 1]
     rec = ck.spearman_ci(a, b)
+    a, b = a.to_numpy(float), b.to_numpy(float)
     if len(a) >= 5:
         rec["pearson_r"], rec["pearson_p"] = map(float, st.pearsonr(a, b))
         rec["kendall_tau"], rec["kendall_p"] = map(float, st.kendalltau(a, b))
