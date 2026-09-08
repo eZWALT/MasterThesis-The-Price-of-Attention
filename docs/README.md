@@ -1,41 +1,22 @@
 # Documentation
 
-This directory separates local Overleaf working copies from thesis deliverables
-that belong to this repository.
-
-## Layout
+Overleaf working copies and the parent-repo notes that tell you how to
+sync them. Manuscript source of truth is `docs/overleaf/`, not this
+file and not the committed `docs/` tree.
 
 ```text
 docs/
-├── data-analysis-foundation.canvas.tsx  # analysis goals and statistical foundation
-├── generated/      # AI-assisted planning and feasibility notes
-├── overleaf/       # local Git clones; ignored by the parent repository
+├── README.md          # this file
+├── generated/         # one leftover: Tang / Ads that Talk Back code review
+├── overleaf/          # local Git clones; ignored by the parent repository
 │   ├── thesis/
 │   ├── presentation/
 │   └── publication/
-└── final/          # versioned final files and supporting material
-    ├── thesis/
-    ├── presentation/
-    └── publication/
+└── final/             # empty on purpose until a camera-ready export
 ```
 
-## Start here
-
-Project handover documents now live in `../.agents/context/`. They describe where
-the study stands, which design and analysis decisions are settled, which logging
-eras exist in the session data, and what is still blocked. Read the most recent
-relevant document before picking up work.
-
-## Research artifacts
-
-`data-analysis-foundation.canvas.tsx` preserves the study's behavioral,
-self-report, and EEG analysis foundation. It records the canonical five
-conditions, primary outcomes and contrasts, mixed-model structure, EEG
-feasibility gates, exclusion strategy, and preregistration sequence.
-
-`generated/` contains the analysis-planning notes that back those decisions,
-including the model feasibility comparison and the EEG feasibility and timing
-reconstruction plan. They are working notes rather than results.
+Science decisions live in `../.agents/context/`. Code map:
+`../analysis/README.md`. Agent router: `../AGENTS.md`.
 
 ## Overleaf mirrors
 
@@ -139,14 +120,5 @@ with the clone's actual absolute path:
 
 ## Final deliverables
 
-`final/` is tracked normally by this repository. Add any reviewed thesis,
-presentation, or publication outputs there, including PDFs, source snapshots,
-figures, or supplementary material that should be preserved with the project.
-
-After copying reviewed material into `final/`, version it in the parent
-repository as usual:
-
-```bash
-git add docs/final
-git commit -m "docs: add final thesis export"
-```
+`final/` is tracked normally by this repository. Add reviewed thesis,
+presentation, or publication outputs there when they exist.
