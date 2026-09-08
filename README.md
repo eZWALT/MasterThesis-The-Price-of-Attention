@@ -1,154 +1,112 @@
 # Conversational Advertising in LLM Assistants
 
-[![Status](https://img.shields.io/badge/status-data%20analysis-brightgreen)](#project-status)
+[![Status](https://img.shields.io/badge/status-write--up-brightgreen)](#status)
 [![Version](https://img.shields.io/badge/version-2.2.0-blue)](VERSION)
 [![Python](https://img.shields.io/badge/python-3.11%E2%80%933.13-blue)](src/project/requirements.txt)
 [![License](https://img.shields.io/badge/license-Apache--2.0-lightgrey)](src/project/LICENSE)
 
-Master's thesis with **Telefónica Research**: how does advertising inside an
-LLM assistant change what users trust, notice, and do?
+Master's thesis with [Telefónica Research](https://www.telefonica.com/en/innovation/telefonica-research/): how does advertising inside an LLM assistant change what users trust, notice, and do?
 
-This repository holds the full apparatus — a Streamlit study platform with a
-RAG ad-retrieval pipeline, the two-arm experimental protocol (in-person EEG lab
-and remote crowdsourcing), the collected session data, and the thesis sources.
+A Streamlit study platform (local LLM + RAG ads), a five-condition protocol run in an EEG lab and on Prolific, and the confirmatory analyses. Collection is finished.
 
-![System architecture](src/project/docs/architecture/architecture.png)
+<p align="center">
+  <img src="src/project/docs/architecture/architecture.png" alt="System architecture" width="820">
+</p>
 
----
+<p align="center">
+  <img src="src/project/docs/participant_flow/flow_lab.png" alt="Laboratory participant flow" width="820">
+</p>
 
-## What's inside
+<details>
+<summary>Working on this repo with an agent?</summary>
 
-- **A running experiment platform.** Participants chat with a local LLM
-  (`qwen3.6:35b` via Ollama or vLLM) that retrieves real Amazon products and
-  weaves them into replies as ads.
-- **A 5-condition within-subject design.** Every participant sees no-ad control,
-  inline ads, and ad blocks, each early and late in the conversation.
-- **Two study arms from one codebase.** `?study=lab` adds the rest baseline that
-  anchors the EEG recording; `?study=crowd` adds Prolific ID entry and an
-  attention check. LSL markers stream either way.
-- **Event-sourced logging.** Every message, retrieval, ad exposure, click, and
-  questionnaire answer lands in append-only JSONL, ready for analysis.
-- **Reproducible figures.** Architecture, participant-flow, and catalog-pipeline
-  diagrams are generated from code, not drawn by hand.
+Start at <code><a href="AGENTS.md">AGENTS.md</a></code>, then <code><a href="analysis/README.md">analysis/README.md</a></code>. This README is the public landing page, not the analysis index. Manuscripts live in gitignored Overleaf mirrors under <code>docs/overleaf/</code>.
+</details>
 
-## Study design at a glance
+## Contents
 
-| Condition | Ad format | Injected at |
-|---|---|---|
-| `no_ads` | none (control) | — |
-| `inline_early` | woven into the assistant's reply | turn 2 |
-| `inline_late` | woven into the assistant's reply | turn 4 |
-| `block_early` | labelled ad block above the reply | turn 2 |
-| `block_late` | labelled ad block above the reply | turn 4 |
-
-Five conditions × one task each, 4 turns per conversation, order
-counterbalanced per participant. Full screen-by-screen protocol:
-[`workflow_b.md`](src/project/docs/workflow_b.md).
+- [Quick start](#quick-start)
+- [Study design](#study-design)
+- [Repository](#repository)
+- [Data](#data)
+- [Documentation](#documentation)
+- [Status](#status)
+- [License](#license)
 
 ## Quick start
 
-**Requirements:** 1x NVIDIA GPU with >=24 GB VRAM (e.g. A100 40 GB).
+Needs one NVIDIA GPU with ≥24 GB VRAM (for example an A100 40 GB).
 
 ```bash
 cd src/project
-cp .env.example .env
-# Edit .env -- set OLLAMA_BIN to the path of your ollama binary
+cp .env.example .env          # set OLLAMA_BIN to a real binary
 ./launch.sh --host
 ```
 
-Then open http://localhost:7777. To click through the whole study without a
-GPU, use `?dev=flow&dry_run=1`. Setup details, backends, and cluster deployment
-live in the [platform README](src/project/README.md).
+Open http://localhost:7777. No GPU? `?dev=flow&dry_run=1` walks the whole protocol with the LLM and retrieval mocked.
 
-## Repository layout
+Backends, cluster mode, and pytest: [platform README](src/project/README.md).
 
-```text
-src/project/        Streamlit study platform — app, RAG pipeline, protocol, logs
-  core/               config, conversation, retrieval, experiment, logging, EEG
-  docs/               protocol + operations docs and generated diagrams
-  experiments/        offline prompt-tuning harness (separate from the study)
-  scripts/            catalog builder, Ollama cluster, pilot XDF inspection
-  tests/              pytest suite
-src/notebooks/      exploratory analysis
-scripts/            log labelling, tracking, and LSL bridge utilities
-docs/               thesis, paper, and presentation sources (Overleaf-backed)
-analysis/           statistical analysis of collected sessions (WIP)
-resources/          literature corpus: papers, blogs, books
-```
+## Study design
+
+Five conditions × one task each, four turns per chat, order counterbalanced. **Implicit** means the product is woven into the reply (not subliminal). **Explicit** is a labelled block above the reply. Log keys stay `inline_*` / `block_*`.
+
+| Paper name | Log / Gold key | Format | Injected at |
+|---|---|---|---|
+| No ads | `no_ads` | control | — |
+| Implicit early | `inline_early` | woven into the reply | turn 2 |
+| Implicit late | `inline_late` | woven into the reply | turn 4 |
+| Explicit early | `block_early` | labelled block above the reply | turn 2 |
+| Explicit late | `block_late` | labelled block above the reply | turn 4 |
+
+Two arms, one codebase: `?study=lab` (rest baseline for EEG) and `?study=crowd` (Prolific ID + attention check). Screen-by-screen protocol: [`workflow_b.md`](src/project/docs/workflow_b.md).
+
+## Repository
+
+| Path | What it is |
+|---|---|
+| [`src/project/`](src/project/README.md) | Streamlit app, RAG pipeline, protocol, Bronze logs |
+| [`analysis/`](analysis/README.md) | Confirmatory analyses (behavioural, EEG, trajectories, combos) |
+| [`scripts/`](scripts/) | Promote sessions, LSL bridge, Overleaf sync |
+| [`docs/`](docs/README.md) | Overleaf sync notes. Live manuscripts: `docs/overleaf/` (gitignored) |
+| [`resources/papers/`](resources/papers/) | Literature corpus (`ADS`, `EEG`, `RAG`, `RecSys`, …) |
+| [`AGENTS.md`](AGENTS.md) | Agent / writing router |
 
 ## Data
 
-Curated session exports are versioned under
-`src/project/logs/tracked/{lab,crowd,beta}/`, one directory per subject. Quality
-issues are carried in the directory name (`_unfinished`, `_unfocused`), and
-per-arm notes sit alongside as `lab-notes.txt` and `crowd_notes.txt`. Live runs
-land in `src/project/logs/production/` and stay git-ignored until reviewed and
-promoted with `scripts/sync_tracked.sh`.
+Bronze JSONL: `src/project/logs/tracked/{lab,crowd,beta}/`. Live runs stay in gitignored `logs/production/` until `scripts/sync_tracked.sh`. Confirmatory roster is **N = 54** (18 lab, 36 crowd): drop `synthetic` / `unfinished` / `crowdfail`, keep `unfocused`.
 
-Models and datasets used throughout the work are collected in this
-[HuggingFace collection](https://huggingface.co/collections/eZWALT/tfm).
+EEG recordings (gitignored): `src/project/logs/xdf/`. Analysis Gold and the reported tables live under [`analysis/`](analysis/README.md), not in the raw JSONL.
 
 ## Documentation
 
-| Document | What it covers |
+| Document | Covers |
 |---|---|
-| [Platform README](src/project/README.md) | Setup, backends, RAG pipeline, logging, operations |
-| [Protocol](src/project/docs/workflow_b.md) | Screens, conditions, counterbalancing, instruments |
-| [Query guide](src/project/docs/query_guide.md) | Every URL parameter that configures a session |
-| [LSL markers](src/project/docs/lsl_marker_protocol.md) | EEG marker stream and time-locking |
-| [Catalog build](src/project/docs/catalog_build.md) | Rebuilding the product catalog and FAISS index |
-| [Diagrams](src/project/docs/architecture/README.md) | How the figures are generated and kept in sync |
-| [Thesis docs](docs/README.md) | Overleaf mirrors, sync workflow, final deliverables |
+| [Platform README](src/project/README.md) | Launch, backends, RAG, logging |
+| [Protocol](src/project/docs/workflow_b.md) | Screens, conditions, instruments |
+| [Query guide](src/project/docs/query_guide.md) | Session URL parameters |
+| [LSL markers](src/project/docs/lsl_marker_protocol.md) | EEG time-locking |
+| [Catalog build](src/project/docs/catalog_build.md) | Product index / FAISS |
+| [Diagrams](src/project/docs/architecture/README.md) | Generated figures |
+| [Thesis docs](docs/README.md) | Overleaf mirrors |
 
-Read-only Overleaf views of the write-up:
-[thesis](https://www.overleaf.com/read/jmpfyvkdxcnt#deeda3) ·
-[presentation](https://www.overleaf.com/read/tvwscngdpyfp#e86fdc) ·
-[paper](https://www.overleaf.com/read/tcggxdnhjgmm#739137)
+Read-only Overleaf views: [thesis](https://www.overleaf.com/read/jmpfyvkdxcnt#deeda3) · [presentation](https://www.overleaf.com/read/tvwscngdpyfp#e86fdc) · [paper](https://www.overleaf.com/read/tcggxdnhjgmm#739137). Source of truth is `docs/overleaf/`.
 
-## Project status
+Every session stamps the root [`VERSION`](VERSION) file (`2.2.0`) into `experiment_config`. Older exports may say `1.1.0-pilot1` or `unknown` — treat those as pilot 1.
 
-Data analysis + paper writing in progress. Collection is complete.
+## Status
 
-## Versioning
-
-`VERSION` at the repository root is the single source of truth, and every
-session stamps it into its `experiment_config` event — so each dataset records
-the build that produced it. Bump it before collecting data under changed
-behaviour and tag the commit (`v2.2.0`); releases are tagged, and the
-`experiment-pilot-v1.*` tags are the earlier pilot line.
-
-Sessions collected before this was consolidated carry `1.1.0-pilot1`, and
-containerised runs from that period may carry `unknown`, because the image could
-not see the version file. Both are fixed as of 2.2.0; treat those strings as
-"pilot 1" when analysing.
-
-## Background reading
+Collection and confirmatory analyses are done. Manuscript write-up is in progress (thesis deadline 17 September 2026).
 
 <details>
-<summary>Recommender systems and LLM advertising sources</summary>
+<summary>Background reading</summary>
 
-- [ACM RecSys Conference](https://www.youtube.com/@acmrecsys/playlists)
-- [Awesome RecSys](https://github.com/jihoo-kim/awesome-RecSys)
-- [Awesome LLMs for RecSys](https://github.com/WLiK/LLM4Rec-Awesome-Papers)
-- [Awesome LLMs in RecSys](https://github.com/CHIANGEL/Awesome-LLM-for-RecSys)
-- [Awesome LLM-enhanced RecSys](https://github.com/nancheng58/Awesome-LLM4RS-Papers)
-- [Ludo's RecSys deep dives](https://machinelearningatscale.substack.com/p/deep-dive-series)
+Local corpus: [`resources/`](resources/) (`papers/`, `blogs/`, `books/`).
+Paper clusters: `ADS`, `CRS`, `EEG`, `Economics`, `IMPORTANT`, `LLM`, `RAG`, `RecSys`, `RL`.
 
-Industry moves on advertising inside assistants:
-
-- [OpenAI ads principles](https://www.youtube.com/watch?v=2agJo3Jf_O4&t=1233s)
-  and the [Agentic Commerce Protocol](https://developers.openai.com/commerce)
-- [Google ads in AI Overviews](https://support.google.com/google-ads/answer/16297775)
-- [Perplexity pausing ad tests](https://searchengineland.com/perplexity-stops-testing-advertising-469452)
-- [Thrad](https://www.thrad.ai/), an LLM-advertising startup
-  ([founder interview](https://www.youtube.com/watch?v=CxAxt1xUpW0))
-
+Industry / lists (not on disk): [ACM RecSys](https://www.youtube.com/@acmrecsys/playlists) · [Awesome RecSys](https://github.com/jihoo-kim/awesome-RecSys) · [LLM4Rec](https://github.com/WLiK/LLM4Rec-Awesome-Papers) · [OpenAI ads](https://www.youtube.com/watch?v=2agJo3Jf_O4&t=1233s) · [Agentic Commerce](https://developers.openai.com/commerce) · [Thrad](https://www.thrad.ai/)
 </details>
-
-The literature corpus itself lives in `resources/papers/`, clustered by topic:
-`ADS`, `CRS`, `EEG`, `LLM`, `RAG`, `RecSys`, `RL`, `Economics`, plus an
-`IMPORTANT` shortlist.
 
 ## License
 
-Apache-2.0 — see [LICENSE](src/project/LICENSE).
+Apache-2.0 — [src/project/LICENSE](src/project/LICENSE).
