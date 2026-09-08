@@ -3,8 +3,9 @@
 Walter asked for combo tables and for process variables that the
 Likert-only scoring never used.
 
-Builder: `analysis/behavioural/build_behavioural_gold.py`.
-Contract: `analysis/behavioural/outputs/gold/README.md`.
+Builder: `analysis/walter/behavioural/build_gold.py`.
+Contract: `analysis/walter/behavioural/outputs/gold/README.md`.
+Katerina's folder is not Gold and is not written to.
 
 ## What exists now
 
