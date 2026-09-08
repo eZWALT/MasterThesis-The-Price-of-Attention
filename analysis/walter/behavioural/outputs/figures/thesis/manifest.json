@@ -1,0 +1,21 @@
+{
+  "figures": [
+    "beh_condition_profiles",
+    "beh_confirmatory_forests",
+    "beh_localisation_forest",
+    "beh_likert_distributions",
+    "beh_estimator_concordance"
+  ],
+  "tables": [
+    "tab_beh_planned",
+    "tab_beh_localisation",
+    "tab_beh_descriptives"
+  ],
+  "sources": [
+    "gold/condition_features.csv",
+    "gold/advertisement_features.csv",
+    "confirmatory/confirmatory_planned_D.csv",
+    "confirmatory/lmm_declared.csv",
+    "confirmatory/posthoc_vs_control.csv"
+  ]
+}
