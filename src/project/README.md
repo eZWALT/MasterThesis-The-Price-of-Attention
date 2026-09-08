@@ -5,13 +5,22 @@ local LLM assistant, a RAG pipeline that retrieves real products as ads, the
 participant protocol, and event-sourced logging. One codebase serves both the
 in-person EEG lab and the remote crowdsourcing arm.
 
+This directory is the **study app**, not analysis Gold. Live runs land in
+`logs/production/` (git-ignored). Reviewed sessions are Bronze under
+`logs/tracked/{lab,crowd,beta}/`. Inferential Gold is
+`analysis/walter/behavioural/` and `analysis/eeg/`.
+**`analysis/behavioural/` is Katerina’s tree — do not open, edit, run,
+or quote it.** Science entrypoint: repository `AGENTS.md`. Leave
+application code here alone unless the task is the platform itself.
+
 ---
 
 ## Quick start
 
 ```bash
 cd src/project
-cp .env.example .env                 # set OLLAMA_BIN, ports, model
+cp .env.example .env                 # then set OLLAMA_BIN to a real binary
+                                     # (the example path will fail)
 ./launch.sh --host                   # Ollama + Streamlit on the host GPU
 ```
 
@@ -76,17 +85,19 @@ Full details — conditions, instruments, item counts, counterbalancing — are 
 
 ```text
 query → [context summary] → [HyDE] → dense (FAISS) → hybrid (BM25 + RRF)
-      → reranker → formatter → [ad summary] → injector
+      → reranker → formatter → injector
 ```
 
-Bracketed stages are optional and toggled per session (`?ctx_sum=1`, `?qe=hyde`,
-`?ad_sum=1`). Query expansion defaults to HyDE. Candidates are filtered to the
-Amazon categories declared by the current task, so a gardening task cannot
-surface laptops.
+Bracketed stages that actually toggle: `?ctx_sum=1` (context summary)
+and `?qe=hyde|expand|none` (HyDE is the default). `?ad_sum=` is parsed
+but is **not** wired into `build_default_stages()` — do not expect an
+ad-text rewrite. Candidates are filtered to the Amazon categories
+declared by the current task, so a gardening task cannot surface
+laptops.
 
 | Component | Model | Device | Runs |
 |---|---|---|---|
-| Intent | `Thrad/thrad-bert-conversation-classifier` | CPU | every turn |
+| Intent (log only) | `Thrad/thrad-bert-conversation-classifier` | CPU | every turn; does not gate ads |
 | Embedding | `Qwen/Qwen3-Embedding-0.6B` (bfloat16) | GPU | ad turns |
 | Reranker | `BAAI/bge-reranker-v2-m3` | GPU | ad turns |
 | Assistant | `qwen3.6:35b` via Ollama/vLLM | GPU | every turn |
@@ -95,16 +106,22 @@ Devices are allocated at import time by free VRAM (`core/device.py`), with the
 LLM's GPUs excluded and a CPU fallback. Models load once at startup so no
 participant waits for a cold cache.
 
-Ads reach the participant through one of two injectors: `inline_persuasive`
-rewrites the reply to mention one product naturally, `explicit_ad_block` renders
-a labelled banner above the reply.
+Ads reach the participant through one of two **injectors**:
+`inline_persuasive` rewrites the reply to mention one product
+naturally; `explicit_ad_block` renders a labelled banner above the
+reply. Protocol / Gold **condition** ids are `inline_early`,
+`inline_late`, `block_early`, `block_late` (plus `no_ads`). JSONL
+`condition_start` stores the condition id in `data.condition` and the
+injector in `data.ad_mode` (and on the envelope `ad_mode`). Do not
+treat those two strings as the same key.
 
 ---
 
 ## Logging
 
 ```text
-logs/production/{experiment_id}/
+logs/production/{experiment_id}/      # live participant sessions
+logs/development/{experiment_id}/     # ?dev=true and ?dev=flow
   {experiment_id}_events.jsonl        append-only live log
   {experiment_id}_export.jsonl        validated copy written at session end
   {experiment_id}_eyetracking.mp4     webcam recording, when enabled
@@ -115,10 +132,12 @@ it enqueues to a writer thread that batches to JSONL every 25 events or 60
 seconds. Each row carries full context — experiment, participant, conversation,
 condition, trial, turn — so any event is queryable on its own.
 
-Representative events: `session_started`, `condition_start`, `user_message`,
-`intent_classified`, `retrieval`, `ad_injected`, `ad_displayed`, `ad_clicked`,
+Representative events: `session_started`, `experiment_config` (VERSION
+stamp), `condition_start`, `user_message`, `intent_classified`,
+`retrieval`, `ad_injected`, `ad_displayed`, `ad_clicked`,
 `turn_N_read`, `turn_N_write`, `post_condition_survey_submitted`,
-`ads_recall_submitted`, `session_complete`.
+`ads_recall_submitted`, `session_complete`. Envelope `ad_mode` is the
+injector, not the condition id.
 
 Inspect sessions in the browser with the bundled pages: **Log Viewer** replays a
 session screen by screen, **Dashboard** aggregates across sessions. Both find
@@ -129,11 +148,14 @@ the logs relative to this directory, or wherever `LOG_DIR` points.
 `logs/production/` is git-ignored. Once a session is reviewed:
 
 ```bash
-python3 ../../scripts/label_sessions.py --exec     # name dirs lab_/crowd_/beta_
+python3 ../../scripts/label_sessions.py --exec     # lab_subject_N / crowd_subject_N
 bash ../../scripts/sync_tracked.sh --exec          # copy into logs/tracked/
 ```
 
-`logs/tracked/{lab,crowd,beta}/` is versioned and is the dataset of record.
+Dry-run is the default; pass `--exec` to write. Names are
+`lab_subject_N` / `crowd_subject_N` (plus `_unfocused` / `_unfinished`),
+not a `lab_` prefix. `logs/tracked/{lab,crowd,beta}/` is versioned
+**Bronze**. Inferential Gold is built in `analysis/`, not here.
 
 ### Threads
 
@@ -173,10 +195,15 @@ tests/                  pytest suite
 ## Development
 
 ```bash
-pytest                      # full suite
-pytest -m unit              # fast — no GPU models, no large files
+# from this directory (src/project), after pip install -r requirements.txt
+pytest -m unit              # fast — no GPU models; four query-param tests
+                            # currently fail (stale skip-list expectations)
+pytest -m e2e               # needs GPU + catalog + FAISS index
 pytest tests/retrieval      # one area
 ```
+
+There is no pytest.ini at the repository root. Bare `pytest` collects
+unit and e2e.
 
 Configuration belongs in `core/config.py`; no other module should hardcode
 numbers, key strings, or prompt text. Anything that varies per session should be
@@ -185,10 +212,10 @@ directory, never to an absolute home directory, so a fresh clone runs anywhere.
 
 ### Versioning
 
-`VERSION` at the repository root is the only version in the project, and
-`core/version.py` resolves it. Every session logs it in `experiment_config`, so
-each dataset states the build that produced it — bump it before collecting data
-under changed behaviour, and tag the commit:
+The **study-app** stamp is the repository `VERSION` file (currently
+2.2.0), exported as `APP_VERSION` by `launch.sh`. `core/version.py`
+resolves it. Every session logs it in `experiment_config`. Collection
+is finished; do not bump it to collect more. Recipe if you ever must:
 
 ```bash
 echo 2.3.0 > ../../VERSION
