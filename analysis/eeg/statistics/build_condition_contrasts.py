@@ -20,6 +20,12 @@ DEFAULT_INPUT = REPOSITORY_ROOT / (
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / (
     "analysis/eeg/statistics/outputs"
 )
+K37_FEATURES = (
+    DEFAULT_OUTPUT_DIR
+    / "sensitivity/ad_local_epochs/dataset_a/around/k37/condition_features.csv"
+)
+ESTIMAND_MARKER = DEFAULT_OUTPUT_DIR / "eeg_condition_contrasts.estimand"
+K37_ESTIMAND = "condition_aggregation_k37"
 CONDITIONS = (
     "no_ads",
     "inline_early",
@@ -287,6 +293,32 @@ def contrast_tables(
     return contrast_rows, score_rows
 
 
+def refuse_confirmatory_clobber(
+    input_path: Path,
+    output_dir: Path,
+    *,
+    force: bool = False,
+) -> None:
+    """Block whole-window writes onto the reported Dataset A tables."""
+    if force:
+        return
+    if output_dir.resolve() != DEFAULT_OUTPUT_DIR.resolve():
+        return
+    if not ESTIMAND_MARKER.exists():
+        return
+    if ESTIMAND_MARKER.read_text(encoding="utf-8").strip() != K37_ESTIMAND:
+        return
+    if input_path.resolve() == K37_FEATURES.resolve():
+        return
+    raise SystemExit(
+        "Refusing to overwrite confirmatory Dataset A "
+        f"({K37_ESTIMAND}) with {input_path}. "
+        "Write to a sensitivity --output-dir, run "
+        "run_equal_n_dataset_a.py, or pass "
+        "--force-overwrite-confirmatory."
+    )
+
+
 def run(
     input_path: Path,
     output_dir: Path,
@@ -295,7 +327,13 @@ def run(
     metric: str = "condition_median",
     expected_condition_rows: int | None = 90,
     drop_incomplete_subjects: bool = False,
+    force_overwrite_confirmatory: bool = False,
 ) -> None:
+    refuse_confirmatory_clobber(
+        input_path,
+        output_dir,
+        force=force_overwrite_confirmatory,
+    )
     rows = [
         row
         for row in read_csv(input_path)
@@ -347,6 +385,14 @@ def main() -> None:
             "exactly 90 eligible condition rows."
         ),
     )
+    parser.add_argument(
+        "--force-overwrite-confirmatory",
+        action="store_true",
+        help=(
+            "Allow writing whole-window Dataset A onto the default "
+            "statistics/outputs tables. Off by default once k=37 is marked."
+        ),
+    )
     args = parser.parse_args()
     run(
         args.input,
@@ -357,6 +403,7 @@ def main() -> None:
             None if args.allow_partial_cohort else 90
         ),
         drop_incomplete_subjects=args.allow_partial_cohort,
+        force_overwrite_confirmatory=args.force_overwrite_confirmatory,
     )
 
 

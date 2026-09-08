@@ -3,12 +3,22 @@
 Condition comparisons, multimodal models, sensitivity analyses, and publication
 outputs. Statistical inference is intentionally outside the Gold data layer.
 
-## Initial condition contrasts
+## Confirmatory Dataset A
+
+Reported Dataset A tables in `outputs/eeg_condition_*.csv` are
+condition aggregation (\(k=37\)), written by:
 
 ```bash
-python analysis/eeg/statistics/build_condition_contrasts.py
+python analysis/eeg/statistics/run_equal_n_dataset_a.py
 python analysis/eeg/statistics/build_ad_contrasts.py
 ```
+
+`build_condition_contrasts.py` with default paths rebuilds the
+**whole-window** estimand and will refuse to overwrite those
+confirmatory files. Use it only with an explicit `--output-dir`
+(sensitivities) or `--force-overwrite-confirmatory`.
+
+## Initial condition contrasts (whole-window / sensitivities)
 
 The script treats participants, not epochs, as the replication unit. It emits
 condition descriptives, participant-level contrast scores, paired t-tests,

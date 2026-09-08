@@ -26,8 +26,17 @@ the preprocessing code only reads them and writes reproducible derivatives.
 The pipeline diagram follows the project documentation convention and lives at
 `src/project/docs/eeg_pipeline/`.
 
-Start with `preprocessing/README.md`. Channel-set / literature-ROI
-averages (George nine-site and Wang-zone) are a sensitivity
+Start with `preprocessing/README.md`. Confirmatory Dataset A is
+condition aggregation \(k=37\):
+
+```bash
+python analysis/eeg/statistics/run_equal_n_dataset_a.py
+```
+
+Do not run `statistics/build_condition_contrasts.py` onto the default
+output directory — that rebuilds whole-window Dataset A over the
+reported tables. Channel-set / literature-ROI averages (George
+nine-site and Wang-zone) are a sensitivity
 (`preprocessing/run_channel_set_sensitivity.py`); they do not replace
 primary Gold. Heatmaps:
-`analysis/plot_channel_set_heatmaps.py`.
+`analysis/eeg/analysis/plot_channel_set_heatmaps.py`.

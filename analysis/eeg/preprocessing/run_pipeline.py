@@ -54,8 +54,8 @@ STAGES: dict[str, tuple[str, ...]] = {
         "validate_engagement_features.py",
     ),
     "analysis": (
-        "analysis/eeg/statistics/build_condition_contrasts.py",
         "analysis/eeg/statistics/build_ad_contrasts.py",
+        "analysis/eeg/statistics/run_equal_n_dataset_a.py",
     ),
     "publication-analysis": (
         "analysis/eeg/analysis/run_publication_analysis.py",

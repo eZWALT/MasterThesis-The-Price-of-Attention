@@ -33,6 +33,8 @@ from build_ad_local_epochs import (  # noqa: E402
 )
 from build_condition_contrasts import (  # noqa: E402
     DEFAULT_OUTPUT_DIR,
+    ESTIMAND_MARKER,
+    K37_ESTIMAND,
     descriptives,
     contrast_tables,
     read_csv,
@@ -112,6 +114,7 @@ def run() -> None:
     write_csv(DEFAULT_OUTPUT_DIR / "eeg_condition_descriptives.csv", descriptive_rows)
     write_csv(DEFAULT_OUTPUT_DIR / "eeg_condition_contrasts.csv", contrast_rows)
     write_csv(DEFAULT_OUTPUT_DIR / "eeg_condition_contrast_scores.csv", score_rows)
+    ESTIMAND_MARKER.write_text(K37_ESTIMAND + "\n", encoding="utf-8")
     print(f"Wrote {len(descriptive_rows)} descriptive rows")
     print(f"Wrote {len(contrast_rows)} contrast-test rows")
     print(f"Wrote {len(score_rows)} participant contrast scores")

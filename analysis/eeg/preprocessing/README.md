@@ -159,11 +159,16 @@ python analysis/eeg/preprocessing/gold/features/validate_ad_features.py
 This creates condition and ad response features, including Fz theta, posterior
 alpha, FAA, band power, engagement, provenance, and retained-signal evidence.
 
-### 6. Initial statistical tables
+### 6. Statistical tables
+
+Dataset B contrasts, then confirmatory Dataset A (\(k=37\)). Do not
+run bare `build_condition_contrasts.py` onto `statistics/outputs/` —
+that is the whole-window estimand and is refused once \(k=37\) is
+marked confirmatory.
 
 ```bash
-python analysis/eeg/statistics/build_condition_contrasts.py
 python analysis/eeg/statistics/build_ad_contrasts.py
+python analysis/eeg/statistics/run_equal_n_dataset_a.py
 ```
 
 ### 7. Publication analysis workspace
