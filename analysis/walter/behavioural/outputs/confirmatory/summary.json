@@ -1,0 +1,170 @@
+{
+  "n_people": 54,
+  "n_tests_surveys": 12,
+  "n_tests_recall": 4,
+  "holm_hits": [
+    {
+      "family": "surveys",
+      "outcome": "credibility",
+      "contrast_label": "early \u2212 late",
+      "mean": -0.3302,
+      "ci95_lo": -0.5539,
+      "ci95_hi": -0.1066,
+      "dz": -0.3939,
+      "p_holm": 0.0165
+    },
+    {
+      "family": "surveys",
+      "outcome": "manipulation",
+      "contrast_label": "any ad \u2212 no ad",
+      "mean": 1.2708,
+      "ci95_lo": 0.7569,
+      "ci95_hi": 1.7847,
+      "dz": 0.6596,
+      "p_holm": 0.0
+    },
+    {
+      "family": "surveys",
+      "outcome": "manipulation",
+      "contrast_label": "implicit \u2212 explicit",
+      "mean": -0.6157,
+      "ci95_lo": -1.1278,
+      "ci95_hi": -0.1037,
+      "dz": -0.3207,
+      "p_holm": 0.0222
+    },
+    {
+      "family": "surveys",
+      "outcome": "manipulation",
+      "contrast_label": "early \u2212 late",
+      "mean": 0.5787,
+      "ci95_lo": 0.206,
+      "ci95_hi": 0.9514,
+      "dz": 0.4142,
+      "p_holm": 0.0073
+    },
+    {
+      "family": "surveys",
+      "outcome": "notice",
+      "contrast_label": "any ad \u2212 no ad",
+      "mean": 2.0741,
+      "ci95_lo": 1.5278,
+      "ci95_hi": 2.6204,
+      "dz": 1.0126,
+      "p_holm": 0.0
+    },
+    {
+      "family": "surveys",
+      "outcome": "notice",
+      "contrast_label": "implicit \u2212 explicit",
+      "mean": -1.1481,
+      "ci95_lo": -1.7052,
+      "ci95_hi": -0.5911,
+      "dz": -0.5497,
+      "p_holm": 0.0003
+    },
+    {
+      "family": "recall",
+      "outcome": "recall_memory",
+      "contrast_label": "implicit \u2212 explicit",
+      "mean": -1.4537,
+      "ci95_lo": -1.8716,
+      "ci95_hi": -1.0358,
+      "dz": -0.9277,
+      "p_holm": 0.0
+    },
+    {
+      "family": "recall",
+      "outcome": "recall_trust_shift",
+      "contrast_label": "early \u2212 late",
+      "mean": -0.4907,
+      "ci95_lo": -0.9024,
+      "ci95_hi": -0.0791,
+      "dz": -0.318,
+      "p_holm": 0.0465
+    }
+  ],
+  "posthoc_vs_control_holm_hits": [
+    {
+      "outcome": "trust",
+      "contrast_label": "explicit early \u2212 no ad",
+      "mean": -0.6852,
+      "ci95_lo": -1.1707,
+      "ci95_hi": -0.1996,
+      "dz": -0.3764,
+      "p_holm": 0.0312
+    },
+    {
+      "outcome": "manipulation",
+      "contrast_label": "implicit early \u2212 no ad",
+      "mean": 1.2037,
+      "ci95_lo": 0.4424,
+      "ci95_hi": 1.965,
+      "dz": 0.4217,
+      "p_holm": 0.0062
+    },
+    {
+      "outcome": "manipulation",
+      "contrast_label": "implicit late \u2212 no ad",
+      "mean": 0.7222,
+      "ci95_lo": 0.0518,
+      "ci95_hi": 1.3926,
+      "dz": 0.2873,
+      "p_holm": 0.0395
+    },
+    {
+      "outcome": "manipulation",
+      "contrast_label": "explicit early \u2212 no ad",
+      "mean": 1.9167,
+      "ci95_lo": 1.391,
+      "ci95_hi": 2.4423,
+      "dz": 0.9725,
+      "p_holm": 0.0
+    },
+    {
+      "outcome": "manipulation",
+      "contrast_label": "explicit late \u2212 no ad",
+      "mean": 1.2407,
+      "ci95_lo": 0.6202,
+      "ci95_hi": 1.8613,
+      "dz": 0.5333,
+      "p_holm": 0.0008
+    },
+    {
+      "outcome": "notice",
+      "contrast_label": "implicit early \u2212 no ad",
+      "mean": 1.6019,
+      "ci95_lo": 0.8749,
+      "ci95_hi": 2.3288,
+      "dz": 0.5877,
+      "p_holm": 0.0001
+    },
+    {
+      "outcome": "notice",
+      "contrast_label": "implicit late \u2212 no ad",
+      "mean": 1.3981,
+      "ci95_lo": 0.6838,
+      "ci95_hi": 2.1125,
+      "dz": 0.522,
+      "p_holm": 0.0003
+    },
+    {
+      "outcome": "notice",
+      "contrast_label": "explicit early \u2212 no ad",
+      "mean": 2.8056,
+      "ci95_lo": 2.1729,
+      "ci95_hi": 3.4382,
+      "dz": 1.1828,
+      "p_holm": 0.0
+    },
+    {
+      "outcome": "notice",
+      "contrast_label": "explicit late \u2212 no ad",
+      "mean": 2.4907,
+      "ci95_lo": 1.8214,
+      "ci95_hi": 3.1601,
+      "dz": 0.9926,
+      "p_holm": 0.0
+    }
+  ]
+}

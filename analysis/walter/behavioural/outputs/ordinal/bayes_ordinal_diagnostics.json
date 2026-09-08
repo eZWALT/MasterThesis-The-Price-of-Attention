@@ -1,0 +1,12 @@
+{
+  "trust": {
+    "max_rhat": 1.0019845670419782,
+    "min_ess_bulk": 1781.7559059281443,
+    "divergences": 0
+  },
+  "behaviour_pushing": {
+    "max_rhat": 1.000747102796416,
+    "min_ess_bulk": 2401.3979374777723,
+    "divergences": 0
+  }
+}

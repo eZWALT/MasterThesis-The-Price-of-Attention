@@ -1,0 +1,323 @@
+{
+  "n_tests": 1755,
+  "n_families": 245,
+  "hits_raw": 215,
+  "hits_holm_family": 106,
+  "hits_bh_global": 53,
+  "expected_false_raw_at_005": 87.75,
+  "by_tier": {
+    "item_pair": {
+      "n_tests": 144,
+      "raw": 42,
+      "holm_family": 31,
+      "bh_global": 23
+    },
+    "primary": {
+      "n_tests": 144,
+      "raw": 35,
+      "holm_family": 24,
+      "bh_global": 15
+    },
+    "process": {
+      "n_tests": 349,
+      "raw": 11,
+      "holm_family": 0,
+      "bh_global": 0
+    },
+    "raw_item": {
+      "n_tests": 612,
+      "raw": 93,
+      "holm_family": 31,
+      "bh_global": 7
+    },
+    "secondary": {
+      "n_tests": 144,
+      "raw": 25,
+      "holm_family": 12,
+      "bh_global": 2
+    },
+    "trajectory": {
+      "n_tests": 362,
+      "raw": 9,
+      "holm_family": 8,
+      "bh_global": 6
+    }
+  },
+  "top_bh_hits": [
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "friedman",
+      "test_label": "friedman 5",
+      "n": 54,
+      "effect": 0.3372,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "primary",
+      "outcome": "notice",
+      "block": "friedman",
+      "test_label": "friedman 5",
+      "n": 54,
+      "effect": 0.309,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "planned_D",
+      "test_label": "any ad \u2212 no ad",
+      "n": 54,
+      "effect": 2.662,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "primary",
+      "outcome": "notice",
+      "block": "planned_D",
+      "test_label": "any ad \u2212 no ad",
+      "n": 54,
+      "effect": 2.0741,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit late",
+      "n": 54,
+      "effect": -3.4074,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit early",
+      "n": 54,
+      "effect": -3.8148,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "primary",
+      "outcome": "notice",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit early",
+      "n": 54,
+      "effect": -2.8056,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "primary",
+      "outcome": "manipulation",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit early",
+      "n": 54,
+      "effect": -1.9167,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0
+    },
+    {
+      "tier": "primary",
+      "outcome": "notice",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit late",
+      "n": 54,
+      "effect": -2.4907,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0001
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "friedman",
+      "test_label": "friedman 4ad",
+      "n": 54,
+      "effect": 0.2044,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0001
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "planned_D",
+      "test_label": "implicit \u2212 explicit",
+      "n": 54,
+      "effect": -1.8981,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0001
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "behaviour_pushing",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit early",
+      "n": 54,
+      "effect": -2.2778,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0001
+    },
+    {
+      "tier": "primary",
+      "outcome": "manipulation",
+      "block": "friedman",
+      "test_label": "friedman 5",
+      "n": 54,
+      "effect": 0.1577,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0001
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "behaviour_manipulate",
+      "block": "pairwise",
+      "test_label": "no ad \u2212 explicit early",
+      "n": 54,
+      "effect": -1.5556,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0003
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "behaviour_pushing",
+      "block": "friedman",
+      "test_label": "friedman 5",
+      "n": 54,
+      "effect": 0.1445,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0003
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "behaviour_pushing",
+      "block": "planned_D",
+      "test_label": "any ad \u2212 no ad",
+      "n": 54,
+      "effect": 1.5046,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0003
+    },
+    {
+      "tier": "primary",
+      "outcome": "notice",
+      "block": "friedman",
+      "test_label": "friedman 4ad",
+      "n": 54,
+      "effect": 0.1636,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0008
+    },
+    {
+      "tier": "primary",
+      "outcome": "manipulation",
+      "block": "planned_D",
+      "test_label": "any ad \u2212 no ad",
+      "n": 54,
+      "effect": 1.2708,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0,
+      "p_bh_global": 0.0011
+    },
+    {
+      "tier": "raw_item",
+      "outcome": "llm_relevant",
+      "block": "bfi_level",
+      "test_label": "person mean ~ E",
+      "n": 54,
+      "effect": -0.5433,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0001,
+      "p_bh_global": 0.002
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "pairwise",
+      "test_label": "implicit early \u2212 explicit early",
+      "n": 54,
+      "effect": -1.963,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0002,
+      "p_bh_global": 0.0025
+    },
+    {
+      "tier": "trajectory",
+      "outcome": "traj_entropy_nats",
+      "block": "bfi_level",
+      "test_label": "person mean ~ E",
+      "n": 54,
+      "effect": 0.5358,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0001,
+      "p_bh_global": 0.0025
+    },
+    {
+      "tier": "trajectory",
+      "outcome": "traj_entropy_normalised",
+      "block": "bfi_level",
+      "test_label": "person mean ~ E",
+      "n": 54,
+      "effect": 0.5328,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0002,
+      "p_bh_global": 0.0027
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "notice_sponsored",
+      "block": "pairwise",
+      "test_label": "implicit late \u2212 explicit early",
+      "n": 54,
+      "effect": -2.2407,
+      "p_raw": 0.0,
+      "p_holm_family": 0.0002,
+      "p_bh_global": 0.0027
+    },
+    {
+      "tier": "trajectory",
+      "outcome": "traj_shift_rate",
+      "block": "bfi_level",
+      "test_label": "person mean ~ E",
+      "n": 54,
+      "effect": 0.5157,
+      "p_raw": 0.0001,
+      "p_holm_family": 0.0003,
+      "p_bh_global": 0.0045
+    },
+    {
+      "tier": "item_pair",
+      "outcome": "behaviour_pushing",
+      "block": "pairwise",
+      "test_label": "implicit late \u2212 explicit early",
+      "n": 54,
+      "effect": -1.5185,
+      "p_raw": 0.0001,
+      "p_holm_family": 0.0006,
+      "p_bh_global": 0.0045
+    }
+  ]
+}

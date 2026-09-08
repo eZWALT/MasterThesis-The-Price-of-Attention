@@ -1,0 +1,374 @@
+{
+  "n_items_ordinal": 16,
+  "n_composites_lmm": 8,
+  "primary_four_engines": [
+    {
+      "outcome": "trust",
+      "contrast": "any_ad_vs_no_ads",
+      "contrast_label": "any ad \u2212 no ad",
+      "D_mean": -0.3426,
+      "p_paired_t": 0.0763,
+      "p_holm_t": 0.1526,
+      "p_wilcoxon": 0.016,
+      "OR": 0.6786,
+      "p_ordinal_gee": 0.0749,
+      "p_holm_gee": 0.1499,
+      "lmm_points": -0.3131,
+      "p_lmm": 0.1348,
+      "p_holm_lmm": 0.2695
+    },
+    {
+      "outcome": "trust",
+      "contrast": "inline_vs_block",
+      "contrast_label": "implicit \u2212 explicit",
+      "D_mean": 0.1481,
+      "p_paired_t": 0.4054,
+      "p_holm_t": 0.4054,
+      "p_wilcoxon": 0.3844,
+      "OR": 1.0553,
+      "p_ordinal_gee": 0.7799,
+      "p_holm_gee": 0.7799,
+      "lmm_points": 0.1576,
+      "p_lmm": 0.4013,
+      "p_holm_lmm": 0.4013
+    },
+    {
+      "outcome": "trust",
+      "contrast": "early_vs_late",
+      "contrast_label": "early \u2212 late",
+      "D_mean": -0.4444,
+      "p_paired_t": 0.021,
+      "p_holm_t": 0.0629,
+      "p_wilcoxon": 0.0258,
+      "OR": 0.6684,
+      "p_ordinal_gee": 0.0441,
+      "p_holm_gee": 0.1324,
+      "lmm_points": -0.4582,
+      "p_lmm": 0.0138,
+      "p_holm_lmm": 0.0414
+    },
+    {
+      "outcome": "credibility",
+      "contrast": "any_ad_vs_no_ads",
+      "contrast_label": "any ad \u2212 no ad",
+      "D_mean": -0.1404,
+      "p_paired_t": 0.3364,
+      "p_holm_t": 0.6728,
+      "p_wilcoxon": 0.0388,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": -0.1251,
+      "p_lmm": 0.3604,
+      "p_holm_lmm": 0.7209
+    },
+    {
+      "outcome": "credibility",
+      "contrast": "inline_vs_block",
+      "contrast_label": "implicit \u2212 explicit",
+      "D_mean": -0.0648,
+      "p_paired_t": 0.4752,
+      "p_holm_t": 0.6728,
+      "p_wilcoxon": 0.278,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": -0.0494,
+      "p_lmm": 0.6873,
+      "p_holm_lmm": 0.7209
+    },
+    {
+      "outcome": "credibility",
+      "contrast": "early_vs_late",
+      "contrast_label": "early \u2212 late",
+      "D_mean": -0.3302,
+      "p_paired_t": 0.0055,
+      "p_holm_t": 0.0165,
+      "p_wilcoxon": 0.0068,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": -0.344,
+      "p_lmm": 0.0047,
+      "p_holm_lmm": 0.014
+    },
+    {
+      "outcome": "manipulation",
+      "contrast": "any_ad_vs_no_ads",
+      "contrast_label": "any ad \u2212 no ad",
+      "D_mean": 1.2708,
+      "p_paired_t": 0.0,
+      "p_holm_t": 0.0,
+      "p_wilcoxon": 0.0,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": 1.2918,
+      "p_lmm": 0.0,
+      "p_holm_lmm": 0.0
+    },
+    {
+      "outcome": "manipulation",
+      "contrast": "inline_vs_block",
+      "contrast_label": "implicit \u2212 explicit",
+      "D_mean": -0.6157,
+      "p_paired_t": 0.0222,
+      "p_holm_t": 0.0222,
+      "p_wilcoxon": 0.0221,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": -0.5358,
+      "p_lmm": 0.0234,
+      "p_holm_lmm": 0.0304
+    },
+    {
+      "outcome": "manipulation",
+      "contrast": "early_vs_late",
+      "contrast_label": "early \u2212 late",
+      "D_mean": 0.5787,
+      "p_paired_t": 0.0036,
+      "p_holm_t": 0.0073,
+      "p_wilcoxon": 0.0036,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": 0.5684,
+      "p_lmm": 0.0152,
+      "p_holm_lmm": 0.0304
+    },
+    {
+      "outcome": "notice",
+      "contrast": "any_ad_vs_no_ads",
+      "contrast_label": "any ad \u2212 no ad",
+      "D_mean": 2.0741,
+      "p_paired_t": 0.0,
+      "p_holm_t": 0.0,
+      "p_wilcoxon": 0.0,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": 2.0756,
+      "p_lmm": 0.0,
+      "p_holm_lmm": 0.0
+    },
+    {
+      "outcome": "notice",
+      "contrast": "inline_vs_block",
+      "contrast_label": "implicit \u2212 explicit",
+      "D_mean": -1.1481,
+      "p_paired_t": 0.0002,
+      "p_holm_t": 0.0003,
+      "p_wilcoxon": 0.0002,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": -1.1764,
+      "p_lmm": 0.0,
+      "p_holm_lmm": 0.0
+    },
+    {
+      "outcome": "notice",
+      "contrast": "early_vs_late",
+      "contrast_label": "early \u2212 late",
+      "D_mean": 0.2593,
+      "p_paired_t": 0.234,
+      "p_holm_t": 0.234,
+      "p_wilcoxon": 0.236,
+      "OR": NaN,
+      "p_ordinal_gee": NaN,
+      "p_holm_gee": NaN,
+      "lmm_points": 0.2955,
+      "p_lmm": 0.2202,
+      "p_holm_lmm": 0.2202
+    }
+  ],
+  "ordinal_holm_hits": [
+    {
+      "outcome": "personality_influence",
+      "contrast_label": "early \u2212 late",
+      "OR": 0.588,
+      "OR_lo": 0.422,
+      "OR_hi": 0.82,
+      "p_holm": 0.005
+    },
+    {
+      "outcome": "personality_changed_mind",
+      "contrast_label": "implicit \u2212 explicit",
+      "OR": 0.557,
+      "OR_lo": 0.385,
+      "OR_hi": 0.805,
+      "p_holm": 0.006
+    },
+    {
+      "outcome": "behaviour_pushing",
+      "contrast_label": "any ad \u2212 no ad",
+      "OR": 3.634,
+      "OR_lo": 2.147,
+      "OR_hi": 6.153,
+      "p_holm": 0.0
+    },
+    {
+      "outcome": "behaviour_pushing",
+      "contrast_label": "implicit \u2212 explicit",
+      "OR": 0.534,
+      "OR_lo": 0.336,
+      "OR_hi": 0.848,
+      "p_holm": 0.011
+    },
+    {
+      "outcome": "behaviour_pushing",
+      "contrast_label": "early \u2212 late",
+      "OR": 1.712,
+      "OR_lo": 1.17,
+      "OR_hi": 2.507,
+      "p_holm": 0.011
+    },
+    {
+      "outcome": "behaviour_manipulate",
+      "contrast_label": "any ad \u2212 no ad",
+      "OR": 2.647,
+      "OR_lo": 1.563,
+      "OR_hi": 4.482,
+      "p_holm": 0.001
+    },
+    {
+      "outcome": "behaviour_manipulate",
+      "contrast_label": "early \u2212 late",
+      "OR": 1.443,
+      "OR_lo": 1.06,
+      "OR_hi": 1.964,
+      "p_holm": 0.039
+    },
+    {
+      "outcome": "notice_brands",
+      "contrast_label": "any ad \u2212 no ad",
+      "OR": 3.697,
+      "OR_lo": 2.045,
+      "OR_hi": 6.685,
+      "p_holm": 0.0
+    },
+    {
+      "outcome": "notice_sponsored",
+      "contrast_label": "any ad \u2212 no ad",
+      "OR": 11.33,
+      "OR_lo": 5.669,
+      "OR_hi": 22.645,
+      "p_holm": 0.0
+    },
+    {
+      "outcome": "notice_sponsored",
+      "contrast_label": "implicit \u2212 explicit",
+      "OR": 0.236,
+      "OR_lo": 0.134,
+      "OR_hi": 0.414,
+      "p_holm": 0.0
+    },
+    {
+      "outcome": "llm_reliable",
+      "contrast_label": "early \u2212 late",
+      "OR": 0.529,
+      "OR_lo": 0.373,
+      "OR_hi": 0.748,
+      "p_holm": 0.001
+    },
+    {
+      "outcome": "llm_impartial",
+      "contrast_label": "any ad \u2212 no ad",
+      "OR": 0.461,
+      "OR_lo": 0.28,
+      "OR_hi": 0.76,
+      "p_holm": 0.007
+    },
+    {
+      "outcome": "llm_impartial",
+      "contrast_label": "early \u2212 late",
+      "OR": 0.593,
+      "OR_lo": 0.407,
+      "OR_hi": 0.865,
+      "p_holm": 0.013
+    },
+    {
+      "outcome": "llm_relevant",
+      "contrast_label": "early \u2212 late",
+      "OR": 0.502,
+      "OR_lo": 0.322,
+      "OR_hi": 0.784,
+      "p_holm": 0.007
+    },
+    {
+      "outcome": "llm_convincing",
+      "contrast_label": "early \u2212 late",
+      "OR": 0.518,
+      "OR_lo": 0.327,
+      "OR_hi": 0.822,
+      "p_holm": 0.016
+    }
+  ],
+  "recall": [
+    {
+      "engine": "ordinal_gee",
+      "outcome": "recall_memory",
+      "contrast_label": "implicit \u2212 explicit",
+      "estimate": -1.459,
+      "p_raw": 0.0,
+      "p_holm": 0.0
+    },
+    {
+      "engine": "ordinal_gee",
+      "outcome": "recall_memory",
+      "contrast_label": "early \u2212 late",
+      "estimate": 0.2681,
+      "p_raw": 0.3076,
+      "p_holm": 0.3076
+    },
+    {
+      "engine": "lmm",
+      "outcome": "recall_memory",
+      "contrast_label": "implicit \u2212 explicit",
+      "estimate": -1.5029,
+      "p_raw": 0.0,
+      "p_holm": 0.0
+    },
+    {
+      "engine": "lmm",
+      "outcome": "recall_memory",
+      "contrast_label": "early \u2212 late",
+      "estimate": 0.2527,
+      "p_raw": 0.3075,
+      "p_holm": 0.3075
+    },
+    {
+      "engine": "ordinal_gee",
+      "outcome": "recall_trust_shift",
+      "contrast_label": "implicit \u2212 explicit",
+      "estimate": -0.002,
+      "p_raw": 0.9916,
+      "p_holm": 0.9916
+    },
+    {
+      "engine": "ordinal_gee",
+      "outcome": "recall_trust_shift",
+      "contrast_label": "early \u2212 late",
+      "estimate": -0.4247,
+      "p_raw": 0.0266,
+      "p_holm": 0.0533
+    },
+    {
+      "engine": "lmm",
+      "outcome": "recall_trust_shift",
+      "contrast_label": "implicit \u2212 explicit",
+      "estimate": 0.004,
+      "p_raw": 0.9843,
+      "p_holm": 0.9843
+    },
+    {
+      "engine": "lmm",
+      "outcome": "recall_trust_shift",
+      "contrast_label": "early \u2212 late",
+      "estimate": -0.4515,
+      "p_raw": 0.0242,
+      "p_holm": 0.0484
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+,duration_sec,duration_sec,time_to_first_user_sec,time_to_first_user_sec,reply_latency_ms_median,reply_latency_ms_median,user_msg_len_median,user_msg_len_median,user_n_words_median,user_n_words_median,assistant_msg_len_median,assistant_msg_len_median,n_typing_events,n_typing_events,conclusion_n_words,conclusion_n_words
+,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std
+no ad,290.3,165.3,79.9,52.9,49542.5,31468.1,94.4,55.4,18.5,10.8,934.7,708.6,2.7,1.9,0.0,0.0
+implicit early,307.4,177.0,88.6,76.4,53204.0,37522.3,89.8,56.5,17.4,10.7,949.4,649.6,2.7,1.9,0.0,0.0
+implicit late,305.7,179.7,79.4,70.9,53588.2,34303.8,96.9,77.9,18.6,14.7,1131.3,696.4,2.7,1.9,0.0,0.0
+explicit early,303.6,229.9,94.8,109.7,55583.2,53915.6,98.1,81.6,18.9,15.7,897.4,630.2,2.7,1.9,0.0,0.0
+explicit late,330.5,257.6,91.2,71.2,58998.8,56501.6,107.9,87.1,21.0,17.3,1024.9,704.5,2.7,1.9,0.0,0.0

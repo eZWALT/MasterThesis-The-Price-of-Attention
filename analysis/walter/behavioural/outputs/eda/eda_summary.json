@@ -1,0 +1,47 @@
+{
+  "n_people": 54,
+  "holm_hits_primary": [
+    {
+      "outcome": "credibility",
+      "contrast": "early_vs_late",
+      "mean": -0.33024691358024694,
+      "p_t": 0.005499030251377602,
+      "p_holm": 0.016497090754132807
+    },
+    {
+      "outcome": "manipulation",
+      "contrast": "any_ad_vs_no_ads",
+      "mean": 1.2708333333333333,
+      "p_t": 1.135044988753991e-05,
+      "p_holm": 3.405134966261973e-05
+    },
+    {
+      "outcome": "manipulation",
+      "contrast": "inline_vs_block",
+      "mean": -0.6157407407407407,
+      "p_t": 0.022156216538733047,
+      "p_holm": 0.022156216538733047
+    },
+    {
+      "outcome": "manipulation",
+      "contrast": "early_vs_late",
+      "mean": 0.5787037037037037,
+      "p_t": 0.003635196046768607,
+      "p_holm": 0.007270392093537214
+    },
+    {
+      "outcome": "notice",
+      "contrast": "any_ad_vs_no_ads",
+      "mean": 2.074074074074074,
+      "p_t": 8.80447428151036e-10,
+      "p_holm": 2.641342284453108e-09
+    },
+    {
+      "outcome": "notice",
+      "contrast": "inline_vs_block",
+      "mean": -1.1481481481481481,
+      "p_t": 0.00017369852266216606,
+      "p_holm": 0.0003473970453243321
+    }
+  ]
+}
