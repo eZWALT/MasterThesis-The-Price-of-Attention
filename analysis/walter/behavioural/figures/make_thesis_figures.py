@@ -45,9 +45,9 @@ RECALL = ["recall_memory", "recall_trust_shift"]
 NAME = {"trust": "Trust", "credibility": "Credibility", "manipulation": "Perceived manipulation", "notice": "Notice",
         "helpfulness": "Helpfulness", "convincingness": "Convincingness", "relevance": "Relevance", "neutrality": "Neutrality",
         "recall_memory": "Cued memory", "recall_trust_shift": "Trust after re-exposure"}
-ITEMS = [("trust", "Trust"), ("llm_reliable", "Reliable information"), ("llm_false", "False information (R)"),
-         ("llm_made_up", "Made-up content (R)"), ("behaviour_pushing", "Pushing / marketing"), ("behaviour_manipulate", "Steering, not assisting"),
-         ("notice_brands", "Brand or product mention"), ("notice_sponsored", "Sponsored button")]
+ITEMS = [("trust", "Trust"), ("llm_reliable", "Reliable responses"), ("llm_false", "False information (R)"),
+         ("llm_made_up", "Made-up information (R)"), ("behaviour_pushing", "Pushing or marketing content"), ("behaviour_manipulate", "Steered my choice, not neutral"),
+         ("notice_brands", "Mentioned products or brands"), ("notice_sponsored", "Noticed sponsored buttons")]
 
 
 def style() -> None:
@@ -215,6 +215,97 @@ def estimator_concordance(planned: pd.DataFrame, lmm: pd.DataFrame) -> None:
 
 
 # --------------------------------------------------------------------------- #
+# figure 6: Holm board over the whole battery (appendix; mirrors fig:eeg-holm-board)
+# --------------------------------------------------------------------------- #
+def holm_board(planned: pd.DataFrame, secondary: pd.DataFrame) -> None:
+    """Rows: 4 primary + 4 secondary composites + 2 recall items. Columns: the
+    three planned contrasts (recall has two). Cell text = D-bar; fill = Holm p
+    (orange below .05, greys above), like the EEG board."""
+    rows = PRIMARY + SECONDARY + RECALL
+    cols = list(CONTRAST)
+    grid_p = pd.DataFrame(np.nan, index=rows, columns=cols)
+    grid_m = grid_p.copy()
+    src = pd.concat([planned[["outcome", "contrast", "mean", "p_holm"]], secondary[["outcome", "contrast", "mean", "p_holm"]]])
+    for _, r in src.iterrows():
+        if r.outcome in rows and r.contrast in cols:
+            grid_p.loc[r.outcome, r.contrast] = r.p_holm
+            grid_m.loc[r.outcome, r.contrast] = r["mean"]
+    fig, ax = plt.subplots(figsize=(7.4, 5.4))
+    from matplotlib.colors import ListedColormap, BoundaryNorm
+    cmap = ListedColormap([CLAY, "#E8C9B5", MIST, "#F2F4F6"])
+    norm = BoundaryNorm([0, 0.05, 0.10, 0.50, 1.0001], cmap.N)
+    data = grid_p.to_numpy(dtype=float)
+    masked = np.ma.masked_invalid(data)
+    ax.imshow(masked, cmap=cmap, norm=norm, aspect="auto")
+    for i, o in enumerate(rows):
+        for j, c in enumerate(cols):
+            if np.isnan(data[i, j]):
+                ax.text(j, i, "undefined", ha="center", va="center", fontsize=7, color=SLATE)
+                continue
+            p = data[i, j]
+            ptxt = "<.001" if p < 0.001 else f"{p:.3f}".lstrip("0")
+            ax.text(j, i, f"{grid_m.iloc[i, j]:+.2f}\nHolm {ptxt}", ha="center", va="center", fontsize=8,
+                    color="white" if p < 0.05 else INK, fontweight="bold" if p < 0.05 else "normal")
+    ax.set_xticks(range(len(cols)), [CONTRAST[c] for c in cols], fontsize=9)
+    ax.set_yticks(range(len(rows)), [NAME[o] for o in rows], fontsize=9)
+    ax.axhline(len(PRIMARY) - 0.5, color=INK, lw=1.2)
+    ax.axhline(len(PRIMARY) + len(SECONDARY) - 0.5, color=INK, lw=1.2)
+    for s in ("top", "right", "left", "bottom"):
+        ax.spines[s].set_visible(False)
+    ax.tick_params(length=0)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in [CLAY, "#E8C9B5", MIST, "#F2F4F6"]]
+    ax.legend(handles, ["Holm p < .05", ".05 to .10", ".10 to .50", "> .50"], loc="upper left", bbox_to_anchor=(1.01, 1), frameon=False, fontsize=8)
+    ax.set_title("Planned contrasts across the behavioural battery (N = 54)\nmean within-person difference in Likert points; Holm within outcome", fontsize=10)
+    fig.tight_layout()
+    save(fig, "beh_holm_board")
+
+
+# --------------------------------------------------------------------------- #
+# figure 7: rainclouds of the person-level differences D_i (appendix)
+# --------------------------------------------------------------------------- #
+def d_rainclouds(condition: pd.DataFrame) -> None:
+    """One panel per primary composite x planned contrast: half-violin, box,
+    and the 54 jittered D_i. Shows the discreteness and the zeros that the
+    assumption paragraph describes; the mean and its 95% t interval are the
+    navy point and bar."""
+    rng = np.random.default_rng(11)
+    fig, axes = plt.subplots(len(PRIMARY), len(CONTRAST), figsize=(11, 8.6), sharex="col")
+    for i, outcome in enumerate(PRIMARY):
+        w = sk.wide(condition, outcome)
+        for j, cid in enumerate(CONTRAST):
+            ax = axes[i, j]
+            d = sk.contrast_scores(w, cid).dropna().to_numpy(dtype=float)
+            # half violin (kde) above the axis, points below
+            from scipy.stats import gaussian_kde
+            xs = np.linspace(d.min() - 0.5, d.max() + 0.5, 200)
+            kde = gaussian_kde(d, bw_method=0.35)(xs)
+            kde = kde / kde.max() * 0.45
+            ax.fill_between(xs, 0.15, 0.15 + kde, color=TEAL, alpha=0.35, lw=0)
+            ax.boxplot(d, orientation="horizontal", positions=[0.15], widths=0.12, showfliers=False, patch_artist=True,
+                       boxprops=dict(facecolor="white", edgecolor=INK, lw=0.9), medianprops=dict(color=CLAY, lw=1.6),
+                       whiskerprops=dict(color=INK, lw=0.9), capprops=dict(color=INK, lw=0.9))
+            ax.scatter(d + rng.uniform(-0.04, 0.04, len(d)), -0.25 + rng.uniform(-0.12, 0.12, len(d)), s=9, color=SLATE, alpha=0.7, zorder=2)
+            m, se = d.mean(), d.std(ddof=1) / np.sqrt(len(d))
+            ax.errorbar(m, -0.55, xerr=1.96 * se, fmt="o", color=NAVY, ecolor=NAVY, capsize=3, ms=5, zorder=3)
+            ax.axvline(0, color=INK, lw=0.8)
+            ax.set_ylim(-0.75, 0.75)
+            ax.set_yticks([])
+            for s in ("left", "top", "right"):
+                ax.spines[s].set_visible(False)
+            share_zero = (d == 0).mean()
+            ax.text(0.99, 0.95, f"zeros {share_zero:.0%}", transform=ax.transAxes, ha="right", va="top", fontsize=7.5, color=SLATE)
+            if i == 0:
+                ax.set_title(CONTRAST[cid], fontsize=10)
+            if j == 0:
+                ax.set_ylabel(NAME[outcome], fontsize=9)
+            if i == len(PRIMARY) - 1:
+                ax.set_xlabel("$D_i$, Likert points")
+    fig.suptitle("Person-level planned differences $D_i$ for the four primary composites (N = 54): density, box, points; navy = mean with 95% t interval", fontsize=10, y=0.995)
+    fig.tight_layout()
+    save(fig, "beh_d_rainclouds")
+
+
+# --------------------------------------------------------------------------- #
 # tables
 # --------------------------------------------------------------------------- #
 def table_planned(planned: pd.DataFrame, lmm: pd.DataFrame) -> str:
@@ -287,13 +378,13 @@ def table_omnibus(friedman: pd.DataFrame, pairs: pd.DataFrame) -> str:
         if o == "notice":
             lines.append(r"\midrule")
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}", ""]
-    hits = pairs[(pairs.p_t_holm10 < 0.05) | (pairs.p_wilcoxon_holm10 < 0.05)].copy()
+    hits = pairs[pairs.p_t_holm10 < 0.10].copy()
     hits["o"] = pd.Categorical(hits.outcome, list(order))
     hits = hits.sort_values(["o", "p_t_holm10"])
     lines += [r"\begin{table}[H]", r"\centering", r"\small",
-              r"\caption{Pairwise sweep over the ten condition pairs within each of the eight composites (\(80\) tests, \(N=54\)), post hoc. Paired \(t\) on the ordinary within-person difference with Holm and Benjamini--Hochberg across the ten pairs of an outcome; the Wilcoxon signed-rank test on the same differences is Holm-adjusted across the same ten as a sensitivity engine. Only pairs below \(.05\) under either Holm are listed; the full grid is in the released tables. Differences read first condition minus second.}",
+              r"\caption{Pairwise sweep over the ten condition pairs within each of the eight composites (\(80\) tests, \(N=54\)), post hoc. Paired \(t\) on the ordinary within-person difference with Holm and Benjamini--Hochberg across the ten pairs of an outcome; Wilcoxon \(p\) is the raw signed-rank sensitivity on the same differences. Pairs with Holm \(p<.10\) are listed; the full grid is in the released tables. Differences read first condition minus second.}",
               r"\label{tab:beh-pairwise}", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}ll r c r r r r@{}}", r"\toprule",
-              r"Outcome & Pair & \(\overline{D}\) & 95\% CI & \(d_z\) & Holm \(p\) & BH \(q\) & Wilcoxon Holm \(p\) \\", r"\midrule"]
+              r"Outcome & Pair & \(\overline{D}\) & 95\% CI & \(d_z\) & Holm \(p\) & BH \(q\) & Wilcoxon \(p\) \\", r"\midrule"]
     last = None
     for _, r in hits.iterrows():
         name = NAME[r.outcome] if r.outcome != last else ""
@@ -301,7 +392,7 @@ def table_omnibus(friedman: pd.DataFrame, pairs: pd.DataFrame) -> str:
             lines.append(r"\addlinespace[2pt]")
         last = r.outcome
         pair = f"{COND[r.a]} \\(-\\) {COND[r.b].lower()}"
-        lines.append(f"{name} & {pair} & {fmt_num(r['mean'])} & {fmt_ci(r.ci95_lo, r.ci95_hi)} & {fmt_num(r.dz)} & {fmt_p(r.p_t_holm10)} & {fmt_p(r.q_t_bh10)} & {fmt_p(r.p_wilcoxon_holm10)} \\\\")
+        lines.append(f"{name} & {pair} & {fmt_num(r['mean'])} & {fmt_ci(r.ci95_lo, r.ci95_hi)} & {fmt_num(r.dz)} & {fmt_p(r.p_t_holm10)} & {fmt_p(r.q_t_bh10)} & {fmt_p(r.p_wilcoxon)} \\\\")
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
     return "\n".join(lines)
 
@@ -376,6 +467,14 @@ def run() -> None:
     localisation_forest(posthoc)
     likert_distributions(condition)
     estimator_concordance(planned, lmm)
+    # secondary composites, Holm within outcome over the three planned contrasts,
+    # from the leave-one-item-out run ("full" variant = pre-specified composite)
+    loo_path = WALTER / "behavioural" / "outputs" / "sensitivity" / "item_loo_contrasts.csv"
+    if loo_path.exists():
+        loo = pd.read_csv(loo_path)
+        secondary = loo[(loo.variant == "full") & (loo.composite.isin(SECONDARY))].rename(columns={"composite": "outcome"})
+        holm_board(planned, secondary)
+    d_rainclouds(condition)
 
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "tab_beh_planned.tex").write_text(table_planned(planned, lmm) + "\n")

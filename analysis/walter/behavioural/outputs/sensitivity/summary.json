@@ -1,0 +1,78 @@
+{
+  "flagged_items": [
+    "llm_opinionated",
+    "llm_reliable",
+    "llm_skeptical"
+  ],
+  "flagged_are_odd_polarity": true,
+  "flagged_raw_rho": {
+    "llm_opinionated": [
+      -0.39,
+      -0.32
+    ],
+    "llm_reliable": [
+      -0.51,
+      -0.48
+    ],
+    "llm_skeptical": [
+      -0.56,
+      -0.32
+    ]
+  },
+  "flagged_reversed_rho": {
+    "llm_opinionated": [
+      0.32,
+      0.39
+    ],
+    "llm_reliable": [
+      0.48,
+      0.51
+    ],
+    "llm_skeptical": [
+      0.32,
+      0.56
+    ]
+  },
+  "flagged_item_rest_rho": {
+    "llm_opinionated": 0.37,
+    "llm_reliable": 0.52,
+    "llm_skeptical": 0.45
+  },
+  "n_loo_cells": 45,
+  "verdict_changes": [
+    {
+      "composite": "credibility",
+      "dropped": "llm_reliable",
+      "contrast": "early_vs_late",
+      "mean": -0.264,
+      "p_holm_variant": 0.1593,
+      "full_sig": true
+    },
+    {
+      "composite": "helpfulness",
+      "dropped": "llm_not_aid",
+      "contrast": "early_vs_late",
+      "mean": -0.384,
+      "p_holm_variant": 0.0421,
+      "full_sig": false
+    },
+    {
+      "composite": "neutrality",
+      "dropped": "llm_neutral",
+      "contrast": "early_vs_late",
+      "mean": -0.407,
+      "p_holm_variant": 0.0137,
+      "full_sig": false
+    },
+    {
+      "composite": "neutrality",
+      "dropped": "llm_opinionated",
+      "contrast": "any_ad_vs_no_ads",
+      "mean": -0.542,
+      "p_holm_variant": 0.0284,
+      "full_sig": false
+    }
+  ],
+  "item_level_holm_hits": 17,
+  "item_level_cells": 57
+}

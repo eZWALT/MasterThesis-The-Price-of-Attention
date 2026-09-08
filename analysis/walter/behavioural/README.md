@@ -40,6 +40,12 @@ Notebooks:
   composites; plus Cronbach α (items reversed once) with arm splits.
   Post hoc; thesis Appendix F (`tab:beh-friedman`, `tab:beh-pairwise`,
   `tab:beh-alpha`).
+- `stats/run_item_sensitivity.py` → `outputs/sensitivity/`: item
+  diagnostics (raw vs reversed inter-item ρ, item–rest ρ, α-if-deleted),
+  leave-one-item-out planned contrasts for the five 3-item composites,
+  item-level planned contrasts, `beh_item_forest`, and the two appendix
+  tables `tab_beh_item_diag` / `tab_beh_item_loo`. Sensitivity only; the
+  pre-specified composites stay primary.
 - `stats/run_assumptions.py` → `outputs/assumptions/`: Shapiro / skew /
   kurtosis / QQ on every planned \(D_i\); paired \(t\) vs Wilcoxon vs sign
   vs bootstrap CI on the same cells; Katerina's 10-pair design on Gold with
