@@ -1,5 +1,9 @@
 # 7 September (evening): Ch 7.2 / 8.1 behavioural — what is ready, one decision
 
+> **Superseded 8 September.** Applied and pushed (thesis `15cf438`); the
+> estimator decision went to option 2 (paired \(t\) primary) and the
+> family to 16 tests. Read `2026-09-08-behavioural-ch7-ch8-applied.md`.
+
 Not applied to Overleaf. Nothing pushed. Personality / demographic
 moderation (`sec:disc-personality`, `tab:analysis-families` row 2)
 stays unestimated and is left for later. Free text is discarded.
