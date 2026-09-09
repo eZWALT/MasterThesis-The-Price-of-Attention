@@ -54,7 +54,9 @@ def find_project_root(start: Path) -> Path:
     return start.resolve()
 
 
-def reverse_code(value: float) -> float:
+def reverse_code(value):
+    if isinstance(value, pd.Series):
+        return value.apply(lambda x: 8.0 - float(x))
     return 8.0 - float(value)
 
 
