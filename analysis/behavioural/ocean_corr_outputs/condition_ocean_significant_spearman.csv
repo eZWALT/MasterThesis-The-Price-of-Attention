@@ -1,0 +1,11 @@
+condition,outcome,ocean_trait,ocean_label,n,spearman_rho,spearman_p,pearson_r,pearson_p,spearman_holm_adjusted_p,spearman_bh_fdr_q
+block_early,convincingness,E,Extraversion,19,-0.4989,0.0297,-0.5013,0.0288,1.0,0.66875
+block_early,helpfulness,E,Extraversion,19,-0.4766,0.0391,-0.4364,0.0617,1.0,0.66875
+block_late,convincingness,C,Conscientiousness,19,-0.5526,0.0141,-0.4896,0.0334,1.0,0.66875
+block_late,helpfulness,O,Openness,19,-0.5319,0.0191,-0.4869,0.0345,1.0,0.66875
+block_late,relevance,C,Conscientiousness,19,-0.482,0.0366,-0.4495,0.0535,1.0,0.66875
+inline_late,relevance,E,Extraversion,19,-0.7235,0.0005,-0.6898,0.0011,0.08750000000000001,0.08750000000000001
+inline_late,helpfulness,E,Extraversion,19,-0.5893,0.0079,-0.5314,0.0192,1.0,0.66875
+inline_late,convincingness,E,Extraversion,19,-0.5016,0.0287,-0.4153,0.077,1.0,0.66875
+no_ads,helpfulness,O,Openness,19,-0.5163,0.0236,-0.5297,0.0197,1.0,0.66875
+no_ads,credibility,C,Conscientiousness,19,-0.4652,0.0447,-0.365,0.1244,1.0,0.66875

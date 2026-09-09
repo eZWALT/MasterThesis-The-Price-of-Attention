@@ -14,14 +14,16 @@ Outcomes:
   credibility, helpfulness, convincingness, relevance, neutrality,
   behaviour_pushing, behaviour_manipulate
 
-Outputs:
+Outputs (all under ocean_corr_outputs/):
   - participant_ocean_scores.csv
   - participant_condition_scores_with_ocean.csv
   - condition_ocean_correlations.csv
   - condition_ocean_significant_spearman.csv
-  - ocean_corr_outputs/analysis_diagram.png
-  - ocean_corr_outputs/spearman_heatmap_by_condition.png
-  - ocean_corr_outputs/spearman_heatmap_<condition>.png
+  - condition_ocean_significant_holm.csv
+  - condition_ocean_significant_bh_fdr.csv
+  - analysis_diagram.png
+  - spearman_heatmap_by_condition.png
+  - spearman_heatmap_<condition>.png
 
 Code by Katerina, 2026-08-06  
 """
@@ -39,7 +41,9 @@ import scipy.stats as stats
 
 
 ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = ROOT.parents[1]
 EXPERIMENT_DIR = ROOT / "Experiment"
+TRACKED_LOG_DIR = PROJECT_ROOT / "src" / "project" / "logs" / "tracked"
 SCORES_CSV = ROOT / "participant_condition_scores.csv"
 OUT_DIR = ROOT / "ocean_corr_outputs"
 
@@ -63,59 +67,115 @@ OCEAN_LABELS = {
 }
 
 
-def collect_ocean_scores(experiment_dir: Path) -> pd.DataFrame:
+def holm_adjusted_pvalues(pvals: np.ndarray) -> np.ndarray:
+    """Holm-Bonferroni adjusted p-values for a set of p-values."""
+    p = np.asarray(pvals, dtype=float)
+    n = len(p)
+    if n == 0:
+        return p.copy()
+
+    order = np.argsort(p)
+    sorted_p = p[order]
+    adjusted_sorted = np.empty(n, dtype=float)
+    running = 0.0
+
+    for i in range(n):
+        rank = i + 1
+        candidate = (n - rank + 1) * sorted_p[i]
+        running = max(running, candidate)
+        adjusted_sorted[i] = min(1.0, running)
+
+    adjusted = np.empty(n, dtype=float)
+    adjusted[order] = adjusted_sorted
+    return adjusted
+
+
+def benjamini_hochberg_qvalues(pvals: np.ndarray) -> np.ndarray:
+    """Benjamini-Hochberg FDR q-values for a set of p-values."""
+    p = np.asarray(pvals, dtype=float)
+    n = len(p)
+    if n == 0:
+        return p.copy()
+
+    order = np.argsort(p)
+    sorted_p = p[order]
+    adjusted_sorted = np.empty(n, dtype=float)
+    running = 1.0
+
+    for i in range(n - 1, -1, -1):
+        rank = i + 1
+        candidate = sorted_p[i] * n / rank
+        running = min(running, candidate)
+        adjusted_sorted[i] = min(1.0, running)
+
+    adjusted = np.empty(n, dtype=float)
+    adjusted[order] = adjusted_sorted
+    return adjusted
+
+
+def collect_ocean_scores(search_roots: Path | list[Path] | tuple[Path, ...]) -> pd.DataFrame:
     """One row per participant from ocean_submitted (fallback: session_complete)."""
+    if isinstance(search_roots, Path):
+        roots = [search_roots]
+    else:
+        roots = list(search_roots)
+
     by_pid: dict[str, dict] = {}
 
-    for path in sorted(experiment_dir.rglob("*_export.jsonl")):
-        with path.open("r", encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                rec = json.loads(line)
-                event = rec.get("event")
-                data = rec.get("data") or {}
-                pid = rec.get("participant_id") or data.get("participant_id")
-                if not pid:
-                    continue
-
-                scores = None
-                raw = None
-                bfi_version = None
-                source_event = None
-
-                if event == "ocean_submitted":
-                    scores = data.get("scores") or data.get("ocean_scores")
-                    raw = data.get("raw") or data.get("ocean_raw")
-                    bfi_version = data.get("bfi_version")
-                    source_event = "ocean_submitted"
-                elif event == "session_complete" and pid not in by_pid:
-                    scores = data.get("ocean_scores") or data.get("scores")
-                    raw = data.get("ocean_raw") or data.get("raw")
-                    source_event = "session_complete"
-
-                if not scores:
-                    continue
-
-                # Prefer ocean_submitted over an earlier session_complete stub.
-                if pid in by_pid and by_pid[pid]["source_event"] == "ocean_submitted":
-                    if source_event != "ocean_submitted":
+    for root in roots:
+        if not root.exists():
+            continue
+        for path in sorted(root.rglob("*_export.jsonl")):
+            with path.open("r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    rec = json.loads(line)
+                    event = rec.get("event")
+                    data = rec.get("data") or {}
+                    pid = rec.get("participant_id") or data.get("participant_id")
+                    if not pid:
                         continue
 
-                row = {
-                    "participant_id": pid,
-                    "bfi_version": bfi_version,
-                    "source_event": source_event,
-                    "source_file": str(path.relative_to(ROOT)),
-                }
-                for trait in OCEAN_COLS:
-                    row[trait] = scores.get(trait)
-                row["ocean_raw"] = json.dumps(raw) if raw is not None else ""
-                by_pid[pid] = row
+                    scores = None
+                    raw = None
+                    bfi_version = None
+                    source_event = None
+
+                    if event == "ocean_submitted":
+                        scores = data.get("scores") or data.get("ocean_scores")
+                        raw = data.get("raw") or data.get("ocean_raw")
+                        bfi_version = data.get("bfi_version")
+                        source_event = "ocean_submitted"
+                    elif event == "session_complete" and pid not in by_pid:
+                        scores = data.get("ocean_scores") or data.get("scores")
+                        raw = data.get("ocean_raw") or data.get("raw")
+                        source_event = "session_complete"
+
+                    if not scores:
+                        continue
+
+                    # Prefer ocean_submitted over an earlier session_complete stub.
+                    if pid in by_pid and by_pid[pid]["source_event"] == "ocean_submitted":
+                        if source_event != "ocean_submitted":
+                            continue
+
+                    row = {
+                        "participant_id": pid,
+                        "bfi_version": bfi_version,
+                        "source_event": source_event,
+                        "source_file": str(path.relative_to(PROJECT_ROOT)) if path.is_relative_to(PROJECT_ROOT) else str(path),
+                    }
+                    for trait in OCEAN_COLS:
+                        row[trait] = scores.get(trait)
+                    row["ocean_raw"] = json.dumps(raw) if raw is not None else ""
+                    by_pid[pid] = row
 
     if not by_pid:
-        raise SystemExit("No OCEAN scores found in Experiment export files.")
+        raise SystemExit(
+            "No OCEAN scores found in Experiment export files or src/project/logs/tracked/**/*_export.jsonl."
+        )
 
     return pd.DataFrame(by_pid.values()).sort_values("participant_id").reset_index(drop=True)
 
@@ -338,18 +398,27 @@ def plot_heatmaps(corr: pd.DataFrame, out_dir: Path) -> list[Path]:
     return written
 
 
-def main() -> None:
-    if not EXPERIMENT_DIR.exists():
-        raise SystemExit(f"Experiment folder not found: {EXPERIMENT_DIR}")
-    if not SCORES_CSV.exists():
-        raise SystemExit(
-            f"Missing {SCORES_CSV.name}. Run Analysis_AdsTalkBack.ipynb first."
-        )
+def resolve_scores_csv() -> Path:
+    candidates = [
+        ROOT / "participant_condition_scores.csv",
+        ROOT / "outputs" / "ad_scores" / "participant_condition_scores.csv",
+        PROJECT_ROOT / "analysis" / "behavioural" / "participant_condition_scores.csv",
+        PROJECT_ROOT / "analysis" / "behavioural" / "outputs" / "ad_scores" / "participant_condition_scores.csv",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise SystemExit(
+        f"Missing participant_condition_scores.csv. Looked in: {', '.join(str(c) for c in candidates)}"
+    )
 
+
+def main() -> None:
+    scores_path = resolve_scores_csv()
     OUT_DIR.mkdir(exist_ok=True)
 
-    ocean = collect_ocean_scores(EXPERIMENT_DIR)
-    scores = pd.read_csv(SCORES_CSV)
+    ocean = collect_ocean_scores([EXPERIMENT_DIR, TRACKED_LOG_DIR])
+    scores = pd.read_csv(scores_path)
 
     missing_outcomes = [c for c in OUTCOME_COLS if c not in scores.columns]
     if missing_outcomes:
@@ -359,14 +428,32 @@ def main() -> None:
     if joined.empty:
         raise SystemExit("No overlapping participant_ids between scores CSV and OCEAN data.")
 
-    corr = correlate_by_condition(joined)
-    sig = corr.dropna(subset=["spearman_p"])
-    sig = sig[sig["spearman_p"] < 0.05].sort_values(["condition", "spearman_p"]).reset_index(drop=True)
+    corr = correlate_by_condition(joined).copy()
 
-    ocean_path = ROOT / "participant_ocean_scores.csv"
-    joined_path = ROOT / "participant_condition_scores_with_ocean.csv"
-    corr_path = ROOT / "condition_ocean_correlations.csv"
-    sig_path = ROOT / "condition_ocean_significant_spearman.csv"
+    valid = corr["spearman_p"].notna()
+    if valid.any():
+        pvals = corr.loc[valid, "spearman_p"].to_numpy(dtype=float)
+        corr.loc[valid, "spearman_holm_adjusted_p"] = holm_adjusted_pvalues(pvals)
+        corr.loc[valid, "spearman_bh_fdr_q"] = benjamini_hochberg_qvalues(pvals)
+    else:
+        corr["spearman_holm_adjusted_p"] = np.nan
+        corr["spearman_bh_fdr_q"] = np.nan
+
+    raw_sig = corr.dropna(subset=["spearman_p"])
+    raw_sig = raw_sig[raw_sig["spearman_p"] < 0.05].sort_values(["condition", "spearman_p"]).reset_index(drop=True)
+
+    holm_sig = corr.dropna(subset=["spearman_holm_adjusted_p"])
+    holm_sig = holm_sig[holm_sig["spearman_holm_adjusted_p"] < 0.05].sort_values(["condition", "spearman_holm_adjusted_p"]).reset_index(drop=True)
+
+    bh_sig = corr.dropna(subset=["spearman_bh_fdr_q"])
+    bh_sig = bh_sig[bh_sig["spearman_bh_fdr_q"] < 0.05].sort_values(["condition", "spearman_bh_fdr_q"]).reset_index(drop=True)
+
+    ocean_path = OUT_DIR / "participant_ocean_scores.csv"
+    joined_path = OUT_DIR / "participant_condition_scores_with_ocean.csv"
+    corr_path = OUT_DIR / "condition_ocean_correlations.csv"
+    raw_sig_path = OUT_DIR / "condition_ocean_significant_spearman.csv"
+    holm_sig_path = OUT_DIR / "condition_ocean_significant_holm.csv"
+    bh_sig_path = OUT_DIR / "condition_ocean_significant_bh_fdr.csv"
     diagram_path = OUT_DIR / "analysis_diagram.png"
 
     write_csv(ocean_path, ocean)
@@ -377,7 +464,9 @@ def main() -> None:
         ].sort_values(["participant_id", "condition"]),
     )
     write_csv(corr_path, corr)
-    write_csv(sig_path, sig)
+    write_csv(raw_sig_path, raw_sig)
+    write_csv(holm_sig_path, holm_sig)
+    write_csv(bh_sig_path, bh_sig)
 
     n_part = int(joined["participant_id"].nunique())
     n_cond = int(joined["condition"].nunique())
@@ -390,25 +479,34 @@ def main() -> None:
     print(f"Wrote {ocean_path.name} ({len(ocean)} rows)")
     print(f"Wrote {joined_path.name} ({len(joined)} rows)")
     print(f"Wrote {corr_path.name} ({len(corr)} rows)")
-    print(f"Wrote {sig_path.name} ({len(sig)} rows)")
+    print(f"Wrote {raw_sig_path.name} ({len(raw_sig)} rows)")
+    print(f"Wrote {holm_sig_path.name} ({len(holm_sig)} rows)")
+    print(f"Wrote {bh_sig_path.name} ({len(bh_sig)} rows)")
     print(f"Wrote {diagram_path.relative_to(ROOT)}")
     for path in heatmap_paths:
         print(f"Wrote {path.relative_to(ROOT)}")
     print()
 
-    print("Significant Spearman correlations (uncorrected p < 0.05):")
-    if sig.empty:
-        print("  (none)")
-    else:
+    def print_results(label: str, df: pd.DataFrame, p_col: str) -> None:
+        print(f"Significant Spearman correlations ({label}):")
+        if df.empty:
+            print("  (none)")
+            return
         print(
             f"{'condition':<14} {'outcome':<22} {'trait':<4} "
-            f"{'rho':>7} {'p':>8} {'n':>3}"
+            f"{'rho':>7} {p_col:>10} {'n':>3}"
         )
-        for _, row in sig.iterrows():
+        for _, row in df.iterrows():
             print(
                 f"{row['condition']:<14} {row['outcome']:<22} {row['ocean_trait']:<4} "
-                f"{row['spearman_rho']:>7.4f} {row['spearman_p']:>8.4f} {int(row['n']):>3}"
+                f"{row['spearman_rho']:>7.4f} {row[p_col]:>10.4f} {int(row['n']):>3}"
             )
+
+    print_results("uncorrected p < 0.05", raw_sig, "spearman_p")
+    print()
+    print_results("Holm-adjusted p < 0.05", holm_sig, "spearman_holm_adjusted_p")
+    print()
+    print_results("BH-FDR q < 0.05", bh_sig, "spearman_bh_fdr_q")
 
 
 if __name__ == "__main__":

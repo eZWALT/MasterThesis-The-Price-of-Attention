@@ -99,12 +99,16 @@ Outcomes correlated with OCEAN traits `E`, `A`, `C`, `N`, `O`:
 python calc_condition_ocean_correlations.py
 ```
 
+All outputs are written to `ocean_corr_outputs/`.
+
 | Output | Description |
 |--------|-------------|
-| `participant_ocean_scores.csv` | OCEAN scores per participant |
-| `participant_condition_scores_with_ocean.csv` | Survey scores joined with OCEAN |
-| `condition_ocean_correlations.csv` | Full correlation table |
-| `condition_ocean_significant_spearman.csv` | Spearman rows with uncorrected *p* < 0.05 |
+| `ocean_corr_outputs/participant_ocean_scores.csv` | OCEAN scores per participant |
+| `ocean_corr_outputs/participant_condition_scores_with_ocean.csv` | Survey scores joined with OCEAN |
+| `ocean_corr_outputs/condition_ocean_correlations.csv` | Full correlation table |
+| `ocean_corr_outputs/condition_ocean_significant_spearman.csv` | Spearman rows with uncorrected *p* < 0.05 |
+| `ocean_corr_outputs/condition_ocean_significant_holm.csv` | Spearman rows with Holm-adjusted *p* < 0.05 |
+| `ocean_corr_outputs/condition_ocean_significant_bh_fdr.csv` | Spearman rows with BH-FDR *q* < 0.05 |
 | `ocean_corr_outputs/analysis_diagram.png` | Analysis flow diagram |
 | `ocean_corr_outputs/spearman_heatmap_by_condition.png` | Combined Spearman heatmaps |
 | `ocean_corr_outputs/spearman_heatmap_<condition>.png` | Per-condition heatmap |
