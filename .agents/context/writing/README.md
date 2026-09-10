@@ -8,11 +8,15 @@ handovers for thesis and publication prose.
 Newest first. Dated notes below this box are history; they do not
 re-open a closed lock.
 
-1. Four-family narrative example (register only, **not** live LaTeX):
+1. **Final narrative from Walter's notebook** (8 Sep evening):
+   `2026-09-08-final-narrative-from-notebook.md`. His TLDR, fabricated
+   narrative, EEG two angles, provider / people takeaways. Register
+   only. Do not paste into `conclusion.tex`.
+2. Four-family narrative example (longer register, **not** live LaTeX):
    `2026-09-08-four-family-narrative-example.md`. Implication-first
    paragraphs with signs and variable names. Do not paste into
    `conclusion.tex`.
-2. **Do not drop** `llm_reliable` / `llm_opinionated` /
+3. **Do not drop** `llm_reliable` / `llm_opinionated` /
    `llm_skeptical` from the battery. Item-correlation rerun is held;
    answered 8 Sep evening as **sensitivity only** (Appendix F
    `sec:app-beh-items`: odd-polarity artefact; credibility early − late
