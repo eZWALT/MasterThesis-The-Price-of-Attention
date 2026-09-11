@@ -1,6 +1,12 @@
 # Behavioural analysis context
 
-## Live now (8 September)
+## Live now (10 September)
+
+- **Personality family estimated** on Walter Gold \(N=54\):
+  `stats/run_personality_declared.py` →
+  `outputs/confirmatory/personality_lmm.csv`. 0/60 Holm. Thesis 7.3 / 8.2
+  / App F written locally; Overleaf push waits on Walter. Do not quote
+  Katerina's \(n=19\) OCEAN heatmaps as this family.
 
 - **Item correlations held.** Katerina flagged `llm_reliable`,
   `llm_opinionated`, `llm_skeptical` as low-correlation and asked

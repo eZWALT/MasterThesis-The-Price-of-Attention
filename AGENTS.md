@@ -111,7 +111,7 @@ Live now boxes override this table.
 | Goal | Status | Where |
 |---|---|---|
 | 1 Behavioural battery | Frozen. Ch 7.2 / 8.1 **applied** (thesis `15cf438`). Paired \(t\) primary. | `analysis/walter/behavioural/` |
-| 2 Personality | On person Gold with BFI | same |
+| 2 Personality | Estimated on Gold \(N=54\). 0/60 Holm. Thesis 7.3 / 8.2 / App F written locally; Overleaf not pushed. | `analysis/walter/behavioural/stats/run_personality_declared.py` |
 | 3 EEG | Confirmatory frozen (4 s, median, ICA, \(k=37\)) | `analysis/eeg/` |
 | 4 Trajectories | Stages 1–4 frozen; utterance primary | `analysis/trajectories/` |
 | 5 Combos | Declared families **applied** (thesis `d206df3`). Dataset A 0/6; Dataset B trust × posterior \(\alpha\) \(\rho=.80\). | `analysis/walter/combos/run_thesis_families.py` |
