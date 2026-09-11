@@ -1,0 +1,95 @@
+{
+  "n_lmm": 60,
+  "lmm_holm_hits": 0,
+  "lmm_raw_hits": 4,
+  "ols_holm_hits": 0,
+  "ols_raw_hits": 4,
+  "demo_holm_hits": 0,
+  "demo_raw_hits": 2,
+  "lmm_vs_ols": {
+    "neither": 60
+  },
+  "nearest_lmm": [
+    {
+      "outcome": "credibility",
+      "trait_label": "Extraversion",
+      "contrast_label": "early \u2212 late",
+      "estimate": -0.3089,
+      "ci95_lo": -0.5495,
+      "ci95_hi": -0.0683,
+      "p_raw": 0.0119,
+      "p_holm": 0.178
+    },
+    {
+      "outcome": "trust",
+      "trait_label": "Extraversion",
+      "contrast_label": "early \u2212 late",
+      "estimate": -0.4648,
+      "ci95_lo": -0.8332,
+      "ci95_hi": -0.0963,
+      "p_raw": 0.0134,
+      "p_holm": 0.2012
+    },
+    {
+      "outcome": "notice",
+      "trait_label": "Openness",
+      "contrast_label": "implicit \u2212 explicit",
+      "estimate": 0.4616,
+      "ci95_lo": 0.0262,
+      "ci95_hi": 0.897,
+      "p_raw": 0.0377,
+      "p_holm": 0.5656
+    },
+    {
+      "outcome": "trust",
+      "trait_label": "Neuroticism",
+      "contrast_label": "any ad \u2212 no ad",
+      "estimate": -0.2689,
+      "ci95_lo": -0.5344,
+      "ci95_hi": -0.0035,
+      "p_raw": 0.0471,
+      "p_holm": 0.6589
+    },
+    {
+      "outcome": "credibility",
+      "trait_label": "Agreeableness",
+      "contrast_label": "any ad \u2212 no ad",
+      "estimate": -0.2025,
+      "ci95_lo": -0.4209,
+      "ci95_hi": 0.016,
+      "p_raw": 0.0692,
+      "p_holm": 0.9695
+    },
+    {
+      "outcome": "notice",
+      "trait_label": "Conscientiousness",
+      "contrast_label": "any ad \u2212 no ad",
+      "estimate": 0.4202,
+      "ci95_lo": -0.0484,
+      "ci95_hi": 0.8887,
+      "p_raw": 0.0788,
+      "p_holm": 1.0
+    },
+    {
+      "outcome": "credibility",
+      "trait_label": "Neuroticism",
+      "contrast_label": "any ad \u2212 no ad",
+      "estimate": -0.1561,
+      "ci95_lo": -0.3302,
+      "ci95_hi": 0.0181,
+      "p_raw": 0.079,
+      "p_holm": 1.0
+    },
+    {
+      "outcome": "notice",
+      "trait_label": "Neuroticism",
+      "contrast_label": "early \u2212 late",
+      "estimate": 0.3498,
+      "ci95_lo": -0.0472,
+      "ci95_hi": 0.7469,
+      "p_raw": 0.0842,
+      "p_holm": 1.0
+    }
+  ],
+  "converged": true
+}

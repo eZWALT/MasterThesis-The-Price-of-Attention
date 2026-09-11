@@ -29,6 +29,10 @@ Notebooks:
   `planned_t_vs_lmm.csv`: the estimator `tab:analysis-families` declares
   (bare random-intercept LMM, Wald planned contrasts, Holm within
   composite). Same estimates as the paired \(t\); 15/16 verdicts agree.
+- `stats/run_personality_declared.py` → `outputs/confirmatory/personality_lmm.csv`:
+  Goal 2 as Methods declares it (trait \(\times\) the three planned
+  contrast codes, demographics as covariates, Holm-15 within composite).
+  0/60 Holm. OLS check and a demo-factor screen sit beside it.
 - `figures/make_thesis_figures.py` → `outputs/figures/thesis/`: PNG + PDF
   in the EEG-suite style (profiles, confirmatory forests, localisation,
   Likert stacks, estimator concordance) and `.tex` tables + figure

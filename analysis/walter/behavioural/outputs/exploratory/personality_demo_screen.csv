@@ -1,0 +1,49 @@
+family,outcome,contrast,contrast_label,factor,n,k_levels,f,p_raw,p_holm,p_holm_sig
+demo_screen,trust,any_ad_vs_no_ads,any ad − no ad,arm,54,2,0.014349513141518146,0.9051115589232777,1.0,False
+demo_screen,trust,any_ad_vs_no_ads,any ad − no ad,sex,54,3,2.360518037896927,0.1046044888687315,1.0,False
+demo_screen,trust,any_ad_vs_no_ads,any ad − no ad,familiar,54,2,0.14599731737631488,0.7039473451515211,1.0,False
+demo_screen,trust,any_ad_vs_no_ads,any ad − no ad,daily,54,2,0.2105348772652008,0.6482606808757421,1.0,False
+demo_screen,trust,inline_vs_block,implicit − explicit,arm,54,2,0.06612170753860834,0.7980843955145884,1.0,False
+demo_screen,trust,inline_vs_block,implicit − explicit,sex,54,3,0.280901172845327,0.7562636079254504,1.0,False
+demo_screen,trust,inline_vs_block,implicit − explicit,familiar,54,2,1.1671304025227172,0.2849769112811322,1.0,False
+demo_screen,trust,inline_vs_block,implicit − explicit,daily,54,2,5.568757969324617,0.022072034102393133,0.26486440922871757,False
+demo_screen,trust,early_vs_late,early − late,arm,54,2,1.3470348961678418,0.25109782813462533,1.0,False
+demo_screen,trust,early_vs_late,early − late,sex,54,3,0.510217113665392,0.6033970436841088,1.0,False
+demo_screen,trust,early_vs_late,early − late,familiar,54,2,0.0015502489342035053,0.968743625554481,1.0,False
+demo_screen,trust,early_vs_late,early − late,daily,54,2,0.0471689105318464,0.8289148261929835,1.0,False
+demo_screen,credibility,any_ad_vs_no_ads,any ad − no ad,arm,54,2,0.8017210875688225,0.3747054523418528,1.0,False
+demo_screen,credibility,any_ad_vs_no_ads,any ad − no ad,sex,54,3,0.2765167139344969,0.7595506884645543,1.0,False
+demo_screen,credibility,any_ad_vs_no_ads,any ad − no ad,familiar,54,2,0.702519977800284,0.40577449736275273,1.0,False
+demo_screen,credibility,any_ad_vs_no_ads,any ad − no ad,daily,54,2,0.4150338502794514,0.5222572360526518,1.0,False
+demo_screen,credibility,inline_vs_block,implicit − explicit,arm,54,2,0.2549784849394768,0.6157246079563489,1.0,False
+demo_screen,credibility,inline_vs_block,implicit − explicit,sex,54,3,1.674197128095673,0.1975960239651385,1.0,False
+demo_screen,credibility,inline_vs_block,implicit − explicit,familiar,54,2,1.8389524693267578,0.1809334216994178,1.0,False
+demo_screen,credibility,inline_vs_block,implicit − explicit,daily,54,2,1.2594990680993137,0.2669013280338805,1.0,False
+demo_screen,credibility,early_vs_late,early − late,arm,54,2,4.110269190937086,0.047763303628472316,0.5731596435416678,False
+demo_screen,credibility,early_vs_late,early − late,sex,54,3,0.932447338457154,0.4001948748192704,1.0,False
+demo_screen,credibility,early_vs_late,early − late,familiar,54,2,0.19156466787649673,0.6634301550102321,1.0,False
+demo_screen,credibility,early_vs_late,early − late,daily,54,2,0.5086677706724515,0.4789047961309099,1.0,False
+demo_screen,manipulation,any_ad_vs_no_ads,any ad − no ad,arm,54,2,0.6442120215210848,0.4258429387595356,1.0,False
+demo_screen,manipulation,any_ad_vs_no_ads,any ad − no ad,sex,54,3,1.3610560697178584,0.26554368297430675,1.0,False
+demo_screen,manipulation,any_ad_vs_no_ads,any ad − no ad,familiar,54,2,0.03586522441309215,0.8505313673706079,1.0,False
+demo_screen,manipulation,any_ad_vs_no_ads,any ad − no ad,daily,54,2,3.2255549836725823,0.07830797175058045,0.9396956610069653,False
+demo_screen,manipulation,inline_vs_block,implicit − explicit,arm,54,2,1.0833824779151795,0.3027574890207879,1.0,False
+demo_screen,manipulation,inline_vs_block,implicit − explicit,sex,54,3,1.5867009660803693,0.2145328064977434,1.0,False
+demo_screen,manipulation,inline_vs_block,implicit − explicit,familiar,54,2,1.7193534269238717,0.19553703452004761,1.0,False
+demo_screen,manipulation,inline_vs_block,implicit − explicit,daily,54,2,0.2974744426404322,0.5878021001845085,1.0,False
+demo_screen,manipulation,early_vs_late,early − late,arm,54,2,0.15429574660228484,0.6960692089815664,1.0,False
+demo_screen,manipulation,early_vs_late,early − late,sex,54,3,0.5005977657344877,0.6091154520173998,1.0,False
+demo_screen,manipulation,early_vs_late,early − late,familiar,54,2,0.025978282156125274,0.8725779508953028,1.0,False
+demo_screen,manipulation,early_vs_late,early − late,daily,54,2,0.662753955721811,0.41930188350511854,1.0,False
+demo_screen,notice,any_ad_vs_no_ads,any ad − no ad,arm,54,2,0.05418952787375491,0.8168410896774413,1.0,False
+demo_screen,notice,any_ad_vs_no_ads,any ad − no ad,sex,54,3,1.1592701764254754,0.32184300382984976,1.0,False
+demo_screen,notice,any_ad_vs_no_ads,any ad − no ad,familiar,54,2,0.11488010934008008,0.736020109903645,1.0,False
+demo_screen,notice,any_ad_vs_no_ads,any ad − no ad,daily,54,2,0.5612539890945607,0.45713118263654345,1.0,False
+demo_screen,notice,inline_vs_block,implicit − explicit,arm,54,2,0.05211778619681426,0.8203136878086739,1.0,False
+demo_screen,notice,inline_vs_block,implicit − explicit,sex,54,3,1.2815308707407016,0.28639929520539265,1.0,False
+demo_screen,notice,inline_vs_block,implicit − explicit,familiar,54,2,0.5559921471342583,0.45923702354139395,1.0,False
+demo_screen,notice,inline_vs_block,implicit − explicit,daily,54,2,0.5210908277227713,0.4736104157707372,1.0,False
+demo_screen,notice,early_vs_late,early − late,arm,54,2,0.022679297290711525,0.8808767109187743,1.0,False
+demo_screen,notice,early_vs_late,early − late,sex,54,3,0.6561818467541382,0.5231530063699175,1.0,False
+demo_screen,notice,early_vs_late,early − late,familiar,54,2,1.1200382738104435,0.29480182200738136,1.0,False
+demo_screen,notice,early_vs_late,early − late,daily,54,2,0.6306666770705888,0.43072024592772734,1.0,False
