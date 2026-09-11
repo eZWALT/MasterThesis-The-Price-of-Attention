@@ -4,20 +4,23 @@
     "beh_confirmatory_forests",
     "beh_localisation_forest",
     "beh_likert_distributions",
-    "beh_estimator_concordance"
+    "beh_estimator_concordance",
+    "beh_personality_board"
   ],
   "tables": [
     "tab_beh_planned",
     "tab_beh_localisation",
     "tab_beh_descriptives",
     "tab_beh_omnibus",
-    "tab_beh_alpha"
+    "tab_beh_alpha",
+    "tab_beh_personality"
   ],
   "sources": [
     "gold/condition_features.csv",
     "gold/advertisement_features.csv",
     "confirmatory/confirmatory_planned_D.csv",
     "confirmatory/lmm_declared.csv",
-    "confirmatory/posthoc_vs_control.csv"
+    "confirmatory/posthoc_vs_control.csv",
+    "confirmatory/personality_lmm.csv"
   ]
 }

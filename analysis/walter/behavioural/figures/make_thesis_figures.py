@@ -89,23 +89,22 @@ def fmt_ci(lo: float, hi: float, digits: int = 2) -> str:
 # --------------------------------------------------------------------------- #
 def condition_profiles(condition: pd.DataFrame) -> None:
     fig, axes = plt.subplots(1, 4, figsize=(12.5, 3.6), sharey=True)
-    x = np.arange(5)
-    rng = np.random.default_rng(3)
+    labels = [COND[c].replace(" ", "\n") for c in sk.CONDITIONS]
     for ax, outcome in zip(axes, PRIMARY):
         w = sk.wide(condition, outcome)
-        arm = condition.drop_duplicates("experiment_id").set_index("experiment_id")["arm"].reindex(w.index)
-        for j, c in enumerate(sk.CONDITIONS):
-            ax.scatter(j + rng.uniform(-0.18, 0.18, len(w)), w[c], s=7, color=MIST, zorder=1)
-        for label, mask, col, ls in (("Laboratory (n = 18)", arm == "lab", TEAL, "--"), ("Crowd (n = 36)", arm == "crowd", CLAY, ":")):
-            m = w.loc[mask].mean()
-            ax.plot(x, [m[c] for c in sk.CONDITIONS], ls, color=col, lw=1.2, label=label, zorder=2)
-        m, se = w.mean(), w.std(ddof=1) / np.sqrt(len(w))
-        ax.errorbar(x, [m[c] for c in sk.CONDITIONS], yerr=[1.96 * se[c] for c in sk.CONDITIONS], fmt="o-", color=NAVY, lw=1.8,
-                    ms=5, capsize=3, label="All (N = 54), 95% CI", zorder=3)
-        ax.set_title(NAME[outcome]); ax.set_xticks(x, [COND[c].replace(" ", "\n") for c in sk.CONDITIONS], fontsize=8)
-        ax.set_ylim(0.8, 7.2); ax.set_yticks(range(1, 8)); ax.grid(axis="y", color=MIST, lw=0.6)
+        data = [w[c].to_numpy(dtype=float) for c in sk.CONDITIONS]
+        bp = ax.boxplot(data, tick_labels=labels, patch_artist=True, widths=0.55,
+                        medianprops={"color": CLAY, "lw": 1.6},
+                        whiskerprops={"color": INK}, capprops={"color": INK},
+                        flierprops={"marker": ".", "ms": 3, "color": SLATE, "markeredgecolor": SLATE})
+        for box in bp["boxes"]:
+            box.set(facecolor=MIST, edgecolor=NAVY, lw=1.0)
+        ax.set_title(NAME[outcome])
+        ax.set_ylim(0.8, 7.2)
+        ax.set_yticks(range(1, 8))
+        ax.tick_params(axis="x", labelsize=8)
+        ax.grid(axis="y", color=MIST, lw=0.6)
     axes[0].set_ylabel("Rating (1–7)")
-    axes[-1].legend(loc="lower right", fontsize=8, frameon=False)
     fig.tight_layout()
     save(fig, "beh_condition_profiles")
 
@@ -454,6 +453,83 @@ FIGURE_ENVIRONMENTS = r"""% Figure environments for Results 7.2 (behavioural). P
 """
 
 
+TRAIT_NAME = {
+    "bfi_e": "E", "bfi_a": "A", "bfi_c": "C", "bfi_n": "N", "bfi_o": "O",
+}
+TRAIT_ORDER = ["bfi_e", "bfi_a", "bfi_c", "bfi_n", "bfi_o"]
+
+
+def personality_board(lmm: pd.DataFrame) -> None:
+    """RQ8 (format) and RQ9 (timing): 4 composites × 5 traits. Cell = slope of
+    D_i per BFI point; fill = Holm p within composite across the 15
+    trait × contrast interactions."""
+    from matplotlib.colors import ListedColormap, BoundaryNorm
+
+    panels = [
+        ("inline_vs_block", "Format (implicit − explicit)"),
+        ("early_vs_late", "Timing (early − late)"),
+    ]
+    cmap = ListedColormap([CLAY, "#E8C9B5", MIST, "#F2F4F6"])
+    norm = BoundaryNorm([0, 0.05, 0.10, 0.50, 1.0001], cmap.N)
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.0), sharey=True)
+    for ax, (cid, title) in zip(axes, panels):
+        block = lmm[lmm.contrast == cid]
+        grid_p = pd.DataFrame(np.nan, index=PRIMARY, columns=TRAIT_ORDER)
+        grid_m = grid_p.copy()
+        for _, r in block.iterrows():
+            grid_p.loc[r.outcome, r.trait] = r.p_holm
+            grid_m.loc[r.outcome, r.trait] = r.estimate
+        data = grid_p.to_numpy(dtype=float)
+        ax.imshow(data, cmap=cmap, norm=norm, aspect="auto")
+        for i, o in enumerate(PRIMARY):
+            for j, t in enumerate(TRAIT_ORDER):
+                p = data[i, j]
+                ptxt = "<.001" if p < 0.001 else (f"{p:.2f}" if p >= 1 else f"{p:.2f}".lstrip("0"))
+                ax.text(j, i, f"{grid_m.iloc[i, j]:+.2f}\n{ptxt}", ha="center", va="center", fontsize=8,
+                        color="white" if p < 0.05 else INK, fontweight="bold" if p < 0.05 else "normal")
+        ax.set_xticks(range(5), [TRAIT_NAME[t] for t in TRAIT_ORDER])
+        ax.set_yticks(range(4), [NAME[o] for o in PRIMARY])
+        ax.set_title(title, fontsize=10)
+        ax.tick_params(length=0)
+        for s in ("top", "right", "left", "bottom"):
+            ax.spines[s].set_visible(False)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in [CLAY, "#E8C9B5", MIST, "#F2F4F6"]]
+    axes[-1].legend(handles, ["Holm p < .05", ".05–.10", ".10–.50", "> .50"], loc="upper left",
+                    bbox_to_anchor=(1.02, 1), frameon=False, fontsize=8)
+    fig.tight_layout()
+    save(fig, "beh_personality_board")
+
+
+def table_personality(lmm: pd.DataFrame) -> str:
+    lines = [
+        r"\begin{table}[H]", r"\centering", r"\footnotesize",
+        r"\caption{Declared personality family (\(N=54\)): random-intercept mixed model of each primary composite on the three planned contrast codes, their interactions with one centred BFI-10 trait, and collapsed demographic covariates (arm, sex, familiar vs other, daily vs less). Each cell is the trait \(\times\) contrast slope in Likert points on \(D_i\) per one point on the 1--5 trait. Holm runs within composite across the fifteen interactions. No cell survives.}",
+        r"\label{tab:beh-personality}",
+        r"\setlength{\tabcolsep}{3.5pt}",
+        r"\begin{tabular}{@{}ll l r c r r@{}}", r"\toprule",
+        r"Outcome & Contrast & Trait & Slope & 95\% CI & Raw \(p\) & Holm \(p\) \\", r"\midrule",
+    ]
+    shown = lmm.copy()
+    shown["outcome"] = pd.Categorical(shown["outcome"], PRIMARY)
+    shown["contrast"] = pd.Categorical(shown["contrast"], list(CONTRAST))
+    shown["trait"] = pd.Categorical(shown["trait"], TRAIT_ORDER)
+    shown = shown.sort_values(["outcome", "contrast", "trait"])
+    last_oc = None
+    for _, r in shown.iterrows():
+        oc = (r.outcome, r.contrast)
+        o_lab = NAME[r.outcome] if last_oc is None or last_oc[0] != r.outcome else ""
+        c_lab = CONTRAST[r.contrast] if last_oc != oc else ""
+        if last_oc is not None and last_oc[0] != r.outcome:
+            lines.append(r"\midrule")
+        lines.append(
+            f"{o_lab} & {c_lab} & {r.trait_label} & {fmt_num(r.estimate)} & "
+            f"$[{r.ci95_lo:.2f},\\,{r.ci95_hi:.2f}]$ & {fmt_p(r.p_raw)} & {fmt_p(r.p_holm)} \\\\"
+        )
+        last_oc = oc
+    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    return "\n".join(lines)
+
+
 def run() -> None:
     style()
     condition = pd.read_csv(GOLD / "condition_features.csv")
@@ -476,6 +552,11 @@ def run() -> None:
         holm_board(planned, secondary)
     d_rainclouds(condition)
 
+    pers_path = CONF / "personality_lmm.csv"
+    pers = pd.read_csv(pers_path) if pers_path.exists() else None
+    if pers is not None:
+        personality_board(pers)
+
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "tab_beh_planned.tex").write_text(table_planned(planned, lmm) + "\n")
     (OUT / "tab_beh_localisation.tex").write_text(table_localisation(posthoc) + "\n")
@@ -485,12 +566,14 @@ def run() -> None:
     alpha = pd.read_csv(CONF / "cronbach_alpha.csv")
     (OUT / "tab_beh_omnibus.tex").write_text(table_omnibus(friedman, pairs) + "\n")
     (OUT / "tab_beh_alpha.tex").write_text(table_alpha(alpha) + "\n")
+    if pers is not None:
+        (OUT / "tab_beh_personality.tex").write_text(table_personality(pers) + "\n")
     (OUT / "fig_beh_environments.tex").write_text(FIGURE_ENVIRONMENTS)
     manifest = {
-        "figures": ["beh_condition_profiles", "beh_confirmatory_forests", "beh_localisation_forest", "beh_likert_distributions", "beh_estimator_concordance"],
-        "tables": ["tab_beh_planned", "tab_beh_localisation", "tab_beh_descriptives", "tab_beh_omnibus", "tab_beh_alpha"],
+        "figures": ["beh_condition_profiles", "beh_confirmatory_forests", "beh_localisation_forest", "beh_likert_distributions", "beh_estimator_concordance", "beh_personality_board"],
+        "tables": ["tab_beh_planned", "tab_beh_localisation", "tab_beh_descriptives", "tab_beh_omnibus", "tab_beh_alpha", "tab_beh_personality"],
         "sources": ["gold/condition_features.csv", "gold/advertisement_features.csv", "confirmatory/confirmatory_planned_D.csv",
-                    "confirmatory/lmm_declared.csv", "confirmatory/posthoc_vs_control.csv"],
+                    "confirmatory/lmm_declared.csv", "confirmatory/posthoc_vs_control.csv", "confirmatory/personality_lmm.csv"],
     }
     (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2))
     print("tables written")
