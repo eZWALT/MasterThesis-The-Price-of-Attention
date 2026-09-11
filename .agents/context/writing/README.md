@@ -3,10 +3,28 @@
 This directory holds durable writing decisions, Overleaf workflow notes, and
 handovers for thesis and publication prose.
 
-## Live now (8 September)
+## Live now (11 September)
 
 Newest first. Dated notes below this box are history; they do not
 re-open a closed lock.
+
+0. **External-reviewer meta-prompt** (11 Sep). Copy-paste block for
+   chatbots that get the thesis PDF only (no repo):
+   `2026-09-11-thesis-review-metaprompt.md`. Everything after the
+   `---` is the prompt. PDF-only wording; no LaTeX labels or Gold
+   filenames.
+1. **Results + appendix PR** (10 Sep evening). Walter `WALTER:` comments
+   and the numbered appendix punch-list are applied in the thesis
+   Overleaf mirror. App **E** is the behavioural battery (was F);
+   App **F** is trajectories (was E). `\promptbox` is in
+   `dissertation.tex`. BH is gone. Rainclouds / D.4 / confirmatory
+   EEG appendix tables / traj exploratory estimators are gone.
+   Overleaf **not pushed** until Walter says so.
+1. **Personality family estimated** (10 Sep). Declared LMM on Walter Gold
+   \(N=54\): 0/60 Holm. Results `sec:results-personality`, Discussion 8.2
+   rewritten, App E `sec:app-beh-personality`. Not Katerina's \(n=19\)
+   Spearman. Script:
+   `analysis/walter/behavioural/stats/run_personality_declared.py`.
 
 1. **Final narrative from Walter's notebook** (8 Sep evening):
    `2026-09-08-final-narrative-from-notebook.md`. His TLDR, fabricated
