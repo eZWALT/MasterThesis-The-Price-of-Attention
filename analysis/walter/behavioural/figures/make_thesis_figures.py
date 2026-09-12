@@ -23,8 +23,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.lines import Line2D
 
 HERE = Path(__file__).resolve().parent
 WALTER = HERE.parents[1]
@@ -35,10 +33,12 @@ GOLD = WALTER / "behavioural" / "outputs" / "gold"
 CONF = WALTER / "behavioural" / "outputs" / "confirmatory"
 OUT = WALTER / "behavioural" / "outputs" / "figures" / "thesis"
 
-NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
-HOLM_ORANGE = CLAY  # unified forest marker; same as beh_localisation_forest
+RED, BLUE, YELLOW, PURPLE = "#D32F2F", "#1565C0", "#F9A825", "#6A1B9A"
+HOLM_ORANGE = "#C45C26"
+SLATE, MIST, INK, PAPER = "#5C6B73", "#D5DDE3", "#12202A", "#F5F5F5"
 HOLM_STAR_SIZE = 16
-HOLM_LEGEND = "Holm p < .05"
+# Discrete Holm-p board: red <.05, yellow .05–.10, grey .10–.50, white >.50
+P_BOARD = [RED, YELLOW, "#B0BEC5", PAPER]
 
 COND = {"no_ads": "No ads", "inline_early": "Implicit early", "inline_late": "Implicit late",
         "block_early": "Explicit early", "block_late": "Explicit late"}
@@ -61,13 +61,6 @@ def style() -> None:
         "axes.edgecolor": INK, "axes.labelcolor": INK, "xtick.color": INK, "ytick.color": INK, "text.color": INK,
         "pdf.fonttype": 42, "ps.fonttype": 42,
     })
-
-
-def holm_legend_handle() -> Line2D:
-    return Line2D(
-        [0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
-        markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND,
-    )
 
 
 def save(fig: plt.Figure, stem: str) -> None:
@@ -105,11 +98,11 @@ def condition_profiles(condition: pd.DataFrame) -> None:
         w = sk.wide(condition, outcome)
         data = [w[c].to_numpy(dtype=float) for c in sk.CONDITIONS]
         bp = ax.boxplot(data, tick_labels=labels, patch_artist=True, widths=0.55,
-                        medianprops={"color": CLAY, "lw": 1.6},
+                        medianprops={"color": RED, "lw": 1.6},
                         whiskerprops={"color": INK}, capprops={"color": INK},
                         flierprops={"marker": ".", "ms": 3, "color": SLATE, "markeredgecolor": SLATE})
         for box in bp["boxes"]:
-            box.set(facecolor=MIST, edgecolor=NAVY, lw=1.0)
+            box.set(facecolor=MIST, edgecolor=INK, lw=1.0)
         ax.set_title(NAME[outcome])
         ax.set_ylim(0.8, 7.2)
         ax.set_yticks(range(1, 8))
@@ -126,8 +119,8 @@ def condition_profiles(condition: pd.DataFrame) -> None:
 def _forest(ax, rows: pd.DataFrame, labels: list[str], title: str, xlabel: str, sig_col: str = "holm_sig", mark_lmm: pd.Series | None = None) -> None:
     y = np.arange(len(rows))[::-1]
     ax.axvline(0, color=INK, lw=0.9)
-    ax.errorbar(rows["mean"], y, xerr=[rows["mean"] - rows["ci95_lo"], rows["ci95_hi"] - rows["mean"]], fmt="o", color=NAVY,
-                ecolor=TEAL, elinewidth=1.4, capsize=3, ms=5)
+    ax.errorbar(rows["mean"], y, xerr=[rows["mean"] - rows["ci95_lo"], rows["ci95_hi"] - rows["mean"]], fmt="o", color=BLUE,
+                ecolor=BLUE, elinewidth=1.4, capsize=3, ms=5)
     xmax = float(rows["ci95_hi"].max()); xmin = float(rows["ci95_lo"].min()); span = xmax - xmin
     for yi, hit in zip(y, rows[sig_col]):
         if hit:
@@ -135,10 +128,9 @@ def _forest(ax, rows: pd.DataFrame, labels: list[str], title: str, xlabel: str, 
     if mark_lmm is not None:
         for yi, hit in zip(y, mark_lmm):
             if hit:
-                ax.text(xmax + 0.06 * span, yi, "†", color=CLAY, fontsize=11, ha="center", va="center")
+                ax.text(xmax + 0.06 * span, yi, "†", color=HOLM_ORANGE, fontsize=11, ha="center", va="center")
     ax.set_yticks(y, labels, fontsize=9); ax.set_xlim(xmin - 0.05 * span, xmax + 0.14 * span)
     ax.set_title(title); ax.set_xlabel(xlabel); ax.grid(axis="x", color=MIST, lw=0.6)
-    ax.legend(handles=[holm_legend_handle()], loc="lower right", frameon=False, fontsize=8)
     # separators between outcomes
     outs = rows["outcome"].to_numpy()
     for k in range(1, len(outs)):
@@ -182,7 +174,7 @@ def localisation_forest(posthoc: pd.DataFrame) -> None:
 # figure 4: Likert distributions of the eight primary items
 # --------------------------------------------------------------------------- #
 def likert_distributions(condition: pd.DataFrame) -> None:
-    cmap = LinearSegmentedColormap.from_list("house", [CLAY, "#E8C9B5", MIST, "#9FB7C4", NAVY], N=7)
+    cmap = plt.colormaps["YlOrRd"].resampled(7)
     fig, axes = plt.subplots(2, 4, figsize=(13, 5.2), sharex=True)
     for ax, (item, label) in zip(axes.ravel(), ITEMS):
         for i, c in enumerate(sk.CONDITIONS):
@@ -196,9 +188,6 @@ def likert_distributions(condition: pd.DataFrame) -> None:
         ax.set_title(label, fontsize=10); ax.set_xlim(0, 100); ax.spines["left"].set_visible(False); ax.tick_params(axis="y", length=0)
     for ax in axes[1]:
         ax.set_xlabel("Per cent of participants")
-    handles = [plt.Rectangle((0, 0), 1, 1, color=cmap(k / 6)) for k in range(7)]
-    fig.legend(handles, [str(k) for k in range(1, 8)], title="Response (1 = strongly disagree, 7 = strongly agree)", ncol=7,
-               loc="lower center", bbox_to_anchor=(0.5, -0.06), frameon=False, fontsize=8, title_fontsize=8)
     fig.tight_layout()
     save(fig, "beh_likert_distributions")
 
@@ -212,14 +201,13 @@ def estimator_concordance(planned: pd.DataFrame, lmm: pd.DataFrame) -> None:
     m = m.sort_values(["o", "c"]).reset_index(drop=True)
     y = np.arange(len(m))[::-1]
     fig, ax = plt.subplots(figsize=(7.5, 6))
-    ax.axvline(-np.log10(0.05), color=CLAY, lw=1, ls="--")
-    ax.text(-np.log10(0.05) + 0.03, y[0] + 0.6, "p = .05", color=CLAY, fontsize=8)
-    for col, lab, mk, colr in (("p_holm", "Paired t, Holm (primary)", "o", NAVY), ("p_holm_lmm", "Random-intercept LMM, Holm (adjusted check)", "s", TEAL),
-                               ("p_wilcoxon", "Wilcoxon, raw (sensitivity)", "^", SLATE)):
-        ax.scatter(-np.log10(m[col].clip(lower=1e-6)), y, marker=mk, s=42, color=colr, label=lab, zorder=3, alpha=0.9)
+    ax.axvline(-np.log10(0.05), color=HOLM_ORANGE, lw=1, ls="--")
+    ax.text(-np.log10(0.05) + 0.03, y[0] + 0.6, "p = .05", color=HOLM_ORANGE, fontsize=8)
+    for col, mk, colr in (("p_holm", "o", RED), ("p_holm_lmm", "s", BLUE),
+                          ("p_wilcoxon", "^", YELLOW)):
+        ax.scatter(-np.log10(m[col].clip(lower=1e-6)), y, marker=mk, s=42, color=colr, zorder=3, alpha=0.9)
     ax.set_yticks(y, [f"{NAME[o]} · {CONTRAST[c]}" for o, c in zip(m.outcome, m.contrast)], fontsize=8)
     ax.set_xlabel("−log10 p"); ax.set_xlim(0, 6.3); ax.grid(axis="x", color=MIST, lw=0.6)
-    ax.legend(loc="lower right", fontsize=8, frameon=False)
     ax.set_title("Planned contrasts under three estimators (N = 54)")
     fig.tight_layout()
     save(fig, "beh_estimator_concordance")
@@ -243,7 +231,7 @@ def holm_board(planned: pd.DataFrame, secondary: pd.DataFrame) -> None:
             grid_m.loc[r.outcome, r.contrast] = r["mean"]
     fig, ax = plt.subplots(figsize=(7.4, 5.4))
     from matplotlib.colors import ListedColormap, BoundaryNorm
-    cmap = ListedColormap([CLAY, "#E8C9B5", MIST, "#F2F4F6"])
+    cmap = ListedColormap(P_BOARD)
     norm = BoundaryNorm([0, 0.05, 0.10, 0.50, 1.0001], cmap.N)
     data = grid_p.to_numpy(dtype=float)
     masked = np.ma.masked_invalid(data)
@@ -262,6 +250,8 @@ def holm_board(planned: pd.DataFrame, secondary: pd.DataFrame) -> None:
             ptxt = "<.001" if p < 0.001 else f"{p:.3f}".lstrip("0")
             ax.text(j, i, f"{grid_m.iloc[i, j]:+.2f}\nHolm {ptxt}", ha="center", va="center", fontsize=8,
                     color="white" if p < 0.05 else INK, fontweight="bold" if p < 0.05 else "normal")
+            if p < 0.05:
+                ax.text(j + 0.42, i - 0.38, "*", ha="right", va="top", fontsize=13, color=HOLM_ORANGE, fontweight="bold")
     ax.set_xticks(range(len(cols)), [CONTRAST[c] for c in cols], fontsize=9)
     ax.set_yticks(range(len(rows)), [NAME[o] for o in rows], fontsize=9)
     ax.axhline(len(PRIMARY) - 0.5, color=INK, lw=1.2)
@@ -269,8 +259,6 @@ def holm_board(planned: pd.DataFrame, secondary: pd.DataFrame) -> None:
     for s in ("top", "right", "left", "bottom"):
         ax.spines[s].set_visible(False)
     ax.tick_params(length=0)
-    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in [CLAY, "#E8C9B5", MIST, "#F2F4F6"]]
-    ax.legend(handles, ["Holm p < .05", ".05 to .10", ".10 to .50", "> .50"], loc="upper left", bbox_to_anchor=(1.01, 1), frameon=False, fontsize=8)
     ax.set_title("Planned contrasts across the behavioural battery (N = 54)\nmean within-person difference in Likert points; Holm within outcome", fontsize=10)
     fig.tight_layout()
     save(fig, "beh_holm_board")
@@ -296,13 +284,13 @@ def d_rainclouds(condition: pd.DataFrame) -> None:
             xs = np.linspace(d.min() - 0.5, d.max() + 0.5, 200)
             kde = gaussian_kde(d, bw_method=0.35)(xs)
             kde = kde / kde.max() * 0.45
-            ax.fill_between(xs, 0.15, 0.15 + kde, color=TEAL, alpha=0.35, lw=0)
+            ax.fill_between(xs, 0.15, 0.15 + kde, color=BLUE, alpha=0.35, lw=0)
             ax.boxplot(d, orientation="horizontal", positions=[0.15], widths=0.12, showfliers=False, patch_artist=True,
-                       boxprops=dict(facecolor="white", edgecolor=INK, lw=0.9), medianprops=dict(color=CLAY, lw=1.6),
+                       boxprops=dict(facecolor="white", edgecolor=INK, lw=0.9), medianprops=dict(color=RED, lw=1.6),
                        whiskerprops=dict(color=INK, lw=0.9), capprops=dict(color=INK, lw=0.9))
             ax.scatter(d + rng.uniform(-0.04, 0.04, len(d)), -0.25 + rng.uniform(-0.12, 0.12, len(d)), s=9, color=SLATE, alpha=0.7, zorder=2)
             m, se = d.mean(), d.std(ddof=1) / np.sqrt(len(d))
-            ax.errorbar(m, -0.55, xerr=1.96 * se, fmt="o", color=NAVY, ecolor=NAVY, capsize=3, ms=5, zorder=3)
+            ax.errorbar(m, -0.55, xerr=1.96 * se, fmt="o", color=BLUE, ecolor=BLUE, capsize=3, ms=5, zorder=3)
             ax.axvline(0, color=INK, lw=0.8)
             ax.set_ylim(-0.75, 0.75)
             ax.set_yticks([])
@@ -486,7 +474,7 @@ def personality_board(lmm: pd.DataFrame) -> None:
         ("inline_vs_block", "Format (implicit − explicit)"),
         ("early_vs_late", "Timing (early − late)"),
     ]
-    cmap = ListedColormap([CLAY, "#E8C9B5", MIST, "#F2F4F6"])
+    cmap = ListedColormap(P_BOARD)
     norm = BoundaryNorm([0, 0.05, 0.10, 0.50, 1.0001], cmap.N)
     fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.0), sharey=True)
     for ax, (cid, title) in zip(axes, panels):
@@ -509,15 +497,14 @@ def personality_board(lmm: pd.DataFrame) -> None:
                 ptxt = "<.001" if p < 0.001 else (f"{p:.2f}" if p >= 1 else f"{p:.2f}".lstrip("0"))
                 ax.text(j, i, f"{grid_m.iloc[i, j]:+.2f}\n{ptxt}", ha="center", va="center", fontsize=8,
                         color="white" if p < 0.05 else INK, fontweight="bold" if p < 0.05 else "normal")
+                if p < 0.05:
+                    ax.text(j + 0.42, i - 0.38, "*", ha="right", va="top", fontsize=13, color=HOLM_ORANGE, fontweight="bold")
         ax.set_xticks(range(5), [TRAIT_NAME[t] for t in TRAIT_ORDER])
         ax.set_yticks(range(4), [NAME[o] for o in PRIMARY])
         ax.set_title(title, fontsize=10)
         ax.tick_params(length=0)
         for s in ("top", "right", "left", "bottom"):
             ax.spines[s].set_visible(False)
-    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in [CLAY, "#E8C9B5", MIST, "#F2F4F6"]]
-    axes[-1].legend(handles, ["Holm p < .05", ".05–.10", ".10–.50", "> .50"], loc="upper left",
-                    bbox_to_anchor=(1.02, 1), frameon=False, fontsize=8)
     fig.tight_layout()
     save(fig, "beh_personality_board")
 

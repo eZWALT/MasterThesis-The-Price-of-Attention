@@ -175,7 +175,10 @@ KAT_OUTCOMES = ("credibility", "helpfulness", "convincingness", "relevance", "ne
 KAT_FACTORS = ("demo_sex", "demo_education", "demo_familiarity", "demo_frequency")
 KAT_REF = {"demo_sex": "Male", "demo_education": "Bachelor's Degree", "demo_familiarity": "Familiar", "demo_frequency": "1–5 times per day"}
 
-NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
+RED, YELLOW = "#D32F2F", "#F9A825"
+HOLM_ORANGE = "#C45C26"
+SLATE, INK, PAPER = "#5C6B73", "#12202A", "#F5F5F5"
+P_BOARD = [RED, YELLOW, "#B0BEC5", PAPER]
 
 
 # ----------------------------------------------------------------------------- #
@@ -418,7 +421,7 @@ def style() -> None:
 
 
 def board(cells: pd.DataFrame) -> None:
-    cmap = ListedColormap([CLAY, "#E8C9B5", MIST, "#F2F4F6"])
+    cmap = ListedColormap(P_BOARD)
     norm = BoundaryNorm([0, 0.05, 0.10, 0.50, 1.0001], cmap.N)
     codings = [("katerina", "Levels kept (sparse merged)"), ("collapsed", "Two-level coding")]
     fig, axes = plt.subplots(2, 3, figsize=(11.2, 6.6), sharey=True)
@@ -455,7 +458,7 @@ def board(cells: pd.DataFrame) -> None:
                     ax.text(j, i, f"{grid_s.iloc[i, j]:.2f}\n{ptxt}{star}", ha="center", va="center", fontsize=8,
                             color="white" if p < 0.05 else INK, fontweight="bold" if p < 0.05 else "normal")
                     if p < 0.05:
-                        ax.text(j + 0.42, i - 0.38, "*", ha="right", va="top", fontsize=13, color=CLAY, fontweight="bold")
+                        ax.text(j + 0.42, i - 0.38, "*", ha="right", va="top", fontsize=13, color=HOLM_ORANGE, fontweight="bold")
             ax.set_xticks(range(len(FACTOR_ORDER)), [FACTOR_TICK[f] for f in FACTOR_ORDER], fontsize=8)
             ax.set_yticks(range(len(OUTCOMES)), [NAME[o] for o in OUTCOMES], fontsize=9)
             ax.set_title(CONTRAST_TITLE[cid] if i_row == 0 else "", fontsize=10)
@@ -463,12 +466,7 @@ def board(cells: pd.DataFrame) -> None:
             for s in ("top", "right", "left", "bottom"):
                 ax.spines[s].set_visible(False)
         axes[i_row, 0].set_ylabel(row_title, fontsize=9)
-    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in [CLAY, "#E8C9B5", MIST, "#F2F4F6"]]
-    labels = ["Holm p < .05 (*)", ".05–.10", ".10–.50", "> .50"]
-    axes[0, -1].legend(handles, labels, loc="upper left", bbox_to_anchor=(1.02, 1), frameon=False, fontsize=8)
-    fig.text(0.01, 0.005, "Cell: spread of the mean within-person contrast across factor levels (Likert points) and Holm p of the joint contrast × factor Wald test, within outcome.",
-             fontsize=7.5, color=SLATE)
-    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.tight_layout()
     FIG.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG / "beh_demographics_board.pdf", format="pdf", bbox_inches="tight", facecolor="white")
     fig.savefig(FIG / "beh_demographics_board.png", format="png", bbox_inches="tight", facecolor="white")
@@ -608,7 +606,17 @@ def run() -> dict:
     return summary
 
 
+def plot_from_frozen() -> None:
+    """Re-draw the board from demographic_moderation_lmm.csv. Does not refit."""
+    style()
+    cells = pd.read_csv(EXPL / "demographic_moderation_lmm.csv")
+    board(cells)
+
+
 if __name__ == "__main__":
-    s = run()
-    print(json.dumps({k: v for k, v in s.items() if k != "coding_notes"}, indent=2, default=str))
-    print(f"Wrote {EXPL / 'demographic_moderation_lmm.csv'}")
+    if "--plot-only" in sys.argv:
+        plot_from_frozen()
+    else:
+        s = run()
+        print(json.dumps({k: v for k, v in s.items() if k != "coding_notes"}, indent=2, default=str))
+        print(f"Wrote {EXPL / 'demographic_moderation_lmm.csv'}")

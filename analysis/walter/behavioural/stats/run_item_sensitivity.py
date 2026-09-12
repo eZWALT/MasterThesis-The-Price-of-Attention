@@ -30,7 +30,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.lines import Line2D
 from statsmodels.stats.multitest import multipletests
 
 HERE = Path(__file__).resolve().parent
@@ -42,10 +41,10 @@ GOLD = WALTER / "behavioural" / "outputs" / "gold"
 OUT = WALTER / "behavioural" / "outputs" / "sensitivity"
 FIG = WALTER / "behavioural" / "outputs" / "figures" / "thesis"
 
-NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
-HOLM_ORANGE = CLAY
+BLUE = "#1565C0"
+HOLM_ORANGE = "#C45C26"
+SLATE, MIST, INK = "#5C6B73", "#D5DDE3", "#12202A"
 HOLM_STAR_SIZE = 16
-HOLM_LEGEND = "Holm p < .05"
 
 SCALES = {
     "credibility": (["llm_reliable", "llm_false", "llm_made_up"], {"llm_false", "llm_made_up"}),
@@ -227,7 +226,7 @@ def item_forest(items_t: pd.DataFrame) -> None:
             r = items_t[(items_t.item == it) & (items_t.contrast == cid)].iloc[0]
             his.append(r.ci95_hi)
             los.append(r.ci95_lo)
-            ax.errorbar(r["mean"], yi, xerr=[[r["mean"] - r.ci95_lo], [r.ci95_hi - r["mean"]]], fmt="o", color=NAVY, ecolor=TEAL,
+            ax.errorbar(r["mean"], yi, xerr=[[r["mean"] - r.ci95_lo], [r.ci95_hi - r["mean"]]], fmt="o", color=BLUE, ecolor=BLUE,
                         elinewidth=1.3, capsize=2.5, ms=4.5)
         xmax = float(max(his)); xmin = float(min(los)); span = xmax - xmin
         for yi, (comp, it) in zip(y, rows):
@@ -247,9 +246,6 @@ def item_forest(items_t: pd.DataFrame) -> None:
     for yi, (comp, it) in zip(y, rows):
         if it in FLAGGED:
             axes[0].get_yticklabels()[list(y).index(yi)].set_fontweight("bold")
-    handle = Line2D([0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
-                    markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND)
-    fig.legend(handles=[handle], loc="lower center", bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=8)
     fig.tight_layout()
     FIG.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG / "beh_item_forest.png", format="png", dpi=300, bbox_inches="tight", facecolor="white")

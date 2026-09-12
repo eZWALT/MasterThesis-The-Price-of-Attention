@@ -74,8 +74,8 @@ OUT_CSV = BEH / "outputs" / "exploratory" / "notice_recall_percentages.csv"
 OUT_FIG = BEH / "outputs" / "figures" / "thesis"
 
 # Palette of figures/make_thesis_figures.py (EEG suite house colours).
-NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
-LIGHT_CLAY = "#E8C9B5"
+RED, BLUE = "#D32F2F", "#1565C0"
+INK, MIST = "#12202A", "#D5DDE3"
 
 COND_NAME = {"no_ads": "No ad", "inline_early": "Implicit early", "inline_late": "Implicit late",
              "block_early": "Explicit early", "block_late": "Explicit late"}
@@ -218,19 +218,18 @@ def make_figure(sp: pd.DataFrame) -> None:
     fig, ax = plt.subplots(figsize=(7.2, 3.6))
     p_yes = noticed[conds].to_numpy() / n
     p_not = notn[conds].to_numpy() / n
-    ax.bar(x, p_yes, color=NAVY, edgecolor="white", lw=0.6, width=0.62, label="Noticed")
-    ax.bar(x, p_not, bottom=p_yes, color=LIGHT_CLAY, edgecolor="white", lw=0.6, width=0.62,
-           label="Did not notice")
+    ax.bar(x, p_yes, color=RED, edgecolor="white", lw=0.6, width=0.62)
+    ax.bar(x, p_not, bottom=p_yes, color=BLUE, edgecolor="white", lw=0.6, width=0.62)
     for i, c in enumerate(conds):
         share, lo, hi = wilson(int(noticed[c]), n)
-        ax.errorbar(x[i], share, yerr=[[share - lo], [hi - share]], fmt="none", ecolor=CLAY, elinewidth=1.4,
+        ax.errorbar(x[i], share, yerr=[[share - lo], [hi - share]], fmt="none", ecolor=INK, elinewidth=1.4,
                     capsize=4, zorder=4)
         dx = -0.17 if share < 0.15 else 0.0
         ax.text(x[i] + dx, share / 2, f"{share:.0%}", ha="center", va="center", color="white", fontsize=9,
                 fontweight="bold")
         if p_not[i] > 0.08:
             ax.text(x[i], p_yes[i] + p_not[i] / 2, f"{p_not[i]:.0%}", ha="center", va="center",
-                    color=INK, fontsize=9)
+                    color="white", fontsize=9)
     ax.set_xticks(x)
     ax.set_xticklabels([COND_NAME[c].replace(" ", "\n") for c in conds], fontsize=9)
     ax.set_ylim(0, 1.0)
@@ -239,10 +238,6 @@ def make_figure(sp: pd.DataFrame) -> None:
     ax.set_ylabel("Percentage of participants")
     ax.grid(axis="y", color=MIST, lw=0.6, zorder=0)
     ax.set_axisbelow(True)
-    handles, labels = ax.get_legend_handles_labels()
-    handles.append(plt.Line2D([0], [0], color=CLAY, lw=1.4))
-    labels.append("Wilson 95% on noticed")
-    ax.legend(handles, labels, loc="upper left", bbox_to_anchor=(1.01, 1.0), frameon=False, fontsize=8.5)
     fig.tight_layout()
     OUT_FIG.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_FIG / "beh_notice_percentages.pdf", format="pdf", bbox_inches="tight", facecolor="white")
