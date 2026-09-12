@@ -17,10 +17,9 @@ Visible board. Science 1–5 is frozen. Details:
 
 ### Thesis, this weekend
 
-- [ ] **§4.2.2** — Walter rewrites from the Gold draft
-- [ ] **Ch 1 Introduction** (~50%) — voice pass; still company-first, typos
-- [ ] **Ch 2 Related work** (~45%) — drop “Publication Related Work”; rewrite closer
-- [ ] **Ch 5 System** (~60%) — quality pass; engineering is already in
+- [ ] **§4.2.2** — text is in; leftover comments only (spine→grains, \(N=54\) once, optional pipeline figure)
+- [ ] **Ch 1 / 5** (~85%) — content is in; user-centric pass only. Not a rewrite
+- [ ] **Ch 2** (~85%) — stays compact on purpose. Do not add context. User-centric closer only; drop the leftover “Publication Related Work” heading
 - [ ] **Statistics attack** — Walter on Overleaf Ch 7–8, drop `% WALTER:` as he goes
 - [ ] **Five juries** — compile PDF; paste `2026-09-11-thesis-review-metaprompt.md`; save under `.agents/context/writing/review-3/`
 - [ ] **Loop 3** — apply his comments + the five juries. Abstract and Ch 9 last, one agent, no wholesale rewrite
@@ -30,26 +29,18 @@ Visible board. Science 1–5 is frozen. Details:
 - [ ] **Results / Discussion titles** — match 100% (genre trajectories is the example)
 - [ ] **Captions** — final pass: relevant, not repeating the figure; OCR the images
 - [ ] **Page breaks / float placement** — after chapter feedback is applied
-- [ ] **§4.2.2** — he asks whether `tab:beh-gold` is needed; keep for now. Behavioural preprocessing still has no pipeline figure (EEG and trajectories do)
 - [ ] **Tell Katerina** — design re-run on Gold \(N=54\), 0/70; her tree stays read-only
 - [ ] **Thesis PDF** — Thu 17 Sep. Cover is `\usePaperTitle=1` (paper title). Flip to `0` for the long thesis title
 
-Parked, not this weekend: G1 voice-read, free-text coding, ad-moment scorer, paper, deck fill.
+Parked, not this weekend: G1 voice-read, free-text coding, ad-moment scorer, dataset release, paper, deck fill.
 
-### Public-release housekeeping (no behaviour change until we do it)
+### Public-release housekeeping (after the PDF)
 
-Do not start these before the PDF is in. Do not move trees while analyses are frozen.
+Data upload is a **side quest**, same shelf as the scorer. Do not start
+it this week. Strategy:
+`.agents/context/data-analysis/policy/2026-09-12-dataset-release-side-quest.md`
 
-**Data (the real release)**
-
-- [ ] Hugging Face **raw**: `scripts/upload_raw_dataset.py` → `eZWALT/Price-of-Attention-RAW` (tracked JSONL + lab XDF). Dry-run first. Confirm ethics / consent / de-identification
-- [ ] Hugging Face **Gold**: behavioural \(N=54\), trajectories (utterance primary), EEG confirmatory tables + \(k=37\) features, combo joins. One dataset card. Not Katerina’s tree
-- [ ] Decide whether ICA models (`candidate_v1/`) ship as a separate gated dataset
-- [ ] Catalog / Amazon JSONL license check before any product text goes public
-- [ ] Do **not** upload Bronze XDF (4.1 GB) or `analysis/policy/outputs/` (591 MB, not a thesis goal) without a separate decision
-- [ ] Scan for Prolific IDs, emails, tokens, unshifted timestamps
-
-**Navigation (repo is hard to walk)**
+**Navigation (repo is hard to walk)** — after 17 Sep, no Gold moves:
 
 - [ ] Root `README.md` title still says “Conversational Advertising…”; align with paper title after submit
 - [ ] Two behavioural trees: `analysis/walter/behavioural/` is Gold; `analysis/behavioural/` is Katerina. Archive or rename hers so a stranger does not run it
@@ -91,12 +82,14 @@ Loop-2 memory (comment → work package, model policy):
 box at the top. Dated files below that box are history. Do not reopen
 them. Do not copy their unchecked boxes back into a to-do list.
 
-| Track | Open, then **stop at Live now** |
-|---|---|
-| Weekend board / manuscripts | `.agents/context/writing/README.md` |
-| Science decisions | `.agents/context/data-analysis/README.md` → then the arm README |
-| Code map (which script, which Gold) | `analysis/README.md` |
-| Side project (not the thesis) | `.agents/context/data-analysis/policy/README.md` |
+
+| Track                               | Open, then **stop at Live now**                                 |
+| ----------------------------------- | --------------------------------------------------------------- |
+| Weekend board / manuscripts         | `.agents/context/writing/README.md`                             |
+| Science decisions                   | `.agents/context/data-analysis/README.md` → then the arm README |
+| Code map (which script, which Gold) | `analysis/README.md`                                            |
+| Side project (not the thesis)       | `.agents/context/data-analysis/policy/README.md`                |
+
 
 Root `README.md`, `.agents/README.md`, and
 `analysis/eeg/preprocessing/README.md` are **not** live status.
@@ -145,10 +138,13 @@ that package, writes a report under `.agents/context/writing/review-2/`
 (or `review-3/` in the next loop). Do not one-shot the whole thesis
 in one context.
 
-| Role | Slug |
-|---|---|
-| Thesis / paper prose | `claude-opus-5-thinking-high` |
-| Fact-check, second reader | `gpt-5.6-sol-max` |
-| Statistics, Gold re-estimation | `inherit` |
-| Plotting / table code only | `cursor-grok-4.6-xhigh-fast` (never prose) |
-| Never | any `composer-*` |
+
+| Role                           | Slug                                       |
+| ------------------------------ | ------------------------------------------ |
+| Thesis / paper prose           | `claude-opus-5-thinking-high`              |
+| Fact-check, second reader      | `gpt-5.6-sol-max`                          |
+| Statistics, Gold re-estimation | `inherit`                                  |
+| Plotting / table code only     | `cursor-grok-4.6-xhigh-fast` (never prose) |
+| Never                          | any `composer-*`                           |
+
+

@@ -1,8 +1,12 @@
-# Policy / ad-moment scorer (side project)
+# Side projects (not the thesis)
 
-**Not a thesis goal.** Insertion-policy \(\pi\) stays dropped from the
-manuscripts (`../2026-08-24-insertion-policy-model-dropped.md`).
-Nothing here enters thesis, paper, or deck before 17 September.
+**Not a thesis goal.** Nothing here enters thesis, paper, or deck
+before 17 September.
+
+- **Ad-moment scorer.** Insertion-policy \(\pi\) stays dropped from the
+  manuscripts (`../2026-08-24-insertion-policy-model-dropped.md`).
+- **Dataset release.** Parked 12 Sep. Strategy only:
+  `2026-09-12-dataset-release-side-quest.md`. Do not upload this week.
 
 Start here, then the newest dated note in this directory.
 

@@ -26,7 +26,8 @@ trust × posterior \(\alpha\) \(\rho=.80\)).
 - Dataset A confirmatory cell is **condition aggregation** \(k=37\).
   `eeg/2026-08-31-equal-n-k37.md`.
 - EEG Holm MDE withdrawn. Do not restore dB MDE ranges.
-- `policy/` is a side project, not a thesis goal.
+- `policy/` is the side-project shelf (scorer + parked dataset
+  release). Not a thesis goal this week.
 - `2026-08-27-backlog-and-timeline.md` and
   `2026-08-18-analysis-priority-order.md` are **historical**. They
   still say Goal 1 gates combos; that gate closed on 7 September.
