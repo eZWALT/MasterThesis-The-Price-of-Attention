@@ -20,7 +20,7 @@ Visible board. Science 1–5 is frozen. Details:
 - [ ] **§4.2.2** — text is in; leftover comments only (spine→grains, \(N=54\) once, optional pipeline figure)
 - [ ] **Ch 1 / 5** (~85%) — content is in; user-centric pass only. Not a rewrite
 - [ ] **Ch 2** (~85%) — stays compact on purpose. Do not add context. User-centric closer only; drop the leftover “Publication Related Work” heading
-- [ ] **Statistics attack** — Walter on Overleaf Ch 7–8, drop `% WALTER:` as he goes
+- [ ] **Statistics attack** — Walter on Overleaf Ch 7–8. Open = `% WALTER:`; done = `% WALTER+:`
 - [ ] **Five juries** — compile PDF; paste `2026-09-11-thesis-review-metaprompt.md`; save under `.agents/context/writing/review-3/`
 - [ ] **Loop 3** — apply his comments + the five juries. Abstract and Ch 9 last, one agent, no wholesale rewrite
 - [ ] **Mechanical leftovers** — `models.tex` still mentions an FDR \(q\); Results still prints a Gold filename; boxplot-vs-profile on `fig:beh-profiles` is still his call
@@ -114,7 +114,8 @@ targets, not this weekend.
 ## Hard stops
 
 - Do not push unless asked. When merging Overleaf, never drop a
-  `% WALTER:` comment. Show text before applying when he is online.
+  `% WALTER:` / `% WALTER+:` comment. Flip to `% WALTER+:` when the
+  ask is applied. Show text before applying when he is online.
 - Conclusion and abstract are edited **last** in a review loop, by one
   agent, never rewritten wholesale. Jacket and Future Work are his.
 - Do not put the ad-moment scorer in thesis / paper / deck before

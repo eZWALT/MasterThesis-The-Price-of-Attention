@@ -12,7 +12,8 @@ Source of the comments: `docs/overleaf/thesis/` commit `8559732`
 ("Update on Overleaf", 85 `WALTER` lines), merged locally into the
 review‑1 PR as `d4f47a7`. Review‑1 comments (forests, BH, boxplots,
 appendix items 1–18) are already closed and tagged `% [AI: closed …]`
-in the tex. **Do not delete Walter's comments.** Add `% [AI: …]` only
+in the tex. **Do not delete Walter's comments.** `% WALTER:` = open;
+`% WALTER+:` = addressed. Add `% [AI: …]` only
 for critical notes.
 
 ## Order of work (do not reorder)

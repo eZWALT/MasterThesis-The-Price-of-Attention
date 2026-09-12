@@ -36,7 +36,8 @@ to own, plus one review loop.
 ## This weekend, in order
 
 1. **He writes.** User-centric pass on Ch 1 (and 5 if he wants); Ch 2 stays short. Apply the leftover §4.2.2 comments if he wants them.
-2. **He attacks statistics** on Overleaf Ch 7–8, dropping `% WALTER:` as he goes.
+2. **He attacks statistics** on Overleaf Ch 7–8. Open asks are `% WALTER:`;
+   addressed ones are `% WALTER+:`. He can drop a line once he accepts it.
 3. **Compile the PDF.** Paste `2026-09-11-thesis-review-metaprompt.md` into five chatbots. Save answers under `review-3/`.
 4. **Loop 3** applies his comments + the five juries. Conclusion and abstract last, one agent, no wholesale rewrite.
 5. **Tell Katerina:** her design was re-run on Gold \(N=54\), 0/70 survive; her tree stays read-only.

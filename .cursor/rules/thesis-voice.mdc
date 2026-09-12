@@ -55,7 +55,12 @@ Full checklist: `.agents/context/writing/2026-09-11-review-loop-2-checklist.md`.
 
 ## Comments in tex
 
-- Keep every `% WALTER:` line. Add `% [AI: …]` only for critical notes.
+- Keep every Walter line. Never delete one.
+- `% WALTER:` is still open. `% WALTER+:` is addressed (same words, plus
+  sign on the tag). Flip the tag when the ask is applied; do not invent
+  a new comment.
+- Add `% [AI: …]` only when the *how* needs one line. The `+` is the
+  status. Grep open with `% WALTER:` and skip `% WALTER+:`.
 - No agent instructions, lock pointers, or `[TODO]` drafts in the tex;
   those live under `.agents/context/`.
 - Keep Gold-provenance comments (`% NUMBERS: analysis/walter/…`).
