@@ -43,8 +43,8 @@ CLAY = "#C45C26"
 INK = "#12202A"
 SLATE = "#5C6B73"
 PAPER = "#F4F6F7"
-CMAP = LinearSegmentedColormap.from_list("p", [PAPER, "#9BB0BC", NAVY])
-DIVERGE = LinearSegmentedColormap.from_list("dp", [CLAY, PAPER, NAVY])
+CMAP = plt.colormaps["YlOrRd"]
+DIVERGE = plt.colormaps["RdBu_r"]
 CONDITION_TEXT = {
     "a_none": "No ad",
     "a_imp_2": "Implicit early",

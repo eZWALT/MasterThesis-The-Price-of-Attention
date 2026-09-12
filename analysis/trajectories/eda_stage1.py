@@ -647,8 +647,8 @@ def figure_examples(conversations: pd.DataFrame) -> Path:
                 0.84,
                 0.34,
                 boxstyle="round,pad=0.02,rounding_size=0.06",
-                facecolor=NAVY if changed else PAPER,
-                edgecolor=NAVY if changed else MIST,
+                facecolor="#D32F2F" if changed else PAPER,
+                edgecolor="#D32F2F" if changed else MIST,
                 linewidth=1.0,
             )
             axis.add_patch(box)
@@ -678,7 +678,7 @@ def figure_examples(conversations: pd.DataFrame) -> Path:
                 position,
                 ymin=(y - 0.28 + 0.7) / (len(picks) + 0.4),
                 ymax=(y + 0.28 + 0.7) / (len(picks) + 0.4),
-                color=CLAY,
+                color="#F9A825",
                 linewidth=2.0,
             )
             axis.text(
@@ -686,7 +686,7 @@ def figure_examples(conversations: pd.DataFrame) -> Path:
                 y + 0.30,
                 "ad",
                 fontsize=7,
-                color=CLAY,
+                color="#F9A825",
                 ha="center",
             )
     for turn in range(1, TURNS + 1):

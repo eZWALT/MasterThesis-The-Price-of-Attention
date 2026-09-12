@@ -30,7 +30,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.lines import Line2D
 from scipy import stats
 
 HERE = Path(__file__).resolve().parent
@@ -60,6 +59,7 @@ from classify_advertisements import permutation_null, turn_pivot  # noqa: E402
 from describe_trajectories import short  # noqa: E402
 
 NAVY = "#1B3A4B"
+BLUE = "#1565C0"
 CLAY = "#C45C26"
 INK = "#12202A"
 SLATE = "#5C6B73"
@@ -561,7 +561,7 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
             index,
             xerr=[[row.mean - row.ci_low], [row.ci_high - row.mean]],
             fmt="o",
-            color=SLATE if fallback else NAVY,
+            color=SLATE if fallback else BLUE,
             mfc="white" if fallback else None,
             capsize=3.2,
             markersize=6,
@@ -596,15 +596,7 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
     axis.set_yticklabels(order.label)
     axis.set_xlim(-0.40, xmax + 0.14 * span)
     axis.set_xlabel(r"Turn 4 share $-$ turn 1 share (95% paired $t$, $N=54$)")
-    axis.legend(
-        handles=[Line2D([0], [0], marker="*", color="none", markeredgecolor=CLAY,
-                        markerfacecolor=CLAY, markersize=14, linestyle="none",
-                        label="Holm p < .05")],
-        loc="lower right",
-        frameon=False,
-        fontsize=8,
-    )
-    # No in-figure title: the manuscript caption carries it.
+    # No Holm text legend: the manuscript caption carries the asterisk.
     return save(figure, "s24_depth_versus_ad")
 
 

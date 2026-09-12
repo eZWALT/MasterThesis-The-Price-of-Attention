@@ -147,7 +147,7 @@ def plot_shift_by_position(transitions: pd.DataFrame) -> None:
     counts = [int(_position_block(frame, p).count()) for p in POSITION_ORDER]
 
     figure, axis = plt.subplots(figsize=(7.2, 4.0))
-    colours = [CLAY if p == "crosses_ad" else NAVY for p in POSITION_ORDER]
+    colours = ["#D32F2F" if p == "crosses_ad" else "#1565C0" for p in POSITION_ORDER]
     axis.bar(range(len(POSITION_ORDER)), rates, color=colours)
     for index, (rate, count) in enumerate(zip(rates, counts)):
         axis.text(
