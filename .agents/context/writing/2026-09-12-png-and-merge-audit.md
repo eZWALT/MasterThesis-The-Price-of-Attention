@@ -10,11 +10,10 @@ and the four diagram includes (`system_architecture`, `ads_data_pipeline`,
 `trajectory_preprocessing`, `eeg_preprocessing`) to PDF. What was still
 a PNG *include* this morning was the montage.
 
-`fig:eeg-montage` now includes `figures/preprocessing/eeg_montage.pdf`
-(0 embedded rasters). Generator: `src/project/docs/eeg_montage/make_eeg_montage.py`.
-The 32 labels are the XDF contract, not the 16-channel test fixture the
-old script was reading. Confirmatory sites (Fz; O1 Oz O2 P3 Pz P4) are
-filled. The old PNG is still on disk as a preview; it is not included.
+`fig:eeg-montage` is Sebastian's signed-off PNG
+(`figures/preprocessing/eeg_montage.png`, Overleaf `c9882fb`).
+Do not replace it with `make_eeg_montage.py`. The generated PDF was
+reverted on 12 Sep afternoon.
 
 Three PNG includes remain, on purpose:
 

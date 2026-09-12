@@ -1,10 +1,8 @@
-"""Vector 32-channel 10-20 montage for the thesis (Ch 4, fig:eeg-montage).
+"""DO NOT use this as the thesis montage.
 
-Recorded labels are the XDF contract in
-analysis/eeg/preprocessing/silver/signal/acquisition_contract.md.
-Confirmatory sites: Fz (frontal-midline theta) and posterior alpha
-(O1, Oz, O2, P3, Pz, P4). Ground Fpz is not a data channel; Cz is the
-online reference and is recorded. Output is a vector PDF.
+The signed-off figure is Sebastian's PNG:
+docs/overleaf/thesis/figures/preprocessing/eeg_montage.png
+(commit c9882fb). This script is a leftover generated stand-in.
 """
 from __future__ import annotations
 

@@ -49,7 +49,7 @@ Closed since that file was written: Goal 1–5, personality, demographics on Gol
 
 Still actually missing, or stale enough to bite a new agent:
 
-- Local Overleaf HEAD is ahead of what he last read: paper title, vector montage, eight restored `WALTER:` lines, unglued §4.2 sentence. **Push when he says.**
+- Montage: use Sebastian's signed-off PNG (`eeg_montage.png`, `c9882fb`). Do not include the generated `eeg_montage.pdf`.
 - `2026-09-08-travel-and-delivery-calendar.md` “still owed” list is **wrong** (abstract/conclusion/8.2 stubs are gone). Live owed = this file.
 - Ch 1 still has one leftover company-welfare sentence (“advertisement t”). Catch it on the user-centric pass; do not expand the chapter.
 - `models.tex` still says exploratory families carry an FDR \(q\). BH is gone.
