@@ -220,10 +220,10 @@ def make_figure(sp: pd.DataFrame) -> None:
     p_not = notn[conds].to_numpy() / n
     p_mid = mid[conds].to_numpy() / n
     p_yes = noticed[conds].to_numpy() / n
-    ax.bar(x, p_yes, color=NAVY, edgecolor="white", lw=0.6, width=0.62, label="Noticed (\u2265 5)")
-    ax.bar(x, p_mid, bottom=p_yes, color=MIST, edgecolor="white", lw=0.6, width=0.62, label="Midpoint (4)")
+    ax.bar(x, p_yes, color=NAVY, edgecolor="white", lw=0.6, width=0.62, label="Noticed")
+    ax.bar(x, p_mid, bottom=p_yes, color=MIST, edgecolor="white", lw=0.6, width=0.62, label="Midpoint")
     ax.bar(x, p_not, bottom=p_yes + p_mid, color=LIGHT_CLAY, edgecolor="white", lw=0.6, width=0.62,
-           label="Did not notice (\u2264 3)")
+           label="Did not notice")
     for i, c in enumerate(conds):
         share, lo, hi = wilson(int(noticed[c]), n)
         ax.errorbar(x[i], share, yerr=[[share - lo], [hi - share]], fmt="none", ecolor=CLAY, elinewidth=1.4,
@@ -240,8 +240,7 @@ def make_figure(sp: pd.DataFrame) -> None:
     ax.set_ylim(0, 1.0)
     ax.set_yticks(np.linspace(0, 1, 6))
     ax.set_yticklabels([f"{v:.0%}" for v in np.linspace(0, 1, 6)])
-    ax.set_ylabel(f"Share of participants (N = {n})")
-    ax.set_title("\u201cI noticed sponsored buttons\u201d, by condition")
+    ax.set_ylabel("Percentage of participants")
     ax.grid(axis="y", color=MIST, lw=0.6, zorder=0)
     ax.set_axisbelow(True)
     handles, labels = ax.get_legend_handles_labels()
