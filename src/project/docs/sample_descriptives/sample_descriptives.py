@@ -238,8 +238,8 @@ def draw_demographics(people: list[dict], out_stem: Path) -> None:
         fontsize=9,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.96))
-    for ext in ("pdf", "png"):
-        fig.savefig(out_stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")
+    fig.savefig(out_stem.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+    fig.savefig(out_stem.with_suffix(".png"), format="png", dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -300,8 +300,8 @@ def draw_bfi(people: list[dict], out_stem: Path) -> None:
         fontsize=8,
     )
     fig.tight_layout()
-    for ext in ("pdf", "png"):
-        fig.savefig(out_stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")
+    fig.savefig(out_stem.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+    fig.savefig(out_stem.with_suffix(".png"), format="png", dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 

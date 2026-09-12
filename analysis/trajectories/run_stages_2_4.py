@@ -30,6 +30,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.lines import Line2D
 from scipy import stats
 
 HERE = Path(__file__).resolve().parent
@@ -113,14 +114,15 @@ def style() -> None:
             "ytick.color": SLATE,
             "axes.spines.top": False,
             "axes.spines.right": False,
+            "pdf.fonttype": 42,
         }
     )
 
 
 def save(figure: plt.Figure, name: str) -> Path:
     FIGURES.mkdir(parents=True, exist_ok=True)
-    for suffix in ("pdf", "png"):
-        figure.savefig(FIGURES / f"{name}.{suffix}")
+    figure.savefig(FIGURES / f"{name}.pdf", format="pdf", bbox_inches="tight")
+    figure.savefig(FIGURES / f"{name}.png", format="png", bbox_inches="tight")
     plt.close(figure)
     return FIGURES / f"{name}.png"
 
@@ -551,6 +553,7 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
     # duplicated the crossing table; the manuscript now cross-references it.
     figure, axis = plt.subplots(figsize=(6.8, 4.2))
     order = depth.sort_values("mean")
+    xmax = float(order.ci_high.max()); xmin = float(order.ci_low.min()); span = xmax - xmin
     for index, row in enumerate(order.itertuples()):
         fallback = row.label in FALLBACK_SHORT
         axis.errorbar(
@@ -577,11 +580,30 @@ def figure_depth_versus_ad(utterances: pd.DataFrame, hard: pd.DataFrame) -> Path
             fontsize=7.5,
             color=SLATE,
         )
+        if row.p_holm < 0.05:
+            axis.text(
+                xmax + 0.06 * span,
+                index,
+                "*",
+                color=CLAY,
+                fontsize=16,
+                ha="center",
+                va="center",
+                fontweight="bold",
+            )
     axis.axvline(0, color=INK, linewidth=0.8)
     axis.set_yticks(range(len(order)))
     axis.set_yticklabels(order.label)
-    axis.set_xlim(-0.40, 0.36)
+    axis.set_xlim(-0.40, xmax + 0.14 * span)
     axis.set_xlabel(r"Turn 4 share $-$ turn 1 share (95% paired $t$, $N=54$)")
+    axis.legend(
+        handles=[Line2D([0], [0], marker="*", color="none", markeredgecolor=CLAY,
+                        markerfacecolor=CLAY, markersize=14, linestyle="none",
+                        label="Holm p < .05")],
+        loc="lower right",
+        frameon=False,
+        fontsize=8,
+    )
     # No in-figure title: the manuscript caption carries it.
     return save(figure, "s24_depth_versus_ad")
 

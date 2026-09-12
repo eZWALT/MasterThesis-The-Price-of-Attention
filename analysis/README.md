@@ -4,7 +4,8 @@ Thesis analyses live here. The running RAG / RecSys app stays in
 `src/project/` and is not this tree.
 
 Science decisions: `.agents/context/data-analysis/README.md`.
-Operational locks: `AGENTS.md`.
+Operational locks and how memory works: `AGENTS.md`.
+Weekend prose board: `.agents/context/writing/2026-09-12-weekend-finish-board.md`.
 
 ## Arms
 

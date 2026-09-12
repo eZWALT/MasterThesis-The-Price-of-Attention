@@ -1,180 +1,154 @@
 # Agent entrypoint
 
-Operational router. Dated history lives under `.agents/context/`. Do
-not treat this file as a changelog or a Results number sheet.
+Router for a new agent. This file is not a changelog, not a Results
+sheet, and not the place for dated status. Those live under
+`.agents/context/`.
 
-| File | Role |
-|---|---|
-| Root `README.md` | Human landing page: what the study is, how to launch the app. **Not** analysis status. |
-| `src/project/README.md` | How to run the Streamlit platform. Leave that tree alone unless the task is the app. |
-| `AGENTS.md` | This file. Hard stops + which Live now box to open next. |
-
-> **CRITICAL (EEG / ICA).** Do not run `fit_ica_cohort.py --overwrite` or
-> `run_ica_sensitivity.py --overwrite-models`. Do not replace files under
-> `src/project/logs/xdf/silver/ica/candidate_v1/`. Those 18 models are
-> human-signed (2026-08-19). Full stop:
+> **CRITICAL (EEG / ICA).** Do not run `fit_ica_cohort.py --overwrite`
+> or `run_ica_sensitivity.py --overwrite-models`. Do not replace files
+> under `src/project/logs/xdf/silver/ica/candidate_v1/`. Those 18 models
+> are human-signed (2026-08-19).
 > `.agents/context/data-analysis/eeg/CRITICAL-do-not-overwrite-ica-models.md`
 
-## Read next, then stop
+## Pending (temporary — remove after 17 Sep)
 
-| Track | Open this, then **stop at Live now** |
+Visible board. Science 1–5 is frozen. Details:
+`.agents/context/writing/2026-09-12-weekend-finish-board.md`
+
+### Thesis, this weekend
+
+- [ ] **§4.2.2** — Walter rewrites from the Gold draft
+- [ ] **Ch 1 Introduction** (~50%) — voice pass; still company-first, typos
+- [ ] **Ch 2 Related work** (~45%) — drop “Publication Related Work”; rewrite closer
+- [ ] **Ch 5 System** (~60%) — quality pass; engineering is already in
+- [ ] **Statistics attack** — Walter on Overleaf Ch 7–8, drop `% WALTER:` as he goes
+- [ ] **Five juries** — compile PDF; paste `2026-09-11-thesis-review-metaprompt.md`; save under `.agents/context/writing/review-3/`
+- [ ] **Loop 3** — apply his comments + the five juries. Abstract and Ch 9 last, one agent, no wholesale rewrite
+- [ ] **Mechanical leftovers** — `models.tex` still mentions an FDR \(q\); Results still prints a Gold filename; boxplot-vs-profile on `fig:beh-profiles` is still his call
+- [ ] **Chapter titles** (his 12 Sep Overleaf note) — Related Work & Context → Related Work; Dataset → Datasets; shorten “AI System Design & Engineering”; unify title case
+- [ ] **Methods 6.2** — put dependent variables next to independent variables; reorder the subsection
+- [ ] **Results / Discussion titles** — match 100% (genre trajectories is the example)
+- [ ] **Captions** — final pass: relevant, not repeating the figure; OCR the images
+- [ ] **Page breaks / float placement** — after chapter feedback is applied
+- [ ] **§4.2.2** — he asks whether `tab:beh-gold` is needed; keep for now. Behavioural preprocessing still has no pipeline figure (EEG and trajectories do)
+- [ ] **Tell Katerina** — design re-run on Gold \(N=54\), 0/70; her tree stays read-only
+- [ ] **Thesis PDF** — Thu 17 Sep. Cover is `\usePaperTitle=1` (paper title). Flip to `0` for the long thesis title
+
+Parked, not this weekend: G1 voice-read, free-text coding, ad-moment scorer, paper, deck fill.
+
+### Public-release housekeeping (no behaviour change until we do it)
+
+Do not start these before the PDF is in. Do not move trees while analyses are frozen.
+
+**Data (the real release)**
+
+- [ ] Hugging Face **raw**: `scripts/upload_raw_dataset.py` → `eZWALT/Price-of-Attention-RAW` (tracked JSONL + lab XDF). Dry-run first. Confirm ethics / consent / de-identification
+- [ ] Hugging Face **Gold**: behavioural \(N=54\), trajectories (utterance primary), EEG confirmatory tables + \(k=37\) features, combo joins. One dataset card. Not Katerina’s tree
+- [ ] Decide whether ICA models (`candidate_v1/`) ship as a separate gated dataset
+- [ ] Catalog / Amazon JSONL license check before any product text goes public
+- [ ] Do **not** upload Bronze XDF (4.1 GB) or `analysis/policy/outputs/` (591 MB, not a thesis goal) without a separate decision
+- [ ] Scan for Prolific IDs, emails, tokens, unshifted timestamps
+
+**Navigation (repo is hard to walk)**
+
+- [ ] Root `README.md` title still says “Conversational Advertising…”; align with paper title after submit
+- [ ] Two behavioural trees: `analysis/walter/behavioural/` is Gold; `analysis/behavioural/` is Katerina. Archive or rename hers so a stranger does not run it
+- [ ] Empty / leftover docs: `docs/context/`, `docs/final/*`, `docs/generated/` (one Tang review). Archive or drop
+- [ ] `src/notebooks/0_problem_definition.ipynb` (April leftover) — archive
+- [ ] `scripts/Pilot_data_Inspection_Sebastian.py` — archive
+- [ ] `.agents/context/` has ~150 dated notes. After 17 Sep, move closed ones under `context/_history/` so only Live now READMEs show
+- [ ] EEG preprocessing READMEs are not live status (said in this file); add a one-line banner on each
+- [ ] Duplicate matplotlib PNG+PDF pairs: keep PDF, drop PNG from git after public (UI screenshots stay PNG)
+- [ ] Local folder is still `MasterThesis-RAG-RecSys`; GitHub is `MasterThesis-The-Price-of-Attention`. Rename local clone when convenient
+- [ ] Overleaf extras `docs/overleaf/{angela-paper,example-eeg}` are reference clones, not this thesis
+- [ ] `resources/papers/` (~139 MB PDFs) + `resources/books/` (copyrighted handbook): do not publish; git-lfs or a private bundle
+- [ ] Executed analysis notebooks (2–8 MB) → HF or `analysis/_viewers/`, not the landing tree
+- [ ] Root license: only `src/project/LICENSE` exists. Add a root LICENSE / CITATION.cff / dataset card
+- [ ] `.gitmodules` points at someone else’s ad-insertion repo. Keep or drop on purpose
+- [ ] Decide whether `.agents/` and `.cursor/rules/` ship in the public repo (useful for agents; contains review voice)
+
+**Do not**
+
+- Move Gold paths or rename confirmatory CSVs
+- Touch ICA models
+- Flatten `analysis/eeg/preprocessing/` Bronze/Silver/Gold
+- Put `analysis/policy/` in the thesis or the public abstract
+
+## Live now
+
+Thesis PDF **Thu 17 Sep**. Defence **Wed 23 Sep** morning, Padova.
+Paper after 25 Sep.
+
+**Open this, then stop:**
+`.agents/context/writing/2026-09-12-weekend-finish-board.md`
+
+Loop-2 memory (comment → work package, model policy):
+`.agents/context/writing/2026-09-11-review-loop-2-checklist.md`.
+
+## How memory works
+
+`.agents/context/` is the journal. Every track README has a **Live now**
+box at the top. Dated files below that box are history. Do not reopen
+them. Do not copy their unchecked boxes back into a to-do list.
+
+| Track | Open, then **stop at Live now** |
 |---|---|
-| Code map | `analysis/README.md` |
-| Science | `.agents/context/data-analysis/README.md` → Live now box, then the arm README |
-| Manuscripts | `.agents/context/writing/README.md` → Live now box |
-| Side project | `.agents/context/data-analysis/policy/README.md` |
+| Weekend board / manuscripts | `.agents/context/writing/README.md` |
+| Science decisions | `.agents/context/data-analysis/README.md` → then the arm README |
+| Code map (which script, which Gold) | `analysis/README.md` |
+| Side project (not the thesis) | `.agents/context/data-analysis/policy/README.md` |
 
-Dated notes below those boxes are history. Do **not** follow “newest
-dated filename” past Live now.
+Root `README.md`, `.agents/README.md`, and
+`analysis/eeg/preprocessing/README.md` are **not** live status.
 
-**Do not use as live status:** root `README.md`, `.agents/README.md`,
-the 5 September “Combos wait on that freeze” paragraph, or
-`analysis/eeg/preprocessing/README.md` as a runbook.
+Context notes never override the LaTeX. Manuscript source of truth is
+only `docs/overleaf/{thesis,publication,presentation}/`. Pull before
+drafting.
+
+Always-on writing rules (voice, Results ≠ Discussion, figure-first,
+Discussion locks) are the `.cursor/rules/*.mdc` files. Do not duplicate
+them here.
+
+## What this repo is
+
+A master’s thesis on what advertising costs the user inside a
+conversational assistant: theory, a purpose-built RAG platform
+(`src/project/`), and five frozen analyses (behaviour, personality /
+demographics, EEG, genre trajectories, associations). The platform is
+not the analysis tree. The paper and the defence deck are later
+targets, not this weekend.
 
 ## Hard stops
 
-- Do not commit or push unless asked.
-- Manuscript source of truth is only the Overleaf mirrors under
-  `docs/overleaf/` (`publication/`, `thesis/`, `presentation/`). Context
-  notes never override LaTeX. Pull before drafting; show text before
-  applying; push only after explicit approval.
-- Do not overwrite live `conclusion.tex`.
+- Do not push unless asked. When merging Overleaf, never drop a
+  `% WALTER:` comment. Show text before applying when he is online.
+- Conclusion and abstract are edited **last** in a review loop, by one
+  agent, never rewritten wholesale. Jacket and Future Work are his.
 - Do not put the ad-moment scorer in thesis / paper / deck before
-  17 September. Do not rebuild its Silver unless asked.
-- Do not pick a \(k\), montage, or questionnaire item by \(p\) or
- by item–item correlation. Katerina's 8 Sep ask to drop
- `llm_reliable` / `llm_opinionated` / `llm_skeptical` is **held**;
- answered as a sensitivity-only appendix (thesis `sec:app-beh-items`),
- composites unchanged:
- `.agents/context/data-analysis/behavioral/2026-09-08-item-correlations-held.md`.
-- Leave `src/project/` application code alone unless the task is the
-  platform itself.
-- **`analysis/behavioural/` is Katerina’s tree. Do not open, edit, run,
-  quote, or rebuild anything in it.** Exception, 8 Sep only:
-  `Cronbach_alpha.py` no longer reverse-codes at parse (α still
-  does `8-x` once). Canonical behavioural Gold and Results numbers
-  come only from `analysis/walter/behavioural/`.
-- **Never run** `python analysis/eeg/preprocessing/run_pipeline.py`.
-  Default order rebuilds whole-window feature Gold. Dataset A tables:
-  only `run_equal_n_dataset_a.py`, and only if asked.
-- **Never quote** `analysis/eeg/analysis/outputs/figures/suite/`
-  rainclouds as confirmatory \(k=37\). Those plots read whole-window
-  Gold (`condition_features.csv`). Confirmatory Dataset A is
-  `analysis/eeg/statistics/outputs/eeg_condition_*.csv`. Three output
-  trees: `analysis/README.md`.
-- `build_condition_contrasts.py` with default paths **refuses** to
-  overwrite confirmatory \(k=37\) once the estimand marker is set.
-  Do not pass `--force-overwrite-confirmatory`.
-- Start-here commands below **rebuild frozen artefacts**. Do not run
-  them unless asked.
+  17 September. `analysis/policy/` is a side project.
+- Do not pick a \(k\), montage, or questionnaire item by \(p\).
+  `llm_reliable` / `llm_opinionated` / `llm_skeptical` stay in.
+- Leave `src/project/` alone unless the task is the platform itself.
+- **`analysis/behavioural/` is Katerina’s tree.** Read for
+  reconciliation only. Never edit, run, or quote it. Thesis numbers
+  come from `analysis/walter/behavioural/` on Gold \(N=54\).
+- Never run `python analysis/eeg/preprocessing/run_pipeline.py`.
+  Never quote suite rainclouds as confirmatory. Never pass
+  `--force-overwrite-confirmatory` to `build_condition_contrasts.py`.
+- Rebuilds and Gold paths: `analysis/README.md`. Re-plot from frozen
+  outputs is always allowed; rebuild only if asked.
 
-## Writing locks
+## Subagents
 
-- **Results ≠ Discussion.** Results report estimands and numbers.
-  Discussion interprets. EEG interpretation is `sec:disc-eeg`, not
-  Results. Trajectories (Defs 1–6, Results, Discussion) are
-  **thesis-only**.
-- **Figure first.** One claim, then the artefact, then only what the
-  visual cannot say. Holm \(p\) is the Holm-adjusted paired \(t\).
-  Wilcoxon \(p\) is raw. Never write “Wilcoxon Holm”. Rule:
-  `.cursor/rules/results-figure-first.mdc`.
-- **Discussion.** Interpret estimated families only. Do not restore
-  “depends on how and when”, “greater visual processing”,
-  explicit-late-as-compromise, a serving-rule *price of attention*,
-  MDE / Holm-80% / “approached significance”, or `sec:disc-summary`.
-  Rule: `.cursor/rules/discussion-interpret-not-serve.mdc`.
-  Lock: `.agents/context/writing/2026-09-06-conclusion-critique-and-ch8.md`.
-- **Names.** implicit vs explicit (not subliminal); early = turn 2,
-  late = turn 4; five-condition RM + no-ad. Log keys stay `inline_*` /
-  `block_*`. Dataset A / Dataset B, never Path A/B. Dataset A display
-  name is **condition aggregation** (\(k=37\)), not “equal-n
-  neighbourhood” or “condition state”. Genre classifier is
-  \(f_{\mathrm{genre}}\), not \(f_\theta\).
-- **MDE withdrawn.** Do not put `eq:mde`, Holm-80% dB ranges, or
-  observed-power paragraphs back in thesis, paper, or deck.
-- **Gold catalog.** Paper names on the figure; filenames are
-  provenance. `advertisements.csv` is **ad genre**, not ad shifts.
-  Demographics sit on **BFI + demo**.
-  `.agents/context/data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
+One work package per subagent. Each one reads the live board, does
+that package, writes a report under `.agents/context/writing/review-2/`
+(or `review-3/` in the next loop). Do not one-shot the whole thesis
+in one context.
 
-Deck notes stay under `.agents/context/writing/`. Do not rewrite
-Walter’s spoken slides.
-
-## Current science state (8 September)
-
-Science 1→5 is done as *analyses*. Thesis write-up is in progress
-(deadline **17 September**). Defence is **23 September** morning
-in Padova, not 18–20. Calendar:
-`.agents/context/writing/2026-09-08-travel-and-delivery-calendar.md`.
-Live now boxes override this table.
-
-| Goal | Status | Where |
-|---|---|---|
-| 1 Behavioural battery | Frozen. Ch 7.2 / 8.1 **applied** (thesis `15cf438`). Paired \(t\) primary. | `analysis/walter/behavioural/` |
-| 2 Personality | Estimated on Gold \(N=54\). 0/60 Holm. Thesis 7.3 / 8.2 / App F written locally; Overleaf not pushed. | `analysis/walter/behavioural/stats/run_personality_declared.py` |
-| 3 EEG | Confirmatory frozen (4 s, median, ICA, \(k=37\)) | `analysis/eeg/` |
-| 4 Trajectories | Stages 1–4 frozen; utterance primary | `analysis/trajectories/` |
-| 5 Combos | Declared families **applied** (thesis `d206df3`). Dataset A 0/6; Dataset B trust × posterior \(\alpha\) \(\rho=.80\). | `analysis/walter/combos/run_thesis_families.py` |
-
-Insertion-policy \(\pi\) as a Results model is dropped. The residual
-scorer under `analysis/policy/` is a **side project**.
-
-## Data analysis — where things live
-
-Participants, not epochs, are the inferential unit. Join on
-`experiment_id`. Verify numbers against code and manifests. Bronze /
-XDF stay immutable.
-
-### EEG
-
-Code: `analysis/eeg/`. Data: `src/project/logs/xdf/`.
-
-- Gold whole-window (storage): `gold/features/condition_features.csv`,
-  `ad_response_features.csv`,
-  `gold/features/task_state/task_state_person_features.csv`.
-- **Confirmatory Dataset A** is condition aggregation \(k=37\) in
-  `analysis/eeg/statistics/outputs/eeg_condition_*.csv`.
-- Epoch-grain `*_epoch_features.csv` must not be tested as people.
-- Channel-set / post-hoc pairwise / ad-local \(k\) are sensitivity or
-  exploratory. Appendix only. Cleaning stays 32-ch.
-
-### Behavioural
-
-Bronze: `src/project/logs/tracked/{lab,crowd}/` (prefer `*export*`).
-Roster: drop `synthetic` / `unfinished` / `crowdfail`; keep
-`unfocused`. \(L=18\), \(C=36\), \(N=54\).
-
-Gold: `analysis/walter/behavioural/outputs/gold/`
-Rebuild (only if asked): `python analysis/walter/behavioural/build_gold.py`.
-
-### Combos
-
-Read the joined views; do not re-join by hand. Lab-only wherever EEG
-is in (\(n=18\)); association, not mediation.
-
-Thesis entry: `python analysis/walter/combos/run_thesis_families.py`.
-`combokit.spearman_ci` aligns pandas Series on their index
-(`experiment_id`). Align before passing numpy arrays.
-`run_combos.py` (2,560 tests) is the exploratory map, not Results.
-
-### Trajectories
-
-Gold (flat under `analysis/trajectories/outputs/`): `utterances.csv`
-(labels), `transitions.csv` (turn pairs), `conversations.csv`
-(shifts), `advertisements.csv` (ad genre). Always select one
-`genre_source` (`utterance` primary). QC (only if asked):
-`python analysis/trajectories/validate_trajectory_dataset.py`.
-
-### Policy (not a thesis goal)
-
-`analysis/policy/`. Residual ridge locked; next is \(m(s)\) / \(q(s,a)\).
-
-## Rebuild commands (only if asked)
-
-```bash
-python analysis/walter/behavioural/build_gold.py
-python analysis/walter/behavioural/stats/run_confirmatory.py
-python analysis/eeg/statistics/run_equal_n_dataset_a.py
-python analysis/walter/combos/run_thesis_families.py
-python analysis/trajectories/validate_trajectory_dataset.py
-```
+| Role | Slug |
+|---|---|
+| Thesis / paper prose | `claude-opus-5-thinking-high` |
+| Fact-check, second reader | `gpt-5.6-sol-max` |
+| Statistics, Gold re-estimation | `inherit` |
+| Plotting / table code only | `cursor-grok-4.6-xhigh-fast` (never prose) |
+| Never | any `composer-*` |

@@ -3,23 +3,41 @@
 This directory holds durable writing decisions, Overleaf workflow notes, and
 handovers for thesis and publication prose.
 
-## Live now (11 September)
+## Live now (12 September)
 
 Newest first. Dated notes below this box are history; they do not
 re-open a closed lock.
 
-0. **External-reviewer meta-prompt** (11 Sep). Copy-paste block for
+0. **Weekend finish board** (12 Sep midday). Section finish %, what
+   Walter still writes, what must not be reopened:
+   `2026-09-12-weekend-finish-board.md`. Cover title switch is
+   `\usePaperTitle` in `dissertation.tex` (**1** = paper title).
+   `AGENTS.md` is the router only; details live here and in
+   `analysis/README.md`.
+0. **PNG + merge audit** (12 Sep morning). Montage is now a vector PDF
+   (`fig:eeg-montage`). Three PNG includes remain (two UI screenshots,
+   Qwen architecture). Eight `WALTER:` lines dropped at `d4f47a7` are
+   restored in `results.tex` (36 again, matching `8559732`). Gold-tables
+   figure no longer breaks the §4.2 sentence. Report:
+   `2026-09-12-png-and-merge-audit.md`. Not pushed until Walter says so.
+1. **Review loop 2 closed and pushed** (12 Sep 09:20, Overleaf `034f5d3`;
+   later HEAD `ba05649` after Walter's Overleaf edits + gold-tables /
+   RQ9 / D3). Compile verified, 156 pp, 0 undefined refs. Walter
+   rewrites §4.2.2 from the draft, attacks the statistics, runs the
+   five-chatbot jury with `2026-09-11-thesis-review-metaprompt.md`, then
+   loop 3. G1 voice-read is parked for that loop. Checklist:
+   `2026-09-11-review-loop-2-checklist.md`. Reports: `review-2/`.
+   Voice: `.cursor/rules/thesis-voice.mdc`.
+1. **External-reviewer meta-prompt** (11 Sep). Copy-paste block for
    chatbots that get the thesis PDF only (no repo):
    `2026-09-11-thesis-review-metaprompt.md`. Everything after the
    `---` is the prompt. PDF-only wording; no LaTeX labels or Gold
    filenames.
-1. **Results + appendix PR** (10 Sep evening). Walter `WALTER:` comments
-   and the numbered appendix punch-list are applied in the thesis
-   Overleaf mirror. App **E** is the behavioural battery (was F);
-   App **F** is trajectories (was E). `\promptbox` is in
-   `dissertation.tex`. BH is gone. Rainclouds / D.4 / confirmatory
-   EEG appendix tables / traj exploratory estimators are gone.
-   Overleaf **not pushed** until Walter says so.
+1. **Review loop 1 closed** (10 Sep evening, thesis `1f93146`).
+   Table-first Results, `\promptbox` appendices, App **E** =
+   behavioural (was F), App **F** = trajectories (was E), BH gone,
+   rainclouds / D.4 / confirmatory EEG appendix tables / traj
+   exploratory estimators gone.
 1. **Personality family estimated** (10 Sep). Declared LMM on Walter Gold
    \(N=54\): 0/60 Holm. Results `sec:results-personality`, Discussion 8.2
    rewritten, App E `sec:app-beh-personality`. Not Katerina's \(n=19\)
@@ -59,7 +77,8 @@ re-open a closed lock.
    `2026-09-07-combos-ch7-ch8.md`.
 6. (history) Behavioural readiness inventory:
    `2026-09-07-ch7-ch8-behavioural-ready.md`. Its open decision is closed.
-7. Gold catalog for Ch 4 (`gold_tables.png` not included; §4.2.2 stub):
+7. Gold catalog for Ch 4 (`fig:gold-tables` included 12 Sep; §4.2.2 draft
+   in, Walter rewriting):
    `../data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
 8. Do **not** overwrite live `conclusion.tex`. Chapter 8 must not
    restore fused how-and-when / serving-rule / MDE language:
@@ -104,8 +123,9 @@ Behavioural Gold / combo joins (7 September):
 `../data-analysis/behavioral/2026-09-07-behavioural-gold-and-combos.md`.
 Catalog and lineage (same evening, **read this for Ch 4**):
 `../data-analysis/2026-09-07-gold-catalog-and-lineage.md`.
-Thesis §4.2.2 is still the stub; `gold_tables.png` is on Overleaf
-and not included. Draft plan (not applied):
+Thesis §4.2.2 had been a stub; a Gold draft is in as of 12 Sep and
+Walter is rewriting it. `fig:gold-tables` (`gold_tables.pdf`) now
+opens §4.2. Draft plan (applied):
 `2026-09-07-ch4-gold-tables.md`. Combo tests are in (0 Holm / BH).
 Reduced blocks (7 Sep night):
 `../data-analysis/behavioral/2026-09-07-combos-reduced-blocks.md`

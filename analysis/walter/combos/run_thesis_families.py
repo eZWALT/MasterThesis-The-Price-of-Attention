@@ -36,12 +36,16 @@ from statsmodels.stats.multitest import multipletests
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.lines import Line2D  # noqa: E402
 
 import combokit as ck  # noqa: E402
 from combokit import sk  # noqa: E402
 from run_eeg_beh_three_engines import dataset_b_wide  # noqa: E402
 
 OUT = ck.OUT / "thesis"
+HOLM_ORANGE = "#C45C26"
+HOLM_STAR_SIZE = 16
+HOLM_LEGEND = "Holm p < .05"
 COMPOSITES = ["trust", "credibility", "manipulation"]
 EEG2 = ["eeg_fz_theta", "eeg_posterior_alpha"]
 PRETTY_EEG = {
@@ -305,27 +309,55 @@ def _forest(ax, sub: pd.DataFrame, labels: list[str], y: np.ndarray, marker: str
                 mfc=color if fill else "white", mec=color, ms=5.5, capsize=2.5, lw=1.1, label=label)
 
 
+def _holm_handle() -> Line2D:
+    return Line2D(
+        [0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
+        markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND,
+    )
+
+
+def _is_holm(hit) -> bool:
+    if pd.isna(hit):
+        return False
+    if isinstance(hit, str):
+        return hit.strip().lower() in {"true", "1", "yes"}
+    return bool(hit)
+
+
+def _mark_holm(ax, y, hits, xmax: float, span: float) -> None:
+    for yi, hit in zip(y, hits):
+        if _is_holm(hit):
+            ax.text(xmax + 0.06 * span, yi, "*", color=HOLM_ORANGE, fontsize=HOLM_STAR_SIZE,
+                    ha="center", va="center", fontweight="bold")
+
+
 def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
-    plt.rcParams.update({"font.size": 9, "axes.spines.top": False, "axes.spines.right": False})
+    plt.rcParams.update({"font.size": 9, "axes.spines.top": False, "axes.spines.right": False, "pdf.fonttype": 42})
     cA, cB, cT = "#4d4d4d", "#b2182b", "#2166ac"
+    holm_h = _holm_handle()
 
     # ---- Figure 1: declared families
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.6, 4.3), gridspec_kw={"width_ratios": [1.05, 1]})
     pairs = [(b, e) for e in EEG2 for b in COMPOSITES]
     lab = [f"{b} × {PRETTY_EEG[e]}" for b, e in pairs]
     yy = np.arange(len(pairs))[::-1].astype(float)
+    subs = []
     for est, col, mk, fill, off, name in (("A", cA, "o", True, 0.16, "Dataset A, condition aggregation"),
                                           ("B", cB, "s", False, -0.16, "Dataset B, onset-locked")):
         sub = pd.concat([T[(T.family == f"beh_eeg_declared_{est}") & (T.beh == b) & (T.eeg == e)] for b, e in pairs])
         _forest(ax1, sub, lab, yy + off, mk, col, fill, name)
-        for yi, (_, r) in zip(yy + off, sub.iterrows()):
-            if r.sig_holm:
-                ax1.text(r.ci_hi + 0.03, yi, f"Holm p = {r.p_holm:.4f}", va="center", fontsize=7.5, color=col)
+        subs.append((sub, yy + off))
+    hi = pd.concat([s["ci_hi"] for s, _ in subs]); lo = pd.concat([s["ci_lo"] for s, _ in subs])
+    xmax = float(hi.max()); xmin = float(lo.min()); span = xmax - xmin
+    for sub, yoff in subs:
+        _mark_holm(ax1, yoff, sub.sig_holm.tolist(), xmax, span)
     ax1.axvline(0, color="k", lw=0.8)
     ax1.set_yticks(yy); ax1.set_yticklabels(lab)
-    ax1.set_xlim(-1, 1.05); ax1.set_xlabel("Spearman ρ, any ad − no ad, n = 18")
+    ax1.set_xlim(min(-1.0, xmin - 0.05 * span), xmax + 0.14 * span)
+    ax1.set_xlabel("Spearman ρ, any ad − no ad, n = 18")
     ax1.set_title("(a) Behaviour × EEG: six declared pairs, two estimands", fontsize=9, loc="left")
-    ax1.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, fontsize=7.5, frameon=False)
+    ax1.legend(handles=ax1.get_legend_handles_labels()[0] + [holm_h], loc="upper center",
+               bbox_to_anchor=(0.5, -0.2), ncol=3, fontsize=7.5, frameon=False)
 
     bt = T[T.family == "beh_traj_declared"]
     te = T[T.family == "traj_eeg_declared_A"]
@@ -339,15 +371,19 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     y2 = np.arange(len(sub2))[::-1].astype(float)
     _forest(ax2, sub2.iloc[:6], lab2[:6], y2[:6], "o", cT, True, "behaviour × trajectory, N = 54")
     _forest(ax2, sub2.iloc[6:], lab2[6:], y2[6:], "D", cA, True, "trajectory × EEG (Dataset A), n = 18")
+    xmax2 = float(sub2.ci_hi.max()); xmin2 = float(sub2.ci_lo.min()); span2 = xmax2 - xmin2
+    _mark_holm(ax2, y2, sub2.sig_holm.tolist(), xmax2, span2)
     ax2.axhline(1.5, color="0.8", lw=0.8, ls=":")
     ax2.axvline(0, color="k", lw=0.8)
     ax2.set_yticks(y2); ax2.set_yticklabels(lab2)
-    ax2.set_xlim(-1, 1.05); ax2.set_xlabel("Spearman ρ, same pooled contrast on both sides")
+    ax2.set_xlim(min(-1.0, xmin2 - 0.05 * span2), xmax2 + 0.14 * span2)
+    ax2.set_xlabel("Spearman ρ, same pooled contrast on both sides")
     ax2.set_title("(b) Trajectory pairs: six and two declared", fontsize=9, loc="left")
-    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=2, fontsize=7.5, frameon=False)
+    ax2.legend(handles=ax2.get_legend_handles_labels()[0] + [holm_h], loc="upper center",
+               bbox_to_anchor=(0.5, -0.2), ncol=3, fontsize=7.5, frameon=False)
     fig.tight_layout()
-    fig.savefig(OUT / "combos_declared_forests.png", dpi=220, bbox_inches="tight")
-    fig.savefig(OUT / "combos_declared_forests.pdf", bbox_inches="tight")
+    fig.savefig(OUT / "combos_declared_forests.png", format="png", dpi=220, bbox_inches="tight")
+    fig.savefig(OUT / "combos_declared_forests.pdf", format="pdf", bbox_inches="tight")
     plt.close(fig)
 
     # ---- Figure 2: the surviving pair and its specificity
@@ -369,19 +405,33 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     sB, sA = sB.loc[order], sA.loc[order]
     _forest(ax2, sB, order, y3 + 0.15, "s", cB, True, "Dataset B, onset-locked")
     _forest(ax2, sA, order, y3 - 0.15, "o", cA, False, "Dataset A, condition aggregation")
-    for yi, e in zip(y3, order):
-        r = sB.loc[e]
-        if r.p_holm_16 < 0.05:
-            ax2.text(r.ci_hi + 0.03, yi + 0.15, f"Holm-16 p = {r.p_holm_16:.3f}", va="center", fontsize=7.5, color=cB)
+    xmax3 = float(max(sB.ci_hi.max(), sA.ci_hi.max()))
+    xmin3 = float(min(sB.ci_lo.min(), sA.ci_lo.min()))
+    span3 = xmax3 - xmin3
+    _mark_holm(ax2, y3 + 0.15, (sB.p_holm_16 < 0.05).tolist(), xmax3, span3)
     ax2.axvline(0, color="k", lw=0.8)
     ax2.set_yticks(y3); ax2.set_yticklabels([PRETTY_EEG[e] for e in order])
-    ax2.set_xlim(-1, 1.05); ax2.set_xlabel("Spearman ρ with trust, any ad − no ad, n = 18")
+    ax2.set_xlim(min(-1.0, xmin3 - 0.05 * span3), xmax3 + 0.14 * span3)
+    ax2.set_xlabel("Spearman ρ with trust, any ad − no ad, n = 18")
     ax2.set_title("(b) Trust against all sixteen EEG measures", fontsize=9, loc="left")
-    ax2.legend(loc="upper center", bbox_to_anchor=(0.5, -0.16), ncol=2, fontsize=7.5, frameon=False)
+    ax2.legend(handles=ax2.get_legend_handles_labels()[0] + [holm_h], loc="upper center",
+               bbox_to_anchor=(0.5, -0.16), ncol=3, fontsize=7.5, frameon=False)
     fig.tight_layout()
-    fig.savefig(OUT / "combos_trust_alpha.png", dpi=220, bbox_inches="tight")
-    fig.savefig(OUT / "combos_trust_alpha.pdf", bbox_inches="tight")
+    fig.savefig(OUT / "combos_trust_alpha.png", format="png", dpi=220, bbox_inches="tight")
+    fig.savefig(OUT / "combos_trust_alpha.pdf", format="pdf", bbox_inches="tight")
     plt.close(fig)
+
+
+def plot_from_frozen() -> None:
+    """Re-plot the two thesis combo figures from declared_families.csv + Gold joins."""
+    T = pd.read_csv(OUT / "declared_families.csv")
+    summary = json.loads((OUT / "summary.json").read_text())
+    Dlab = pd.read_csv(ck.GOLD / "combo_threeway_lab_D.csv").set_index("experiment_id")
+    ad_w, match_w = dataset_b_wide()
+    trust = Dlab["trust__any_ad_vs_no_ads"]
+    alphaB = eeg_B_any(ad_w["eeg_posterior_alpha"], match_w["eeg_posterior_alpha"]).reindex(Dlab.index)
+    frame = pd.DataFrame({"trust": trust, "alphaB": alphaB})
+    make_figures(T, frame, summary)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,13 @@
 # Behavioural analysis context
 
-## Live now (10 September)
+## Live now (11 September)
+
+- **Demographic moderation reconciled (WP1).** Katerina's demographic
+  design refitted on Walter Gold \(N=54\) with the planned contrast codes:
+  `stats/run_demographic_moderation.py` → `outputs/exploratory/demographic_moderation_*.csv`,
+  `figures/thesis/beh_demographics_board.pdf`, `tab_beh_demographics.tex`.
+  0/70 Holm under her coding, 0/70 collapsed; her raw hits were two- and
+  three-person levels. Report: `../../writing/review-2/WP1-report.md`.
 
 - **Personality family estimated** on Walter Gold \(N=54\):
   `stats/run_personality_declared.py` →
@@ -30,7 +37,7 @@ shift. GEE cells in `outputs/events/` are not hits.
 **7 September (evening):** shared Gold catalog and lineage
 (`../2026-09-07-gold-catalog-and-lineage.md`). Three grains
 (message / chat / person). Paper names on the figure; files stay.
-Thesis Ch 4.2 is the prose home; 4.2.2 is still a stub.
+Thesis Ch 4.2 is the prose home; 4.2.2 has a Gold draft (12 Sep) that Walter is rewriting.
 
 **7 September (afternoon, later):** Goal 1 freeze run on Walter's
 Gold: 6 of 12 survey cells + 2 of 4 recall cells Holm-significant;

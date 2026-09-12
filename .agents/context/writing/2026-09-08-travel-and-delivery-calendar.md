@@ -21,15 +21,15 @@ Do not open the policy scorer before 17 September.
 
 ## Still owed on the thesis before Friday 18
 
-Analyses 1–5 are frozen. These are prose holes, not science:
+Analyses 1–5 are frozen. Abstract, conclusion, 8.2, gold-tables, and
+the Results opener are no longer stubs (closed in loop 2, 12 Sep).
+Live owed is the weekend board, not this list:
 
-1. `frontmatter/abstract.tex` — live `% behavioural findings %`; combo sentences are comments; stray `+` on line 23.
-2. `chapters/conclusion.tex` — behavioural and combo paragraphs are comments. Live EEG / policy block still has the forbidden “how and when” / *price of attention* / explicit-late compromise. Harmonise Chapter 9 **down** to Chapter 8. Do not overwrite until he says so; show text first.
-3. Dataset §4.2.2 — still says Gold is being frozen. `gold_tables.png` is on Overleaf and not included.
-4. Results chapter opener — still says cross-family associations are unestimated. §7.5 estimates them.
-5. Discussion §8.2 personality is the token `WIP`. Declare the gap or write it. Do not leave a one-word section.
+`.agents/context/writing/2026-09-12-weekend-finish-board.md`
 
-Priority if hours collide: **abstract + conclusion → 4.2.2 + opener → compile → deck rehearsal.** Paper after the 25th. Policy scorer after the 17th.
+Priority if hours collide: **Ch 1 / 2 voice + §4.2.2 → statistics
+attack → five juries → loop 3 → compile.** Paper after the 25th.
+Policy scorer after the 17th. Deck after the PDF.
 
 ## Do not
 

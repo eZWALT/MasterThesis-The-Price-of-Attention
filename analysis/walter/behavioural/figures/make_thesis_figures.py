@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.lines import Line2D
 
 HERE = Path(__file__).resolve().parent
 WALTER = HERE.parents[1]
@@ -35,6 +36,9 @@ CONF = WALTER / "behavioural" / "outputs" / "confirmatory"
 OUT = WALTER / "behavioural" / "outputs" / "figures" / "thesis"
 
 NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
+HOLM_ORANGE = CLAY  # unified forest marker; same as beh_localisation_forest
+HOLM_STAR_SIZE = 16
+HOLM_LEGEND = "Holm p < .05"
 
 COND = {"no_ads": "No ads", "inline_early": "Implicit early", "inline_late": "Implicit late",
         "block_early": "Explicit early", "block_late": "Explicit late"}
@@ -59,10 +63,17 @@ def style() -> None:
     })
 
 
+def holm_legend_handle() -> Line2D:
+    return Line2D(
+        [0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
+        markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND,
+    )
+
+
 def save(fig: plt.Figure, stem: str) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    for suffix in (".png", ".pdf"):
-        fig.savefig(OUT / f"{stem}{suffix}", bbox_inches="tight", facecolor="white")
+    fig.savefig(OUT / f"{stem}.png", format="png", bbox_inches="tight", facecolor="white")
+    fig.savefig(OUT / f"{stem}.pdf", format="pdf", bbox_inches="tight", facecolor="white")
     plt.close(fig)
     print(f"wrote {OUT / stem}.pdf")
 
@@ -120,13 +131,14 @@ def _forest(ax, rows: pd.DataFrame, labels: list[str], title: str, xlabel: str, 
     xmax = float(rows["ci95_hi"].max()); xmin = float(rows["ci95_lo"].min()); span = xmax - xmin
     for yi, hit in zip(y, rows[sig_col]):
         if hit:
-            ax.text(xmax + 0.06 * span, yi, "*", color=CLAY, fontsize=16, ha="center", va="center", fontweight="bold")
+            ax.text(xmax + 0.06 * span, yi, "*", color=HOLM_ORANGE, fontsize=HOLM_STAR_SIZE, ha="center", va="center", fontweight="bold")
     if mark_lmm is not None:
         for yi, hit in zip(y, mark_lmm):
             if hit:
                 ax.text(xmax + 0.06 * span, yi, "†", color=CLAY, fontsize=11, ha="center", va="center")
     ax.set_yticks(y, labels, fontsize=9); ax.set_xlim(xmin - 0.05 * span, xmax + 0.14 * span)
     ax.set_title(title); ax.set_xlabel(xlabel); ax.grid(axis="x", color=MIST, lw=0.6)
+    ax.legend(handles=[holm_legend_handle()], loc="lower right", frameon=False, fontsize=8)
     # separators between outcomes
     outs = rows["outcome"].to_numpy()
     for k in range(1, len(outs)):
@@ -235,7 +247,12 @@ def holm_board(planned: pd.DataFrame, secondary: pd.DataFrame) -> None:
     norm = BoundaryNorm([0, 0.05, 0.10, 0.50, 1.0001], cmap.N)
     data = grid_p.to_numpy(dtype=float)
     masked = np.ma.masked_invalid(data)
-    ax.imshow(masked, cmap=cmap, norm=norm, aspect="auto")
+    ny, nx = masked.shape
+    ax.pcolormesh(np.arange(nx + 1) - 0.5, np.arange(ny + 1) - 0.5, masked,
+                  cmap=cmap, norm=norm, shading="flat")
+    ax.set_xlim(-0.5, nx - 0.5)
+    ax.set_ylim(ny - 0.5, -0.5)
+    ax.set_aspect("auto")
     for i, o in enumerate(rows):
         for j, c in enumerate(cols):
             if np.isnan(data[i, j]):
@@ -480,7 +497,12 @@ def personality_board(lmm: pd.DataFrame) -> None:
             grid_p.loc[r.outcome, r.trait] = r.p_holm
             grid_m.loc[r.outcome, r.trait] = r.estimate
         data = grid_p.to_numpy(dtype=float)
-        ax.imshow(data, cmap=cmap, norm=norm, aspect="auto")
+        ny, nx = data.shape
+        ax.pcolormesh(np.arange(nx + 1) - 0.5, np.arange(ny + 1) - 0.5, data,
+                      cmap=cmap, norm=norm, shading="flat")
+        ax.set_xlim(-0.5, nx - 0.5)
+        ax.set_ylim(ny - 0.5, -0.5)
+        ax.set_aspect("auto")
         for i, o in enumerate(PRIMARY):
             for j, t in enumerate(TRAIT_ORDER):
                 p = data[i, j]

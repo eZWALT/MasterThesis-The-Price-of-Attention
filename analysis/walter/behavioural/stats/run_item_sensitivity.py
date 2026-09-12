@@ -30,6 +30,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.lines import Line2D
 from statsmodels.stats.multitest import multipletests
 
 HERE = Path(__file__).resolve().parent
@@ -42,6 +43,9 @@ OUT = WALTER / "behavioural" / "outputs" / "sensitivity"
 FIG = WALTER / "behavioural" / "outputs" / "figures" / "thesis"
 
 NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
+HOLM_ORANGE = CLAY
+HOLM_STAR_SIZE = 16
+HOLM_LEGEND = "Holm p < .05"
 
 SCALES = {
     "credibility": (["llm_reliable", "llm_false", "llm_made_up"], {"llm_false", "llm_made_up"}),
@@ -209,7 +213,6 @@ def tex_loo(loo: pd.DataFrame, composites=("credibility", "neutrality", "convinc
 def item_forest(items_t: pd.DataFrame) -> None:
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 9, "axes.spines.top": False, "axes.spines.right": False,
                          "axes.edgecolor": INK, "text.color": INK, "pdf.fonttype": 42})
-    comps = ["trust_item", "credibility", "manipulation", "notice"]
     fig, axes = plt.subplots(1, 3, figsize=(12.5, 6.2), sharey=True)
     rows = []
     for comp in ["credibility", "manipulation", "notice"]:
@@ -219,12 +222,20 @@ def item_forest(items_t: pd.DataFrame) -> None:
     y = np.arange(len(rows))[::-1]
     for ax, cid in zip(axes, sk.PLANNED):
         ax.axvline(0, color=INK, lw=0.9)
+        his, los = [], []
         for yi, (comp, it) in zip(y, rows):
             r = items_t[(items_t.item == it) & (items_t.contrast == cid)].iloc[0]
-            col = CLAY if r.holm_sig else NAVY
-            ax.errorbar(r["mean"], yi, xerr=[[r["mean"] - r.ci95_lo], [r.ci95_hi - r["mean"]]], fmt="o", color=col, ecolor=TEAL if not r.holm_sig else CLAY,
+            his.append(r.ci95_hi)
+            los.append(r.ci95_lo)
+            ax.errorbar(r["mean"], yi, xerr=[[r["mean"] - r.ci95_lo], [r.ci95_hi - r["mean"]]], fmt="o", color=NAVY, ecolor=TEAL,
                         elinewidth=1.3, capsize=2.5, ms=4.5)
-        # separators between composites
+        xmax = float(max(his)); xmin = float(min(los)); span = xmax - xmin
+        for yi, (comp, it) in zip(y, rows):
+            r = items_t[(items_t.item == it) & (items_t.contrast == cid)].iloc[0]
+            if r.holm_sig:
+                ax.text(xmax + 0.06 * span, yi, "*", color=HOLM_ORANGE, fontsize=HOLM_STAR_SIZE,
+                        ha="center", va="center", fontweight="bold")
+        ax.set_xlim(xmin - 0.05 * span, xmax + 0.14 * span)
         comps_seq = [c for c, _ in rows]
         for k in range(1, len(rows)):
             if comps_seq[k] != comps_seq[k - 1]:
@@ -236,11 +247,13 @@ def item_forest(items_t: pd.DataFrame) -> None:
     for yi, (comp, it) in zip(y, rows):
         if it in FLAGGED:
             axes[0].get_yticklabels()[list(y).index(yi)].set_fontweight("bold")
-    fig.suptitle("Item-level planned contrasts behind the primary composites (N = 54); orange = Holm p < .05 within item", fontsize=10, y=0.995)
+    handle = Line2D([0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
+                    markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND)
+    fig.legend(handles=[handle], loc="lower center", bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=8)
     fig.tight_layout()
     FIG.mkdir(parents=True, exist_ok=True)
-    for suf in (".png", ".pdf"):
-        fig.savefig(FIG / f"beh_item_forest{suf}", dpi=300, bbox_inches="tight", facecolor="white")
+    fig.savefig(FIG / "beh_item_forest.png", format="png", dpi=300, bbox_inches="tight", facecolor="white")
+    fig.savefig(FIG / "beh_item_forest.pdf", format="pdf", bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 

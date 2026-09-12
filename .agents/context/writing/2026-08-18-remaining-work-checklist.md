@@ -1,5 +1,10 @@
 # Remaining work checklist (18 August 2026)
 
+> **Historical. Do not treat unchecked boxes as live work.** Science 1–5
+> and thesis Ch 7–9 are done as of 12 Sep. Live board:
+> `2026-09-11-review-loop-2-checklist.md`. This file is a snapshot of
+> what was open on 18 August.
+
 High-level items only. Cross them when the artefact exists (script +
 numbers, or Overleaf prose), not when they have been discussed.
 

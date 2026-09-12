@@ -147,7 +147,16 @@ def draw_board(
             norm = TwoSlopeNorm(vmin=-span, vcenter=0.0, vmax=span)
             limits = {}
             decimals = 2 if span >= 0.1 else 3
-        axis.imshow(matrix, cmap=cmap, norm=norm, **limits)
+        ny, nx = matrix.shape
+        mesh_kw = {"cmap": cmap, "shading": "flat"}
+        if norm is not None:
+            mesh_kw["norm"] = norm
+        else:
+            mesh_kw.update(limits)
+        axis.pcolormesh(np.arange(nx + 1) - 0.5, np.arange(ny + 1) - 0.5, matrix, **mesh_kw)
+        axis.set_xlim(-0.5, nx - 0.5)
+        axis.set_ylim(ny - 0.5, -0.5)
+        axis.set_aspect("auto")
         axis.set_xticks(range(len(order)))
         axis.set_yticks(range(len(order)))
         axis.set_xticklabels(
@@ -195,8 +204,8 @@ def draw_board(
 def save(figure: plt.Figure, filename: str) -> plt.Figure:
     """Write png and pdf, and hand the figure back for the report PDF."""
     OUT.mkdir(parents=True, exist_ok=True)
-    for suffix in ("pdf", "png"):
-        figure.savefig(OUT / f"{filename}.{suffix}", dpi=200)
+    figure.savefig(OUT / f"{filename}.pdf", format="pdf")
+    figure.savefig(OUT / f"{filename}.png", format="png", dpi=200)
     print(f"Wrote {filename}.pdf / .png")
     return figure
 
@@ -662,7 +671,19 @@ def draw_thesis_appendix(
     split = len(blocks[0][1])
 
     figure, axis = plt.subplots(figsize=(11.0, 6.4))
-    axis.imshow(matrix, cmap=HOLM_CMAP, vmin=0.0, vmax=1.0, aspect="auto")
+    ny, nx = matrix.shape
+    axis.pcolormesh(
+        np.arange(nx + 1) - 0.5,
+        np.arange(ny + 1) - 0.5,
+        matrix,
+        cmap=HOLM_CMAP,
+        vmin=0.0,
+        vmax=1.0,
+        shading="flat",
+    )
+    axis.set_xlim(-0.5, nx - 0.5)
+    axis.set_ylim(ny - 0.5, -0.5)
+    axis.set_aspect("auto")
     axis.set_xticks(range(len(columns)))
     axis.set_xticklabels(columns, fontsize=7.5, rotation=90)
     axis.set_yticks(range(len(FEATURE_ORDER)))

@@ -63,6 +63,7 @@ def style() -> None:
             "ytick.color": SLATE,
             "axes.spines.top": False,
             "axes.spines.right": False,
+            "pdf.fonttype": 42,
         }
     )
 
@@ -88,8 +89,8 @@ def short(label: str) -> str:
 
 def save(figure: plt.Figure, name: str) -> None:
     FIGURES.mkdir(parents=True, exist_ok=True)
-    for suffix in ("png", "pdf"):
-        figure.savefig(FIGURES / f"{name}.{suffix}", bbox_inches="tight")
+    figure.savefig(FIGURES / f"{name}.pdf", format="pdf", bbox_inches="tight")
+    figure.savefig(FIGURES / f"{name}.png", format="png", bbox_inches="tight")
     plt.close(figure)
 
 

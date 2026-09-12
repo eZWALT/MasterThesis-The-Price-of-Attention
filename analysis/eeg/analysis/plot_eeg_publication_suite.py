@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.lines import Line2D
 
 from condition_labels import (
     CONDITION_LABELS,
@@ -32,6 +33,9 @@ OUT = Path(__file__).resolve().parent / "outputs" / "figures" / "suite"
 
 NAVY = "#1B3A4B"
 CLAY = "#C45C26"
+HOLM_ORANGE = CLAY
+HOLM_STAR_SIZE = 16
+HOLM_LEGEND = "Holm p < .05"
 TEAL = "#2A6F6F"
 SLATE = "#5C6B73"
 MIST = "#D5DDE3"
@@ -84,7 +88,7 @@ def save(figure: plt.Figure, stem: str) -> list[Path]:
     paths = []
     for suffix in (".png", ".pdf"):
         path = OUT / f"{stem}{suffix}"
-        figure.savefig(path, bbox_inches="tight", facecolor="white")
+        figure.savefig(path, format=suffix[1:], bbox_inches="tight", facecolor="white")
         paths.append(path)
     plt.close(figure)
     print(f"wrote {paths[0]}")
@@ -207,6 +211,7 @@ def plot_confirmatory_forests(
         frame = frame.sort_values(["order", "feat_order"]).reset_index(drop=True)
         colors = [NAVY if row.feature.startswith("fz_") else TEAL for row in frame.itertuples()]
         positions = np.arange(len(frame))
+        xmax = float(frame["ci_upper"].max()); xmin = float(frame["ci_lower"].min()); span = xmax - xmin
         for index, row in frame.iterrows():
             axis.errorbar(
                 row["mean_difference"],
@@ -219,21 +224,20 @@ def plot_confirmatory_forests(
                 markersize=6,
                 elinewidth=1.4,
             )
-            star = holm_star(float(row["p_t_holm"]) if row["p_t_holm"] != "" else math.nan)
-            if star:
-                # One marker, large enough to survive print; the caption
-                # states what it means.
+            p_holm = float(row["p_t_holm"]) if row["p_t_holm"] != "" else math.nan
+            if pd.notna(p_holm) and p_holm < 0.05:
                 axis.text(
-                    row["ci_upper"] + 0.05 * abs(frame["ci_upper"]).max(),
+                    xmax + 0.06 * span,
                     positions[index],
                     "*",
                     va="center",
-                    ha="left",
-                    color=CLAY,
-                    fontsize=22,
+                    ha="center",
+                    color=HOLM_ORANGE,
+                    fontsize=HOLM_STAR_SIZE,
                     fontweight="bold",
                 )
         axis.axvline(0, color=INK, linewidth=0.8)
+        axis.set_xlim(xmin - 0.05 * span, xmax + 0.14 * span)
         axis.set_yticks(
             positions,
             [
@@ -244,6 +248,11 @@ def plot_confirmatory_forests(
         axis.invert_yaxis()
         axis.set_xlabel("Mean within-person difference, dB (95% t CI)")
         axis.set_title(title)
+    handle = Line2D(
+        [0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
+        markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND,
+    )
+    figure.legend(handles=[handle], loc="lower center", bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=9)
     # No suptitle or in-figure footnote: the manuscript caption carries them.
     save(figure, "figure_08_confirmatory_forests")
 

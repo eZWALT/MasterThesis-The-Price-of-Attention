@@ -76,7 +76,7 @@ def save(figure: plt.Figure, stem: str) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for suffix in (".png", ".pdf"):
         path = OUT / f"{stem}{suffix}"
-        figure.savefig(path, bbox_inches="tight", facecolor="white")
+        figure.savefig(path, format=suffix[1:], bbox_inches="tight", facecolor="white")
     plt.close(figure)
     print(f"wrote {OUT / (stem + '.png')}")
 
@@ -115,7 +115,19 @@ def draw(
     show_ylabels: bool,
     annotate: bool = True,
 ) -> None:
-    axis.imshow(values, aspect="auto", cmap=CMAP, vmin=0, vmax=1)
+    ny, nx = values.shape
+    axis.pcolormesh(
+        np.arange(nx + 1) - 0.5,
+        np.arange(ny + 1) - 0.5,
+        values,
+        cmap=CMAP,
+        vmin=0,
+        vmax=1,
+        shading="flat",
+    )
+    axis.set_xlim(-0.5, nx - 0.5)
+    axis.set_ylim(ny - 0.5, -0.5)
+    axis.set_aspect("auto")
     axis.set_xticks(range(len(contrasts)), [label for _, label in contrasts], rotation=28, ha="right")
     if show_ylabels:
         axis.set_yticks(range(len(FEATURES)), [label for _, label in FEATURES])
@@ -267,13 +279,20 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
         title="Dataset B: onset-locked, versus matched no-ad",
         show_ylabels=False,
     )
-    cbar = figure.colorbar(
-        plt.cm.ScalarMappable(cmap=CMAP, norm=plt.Normalize(0, 1)),
-        ax=axes,
-        fraction=0.03,
-        pad=0.02,
+    cax = figure.add_axes([0.93, 0.12, 0.016, 0.76])
+    n = 64
+    cax.pcolormesh(
+        [0, 1],
+        np.linspace(0, 1, n + 1),
+        np.linspace(0, 1, n).reshape(n, 1),
+        cmap=CMAP,
+        shading="flat",
     )
-    cbar.set_label("Holm p")
+    cax.set_xticks([])
+    cax.set_yticks([0, 0.05, 0.5, 1.0])
+    cax.set_yticklabels(["0", ".05", ".50", "1"])
+    cax.set_ylabel("Holm p")
+    figure.subplots_adjust(right=0.91)
     # No suptitle or in-figure footnote: the manuscript caption carries them.
     save(figure, "board_dataset_a_b_4s")
 

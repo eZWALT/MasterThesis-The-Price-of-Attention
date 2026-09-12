@@ -97,8 +97,8 @@ def style() -> None:
 
 def save(figure: plt.Figure, name: str) -> Path:
     FIGURES.mkdir(parents=True, exist_ok=True)
-    for suffix in ("pdf", "png"):
-        figure.savefig(FIGURES / f"{name}.{suffix}")
+    figure.savefig(FIGURES / f"{name}.pdf", format="pdf")
+    figure.savefig(FIGURES / f"{name}.png", format="png")
     plt.close(figure)
     return FIGURES / f"{name}.png"
 

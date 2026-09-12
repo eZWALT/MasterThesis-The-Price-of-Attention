@@ -1,0 +1,726 @@
+{
+  "n_people": 54,
+  "age_estimable": false,
+  "min_level_people": 5,
+  "coding_notes": {
+    "katerina": {
+      "sex": {
+        "source": "demo_sex",
+        "reference": "Male",
+        "levels": [
+          "Male",
+          "Female"
+        ],
+        "raw_counts": {
+          "Male": 30,
+          "Female": 21,
+          "missing": 3
+        },
+        "coded_counts": {
+          "Male": 30,
+          "Female": 21,
+          "excluded": 3
+        },
+        "excluded_raw": [
+          "missing"
+        ],
+        "merged_raw": []
+      },
+      "education": {
+        "source": "demo_education",
+        "reference": "Bachelor's",
+        "levels": [
+          "High school",
+          "Bachelor's",
+          "Master's or PhD"
+        ],
+        "raw_counts": {
+          "Bachelor's Degree": 20,
+          "Master's Degree": 16,
+          "High School": 10,
+          "Other": 3,
+          "PhD": 3,
+          "missing": 2
+        },
+        "coded_counts": {
+          "Bachelor's": 20,
+          "Master's or PhD": 19,
+          "High school": 10,
+          "excluded": 5
+        },
+        "excluded_raw": [
+          "Other",
+          "missing"
+        ],
+        "merged_raw": [
+          "Master's Degree",
+          "PhD"
+        ]
+      },
+      "familiarity": {
+        "source": "demo_familiarity",
+        "reference": "Familiar",
+        "levels": [
+          "Familiar",
+          "Less than familiar"
+        ],
+        "raw_counts": {
+          "Familiar": 42,
+          "Somewhat Familiar": 10,
+          "Somewhat Unfamiliar": 2
+        },
+        "coded_counts": {
+          "Familiar": 42,
+          "Less than familiar": 12
+        },
+        "excluded_raw": [],
+        "merged_raw": [
+          "Somewhat Familiar",
+          "Somewhat Unfamiliar"
+        ]
+      },
+      "frequency": {
+        "source": "demo_frequency",
+        "reference": "1\u20135 per day",
+        "levels": [
+          "> 5 per day",
+          "1\u20135 per day",
+          "1\u20135 per week",
+          "Monthly or less"
+        ],
+        "raw_counts": {
+          "1\u20135 times per day": 19,
+          "Greater than 5 times per day": 16,
+          "1\u20135 times per week": 12,
+          "1\u20135 times per month": 5,
+          "Fewer than 5 times ever": 2
+        },
+        "coded_counts": {
+          "1\u20135 per day": 19,
+          "> 5 per day": 16,
+          "1\u20135 per week": 12,
+          "Monthly or less": 7
+        },
+        "excluded_raw": [],
+        "merged_raw": [
+          "1\u20135 times per month",
+          "Fewer than 5 times ever"
+        ]
+      },
+      "arm": {
+        "source": "arm",
+        "reference": "Crowd",
+        "levels": [
+          "Crowd",
+          "Laboratory"
+        ],
+        "raw_counts": {
+          "crowd": 36,
+          "lab": 18
+        },
+        "coded_counts": {
+          "Crowd": 36,
+          "Laboratory": 18
+        },
+        "excluded_raw": [],
+        "merged_raw": []
+      }
+    },
+    "collapsed": {
+      "sex": {
+        "source": "demo_sex",
+        "reference": "Male",
+        "levels": [
+          "Male",
+          "Female"
+        ],
+        "raw_counts": {
+          "Male": 30,
+          "Female": 21,
+          "missing": 3
+        },
+        "coded_counts": {
+          "Male": 30,
+          "Female": 21,
+          "excluded": 3
+        },
+        "excluded_raw": [
+          "missing"
+        ],
+        "merged_raw": []
+      },
+      "education": {
+        "source": "demo_education",
+        "reference": "Bachelor's or less",
+        "levels": [
+          "Bachelor's or less",
+          "Graduate degree"
+        ],
+        "raw_counts": {
+          "Bachelor's Degree": 20,
+          "Master's Degree": 16,
+          "High School": 10,
+          "Other": 3,
+          "PhD": 3,
+          "missing": 2
+        },
+        "coded_counts": {
+          "Bachelor's or less": 30,
+          "Graduate degree": 19,
+          "excluded": 5
+        },
+        "excluded_raw": [
+          "Other",
+          "missing"
+        ],
+        "merged_raw": [
+          "Bachelor's Degree",
+          "High School",
+          "Master's Degree",
+          "PhD"
+        ]
+      },
+      "familiarity": {
+        "source": "demo_familiarity",
+        "reference": "Familiar",
+        "levels": [
+          "Familiar",
+          "Other"
+        ],
+        "raw_counts": {
+          "Familiar": 42,
+          "Somewhat Familiar": 10,
+          "Somewhat Unfamiliar": 2
+        },
+        "coded_counts": {
+          "Familiar": 42,
+          "Other": 12
+        },
+        "excluded_raw": [],
+        "merged_raw": [
+          "Somewhat Familiar",
+          "Somewhat Unfamiliar"
+        ]
+      },
+      "frequency": {
+        "source": "demo_frequency",
+        "reference": "Daily",
+        "levels": [
+          "Daily",
+          "Less"
+        ],
+        "raw_counts": {
+          "1\u20135 times per day": 19,
+          "Greater than 5 times per day": 16,
+          "1\u20135 times per week": 12,
+          "1\u20135 times per month": 5,
+          "Fewer than 5 times ever": 2
+        },
+        "coded_counts": {
+          "Daily": 35,
+          "Less": 19
+        },
+        "excluded_raw": [],
+        "merged_raw": [
+          "1\u20135 times per day",
+          "1\u20135 times per month",
+          "1\u20135 times per week",
+          "Fewer than 5 times ever",
+          "Greater than 5 times per day"
+        ]
+      },
+      "arm": {
+        "source": "arm",
+        "reference": "Crowd",
+        "levels": [
+          "Crowd",
+          "Laboratory"
+        ],
+        "raw_counts": {
+          "crowd": 36,
+          "lab": 18
+        },
+        "coded_counts": {
+          "Crowd": 36,
+          "Laboratory": 18
+        },
+        "excluded_raw": [],
+        "merged_raw": []
+      }
+    }
+  },
+  "family": {
+    "katerina": {
+      "n_cells": 70,
+      "holm_hits": 0,
+      "raw_hits": 1,
+      "ols_holm_hits": 0,
+      "ols_raw_hits": 1,
+      "converged": true,
+      "lmm_vs_ols": {
+        "neither": 70
+      },
+      "nearest": [
+        {
+          "outcome": "recall_memory",
+          "contrast_label": "early \u2212 late",
+          "factor": "familiarity",
+          "k_levels": 2,
+          "spread_D": 1.1964,
+          "max_level": "Less than familiar",
+          "min_level": "Familiar",
+          "level_means_D": "{\"Familiar\": -0.071, \"Less than familiar\": 1.125}",
+          "wald_chi2": 4.0452,
+          "df": 1,
+          "p_raw": 0.0443,
+          "p_holm": 0.443
+        },
+        {
+          "outcome": "recall_memory",
+          "contrast_label": "early \u2212 late",
+          "factor": "frequency",
+          "k_levels": 4,
+          "spread_D": 1.5855,
+          "max_level": "> 5 per day",
+          "min_level": "1\u20135 per day",
+          "level_means_D": "{\"1\\u20135 per day\": -0.711, \"> 5 per day\": 0.875, \"1\\u20135 per week\": 0.5, \"Monthly or less\": 0.571}",
+          "wald_chi2": 7.6551,
+          "df": 3,
+          "p_raw": 0.0537,
+          "p_holm": 0.4833
+        },
+        {
+          "outcome": "credibility",
+          "contrast_label": "early \u2212 late",
+          "factor": "arm",
+          "k_levels": 2,
+          "spread_D": 0.4769,
+          "max_level": "Crowd",
+          "min_level": "Laboratory",
+          "level_means_D": "{\"Crowd\": -0.171, \"Laboratory\": -0.648}",
+          "wald_chi2": 3.5027,
+          "df": 1,
+          "p_raw": 0.0613,
+          "p_holm": 0.9191
+        },
+        {
+          "outcome": "notice",
+          "contrast_label": "implicit \u2212 explicit",
+          "factor": "sex",
+          "k_levels": 2,
+          "spread_D": 0.9417,
+          "max_level": "Female",
+          "min_level": "Male",
+          "level_means_D": "{\"Male\": -1.525, \"Female\": -0.583}",
+          "wald_chi2": 3.3252,
+          "df": 1,
+          "p_raw": 0.0682,
+          "p_holm": 1.0
+        },
+        {
+          "outcome": "recall_memory",
+          "contrast_label": "early \u2212 late",
+          "factor": "education",
+          "k_levels": 3,
+          "spread_D": 1.45,
+          "max_level": "Bachelor's",
+          "min_level": "High school",
+          "level_means_D": "{\"Bachelor's\": 0.95, \"High school\": -0.5, \"Master's or PhD\": 0.0}",
+          "wald_chi2": 4.8898,
+          "df": 2,
+          "p_raw": 0.0867,
+          "p_holm": 0.6939
+        },
+        {
+          "outcome": "notice",
+          "contrast_label": "early \u2212 late",
+          "factor": "frequency",
+          "k_levels": 4,
+          "spread_D": 1.6585,
+          "max_level": "> 5 per day",
+          "min_level": "Monthly or less",
+          "level_means_D": "{\"1\\u20135 per day\": -0.145, \"> 5 per day\": 1.016, \"1\\u20135 per week\": 0.417, \"Monthly or less\": -0.643}",
+          "wald_chi2": 5.6673,
+          "df": 3,
+          "p_raw": 0.129,
+          "p_holm": 1.0
+        }
+      ]
+    },
+    "collapsed": {
+      "n_cells": 70,
+      "holm_hits": 0,
+      "raw_hits": 2,
+      "ols_holm_hits": 0,
+      "ols_raw_hits": 2,
+      "converged": true,
+      "lmm_vs_ols": {
+        "neither": 70
+      },
+      "nearest": [
+        {
+          "outcome": "trust",
+          "contrast_label": "implicit \u2212 explicit",
+          "factor": "frequency",
+          "k_levels": 2,
+          "spread_D": 0.8376,
+          "max_level": "Daily",
+          "min_level": "Less",
+          "level_means_D": "{\"Daily\": 0.443, \"Less\": -0.395}",
+          "wald_chi2": 4.7643,
+          "df": 1,
+          "p_raw": 0.0291,
+          "p_holm": 0.4358
+        },
+        {
+          "outcome": "recall_memory",
+          "contrast_label": "early \u2212 late",
+          "factor": "familiarity",
+          "k_levels": 2,
+          "spread_D": 1.1964,
+          "max_level": "Other",
+          "min_level": "Familiar",
+          "level_means_D": "{\"Familiar\": -0.071, \"Other\": 1.125}",
+          "wald_chi2": 4.0452,
+          "df": 1,
+          "p_raw": 0.0443,
+          "p_holm": 0.443
+        },
+        {
+          "outcome": "credibility",
+          "contrast_label": "early \u2212 late",
+          "factor": "arm",
+          "k_levels": 2,
+          "spread_D": 0.4769,
+          "max_level": "Crowd",
+          "min_level": "Laboratory",
+          "level_means_D": "{\"Crowd\": -0.171, \"Laboratory\": -0.648}",
+          "wald_chi2": 3.5027,
+          "df": 1,
+          "p_raw": 0.0613,
+          "p_holm": 0.9191
+        },
+        {
+          "outcome": "notice",
+          "contrast_label": "implicit \u2212 explicit",
+          "factor": "sex",
+          "k_levels": 2,
+          "spread_D": 0.9417,
+          "max_level": "Female",
+          "min_level": "Male",
+          "level_means_D": "{\"Male\": -1.525, \"Female\": -0.583}",
+          "wald_chi2": 3.3252,
+          "df": 1,
+          "p_raw": 0.0682,
+          "p_holm": 1.0
+        },
+        {
+          "outcome": "manipulation",
+          "contrast_label": "any ad \u2212 no ad",
+          "factor": "frequency",
+          "k_levels": 2,
+          "spread_D": 0.966,
+          "max_level": "Daily",
+          "min_level": "Less",
+          "level_means_D": "{\"Daily\": 1.611, \"Less\": 0.645}",
+          "wald_chi2": 3.1204,
+          "df": 1,
+          "p_raw": 0.0773,
+          "p_holm": 1.0
+        },
+        {
+          "outcome": "notice",
+          "contrast_label": "implicit \u2212 explicit",
+          "factor": "education",
+          "k_levels": 2,
+          "spread_D": 0.8382,
+          "max_level": "Graduate degree",
+          "min_level": "Bachelor's or less",
+          "level_means_D": "{\"Bachelor's or less\": -1.325, \"Graduate degree\": -0.487}",
+          "wald_chi2": 2.6285,
+          "df": 1,
+          "p_raw": 0.105,
+          "p_holm": 1.0
+        }
+      ]
+    }
+  },
+  "secondary_sensitivity": {
+    "outcomes": [
+      "helpfulness",
+      "convincingness",
+      "relevance",
+      "neutrality"
+    ],
+    "n_cells": 60,
+    "holm_hits": 0,
+    "raw_hits": 2,
+    "nearest": [
+      {
+        "outcome": "neutrality",
+        "contrast_label": "implicit \u2212 explicit",
+        "factor": "arm",
+        "level_means_D": "{\"Crowd\": -0.356, \"Laboratory\": 0.361}",
+        "wald_chi2": 5.0833,
+        "df": 1,
+        "p_raw": 0.0242,
+        "p_holm": 0.3624
+      },
+      {
+        "outcome": "neutrality",
+        "contrast_label": "any ad \u2212 no ad",
+        "factor": "sex",
+        "level_means_D": "{\"Male\": -0.161, \"Female\": -0.901}",
+        "wald_chi2": 4.4598,
+        "df": 1,
+        "p_raw": 0.0347,
+        "p_holm": 0.4858
+      },
+      {
+        "outcome": "neutrality",
+        "contrast_label": "any ad \u2212 no ad",
+        "factor": "arm",
+        "level_means_D": "{\"Crowd\": -0.146, \"Laboratory\": -0.81}",
+        "wald_chi2": 3.4856,
+        "df": 1,
+        "p_raw": 0.0619,
+        "p_holm": 0.8048
+      },
+      {
+        "outcome": "relevance",
+        "contrast_label": "implicit \u2212 explicit",
+        "factor": "frequency",
+        "level_means_D": "{\"1\\u20135 per day\": 0.439, \"> 5 per day\": -0.104, \"1\\u20135 per week\": -0.514, \"Monthly or less\": 0.167}",
+        "wald_chi2": 5.9811,
+        "df": 3,
+        "p_raw": 0.1125,
+        "p_holm": 1.0
+      }
+    ]
+  },
+  "katerina_design_on_gold": {
+    "outcomes": [
+      "credibility",
+      "helpfulness",
+      "convincingness",
+      "relevance",
+      "neutrality",
+      "behaviour_pushing",
+      "behaviour_manipulate",
+      "trust",
+      "manipulation",
+      "notice"
+    ],
+    "n_terms": 440,
+    "raw_hits": 18,
+    "holm_within_outcome_hits": 2,
+    "holm_within_outcome_factor_hits": 3,
+    "raw_hits_by_factor": {
+      "demo_education": 10,
+      "demo_frequency": 4,
+      "demo_familiarity": 2,
+      "demo_sex": 2
+    },
+    "raw_hit_cells": [
+      {
+        "outcome": "relevance",
+        "factor": "demo_familiarity",
+        "condition_dummy": "block_early",
+        "level": "Somewhat Unfamiliar",
+        "n_people_level": 2,
+        "estimate": -3.9365,
+        "p_raw": 0.0003,
+        "p_holm_factor": 0.0024,
+        "p_holm": 0.0133
+      },
+      {
+        "outcome": "relevance",
+        "factor": "demo_frequency",
+        "condition_dummy": "block_early",
+        "level": "Fewer than 5 times ever",
+        "n_people_level": 2,
+        "estimate": -3.8509,
+        "p_raw": 0.0005,
+        "p_holm_factor": 0.0082,
+        "p_holm": 0.022
+      },
+      {
+        "outcome": "neutrality",
+        "factor": "demo_sex",
+        "condition_dummy": "block_early",
+        "level": "Female",
+        "n_people_level": 21,
+        "estimate": -1.246,
+        "p_raw": 0.0046,
+        "p_holm_factor": 0.0186,
+        "p_holm": 0.2043
+      },
+      {
+        "outcome": "notice",
+        "factor": "demo_education",
+        "condition_dummy": "inline_late",
+        "level": "Other",
+        "n_people_level": 3,
+        "estimate": -4.2917,
+        "p_raw": 0.0052,
+        "p_holm_factor": 0.0831,
+        "p_holm": 0.2285
+      },
+      {
+        "outcome": "credibility",
+        "factor": "demo_education",
+        "condition_dummy": "inline_early",
+        "level": "Other",
+        "n_people_level": 3,
+        "estimate": 2.1167,
+        "p_raw": 0.0055,
+        "p_holm_factor": 0.0885,
+        "p_holm": 0.2433
+      },
+      {
+        "outcome": "behaviour_pushing",
+        "factor": "demo_education",
+        "condition_dummy": "inline_late",
+        "level": "Other",
+        "n_people_level": 3,
+        "estimate": -4.6833,
+        "p_raw": 0.0065,
+        "p_holm_factor": 0.1036,
+        "p_holm": 0.285
+      },
+      {
+        "outcome": "notice",
+        "factor": "demo_education",
+        "condition_dummy": "inline_early",
+        "level": "Other",
+        "n_people_level": 3,
+        "estimate": -3.6333,
+        "p_raw": 0.018,
+        "p_holm_factor": 0.2696,
+        "p_holm": 0.773
+      },
+      {
+        "outcome": "manipulation",
+        "factor": "demo_education",
+        "condition_dummy": "inline_late",
+        "level": "Other",
+        "n_people_level": 3,
+        "estimate": -3.6,
+        "p_raw": 0.018,
+        "p_holm_factor": 0.288,
+        "p_holm": 0.792
+      },
+      {
+        "outcome": "trust",
+        "factor": "demo_education",
+        "condition_dummy": "inline_late",
+        "level": "PhD",
+        "n_people_level": 3,
+        "estimate": 2.7833,
+        "p_raw": 0.0193,
+        "p_holm_factor": 0.3091,
+        "p_holm": 0.8501
+      },
+      {
+        "outcome": "helpfulness",
+        "factor": "demo_familiarity",
+        "condition_dummy": "block_early",
+        "level": "Somewhat Unfamiliar",
+        "n_people_level": 2,
+        "estimate": -2.8175,
+        "p_raw": 0.0204,
+        "p_holm_factor": 0.1635,
+        "p_holm": 0.8991
+      },
+      {
+        "outcome": "helpfulness",
+        "factor": "demo_frequency",
+        "condition_dummy": "block_late",
+        "level": "Greater than 5 times per day",
+        "n_people_level": 16,
+        "estimate": 1.2566,
+        "p_raw": 0.027,
+        "p_holm_factor": 0.4313,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "convincingness",
+        "factor": "demo_frequency",
+        "condition_dummy": "block_late",
+        "level": "1\u20135 times per week",
+        "n_people_level": 12,
+        "estimate": 1.3216,
+        "p_raw": 0.028,
+        "p_holm_factor": 0.4485,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "credibility",
+        "factor": "demo_education",
+        "condition_dummy": "inline_early",
+        "level": "PhD",
+        "n_people_level": 3,
+        "estimate": 1.6722,
+        "p_raw": 0.0284,
+        "p_holm_factor": 0.4259,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "trust",
+        "factor": "demo_education",
+        "condition_dummy": "block_early",
+        "level": "PhD",
+        "n_people_level": 3,
+        "estimate": 2.5833,
+        "p_raw": 0.0299,
+        "p_holm_factor": 0.4487,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "credibility",
+        "factor": "demo_education",
+        "condition_dummy": "inline_late",
+        "level": "PhD",
+        "n_people_level": 3,
+        "estimate": 1.6111,
+        "p_raw": 0.0347,
+        "p_holm_factor": 0.4859,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "helpfulness",
+        "factor": "demo_frequency",
+        "condition_dummy": "block_early",
+        "level": "Fewer than 5 times ever",
+        "n_people_level": 2,
+        "estimate": -2.5702,
+        "p_raw": 0.0389,
+        "p_holm_factor": 0.5836,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "credibility",
+        "factor": "demo_education",
+        "condition_dummy": "block_late",
+        "level": "Other",
+        "n_people_level": 3,
+        "estimate": 1.5611,
+        "p_raw": 0.0407,
+        "p_holm_factor": 0.5296,
+        "p_holm": 1.0
+      },
+      {
+        "outcome": "neutrality",
+        "factor": "demo_sex",
+        "condition_dummy": "inline_late",
+        "level": "Female",
+        "n_people_level": 21,
+        "estimate": -0.9,
+        "p_raw": 0.0409,
+        "p_holm_factor": 0.1227,
+        "p_holm": 1.0
+      }
+    ],
+    "converged": true
+  }
+}

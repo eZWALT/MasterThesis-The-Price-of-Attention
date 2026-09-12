@@ -1,0 +1,61 @@
+---
+description: Thesis voice and presentation rules from Walter's 11 Sep review. Always apply when editing docs/overleaf/thesis or docs/overleaf/publication.
+alwaysApply: true
+---
+
+# Thesis voice (Walter, 11 Sep)
+
+Full checklist: `.agents/context/writing/2026-09-11-review-loop-2-checklist.md`.
+
+## Narrative
+
+- **User-centric.** The study measures what advertising costs the user
+  (trust, credibility, felt manipulation, attention). Not advertiser
+  yield, not a serving rule. Abstract, Implications, Conclusion say so.
+- **On Walter's side.** Critical, never destructive. A Holm-surviving
+  result (posterior \(\alpha\) early−late; explicit-early onset tilt;
+  trust × posterior \(\alpha\) \(\rho=.80\)) is stated as a finding
+  first, then one caveat. Never "not greater visual processing",
+  "the pipeline is not dead", "the dull readings win".
+- **Answer the RQs.** Discussion carries `tab:rq-answers`; every RQ is
+  answered positively or negatively. Unanswerable RQs are removed from
+  the introduction, not left open.
+- **Limitations ≠ Future work.** Ch 8 limitations = what the design
+  could not see. Ch 9 future work = what to build next.
+
+## Prose
+
+- Paragraph titles are short noun phrases: `Temporal effects on memory
+  and trust.` Never slogans, never Twitter.
+- No WIP prose in the PDF. A gap is `% [AI: …]`, one line, critical only.
+- No unexplained jargon: OR, GEE, lean, inventory, labelling. Define in
+  one clause or drop.
+- Positive Results paragraph models: the `tab:traj-aligned-counts`
+  paragraph and the trust × posterior \(\alpha\) paragraph in 7.6.1.
+- Short paragraphs. Never one blob per section.
+- Direction always in words ("explicit is noticed more than implicit");
+  magnitude optional.
+
+## Names
+
+- `contexts` (bare utterance vs deployed window fed to
+  \(f_{\mathrm{genre}}\)), not `labellings`.
+- `outcomes`, not `composites`. `banner` for the explicit unit, not `card`.
+- \(k=37\) only in Ch 4 preprocessing and Methods. "\(u_5\) does not
+  exist" once, in Results 7.5.
+- Holm \(p\) = Holm-adjusted paired \(t\). Wilcoxon \(p\) is raw. No BH.
+
+## Figures and tables
+
+- Every figure is a vector PDF from matplotlib (`format="pdf"`, no
+  `rasterized`). PNG only for UI screenshots.
+- Every forest plot marks Holm \(p<.05\) with the same orange asterisk.
+- Captions ≤ 2 lines. Tables: bold Holm-significant rows, family
+  divider rules, "Key estimate" not "Headline".
+
+## Comments in tex
+
+- Keep every `% WALTER:` line. Add `% [AI: …]` only for critical notes.
+- No agent instructions, lock pointers, or `[TODO]` drafts in the tex;
+  those live under `.agents/context/`.
+- Keep Gold-provenance comments (`% NUMBERS: analysis/walter/…`).

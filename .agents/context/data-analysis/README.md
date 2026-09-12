@@ -7,7 +7,13 @@ This directory holds durable analysis decisions and audit summaries.
 
 Code map: `analysis/README.md`. Do not invert science order 1→5.
 
-## Live now (8 September)
+## Live now (12 September)
+
+All five analysis goals are **frozen**. Thesis prose is the live
+thread: `.agents/context/writing/2026-09-12-weekend-finish-board.md`.
+Demographics reconciled on Gold \(N=54\): 0/70 Holm (WP1). Personality
+0/60. Combos declared families applied (Dataset A 0/6; onset-locked
+trust × posterior \(\alpha\) \(\rho=.80\)).
 
 - **Item correlations held (do not rerun):** Katerina asked to drop
   `llm_reliable`, `llm_opinionated`, `llm_skeptical`. Do not.

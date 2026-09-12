@@ -73,8 +73,8 @@ def style() -> None:
 def save(figure: plt.Figure, name: str) -> Path:
     FIGURES.mkdir(parents=True, exist_ok=True)
     path = FIGURES / f"{name}.png"
-    figure.savefig(path, bbox_inches="tight")
-    figure.savefig(FIGURES / f"{name}.pdf", bbox_inches="tight")
+    figure.savefig(path, format="png", bbox_inches="tight")
+    figure.savefig(FIGURES / f"{name}.pdf", format="pdf", bbox_inches="tight")
     plt.close(figure)
     return path
 
@@ -102,7 +102,19 @@ def row_normalise(counts: np.ndarray) -> np.ndarray:
 
 
 def draw_matrix(axis, matrix, genres, *, vmin, vmax, cmap, title, counts=None, annotate=True):
-    image = axis.imshow(matrix, cmap=cmap, vmin=vmin, vmax=vmax)
+    ny, nx = matrix.shape
+    image = axis.pcolormesh(
+        np.arange(nx + 1) - 0.5,
+        np.arange(ny + 1) - 0.5,
+        matrix,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        shading="flat",
+    )
+    axis.set_xlim(-0.5, nx - 0.5)
+    axis.set_ylim(ny - 0.5, -0.5)
+    axis.set_aspect("equal")
     ticks = [short(g) for g in genres]
     axis.set_xticks(range(len(genres)))
     axis.set_xticklabels(ticks, rotation=55, ha="right", fontsize=7)
@@ -149,10 +161,20 @@ def plot_overall_both(transitions: pd.DataFrame, genres: list[str]) -> Path:
             title=f"{SOURCE_TITLE[source]}\n{len(frame)} transitions",
             counts=counts,
         )
-    figure.colorbar(image, ax=axes, fraction=0.02, pad=0.02).set_label(
-        "P(to | from)"
+    cax = figure.add_axes([0.93, 0.18, 0.015, 0.64])
+    n = 64
+    cax.pcolormesh(
+        [0, 1],
+        np.linspace(0, 1, n + 1),
+        np.linspace(0, 1, n).reshape(n, 1),
+        cmap=CMAP,
+        shading="flat",
     )
+    cax.set_xticks([])
+    cax.set_yticks([0, 0.5, 1.0])
+    cax.set_ylabel("P(to | from)")
     figure.suptitle("Genre transition matrices, all conversations", color=INK)
+    figure.subplots_adjust(right=0.91)
     return save(figure, "heatmap_overall_both")
 
 
