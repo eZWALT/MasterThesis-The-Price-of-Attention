@@ -49,7 +49,7 @@ Closed since that file was written: Goal 1–5, personality, demographics on Gol
 
 Still actually missing, or stale enough to bite a new agent:
 
-- Montage: use Sebastian's signed-off PNG (`eeg_montage.png`, `c9882fb`). Do not include the generated `eeg_montage.pdf`.
+- Montage: Sebastian's cap style, our 32-ch rules (GND=Fpz, Cz=ref, green=Fz \(\theta\) + posterior \(\alpha\)). Generator `src/project/docs/eeg_montage/make_eeg_montage.py`. His original PNG is `eeg_montage_sebastian.png`.
 - `2026-09-08-travel-and-delivery-calendar.md` “still owed” list is **wrong** (abstract/conclusion/8.2 stubs are gone). Live owed = this file.
 - Ch 1 still has one leftover company-welfare sentence (“advertisement t”). Catch it on the user-centric pass; do not expand the chapter.
 - `models.tex` still says exploratory families carry an FDR \(q\). BH is gone.
