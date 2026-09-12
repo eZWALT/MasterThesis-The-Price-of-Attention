@@ -27,7 +27,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.transforms import blended_transform_factory  # noqa: E402
 import pandas as pd  # noqa: E402
 
@@ -40,7 +39,8 @@ OUT_DIR = COMBOS
 FIG_COPY = ROOT / "docs/overleaf/thesis/figures/results/effects_matrix.pdf"
 
 # Shared thesis palette (same CLAY orange as the unified Holm asterisk).
-NAVY, CLAY, TEAL, SLATE, MIST, INK = "#1B3A4B", "#C45C26", "#2A6F6F", "#5C6B73", "#D5DDE3", "#12202A"
+HOLM_ORANGE = "#C45C26"
+SLATE, MIST, INK = "#5C6B73", "#D5DDE3", "#12202A"
 
 # ----------------------------------------------------------------------------
 # Column and row definitions
@@ -352,7 +352,7 @@ def draw(cells: list[dict], out_pdf: Path) -> None:
     fig_w_in = 6.3
     fig_h_in = 0.33 * len(rows) + gap * (len(GROUPS) - 1) * 0.33 + 2.0
     fig, ax = plt.subplots(figsize=(fig_w_in, fig_h_in))
-    fig.subplots_adjust(left=0.34, right=0.985, top=0.885, bottom=0.185)
+    fig.subplots_adjust(left=0.34, right=0.985, top=0.885, bottom=0.06)
     ax.set_xlim(-0.5, len(COLUMNS) - 0.5)
     ax.set_ylim(n_rows_y, -0.5)
     ax.axis("off")
@@ -390,7 +390,7 @@ def draw(cells: list[dict], out_pdf: Path) -> None:
             ysep = y0 - gap / 2
             ax.plot([-0.5, len(COLUMNS) - 0.5], [ysep, ysep], color=SLATE, lw=0.6, zorder=0)
         ax.text(0.012, (y0 + y1) / 2, glabel, transform=gutter, ha="left", va="center", fontsize=fs_small,
-                color=NAVY, style="italic", linespacing=1.05, clip_on=False)
+                color=INK, style="italic", linespacing=1.05, clip_on=False)
 
     # Cells.
     for rid, _rlabel, _gid, yy in rows:
@@ -406,33 +406,10 @@ def draw(cells: list[dict], out_pdf: Path) -> None:
             n = c["arrows"]
             xs = [j + (k - (n - 1) / 2) * dx for k in range(n)]
             if c["filled"]:
-                mfc, mec = CLAY, CLAY
+                mfc, mec = HOLM_ORANGE, HOLM_ORANGE
             else:
                 mfc, mec = "white", SLATE
             ax.plot(xs, [yy] * n, linestyle="none", marker=marker, ms=ms, mfc=mfc, mec=mec, mew=1.0, zorder=3)
-
-    # Legend.
-    def tri(marker, filled):
-        return Line2D([], [], linestyle="none", marker=marker, ms=ms, mfc=CLAY if filled else "white",
-                      mec=CLAY if filled else SLATE, mew=1.0)
-
-    handles = [tri("^", True), tri("^", False), tri("v", False),
-               Line2D([], [], linestyle="none", marker=".", ms=4, color=SLATE)]
-    labels = ["Holm $p<.05$", "Holm $p\\geq.05$", "estimate below zero", "not estimated"]
-    leg = fig.legend(handles, labels, loc="upper left", bbox_to_anchor=(0.012, 0.165), ncol=4, fontsize=fs_small,
-                     frameon=False, handletextpad=0.4, columnspacing=1.4, borderaxespad=0.0)
-    leg.set_zorder(5)
-    notes = (
-        r"Triangle direction is the sign of the estimate in the row's own units (higher trust $\blacktriangle$, higher manipulation $\blacktriangle$)."
-        "\n"
-        r"Triangle count 1 / 2 / 3: $|d_z|<.2$ / $.2$–$.5$ / $>.5$; association rows $|\rho|<.3$ / $.3$–$.6$ / $>.6$ ($\blacktriangle$ = positive $\rho$). 0: estimate exactly zero."
-        "\n"
-        r"Trajectory any-ad cells are early pooled ($\delta^{(a)}_2$) or late pooled ($N_{\mathrm{shift}}$) minus $a^{\emptyset}$; "
-        r"condition-aggregation marginals are the post hoc pairwise sweep."
-        "\n"
-        r"$^{\dagger}$Exploratory measure. Absolute $\delta$ is shown; relative $\alpha$ and $\beta$ fall in the same explicit-early cell (Holm $.026$, $.018$)."
-    )
-    fig.text(0.012, 0.125, notes, ha="left", va="top", fontsize=fs_small - 0.4, color=INK, linespacing=1.4)
 
     fig.savefig(out_pdf, format="pdf")
     plt.close(fig)

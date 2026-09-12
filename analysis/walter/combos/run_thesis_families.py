@@ -333,8 +333,7 @@ def _mark_holm(ax, y, hits, xmax: float, span: float) -> None:
 
 def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     plt.rcParams.update({"font.size": 9, "axes.spines.top": False, "axes.spines.right": False, "pdf.fonttype": 42})
-    cA, cB, cT = "#4d4d4d", "#b2182b", "#2166ac"
-    holm_h = _holm_handle()
+    cA, cB, cT, cE = "#D32F2F", "#1565C0", "#F9A825", "#6A1B9A"
 
     # ---- Figure 1: declared families
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.6, 4.3), gridspec_kw={"width_ratios": [1.05, 1]})
@@ -356,8 +355,6 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     ax1.set_xlim(min(-1.0, xmin - 0.05 * span), xmax + 0.14 * span)
     ax1.set_xlabel("Spearman ρ, any ad − no ad, n = 18")
     ax1.set_title("(a) Behaviour × EEG: six declared pairs, two estimands", fontsize=9, loc="left")
-    ax1.legend(handles=ax1.get_legend_handles_labels()[0] + [holm_h], loc="upper center",
-               bbox_to_anchor=(0.5, -0.2), ncol=3, fontsize=7.5, frameon=False)
 
     bt = T[T.family == "beh_traj_declared"]
     te = T[T.family == "traj_eeg_declared_A"]
@@ -370,7 +367,7 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     sub2 = pd.DataFrame(rows2)
     y2 = np.arange(len(sub2))[::-1].astype(float)
     _forest(ax2, sub2.iloc[:6], lab2[:6], y2[:6], "o", cT, True, "behaviour × trajectory, N = 54")
-    _forest(ax2, sub2.iloc[6:], lab2[6:], y2[6:], "D", cA, True, "trajectory × EEG (Dataset A), n = 18")
+    _forest(ax2, sub2.iloc[6:], lab2[6:], y2[6:], "D", cE, True, "trajectory × EEG (Dataset A), n = 18")
     xmax2 = float(sub2.ci_hi.max()); xmin2 = float(sub2.ci_lo.min()); span2 = xmax2 - xmin2
     _mark_holm(ax2, y2, sub2.sig_holm.tolist(), xmax2, span2)
     ax2.axhline(1.5, color="0.8", lw=0.8, ls=":")
@@ -379,8 +376,6 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     ax2.set_xlim(min(-1.0, xmin2 - 0.05 * span2), xmax2 + 0.14 * span2)
     ax2.set_xlabel("Spearman ρ, same pooled contrast on both sides")
     ax2.set_title("(b) Trajectory pairs: six and two declared", fontsize=9, loc="left")
-    ax2.legend(handles=ax2.get_legend_handles_labels()[0] + [holm_h], loc="upper center",
-               bbox_to_anchor=(0.5, -0.2), ncol=3, fontsize=7.5, frameon=False)
     fig.tight_layout()
     fig.savefig(OUT / "combos_declared_forests.png", format="png", dpi=220, bbox_inches="tight")
     fig.savefig(OUT / "combos_declared_forests.pdf", format="pdf", bbox_inches="tight")
@@ -414,8 +409,6 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     ax2.set_xlim(min(-1.0, xmin3 - 0.05 * span3), xmax3 + 0.14 * span3)
     ax2.set_xlabel("Spearman ρ with trust, any ad − no ad, n = 18")
     ax2.set_title("(b) Trust against all sixteen EEG measures", fontsize=9, loc="left")
-    ax2.legend(handles=ax2.get_legend_handles_labels()[0] + [holm_h], loc="upper center",
-               bbox_to_anchor=(0.5, -0.16), ncol=3, fontsize=7.5, frameon=False)
     fig.tight_layout()
     fig.savefig(OUT / "combos_trust_alpha.png", format="png", dpi=220, bbox_inches="tight")
     fig.savefig(OUT / "combos_trust_alpha.pdf", format="pdf", bbox_inches="tight")
