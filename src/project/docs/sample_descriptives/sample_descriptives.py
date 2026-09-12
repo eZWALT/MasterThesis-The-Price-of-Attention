@@ -41,8 +41,8 @@ CROWD_IDS = (
     ]
 )
 
-LAB_C = "#3D6B8A"
-CR_C = "#9A7A96"
+LAB_C = "#D32F2F"
+CR_C = "#1565C0"
 INK = "#243240"
 MUTED = "#5C6770"
 GRID = "#D5DBE0"
@@ -227,17 +227,7 @@ def draw_demographics(people: list[dict], out_stem: Path) -> None:
     for letter, (ax, title, key, levels) in zip(letters, panels):
         grouped_bars(ax, levels, pct(people, "lab", key, levels), pct(people, "crowd", key, levels))
         ax.set_title(f"({letter})  {title}", fontsize=10, color=INK, pad=6, loc="left")
-    handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(
-        handles,
-        labels,
-        loc="upper center",
-        ncol=2,
-        frameon=False,
-        bbox_to_anchor=(0.5, 1.02),
-        fontsize=9,
-    )
-    fig.tight_layout(rect=(0, 0, 1, 0.96))
+    fig.tight_layout()
     fig.savefig(out_stem.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
     fig.savefig(out_stem.with_suffix(".png"), format="png", dpi=300, bbox_inches="tight")
     plt.close(fig)
