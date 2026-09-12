@@ -1,14 +1,15 @@
 """Thesis montage in Sebastian's cap style, our 32-channel rules.
 
 Look: circular 10--20 schematic, labels inside the discs, GND / Cz as
-black discs, one green accent. Not a matplotlib scatter with a title.
+black discs. High-contrast fills: red Fz, blue posterior alpha, yellow
+other recorded.
 
 Rules (acquisition_contract.md):
 - 32 recorded actiCHamp labels
 - Fpz = ground, not recorded (drawn as GND)
 - Cz = online reference and recorded (drawn as the black centre disc)
-- Green = confirmatory sites: Fz (midline theta) and posterior alpha
-  (O1, Oz, O2, P3, Pz, P4)
+- Red = Fz (midline theta). Blue = posterior alpha
+  (O1, Oz, O2, P3, Pz, P4). Yellow = the other recorded channels.
 
 Do not put Sebastian's FT9/TP9 labels or his green set (Fp1/F3/O1…) back.
 """
@@ -67,14 +68,14 @@ RECORDED = (
     "Pz", "P3", "P7", "P9", "O1", "Oz", "O2", "P10", "P8", "P4", "CP2",
     "CP6", "T8", "C4", "Cz", "FC2", "FC6", "F10", "F8", "F4", "Fp2",
 )
-CONFIRM = {"Fz", "O1", "Oz", "O2", "P3", "Pz", "P4"}
+FZ = {"Fz"}
+POSTERIOR = {"O1", "Oz", "O2", "P3", "Pz", "P4"}
 
-GREEN = "#43A047"
-GREY = "#B0B0B0"
-GREY_EDGE = "#6E6E6E"
+RED = "#D32F2F"
+BLUE = "#1565C0"
+YELLOW = "#F9A825"
 BLACK = "#1A1A1A"
-RED = "#E53935"
-BLUE = "#42A5F5"
+RING = "#9E9E9E"
 INK = "#222222"
 
 
@@ -105,20 +106,23 @@ def main() -> None:
 
     head_r = 1.12
     ax.add_patch(Circle((0, 0), head_r, fill=False, edgecolor=BLACK, lw=1.8, zorder=1))
-    ax.add_patch(Circle((0, 0), 0.55, fill=False, edgecolor=RED, lw=1.05, zorder=1))
-    ax.plot([-head_r, head_r], [0, 0], color=BLUE, lw=1.05, zorder=1)
-    ax.plot([0, 0], [-head_r, head_r], color=BLUE, lw=1.05, zorder=1)
+    ax.add_patch(Circle((0, 0), 0.55, fill=False, edgecolor=RING, lw=1.05, zorder=1))
+    ax.plot([-head_r, head_r], [0, 0], color=RING, lw=1.05, zorder=1)
+    ax.plot([0, 0], [-head_r, head_r], color=RING, lw=1.05, zorder=1)
 
     r_ch, r_ref = 0.096, 0.118
     for name in RECORDED:
         if name == "Cz":
             continue
         xy = XY[name]
-        if name in CONFIRM:
-            disc(ax, xy, r_ch, GREEN, "#2E7D32", 0.7)
+        if name in FZ:
+            disc(ax, xy, r_ch, RED, "#B71C1C", 0.7)
+            label(ax, xy, name, "white", 6.1)
+        elif name in POSTERIOR:
+            disc(ax, xy, r_ch, BLUE, "#0D47A1", 0.7)
             label(ax, xy, name, "white", 6.1)
         else:
-            disc(ax, xy, r_ch, GREY, GREY_EDGE, 0.7)
+            disc(ax, xy, r_ch, YELLOW, "#F57F17", 0.7)
             label(ax, xy, name, INK, 6.1)
 
     disc(ax, XY["Cz"], r_ref, BLACK, BLACK, 0.0)
