@@ -201,7 +201,7 @@ def main() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# figure: stacked shares of the sponsored-button item per condition
+# figure: noticed (>=5) vs not (otherwise), detection item, one bar per condition
 # --------------------------------------------------------------------------- #
 def make_figure(sp: pd.DataFrame) -> None:
     plt.rcParams.update({
@@ -213,27 +213,23 @@ def make_figure(sp: pd.DataFrame) -> None:
     n = len(sp)
     conds = list(sk.CONDITIONS)
     noticed = (sp >= 5).sum()
-    mid = (sp == 4).sum()
-    notn = (sp <= 3).sum()
+    notn = (sp <= 4).sum()
     x = np.arange(len(conds))
     fig, ax = plt.subplots(figsize=(7.2, 3.6))
-    p_not = notn[conds].to_numpy() / n
-    p_mid = mid[conds].to_numpy() / n
     p_yes = noticed[conds].to_numpy() / n
+    p_not = notn[conds].to_numpy() / n
     ax.bar(x, p_yes, color=NAVY, edgecolor="white", lw=0.6, width=0.62, label="Noticed")
-    ax.bar(x, p_mid, bottom=p_yes, color=MIST, edgecolor="white", lw=0.6, width=0.62, label="Midpoint")
-    ax.bar(x, p_not, bottom=p_yes + p_mid, color=LIGHT_CLAY, edgecolor="white", lw=0.6, width=0.62,
+    ax.bar(x, p_not, bottom=p_yes, color=LIGHT_CLAY, edgecolor="white", lw=0.6, width=0.62,
            label="Did not notice")
     for i, c in enumerate(conds):
         share, lo, hi = wilson(int(noticed[c]), n)
         ax.errorbar(x[i], share, yerr=[[share - lo], [hi - share]], fmt="none", ecolor=CLAY, elinewidth=1.4,
                     capsize=4, zorder=4)
-        # short bars: move the label off the whisker
         dx = -0.17 if share < 0.15 else 0.0
         ax.text(x[i] + dx, share / 2, f"{share:.0%}", ha="center", va="center", color="white", fontsize=9,
                 fontweight="bold")
         if p_not[i] > 0.08:
-            ax.text(x[i], p_yes[i] + p_mid[i] + p_not[i] / 2, f"{p_not[i]:.0%}", ha="center", va="center",
+            ax.text(x[i], p_yes[i] + p_not[i] / 2, f"{p_not[i]:.0%}", ha="center", va="center",
                     color=INK, fontsize=9)
     ax.set_xticks(x)
     ax.set_xticklabels([COND_NAME[c].replace(" ", "\n") for c in conds], fontsize=9)
