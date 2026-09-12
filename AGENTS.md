@@ -24,10 +24,10 @@ Visible board. Science 1–5 is frozen. Details:
 - [ ] **Five juries** — compile PDF; paste `2026-09-11-thesis-review-metaprompt.md`; save under `.agents/context/writing/review-3/`
 - [ ] **Loop 3** — apply his comments + the five juries. Abstract and Ch 9 last, one agent, no wholesale rewrite
 - [ ] **Mechanical leftovers** — `models.tex` still mentions an FDR \(q\); Results still prints a Gold filename; boxplot-vs-profile on `fig:beh-profiles` is still his call
-- [ ] **Chapter titles** (his 12 Sep Overleaf note) — Related Work & Context → Related Work; Dataset → Datasets; shorten “AI System Design & Engineering”; unify title case
-- [ ] **Methods 6.2** — put dependent variables next to independent variables; reorder the subsection
-- [ ] **Results / Discussion titles** — match 100% (genre trajectories is the example)
-- [ ] **Captions** — final pass: relevant, not repeating the figure; OCR the images
+- [x] **Chapter titles** (his 12 Sep Overleaf note) — Related Work & Context → Related Work; Dataset → Datasets; shorten “AI System Design & Engineering”; unify title case
+- [x] **Methods 6.2** — put dependent variables next to independent variables; reorder the subsection
+- [x] **Results / Discussion titles** — match 100% (genre trajectories is the example)
+- [ ] **Captions** — final pass (loop 3 WP-E running): relevant, not repeating the figure; OCR the images
 - [ ] **Page breaks / float placement** — after chapter feedback is applied
 - [ ] **Tell Katerina** — design re-run on Gold \(N=54\), 0/70; her tree stays read-only
 - [ ] **Thesis PDF** — Thu 17 Sep. Cover is `\usePaperTitle=1` (paper title). Flip to `0` for the long thesis title
