@@ -12,8 +12,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.colors import LinearSegmentedColormap
-
 from condition_labels import DATASET_A_LABELS, DATASET_B_LABELS
 
 
@@ -26,12 +24,10 @@ OUT = Path(__file__).resolve().parent / "outputs" / "figures" / "eeg_only" / "he
 
 NAVY = "#1B3A4B"
 CLAY = "#C45C26"
+HOLM_ORANGE = "#C45C26"
 INK = "#12202A"
 SLATE = "#5C6B73"
-CMAP = LinearSegmentedColormap.from_list(
-    "holm",
-    ["#C45C26", "#F0D5B8", "#F4F6F7", "#9BB0BC"],
-)
+CMAP = plt.colormaps["YlOrRd_r"]
 
 # Greek symbols, to match the manuscript prose (Fz θ, posterior α, ...).
 FEATURES = [
@@ -153,6 +149,17 @@ def draw(
                     fontsize=fontsize,
                     fontweight="semibold" if value < 0.05 else "normal",
                 )
+                if value < 0.05:
+                    axis.text(
+                        x + 0.42,
+                        y - 0.38,
+                        "*",
+                        ha="right",
+                        va="top",
+                        color=HOLM_ORANGE,
+                        fontsize=11,
+                        fontweight="bold",
+                    )
 
 
 def apa_p(value: float) -> str:

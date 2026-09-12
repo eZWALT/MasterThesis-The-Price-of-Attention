@@ -31,11 +31,12 @@ STATS = ROOT / "analysis/eeg/statistics/outputs"
 GOLD = ROOT / "src/project/logs/xdf/gold/features"
 OUT = Path(__file__).resolve().parent / "outputs" / "figures" / "suite"
 
+RED = "#D32F2F"
+BLUE = "#1565C0"
 NAVY = "#1B3A4B"
 CLAY = "#C45C26"
 HOLM_ORANGE = CLAY
 HOLM_STAR_SIZE = 16
-HOLM_LEGEND = "Holm p < .05"
 TEAL = "#2A6F6F"
 SLATE = "#5C6B73"
 MIST = "#D5DDE3"
@@ -209,7 +210,7 @@ def plot_confirmatory_forests(
             {key: index for index, key in enumerate(PRIMARY)}
         )
         frame = frame.sort_values(["order", "feat_order"]).reset_index(drop=True)
-        colors = [NAVY if row.feature.startswith("fz_") else TEAL for row in frame.itertuples()]
+        colors = [RED if row.feature.startswith("fz_") else BLUE for row in frame.itertuples()]
         positions = np.arange(len(frame))
         xmax = float(frame["ci_upper"].max()); xmin = float(frame["ci_lower"].min()); span = xmax - xmin
         for index, row in frame.iterrows():
@@ -248,12 +249,7 @@ def plot_confirmatory_forests(
         axis.invert_yaxis()
         axis.set_xlabel("Mean within-person difference, dB (95% t CI)")
         axis.set_title(title)
-    handle = Line2D(
-        [0], [0], marker="*", color="none", markeredgecolor=HOLM_ORANGE,
-        markerfacecolor=HOLM_ORANGE, markersize=14, linestyle="none", label=HOLM_LEGEND,
-    )
-    figure.legend(handles=[handle], loc="lower center", bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=9)
-    # No suptitle or in-figure footnote: the manuscript caption carries them.
+    # No Holm text legend: the manuscript caption carries the asterisk.
     save(figure, "figure_08_confirmatory_forests")
 
 

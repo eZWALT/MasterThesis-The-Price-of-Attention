@@ -25,7 +25,7 @@ plt.rcParams["figure.max_open_warning"] = 0
 
 import pandas as pd  # noqa: E402
 from matplotlib.backends.backend_pdf import PdfPages  # noqa: E402
-from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm  # noqa: E402
+from matplotlib.colors import TwoSlopeNorm  # noqa: E402
 
 from condition_labels import CONDITION_LABELS  # noqa: E402
 
@@ -36,14 +36,9 @@ OUT = Path(__file__).resolve().parent / "outputs" / "figures" / "posthoc"
 
 INK = "#12202A"
 SLATE = "#5C6B73"
-HOLM_CMAP = LinearSegmentedColormap.from_list(
-    "holm",
-    ["#C45C26", "#F0D5B8", "#F4F6F7", "#9BB0BC"],
-)
-DIFF_CMAP = LinearSegmentedColormap.from_list(
-    "diff",
-    ["#1B3A4B", "#F4F6F7", "#C45C26"],
-)
+HOLM_ORANGE = "#C45C26"
+HOLM_CMAP = plt.colormaps["YlOrRd_r"]
+DIFF_CMAP = plt.colormaps["RdBu_r"]
 
 DATASET_A_DISPLAY = (
     "no_ads",
@@ -693,15 +688,30 @@ def draw_thesis_appendix(
     )
     for row in range(matrix.shape[0]):
         for column in range(matrix.shape[1]):
+            p = matrix[row, column]
+            if np.isnan(p):
+                continue
             axis.text(
                 column,
                 row,
-                f"{matrix[row, column]:.2f}".lstrip("0"),
+                f"{p:.2f}".lstrip("0"),
                 ha="center",
                 va="center",
                 fontsize=5.4,
-                color=INK,
+                color="#FFFFFF" if p < 0.05 else INK,
+                fontweight="bold" if p < 0.05 else "normal",
             )
+            if p < 0.05:
+                axis.text(
+                    column + 0.42,
+                    row - 0.38,
+                    "*",
+                    ha="right",
+                    va="top",
+                    fontsize=8,
+                    color=HOLM_ORANGE,
+                    fontweight="bold",
+                )
     axis.axvline(split - 0.5, color="#FFFFFF", linewidth=2.4)
     axis.text(
         (split - 1) / 2,
