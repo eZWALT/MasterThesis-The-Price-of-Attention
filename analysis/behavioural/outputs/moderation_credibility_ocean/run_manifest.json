@@ -1,0 +1,46 @@
+{
+  "family": "credibility",
+  "outcome": "credibility",
+  "created_utc": "2026-09-14T11:01:14.395377+00:00",
+  "gold_dir": "C:\\Users\\katly\\Documents\\GitHub\\MasterThesis-The-Price-of-Attention\\analysis\\walter\\behavioural\\outputs\\gold",
+  "n_rows_long": 270,
+  "n_people_long": 54,
+  "n_people_deltas": 54,
+  "conditions": [
+    "no_ads",
+    "inline_early",
+    "inline_late",
+    "block_early",
+    "block_late"
+  ],
+  "planned_contrasts": [
+    "any_ad_vs_no_ads",
+    "inline_vs_block",
+    "early_vs_late"
+  ],
+  "bfi": [
+    "bfi_e",
+    "bfi_a",
+    "bfi_c",
+    "bfi_n",
+    "bfi_o"
+  ],
+  "demographics": [
+    "demo_sex",
+    "demo_education",
+    "demo_familiarity",
+    "demo_frequency"
+  ],
+  "demo_age_non_null": 0,
+  "alpha": 0.05,
+  "correction": "Holm within family block (Model 1: 3 contrasts; Model 2 BFI: 5 traits per contrast)",
+  "outputs": [
+    "analysis_long.csv",
+    "model1_condition_effects.csv",
+    "model2_delta_moderation.csv",
+    "model2_delta_demographics.csv",
+    "model2_interaction_terms.csv",
+    "significant_summary.csv",
+    "run_manifest.json"
+  ]
+}

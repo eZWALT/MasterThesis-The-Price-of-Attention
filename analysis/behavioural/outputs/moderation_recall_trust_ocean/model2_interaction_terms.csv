@@ -1,0 +1,16 @@
+model,family,outcome,moderator,moderator_label,term,coef,se,p_raw,n_people,note,p_holm,holm_sig
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_e,Extraversion,C(condition)[T.inline_late]:trait_c,0.27025063567017754,0.29713210521604316,0.36307030167823484,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_e,Extraversion,C(condition)[T.block_early]:trait_c,0.2680711950599343,0.29713210521604316,0.3669531199122936,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_e,Extraversion,C(condition)[T.block_late]:trait_c,-0.27715219760261567,0.29713210521604316,0.35094519272689884,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_a,Agreeableness,C(condition)[T.inline_late]:trait_c,0.3004149377593359,0.29756261086386926,0.3126938542533275,54,,0.625387708506655,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_a,Agreeableness,C(condition)[T.block_early]:trait_c,-0.4182572614107887,0.29756261086386926,0.15983968543254667,54,,0.47951905629764,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_a,Agreeableness,C(condition)[T.block_late]:trait_c,-0.2500691562932229,0.29756261086386926,0.4006887864444876,54,,0.625387708506655,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_c,Conscientiousness,C(condition)[T.inline_late]:trait_c,0.04608294930875579,0.3183194894404626,0.8848928739347328,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_c,Conscientiousness,C(condition)[T.block_early]:trait_c,-0.3428571428571429,0.3183194894404626,0.28144229988267144,54,,0.8443268996480143,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_c,Conscientiousness,C(condition)[T.block_late]:trait_c,-0.03809523809523797,0.3183194894404626,0.9047397261239798,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_n,Neuroticism,C(condition)[T.inline_late]:trait_c,-0.1507009345794392,0.24084685287078178,0.5315034017018854,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_n,Neuroticism,C(condition)[T.block_early]:trait_c,0.0483644859813084,0.2408468528707818,0.840847047700696,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_n,Neuroticism,C(condition)[T.block_late]:trait_c,-0.17570093457943928,0.24084685287078178,0.46568785665739265,54,,1.0,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_o,Openness,C(condition)[T.inline_late]:trait_c,-0.3535410764872514,0.26144266563497287,0.17628895404176403,54,,0.5288668621252921,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_o,Openness,C(condition)[T.block_early]:trait_c,-0.2549575070821526,0.2614426656349729,0.3294636807700223,54,,0.6589273615400446,False
+model2b_interaction,trust_after_reexposure,recall_trust_shift,bfi_o,Openness,C(condition)[T.block_late]:trait_c,0.21699716713881034,0.2614426656349729,0.40653931421825507,54,,0.6589273615400446,False

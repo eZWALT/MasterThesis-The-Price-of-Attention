@@ -3,7 +3,8 @@ Condition-specific correlations between survey scores and OCEAN (BFI-10).
 
 Joins:
   - participant_condition_scores.csv  (outcome scores per participant x condition)
-  - Experiment/**/*_export.jsonl      (ocean_submitted / session_complete scores)
+  - src/project/logs/tracked/crowd/**/*_export.jsonl
+    (ocean_submitted / session_complete scores)
 
 For each condition, correlates each outcome score with each OCEAN trait
 (E, A, C, N, O) using:
@@ -43,7 +44,8 @@ import scipy.stats as stats
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parents[1]
 EXPERIMENT_DIR = ROOT / "Experiment"
-TRACKED_LOG_DIR = PROJECT_ROOT / "src" / "project" / "logs" / "tracked"
+CROWD_LOG_DIR = PROJECT_ROOT / "src" / "project" / "logs" / "tracked" / "crowd"
+TRACKED_LOG_DIR = CROWD_LOG_DIR
 SCORES_CSV = ROOT / "participant_condition_scores.csv"
 OUT_DIR = ROOT / "ocean_corr_outputs"
 
@@ -417,7 +419,7 @@ def main() -> None:
     scores_path = resolve_scores_csv()
     OUT_DIR.mkdir(exist_ok=True)
 
-    ocean = collect_ocean_scores([EXPERIMENT_DIR, TRACKED_LOG_DIR])
+    ocean = collect_ocean_scores([EXPERIMENT_DIR, CROWD_LOG_DIR, TRACKED_LOG_DIR])
     scores = pd.read_csv(scores_path)
 
     missing_outcomes = [c for c in OUTCOME_COLS if c not in scores.columns]

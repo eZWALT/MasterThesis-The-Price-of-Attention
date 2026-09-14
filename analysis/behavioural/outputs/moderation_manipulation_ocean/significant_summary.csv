@@ -1,0 +1,4 @@
+source,outcome,contrast,contrast_label,effect,p_raw,p_holm,moderator
+model1,manipulation,any_ad_vs_no_ads,any ad - no ad,1.2708333333333341,1.2578874526063903e-06,3.773662357819171e-06,
+model1,manipulation,inline_vs_block,implicit - explicit,-0.6157407407407407,0.008658008764914786,0.017316017529829572,
+model1,manipulation,early_vs_late,early - late,0.5787037037037036,0.013611353577980052,0.017316017529829572,

@@ -1,0 +1,3 @@
+source,outcome,contrast,contrast_label,effect,p_raw,p_holm,moderator
+model1,recall_memory,inline_vs_block,implicit - explicit,-1.4537037037037086,5.073631892439111e-09,1.0147263784878221e-08,
+model2_delta_demo,recall_memory,early_vs_late,early - late,,0.020899864971514123,0.020899864971514123,demo_familiarity

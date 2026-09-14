@@ -1,0 +1,4 @@
+source,outcome,contrast,contrast_label,effect,p_raw,p_holm,moderator
+model1,notice,any_ad_vs_no_ads,any ad - no ad,2.074074074074079,4.959878206079071e-14,1.4879634618237214e-13,
+model1,notice,inline_vs_block,implicit - explicit,-1.1481481481481501,3.1278090221275473e-06,6.255618044255095e-06,
+model2_delta_demo,notice,inline_vs_block,implicit - explicit,,0.005098093087277493,0.005098093087277493,demo_education

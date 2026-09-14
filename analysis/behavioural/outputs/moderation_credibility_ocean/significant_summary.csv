@@ -1,0 +1,2 @@
+source,outcome,contrast,contrast_label,effect,p_raw,p_holm,moderator
+model1,credibility,early_vs_late,early - late,-0.33024691358024694,0.0062705780559821475,0.01881173416794644,

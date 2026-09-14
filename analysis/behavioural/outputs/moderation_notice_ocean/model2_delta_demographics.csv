@@ -1,0 +1,40 @@
+model,family,outcome,contrast,contrast_label,moderator,term,coef,se,p_raw,n,r2,note,p_holm,holm_sig
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_sex,factor_overall,,,0.543536768405434,51,0.00757941799292261,,0.543536768405434,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_sex,C(demo_sex)[T.Male],0.36130952380952486,0.5906243140316251,0.5435367684054333,51,0.00757941799292261,,0.5435367684054333,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_education,factor_overall,,,0.09296471889426404,52,0.15292620375360688,,0.09296471889426404,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_education,C(demo_education)[T.High School],0.28124999999999944,0.7686580986409912,0.7160834414945147,52,0.15292620375360688,,1.0,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_education,C(demo_education)[T.Master's Degree],-0.33750000000000085,0.6656774402477429,0.6145238157505221,52,0.15292620375360688,,1.0,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_education,C(demo_education)[T.Other],-2.9937500000000026,1.2287849133706945,0.018679655296076875,52,0.15292620375360688,,0.0747186211843075,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_education,C(demo_education)[T.PhD],1.2979166666666657,1.2287849133706943,0.2962485921538183,52,0.15292620375360688,,0.888745776461455,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_familiarity,factor_overall,,,0.6011075419462062,52,0.005506269278149456,,0.6011075419462062,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_familiarity,C(demo_familiarity)[T.Somewhat Familiar],-0.38749999999999973,0.7364766911903368,0.6011075419462064,52,0.005506269278149456,,0.6011075419462064,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_frequency,factor_overall,,,0.4835751252208763,52,0.04935479760547101,,0.4835751252208763,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_frequency,C(demo_frequency)[T.1–5 times per month],-1.0921052631578965,1.049780223599811,0.30340411257443606,52,0.04935479760547101,,0.9102123377233082,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_frequency,C(demo_frequency)[T.1–5 times per week],0.05372807017544068,0.770137005913052,0.9446711013599483,52,0.04935479760547101,,0.9446711013599483,False
+model2_delta_demo,ad_noticing,notice,any_ad_vs_no_ads,any ad - no ad,demo_frequency,C(demo_frequency)[T.Greater than 5 times per day],0.5719572368421072,0.708682647861143,0.42360677298121907,52,0.04935479760547101,,0.9102123377233082,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_sex,factor_overall,,,0.11966177603780756,51,0.048702119544488554,,0.11966177603780756,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_sex,C(demo_sex)[T.Male],-0.9416666666666673,0.5945433019833531,0.11966177603780814,51,0.048702119544488554,,0.11966177603780814,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_education,factor_overall,,,0.005098093087277493,52,0.26574768384997194,,0.005098093087277493,True
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_education,C(demo_education)[T.High School],0.7125000000000005,0.726193533345169,0.3315457486102832,52,0.26574768384997194,,0.3315457486102832,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_education,C(demo_education)[T.Master's Degree],1.6250000000000004,0.6289020479408978,0.01293870998729915,52,0.26574768384997194,,0.0517548399491966,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_education,C(demo_education)[T.Other],-1.9375000000000009,1.1609006130808692,0.10177372032077621,52,0.26574768384997194,,0.30532116096232864,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_education,C(demo_education)[T.PhD],-1.8541666666666685,1.1609006130808692,0.11692817891007985,52,0.26574768384997194,,0.30532116096232864,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_familiarity,factor_overall,,,0.4677499344925726,52,0.010595085081917532,,0.4677499344925726,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_familiarity,C(demo_familiarity)[T.Somewhat Familiar],0.5369047619047617,0.7337482206091989,0.4677499344925744,52,0.010595085081917532,,0.4677499344925744,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_frequency,factor_overall,,,0.2856026896118824,52,0.07509033406114918,,0.2856026896118824,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_frequency,C(demo_frequency)[T.1–5 times per month],1.9052631578947405,1.0342865176202078,0.07164211873183227,52,0.07509033406114918,,0.2149263561954968,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_frequency,C(demo_frequency)[T.1–5 times per week],-0.1030701754386002,0.7587705540925829,0.8925171289994471,52,0.07509033406114918,,1.0,False
+model2_delta_demo,ad_noticing,notice,inline_vs_block,implicit - explicit,demo_frequency,C(demo_frequency)[T.Greater than 5 times per day],0.12088815789473394,0.6982232008912286,0.8632719183761227,52,0.07509033406114918,,1.0,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_sex,factor_overall,,,0.25285838885029466,51,0.02659544563973837,,0.25285838885029466,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_sex,C(demo_sex)[T.Male],-0.5178571428571427,0.44756383025841506,0.25285838885029394,51,0.02659544563973837,,0.25285838885029394,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_education,factor_overall,,,0.8325640303188395,52,0.030097460725722947,,0.8325640303188395,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_education,C(demo_education)[T.High School],-0.36250000000000016,0.6272539146185186,0.5660796308521039,52,0.030097460725722947,,1.0,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_education,C(demo_education)[T.Master's Degree],-0.47500000000000026,0.543217824682872,0.38633652381431993,52,0.030097460725722947,,1.0,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_education,C(demo_education)[T.Other],0.42083333333333317,1.0027346989495989,0.6766274130043426,52,0.030097460725722947,,1.0,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_education,C(demo_education)[T.PhD],0.1708333333333336,1.0027346989495987,0.8654524614170412,52,0.030097460725722947,,1.0,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_familiarity,factor_overall,,,0.7759524545917804,52,0.00163485506034855,,0.7759524545917804,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_familiarity,C(demo_familiarity)[T.Somewhat Familiar],-0.15595238095238098,0.5450195548718815,0.7759524545917795,52,0.00163485506034855,,0.7759524545917795,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_frequency,factor_overall,,,0.1467215754398301,52,0.10480180480409507,,0.1467215754398301,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_frequency,C(demo_frequency)[T.1–5 times per month],0.09473684210526429,0.7524162275484914,0.9003289593164828,52,0.10480180480409507,,0.9003289593164828,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_frequency,C(demo_frequency)[T.1–5 times per week],0.5614035087719282,0.5519856134244413,0.314223242535673,52,0.10480180480409507,,0.628446485071346,False
+model2_delta_demo,ad_noticing,notice,early_vs_late,early - late,demo_frequency,C(demo_frequency)[T.Greater than 5 times per day],1.1603618421052615,0.5079390070849998,0.026807757838538903,52,0.10480180480409507,,0.0804232735156167,False
