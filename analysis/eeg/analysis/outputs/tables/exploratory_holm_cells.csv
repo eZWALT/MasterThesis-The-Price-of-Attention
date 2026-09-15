@@ -1,0 +1,8 @@
+dataset,dataset_label,contrast_id,contrast,feature,measure,feature_tier,n_participants,mean_difference,ci_lower,ci_upper,cohen_dz,p_t_raw,p_t_holm
+A,Condition aggregation,early_vs_late,early - late,theta_relative_power,relative theta,exploratory,18,-0.004689168799513,-0.0082399551196248,-0.0011383824794012,-0.6567189838651789,0.0126672063828926,0.0380016191486779
+B,Onset-locked,block_early_vs_no_ad_early,explicit early - a_empty,delta_relative_power,relative delta,exploratory,18,0.1888872334378442,0.0875774530883228,0.2901970137873657,0.9271702200776316,0.001070629383443,0.0042825175337723
+B,Onset-locked,block_early_vs_no_ad_early,explicit early - a_empty,delta_power_db_uv2,global delta (dB),exploratory,18,4.602253733892598,1.988980611758309,7.215526856026887,0.8757779351085477,0.0017185791237994,0.0068743164951977
+B,Onset-locked,block_early_vs_no_ad_early,explicit early - a_empty,beta_relative_power,relative beta,exploratory,18,-0.0879164997967744,-0.1446136955658883,-0.0312193040276605,-0.7711112727093279,0.0044979457493537,0.0179917829974151
+B,Onset-locked,block_early_vs_no_ad_early,explicit early - a_empty,theta_power_db_uv2,global theta (dB),secondary_global,18,1.6771395147666652,0.5570449158106816,2.7972341137226486,0.7445994830564199,0.0057302877317393,0.0229211509269573
+B,Onset-locked,block_early_vs_no_ad_early,explicit early - a_empty,alpha_relative_power,relative alpha,exploratory,18,-0.0390518698781972,-0.0656777959004203,-0.012425943855974,-0.7293657315499359,0.0065825329898832,0.0263301319595328
+B,Onset-locked,inline_late_vs_no_ad_late,implicit late - a_empty,gamma_relative_power,relative gamma,exploratory,18,-0.0435051802168252,-0.0748271172594316,-0.0121832431742188,-0.6907177264550445,0.0093390515446481,0.0373562061785924

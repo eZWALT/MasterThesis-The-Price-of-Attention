@@ -1,0 +1,7 @@
+task,task_id,inline_early,inline_late,block_early,block_late,no_ads,Total
+Laptop on a budget,swt_laptop_budget,13,13,11,8,9,54
+Fitness restart,swt_fitness_restart,10,6,13,12,13,54
+Gardening gift,swt_gardening_birthday_gift,11,5,10,14,14,54
+Pet decision,swt_pet_decision_and_setup,10,13,13,10,8,54
+Study environment,swt_study_environment,10,17,7,10,10,54
+Total,,54,54,54,54,54,270
