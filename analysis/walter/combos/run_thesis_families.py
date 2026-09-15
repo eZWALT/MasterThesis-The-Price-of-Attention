@@ -341,8 +341,9 @@ def make_figures(T: pd.DataFrame, frame: pd.DataFrame, summary: dict) -> None:
     lab = [f"{b} × {PRETTY_EEG[e]}" for b, e in pairs]
     yy = np.arange(len(pairs))[::-1].astype(float)
     subs = []
-    for est, col, mk, fill, off, name in (("A", cA, "o", True, 0.16, "Dataset A, condition aggregation"),
-                                          ("B", cB, "s", False, -0.16, "Dataset B, onset-locked")):
+    # Same marker convention as panel (b) of combos_trust_alpha: B filled squares, A hollow circles.
+    for est, col, mk, fill, off, name in (("A", cA, "o", False, 0.16, "Dataset A, condition aggregation"),
+                                          ("B", cB, "s", True, -0.16, "Dataset B, onset-locked")):
         sub = pd.concat([T[(T.family == f"beh_eeg_declared_{est}") & (T.beh == b) & (T.eeg == e)] for b, e in pairs])
         _forest(ax1, sub, lab, yy + off, mk, col, fill, name)
         subs.append((sub, yy + off))
