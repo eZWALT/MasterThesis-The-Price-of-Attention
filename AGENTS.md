@@ -68,7 +68,8 @@ it this week. Strategy:
 ## Live now
 
 Thesis PDF **Thu 17 Sep**. Defence **Wed 23 Sep** morning, Padova.
-Paper after 25 Sep.
+Paper after 25 Sep; rebuild plan, golden inventory, and `\Rev` loop:
+`.agents/context/writing/2026-09-15-paper-rebuild-golden-inventory.md`.
 
 **Open this, then stop:**
 `.agents/context/writing/2026-09-12-weekend-finish-board.md`
