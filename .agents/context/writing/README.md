@@ -3,11 +3,36 @@
 This directory holds durable writing decisions, Overleaf workflow notes, and
 handovers for thesis and publication prose.
 
-## Live now (12 September)
+## Live now (14 September, evening)
 
 Newest first. Dated notes below this box are history; they do not
 re-open a closed lock.
 
+0. **Five-LLM jury, two iterations** (15 Sep). Plan: judge on v1 →
+   apply v2 → judge on v2 → apply v3 → final. Prompt:
+   `2026-09-11-thesis-review-metaprompt.md`. Index:
+   `review-3/jury-README.md`. v1 five-pack is in: Deepseek,
+   Grok 4.6 web think-low, ChatGPT, Claude Sonnet 5, Gemini 3
+   Pro (`review-3/jury-v1-gemini-3-pro-full.md`; full 156-pp
+   PDF. Truncated first pass kept as
+   `jury-v1-gemini-3-pro.md`).
+   Extra in-IDE dumps: Muse 1.3, Kimi K3 Max, Opus 5,
+   Fable 5.1, GPT 5.6 Sol
+   (`review-3/jury-v1-gpt-5.6-sol.md`). Reconcile-later
+   prompt:
+   `review-3/ensemble-jury-reconciliation.md`. Wait for Walter
+   before apply. Full local PDF:
+   `docs/overleaf/thesis/_build/dissertation.pdf`
+   (156 pp; do not commit/push).
+   Do not apply from one jury unless Walter says so. Do not treat
+   jury table cells as Gold.
+0. **Thesis v1, source cleaned for the jury** (14 Sep evening).
+   Walter accepted the loop-3 prose. Green marks off; every
+   `\rev{}`, `% WALTER:` / `% WALTER+:`, `% [AI:]`, and the
+   reviewer-attack-surface block are gone from the `.tex`. Provenance
+   `% NUMBERS:` lines stay. Do not put review chat back in the
+   manuscript. Note:
+   `2026-09-14-thesis-v1-source-clean.md`.
 0. **Weekend finish board** (12 Sep midday). Section finish %, what
    Walter still writes, what must not be reopened:
    `2026-09-12-weekend-finish-board.md`. Cover title switch is
@@ -28,11 +53,13 @@ re-open a closed lock.
    loop 3. G1 voice-read is parked for that loop. Checklist:
    `2026-09-11-review-loop-2-checklist.md`. Reports: `review-2/`.
    Voice: `.cursor/rules/thesis-voice.mdc`.
-1. **External-reviewer meta-prompt** (11 Sep). Copy-paste block for
-   chatbots that get the thesis PDF only (no repo):
-   `2026-09-11-thesis-review-metaprompt.md`. Everything after the
-   `---` is the prompt. PDF-only wording; no LaTeX labels or Gold
-   filenames.
+1. **External-reviewer meta-prompt** (11 Sep; closer updated 14 Sep
+   evening). Copy-paste block for chatbots that get the thesis PDF
+   only (no repo): `2026-09-11-thesis-review-metaprompt.md`.
+   Everything after the `---` is the prompt. Full-PDF pass with
+   suggestions in every chapter; weight on Abstract, Methods §6.3,
+   Results, Discussion, Conclusion. PDF-only wording; no LaTeX
+   labels or Gold filenames.
 1. **Review loop 1 closed** (10 Sep evening, thesis `1f93146`).
    Table-first Results, `\promptbox` appendices, App **E** =
    behavioural (was F), App **F** = trajectories (was E), BH gone,

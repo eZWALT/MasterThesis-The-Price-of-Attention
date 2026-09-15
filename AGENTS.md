@@ -17,12 +17,12 @@ Visible board. Science 1–5 is frozen. Details:
 
 ### Thesis, this weekend
 
-- [ ] **§4.2.2** — text is in; leftover comments only (spine→grains, \(N=54\) once, optional pipeline figure)
-- [ ] **Ch 1 / 5** (~85%) — content is in; user-centric pass only. Not a rewrite
-- [ ] **Ch 2** (~85%) — stays compact on purpose. Do not add context. User-centric closer only; drop the leftover “Publication Related Work” heading
-- [ ] **Statistics attack** — Walter on Overleaf Ch 7–8. Open = `% WALTER:`; done = `% WALTER+:`
-- [ ] **Five juries** — compile PDF; paste `2026-09-11-thesis-review-metaprompt.md`; save under `.agents/context/writing/review-3/`
-- [ ] **Loop 3** — apply his comments + the five juries. Abstract and Ch 9 last, one agent, no wholesale rewrite
+- [x] **§4.2.2** — spine→grain applied; leftover comment-only asks archived in `2026-09-14-thesis-v1-source-clean.md`
+- [x] **Ch 1 / 2** — surgical user-centric pass applied 14 Sep; Ch 5 left
+- [x] **Ch 2 closer** — user-first; leftover paper heading was already gone
+- [x] **Statistics attack** — accepted as v1; all `% WALTER:` / `% WALTER+:` / `% [AI:]` stripped from the `.tex` (14 Sep evening)
+- [x] **Five juries** — dumps under `.agents/context/writing/review-3/`; index `jury-README.md`
+- [ ] **Loop 3b** — apply the five juries only. Abstract and Ch 9 last, one agent, no wholesale rewrite. Do not put review comments back in the `.tex`
 - [ ] **Mechanical leftovers** — `models.tex` still mentions an FDR \(q\); Results still prints a Gold filename; boxplot-vs-profile on `fig:beh-profiles` is still his call
 - [x] **Chapter titles** (his 12 Sep Overleaf note) — Related Work & Context → Related Work; Dataset → Datasets; shorten “AI System Design & Engineering”; unify title case
 - [x] **Methods 6.2** — put dependent variables next to independent variables; reorder the subsection
@@ -72,6 +72,10 @@ Paper after 25 Sep.
 
 **Open this, then stop:**
 `.agents/context/writing/2026-09-12-weekend-finish-board.md`
+
+Thesis **v1** source clean (14 Sep evening):
+`.agents/context/writing/2026-09-14-thesis-v1-source-clean.md`.
+No `% WALTER:` / `% [AI:]` / `\rev` back in the `.tex`.
 
 Loop-2 memory (comment → work package, model policy):
 `.agents/context/writing/2026-09-11-review-loop-2-checklist.md`.

@@ -35,11 +35,21 @@ to own, plus one review loop.
 
 ## This weekend, in order
 
-1. **He writes.** User-centric pass on Ch 1 (and 5 if he wants); Ch 2 stays short. Apply the leftover §4.2.2 comments if he wants them.
-2. **He attacks statistics** on Overleaf Ch 7–8. Open asks are `% WALTER:`;
-   addressed ones are `% WALTER+:`. He can drop a line once he accepts it.
-3. **Compile the PDF.** Paste `2026-09-11-thesis-review-metaprompt.md` into five chatbots. Save answers under `review-3/`.
-4. **Loop 3** applies his comments + the five juries. Conclusion and abstract last, one agent, no wholesale rewrite.
+1. **He writes.** Done enough for v1: user-centric pass on Ch 1–2, Ch 4
+   notation aligned to Ch 5. Residual comment-only asks are archived in
+   `2026-09-14-thesis-v1-source-clean.md`.
+2. **He attacks statistics** on Overleaf Ch 7–8. **Closed for v1.** All
+   `% WALTER:` / `% WALTER+:` lines were stripped from the source on
+   14 Sep evening so a committee cannot read the review chat.
+3. **Five-LLM jury, two iterations.** Prompt:
+   `2026-09-11-thesis-review-metaprompt.md`. Index:
+   `review-3/jury-README.md`. v1 five-pack is in (use Gemini
+   full-PDF dump). Extra in-IDE dumps listed there. Wait
+   before apply.
+   Then: apply → v2 → second five-judge pass → apply → v3 → final.
+4. **Each apply** uses the juries from that pass only. Conclusion and
+   abstract last, one agent, no wholesale rewrite. Do not put
+   `% WALTER:` back. Do not treat jury table cells as Gold.
 5. **Tell Katerina:** her design was re-run on Gold \(N=54\), 0/70 survive; her tree stays read-only.
 
 Parked, not this weekend: G1 voice-read (72 items, mechanical ones already applied), free-text coding, ad-moment scorer, dataset release, paper, deck fill.
