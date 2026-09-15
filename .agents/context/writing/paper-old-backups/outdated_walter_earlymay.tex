@@ -1,0 +1,580 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Working Document -- Conversational Advertisement}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Goal of this Document}
+
+This document is a working space to:
+\begin{itemize}
+    \item Define research questions
+    \item Formalize the problem mathematically
+    \item Collect and cluster relevant papers
+    \item Brainstorm possible experiments
+\end{itemize}
+
+(it still needs tightening in four places: scope, variable hierarchy, question wording, and consistency of terminology.)
+
+
+This is NOT a final paper. Right now its just an ambitious brainstorming with research directions rather than a controlled research plan, so it must be iterated until the scope is tight. Now, our initial goal is:
+\\ 
+
+\fbox{
+\parbox{0.9\linewidth}{
+% PROBLEM SETTING
+We study how conversational AI systems can introduce advertising and how this affects user trust and wellbeing. Specifically, we investigate how ad format and conversational context shape user responses in multi-turn LLM interactions in order to help LLM Platforms understand better the trade-offs of advertisement and how can they jointly benefit the users, advertisers and the platform.
+\\ 
+
+Rather than optimizing advertising policies or maximizing platform-level objectives, our goal is to characterize and model the underlying mechanisms of conversational advertising. This includes understanding how different ad designs influence cognitive load, trust, attention allocation and downstream conversational dynamics.
+\\
+
+We further aim to learn interpretable predictive models of ad appropriateness, estimating:
+\[
+P(\text{AdAppropriate}_t = 1 \mid \text{Context}_t)
+\]
+where context includes conversational state, intent structure, ad format, and user-specific factors such as personality traits.
+\\
+
+To complement behavioral and predictive analysis, we conduct a controlled user study with EEG, eye-tracking measurements, OCEAN personality data and self-reports of trust/annoyance. This allows us to quantify neurocognitive responses to different advertising interventions and evaluate whether these signals provide additional explanatory power beyond conversational features alone.
+\\ 
+
+Finally, we introduce a structured taxonomy and conceptual framework for conversational advertising in LLM systems, linking ad design choices, intent structure, and measurable attention shift in conversational trajectories.
+
+
+}
+}
+
+\newpage 
+
+\section{Theoretical Work}
+
+THIS IS JUST AI SLOP I CREATED TO HAVE A MINIMAL STRUCTURE THIS MUST BE WORKED ON YET! I'M WORKING ON IT BUT DO NOT EVEN LOOK AT IT 
+
+This section introduces preliminary abstractions used to structure the experimental design. The goal is to define a minimal and consistent framework linking conversational dynamics, advertising interventions, and observed user responses.
+
+\subsection{Intent}
+
+We model a conversation as a sequence of turns $\{u_t, a_t\}_{t=1}^T$, where $u_t$ is the user utterance and $a_t$ the assistant response.
+
+At each turn, we associate a latent intent state $I_t \in \mathcal{I}$, what the user wants or needs help with... The space of intents is inherently infinite by definition so previous work like [1] tried to cluster intents to create a more tractable set of "Genres". 
+
+Genres are ...
+
+We use a coarse-grained intent space:
+
+\[
+\mathcal{I} = \{\text{Informational}, \text{Transactional}, \text{Social}\}
+\]
+
+Intent evolves as a function of the conversation history:
+
+\[
+I_t = f(u_{\leq t}, a_{\leq t})
+\]
+
+This representation allows us to model conversations as intent or genre trajectories $\{I_t\}$, which from the point of view of advertisement can give us multiple advantages (Predicting the right placement, the forecasted impact...)
+
+\subsection{Ads Taxonomy}
+
+We model advertisements as interventions applied to a response at turn $t^*$. We acknowledge the fact that there are many dimensions associated with this, and that advertisement types are simply just instances of this underlying space. So we introduce a common vocabulary and taxonomy to talk about ad types:
+
+An ad has the dimensions:
+\begin{itemize}
+    \item Content
+    \item Integration mode 
+    \item Strategy
+    \item Initiative...
+\end{itemize}
+
+An ad is defined as:
+\[
+A = (C, \tau, \alpha)
+\]
+where $C$ is content, $\tau$ is the integration mode, and $\alpha$ is the alignment with the current intent.
+
+We consider discrete integration modes:
+\[
+\tau \in \{\text{Subtle}, \text{Sponsored}, \text{Inline}, \text{Explicit}\}
+\]
+
+An intervention modifies the response:
+\[
+a_{t^*} \rightarrow \tilde{a}_{t^*}
+\]
+
+\subsection{Metrics}
+
+One last key challenge about Conversational Advertisement is the definition of proper metrics to avoid exploiting proxy metrics like CTR or CPM that has been done in the past for web advertisement. We define observed outcomes capturing user response:
+
+\begin{itemize}
+    \item Trust: $T$, with $\Delta T = T_{\text{post}} - T_{\text{pre}}$
+    \item Intrusiveness: $R$
+    \item Engagement: $E$ (e.g., continuation)
+    \item Attention: $G$ (eye-tracking)
+    \item Cognitive load: $L$ (EEG)
+\end{itemize}
+
+We define ad appropriateness as:
+\[
+\text{AdAppropriate}_t = \mathbb{1}[\Delta T \geq 0 \wedge E = 1 \wedge R \leq \theta]
+\]
+
+We also measure semantic shift:
+\[
+\Delta S = 1 - \cos(e_{t^*-1}, e_{t^*+1})
+\]
+
+The problem of conversational advertisement geared toward LLM platforms is the joint optimization of user value and user trust, advertiser value and trust and platform long term revenue and value. So having these 3 dimensions to satisfy: 
+
+\begin{itemize}
+    \item Users:
+    \item Advertisers:
+    \item Platform:
+\end{itemize}
+
+\newpage
+
+\section{Research Variables \& Questions (Final Direction)}
+
+Our work is framed as a \textbf{signal-rich experimental ML study}, combining controlled human experiments with interpretable predictive modeling.
+
+
+\subsection{Research Variables}
+
+We structure the problem into \textbf{manipulated experimental factors} and \textbf{observed outcome signals}. This separation is used to ensure interpretability of causal effects and predictive modeling consistency.
+
+\subsubsection{Manipulated Factors (Experimental Conditions)}
+
+Take into account that ad type is not a pure variable but rather instances of multiple dimensions that make up what an ad is: Integration strategy, timing policy, alignment policy, persuasive strategy and user agency... However exploring integration strategy is the most important factor of them all without accounting for timing policy, however due to lack of data we cannot test for that.
+
+\begin{itemize}
+
+    \item \textbf{Ad Type (Format / Integration Mode)}  
+    This is the primary experimental variable, capturing how advertising is presented within the conversational interface. Each type here represents a sensible instance of the taxonomy space we have previously defined with varying level of a priori intrusiveness.
+    
+    \begin{enumerate}
+        \item \textit{Sponsored recommendation}: clearly labeled suggestion embedded in response (Bing Style)
+        \item \textit{Inline persuasive suggestion}: integrated promotional content within the answer.
+        \item Sponsored conversational suggestions: Perplexity style
+        \item \textit{Explicit ad block}: clearly separated, high-salience advertisement (CTA-style) (OpenAI Style)
+    \end{enumerate}
+
+    \item 
+
+    \item \textbf{Conversation State (Intent Category)}  
+    Derived from the intent/genre classifier, we can to group these into macro-genres of intent or keep the granularity higher, that summarize the main use cases of Human - Language Model interactions.
+    \begin{itemize}
+        \item \textit{Informational} (e.g., academic help, general guidance, work, programming)
+        \item \textit{Transactional} (e.g., purchasable products)
+        \item \textit{Social} (e.g., relationships, chit-chat, roleplay)
+    \end{itemize}
+
+    \item \textbf{User personality traits (OCEAN)}:     We include a reduced Big Five personality representation to capture stable user differences relevant to persuasion and ad sensitivity. We will have to focus on coarse comparisons (e.g., high vs. low trait levels) rather than fine-grained modeling.
+
+
+    
+\end{itemize}
+
+\subsubsection{Observed Outcomes (Dependent Variables)}
+
+\begin{itemize}
+\item \textbf{Neurophysiological signals}: EEG-based indices capturing cognitive and affective states during interaction, including the Cognitive Load Index ($CLI = \frac{\theta_{frontal}}{\beta_{frontal}}$), the Engagement Index ($EI = \frac{\beta}{\alpha + \theta}$), and the Arousal Index ($AI = \frac{\beta}{\alpha}$), complemented by (i) frontal theta power as a direct workload marker ($\Theta_{frontal}(t)$) and (ii) alpha suppression relative to baseline as a task engagement indicator ($\Delta \alpha(t) = 1 - \frac{\alpha(t)}{\alpha_{baseline}}$). One last key metric is Frontal Alpha Asymmetry $FAA = log(alpha_right) - log(alpha_left)$
+    
+    \item \textbf{Eye-tracking}: attention allocation, fixation disruption, gaze shifts
+    \item \textbf{Self-report}: trust, annoyance, perceived relevance, perceived intrusiveness
+    \item \textbf{Behavioral signals}: interaction continuation, ad clicks, engagement metrics
+    \item \textbf{Semantic attention shift}: change in conversational intent trajectory following ad insertion (e.g., transition between intent states after exposure to an ad)
+\end{itemize}
+
+\newpage 
+
+\subsection{Research Questions}
+
+Contributions are clustered into 3 buckets: Causal studies (\ref{RQ0}, \ref{RQ1}), Predictive Modelling (\ref{RQ2}, \ref{RQ3}, \ref{RQ4}) and the theoretical and formalization advancements in the field of conversational advertisement. See \ref{Contributions}.
+
+\subsubsection{RQ0: Human Response to Conversational Advertising}
+\label{RQ0}
+How do different ad formats affect user trust, and perceived intrusiveness in conversational systems? 
+\vspace{0.3cm}
+\textbf{Interaction studied:}
+\[
+\text{Ad Type} \rightarrow \text{Human Response}
+\]
+
+Relevant EEG signals: CLI, AI, FTP, AS
+
+\subsubsection{RQ1: Semantic Attention Shift Induced by Ads  (Optional)}
+\label{RQ1}
+
+How do different ad formats influence the semantic shift of the conversation attention towards the advertised product?
+
+\vspace{0.3cm}
+\textbf{Interaction studied:}
+\[
+\text{Ad Type} \rightarrow \Delta(\text{Intent})
+\]
+
+Relevant EEG signals: EI, FAA
+
+\subsubsection{RQ2: Ad Opportunity Prediction}
+\label{RQ2}
+
+Can we predict whether a conversational turn is an appropriate moment for ad insertion without degrading user trust?
+
+\vspace{0.3cm}
+\textbf{Interaction studied:}
+\[
+P(\text{AdAppropriate}_t = 1 \mid \text{State}_t, t, \text{AdType}, Context, \text{Coherence})
+\]
+
+\vspace{0.2cm}
+Where coherence of the ad given the context can be calculated with embeddings, llm-as-a-judge..
+
+\subsubsection{RQ3: Value of Neurophysiological Signals}
+\label{RQ3}
+
+Do EEG and eye-tracking signals improve the predictive performance of ad opportunity models beyond conversational features alone?
+
+\vspace{0.3cm}
+\textbf{Interaction studied:}
+\[
+\text{Features} \quad \text{vs} \quad (\text{Features} + \text{Neuro Signals})
+\]
+
+\vspace{0.2cm}
+This is an ablation study evaluating whether neuro signals provide additional predictive value.
+
+
+\subsubsection{RQ4: Moderation by User Traits (Optional)}
+\label{RQ4}
+
+Do individual personality traits modulate user sensitivity to different conversational ad formats?
+
+\vspace{0.3cm}
+\textbf{Interaction studied:}
+\[
+\text{Ad Type} \times \text{User Trait} \rightarrow \text{Human Response}
+\]
+
+\vspace{0.2cm}
+We must focus though on a reduced representation of personality (e.g., high vs.\ low neuroticism or extraversion) to evaluate whether certain user groups are systematically more sensitive to different ad formats.
+\newpage
+
+\subsection{Contributions}
+\label{Contributions}
+\begin{enumerate}
+    \item \textbf{Conversational Advertising Benchmark Dataset:} 
+    We construct a controlled multimodal dataset of human-LLM interactions with systematically varied ad formats and conversational contexts, enriched with EEG, eye-tracking, behavioral signals, and self-reports of trust and perceived relevance.
+
+    \item \textbf{Neuro-Cognitive Evaluation of Advertising Interventions:} 
+    We provide a systematic analysis of how conversational ad formats affect attention shift, cognitive load, attention dynamics, and trust using EEG and eye-tracking signals, including ablation studies to quantify the added value of neurophysiological data.
+    
+    
+    \item \textbf{Ad Opportunity Prediction Model:} 
+    We formalize and learn a predictive model of ad appropriateness conditioned on conversational state, ad format, turn index, interaction context and other factors. The model provides an interpretable estimate of optimal intervention points and enables analysis of feature importance in ad placement decisions.
+
+    Additionally, the framework enriches the taxonomy and theory of conversational advertising, including intent and genre modeling, attention shift, and the limitations of traditional proxy metrics.
+
+    \item \textbf{Theoretical Framework and Taxonomy for Conversational Advertising:} 
+    We introduce a structured formalization of conversational advertising, together with a taxonomy of ad integration strategies in \textbf{multi-turn LLM systems}. It provides a principled lens to analyze intent and genre modeling, attention shift mechanisms, and the limitations of traditional proxy metrics (e.g., CTR) in conversational settings, extending beyond prior work focused primarily on static ad placement and bidding-based systems.
+
+\end{enumerate}
+
+\newpage   
+
+\subsection{Experiments}
+
+This work will be charactertized by only one experiment, we will have users experimenting with different engaging conversational tasks while ads while appear and the recordings of all these signals and self-reports will be logged for generating the final datasets.
+
+\subsubsection{Experimental Design \& Session Structure}
+
+Each participant interacts with an LLM across three independent conversational trials, each corresponding to a different task and ad condition. The study follows a within-subject design with counterbalanced ordering of ad types and tasks to mitigate ordering effects (Latin squares format kind of).
+\\ 
+
+Each experimental session is structured as follows with an approximated duration of 1.30h - 1.45h:
+
+\begin{itemize}
+    \item \textbf{Introduction and Consent (10 min)}
+    \item \textbf{Sensor Setup, Calibration and Personality Assesment (15 min)}
+    \item \textbf{Baseline Recording + Practice Trial (5 min)}
+    \item \textbf{Main Experiment (3/4 trials, $\sim$15 min each)}
+    \item \textbf{Final Survey and Debrief (5 min)}
+\end{itemize}
+\\ 
+
+For each session we have multiple trials, all of which have the following standard structure:
+\\ 
+
+\begin{enumerate}
+    \item \textbf{Task Presentation}: Participants are given an engaging task prompt designed to elicit natural conversation.
+
+    \item \textbf{Conversational Interaction}: Participants engage in a conversation with the LLM for a minimum of 6 and a maximum of 10 turns. An advertisement is systematically introduced at fixed turns (turn 3 or 4 and turn 6/7) depending on the experimental condition.
+
+    \item \textbf{Post-Trial Survey}: After each conversation, participants report perceived trust, intrusiveness, relevance, annoyance, and helpfulness using Likert-scale responses.
+\end{enumerate}
+
+\subsubsection{Task Design}
+
+We design tasks to induce natural and engaging interactions across three broad intent genres:
+
+\begin{itemize}
+    \item \textbf{Informational}: e.g., improving a daily habit or learning how to optimize a personal workflow.
+    
+    \item \textbf{Transactional}: e.g., selecting a product under constraints or planning a purchase decision.
+    
+    \item \textbf{Reflective / Social}: e.g., discussing life decisions, goals, or personal dilemmas.
+\end{itemize}
+
+WORK IN PROGRESS TAKE SOME EXAMPLES TO CONSTRUCT THE FINAL 4 TASKS
+\\ 
+\begin{itemize}
+    \item Find the best laptop you can find with a constrained budget of 500 dollars
+    \item Organize a realistic trip this year 
+    \item Find the perfect gift for someone special
+    \item What is your biggest pain poin your day to day that an LLM could help you optimize? What area of your life you would wish to improve?
+    \item What is the most annoying thing in your day to day? Interact with the LLM to gather ideas on how to fix it
+    \item Find a new hobby that fits you
+    \item Design your ideal weekend / routine
+    \item What would happen if you did not go to work for 1 full day a week? (crazy what ifs to hook people)
+    \item Where do you see yourself in 10 years? is it the place where you want to be? Otherwise what will you do to change it?
+    \item What is an unpopular opinon of yours, try to debate it and win against an LLM.
+    \item Ask for recommendations for any product you currently need (headphones, bag, phone...)
+\end{itemize}
+
+The final set of 4 task prompts we have concluded will elicit engagement from the subjects and belong to those intent genres are the following:
+
+\begin{enumerate}
+    \item 
+\end{enumerate}
+
+
+\subsubsection{Hypotheses \& Statistical Rigor}
+
+Before going deep into experiment design one thing that must be adressed is the initial hypotheses we are testing against to make experiments more productive rather than "fishing expedition". To avoid this we will have to keep outcome variables low and plan beforehand:
+
+\begin{itemize}
+    \item Metrics
+    \item Hypothesis
+    \item Analysis Plan
+\end{itemize}
+
+Also with a expected study size of 50 people we must avoid multiple variables interaction study because that would lead to weak statistical results, thats why research question about user personality is secondary. Ad type is treated as the primary fixed effect, while task category and trial index are included as covariates.
+\\
+We define a single primary \textbf{independent variable (IV)}, Ad Type, capturing the format and integration of advertising within the conversational response. We consider two primary \textbf{dependent variables (DV)}:
+\begin{itemize}
+    \item \textbf{Trust}
+    \item \textbf{Perceived Intrusiveness}
+\end{itemize}
+
+Secondary outcomes include:
+\begin{itemize}
+    \item Annoyance and perceived relevance
+    \item Neurophysiological signals (EEG cognitive load, engagement)
+    \item Eye-tracking measures of attention
+\end{itemize}
+
+We control for contextual \textbf{covariates} such as turn index, message and response length, conversation length, and inferred intent. User personality traits (OCEAN) and task type are treated as \textbf{moderating variables}, capturing heterogeneity in user sensitivity to different ad formats.
+\\
+
+Additionally, we collect neurophysiological signals (EEG and eye-tracking) to measure cognitive load and attention dynamics. These signals are used in exploratory analyses and predictive modeling.Some hypothesis testing similar as this one will be performed to aim to solve the research questions at hand:
+\\
+
+\textbf{H1:} More intrusive ad formats lead to a decrease in user trust.
+
+\textbf{H2:} More intrusive ad formats lead to an increase in perceived intrusiveness.
+
+\textbf{H3:} More intrusive ad formats reduce the probability of interaction continuation.
+
+\textbf{H4:} Incorporating neurophysiological signals (EEG and eye-tracking) improves predictive performance of user response models compared to conversational features alone.
+
+\textbf{H5:} User personality traits moderate the effect of ad type on user response (e.g., trust and perceived intrusiveness).
+
+\subsubsection{Further design choices}
+
+To mitigate ordering and carryover effects, both task order and ad type assignment are counterbalanced across participants. Task categories are rotated using a Latin-square design. Ad types are assigned such that each condition appears equally often in each trial position and across task categories.
+\\
+
+Moreover
+
+\newpage
+
+\section{Further work}
+
+This section can be understood as a continuation of the original paper that builds on previous findings and using the same conversational advertisingtheoretical framework. Some ideas for future papers that can be researched:
+
+\begin{itemize}
+    \item Enhancing the dataset with data augmentation?
+    \item RL Policy Learning (Ad insertion policies, greediness how many ads are placed constrained by trust...)
+    \item Personalized Conversational Advertising under User Trait Heterogeneity
+\end{itemize}
+
+\newpage
+
+\section{Implementation and System overview}
+
+The experimental platform is designed as a modular system that orchestrates conversational interaction, controlled advertisement injection, and multimodal data collection. The goal of the implementation is not to optimize performance or scalability, but to ensure experimental control, reproducibility, and precise synchronization across all data sources.
+
+The system is composed of five main components:
+
+\begin{enumerate}
+    \item \textbf{Conversation Engine (UI + LLM)}
+    \item \textbf{Advertisement Injection Engine}
+    \item \textbf{Experiment Orchestrator!}
+    \item \textbf{Participant State Manager}
+    \item \textbf{Multimodal Logging System}
+\end{enumerate}
+
+These components interact in a tightly controlled loop during each conversational turn.
+
+\vspace{0.3cm}
+
+\subsection{Conversation Engine}
+
+The Conversation Engine provides the user interface and handles interaction with the language model.
+
+\begin{itemize}
+    \item A web-based chat interface (implemented in Streamlit) is used to present tasks and collect user messages.
+    \item The backend connects to a locally hosted LLM (served via vLLM) to generate assistant responses.
+    \item All interactions follow a standard chat format with a fixed system prompt to ensure consistency across participants.
+\end{itemize}
+
+The Conversation Engine is intentionally kept minimal to reduce UI-induced bias and ensure that observed effects are attributable to experimental variables.
+
+\vspace{0.3cm}
+
+\subsection{Advertisement Injection Engine}
+
+The Advertisement Engine is responsible for introducing controlled advertising interventions into assistant responses.
+
+\begin{itemize}
+    \item Ads are injected at predefined turns (e.g., $t = 3, 6$) based on the experimental condition.
+    \item Each ad corresponds to a predefined \textbf{integration mode} (Subtle, Sponsored, Inline, Explicit).
+    \item The engine modifies the base LLM response $a_t$ to produce an augmented response $\tilde{a}_t$.
+    \item Ad content is selected to be semantically aligned with the current conversational context.
+\end{itemize}
+
+This component operationalizes the independent variable of the study.
+
+\vspace{0.3cm}
+
+\subsection{Experiment Controller}
+
+The Experiment Controller manages the progression of each session.
+
+\begin{itemize}
+    \item Implements the experimental flow (consent $\rightarrow$ baseline $\rightarrow$ trials $\rightarrow$ surveys).
+    \item Assigns task order and ad conditions using a counterbalanced design.
+    \item Tracks trial boundaries, turn indices, and triggers ad injection events.
+\end{itemize}
+
+The controller ensures that all participants experience consistent experimental conditions.
+
+\vspace{0.3cm}
+
+\subsection{Participant State Manager}
+
+This component maintains all session-specific information:
+
+\begin{itemize}
+    \item Participant ID and metadata
+    \item OCEAN personality scores
+    \item Assigned experimental conditions
+    \item Current trial and turn index
+\end{itemize}
+
+State is persisted throughout the session to ensure robustness against interruptions and to enable consistent logging.
+
+\vspace{0.3cm}
+
+\subsection{Multimodal Logging System}
+
+A centralized logging system captures all experimental data with precise timestamps.
+
+\begin{itemize}
+    \item \textbf{Conversational data:} user inputs, model outputs, ad types, turn indices
+    \item \textbf{Behavioral data:} interaction duration, continuation signals
+    \item \textbf{Survey responses:} trust, intrusiveness, relevance, annoyance
+    \item \textbf{Neurophysiological data:} EEG and eye-tracking streams
+\end{itemize}
+
+Each event is recorded with a unified timestamp to enable post-hoc synchronization across modalities.
+
+\vspace{0.3cm}
+
+\subsection{System Architecture}
+
+The system follows a lightweight client-server architecture:
+
+\begin{itemize}
+    \item \textbf{Frontend:} Streamlit interface for interaction and surveys
+    \item \textbf{Backend:} Python service (e.g., FastAPI) for orchestration and logging
+    \item \textbf{LLM Serving:} vLLM hosting a local model (e.g., Qwen 3.5)
+    \item \textbf{Storage:} Structured logs (JSONL or database)
+\end{itemize}
+
+This separation ensures modularity and allows independent control of UI, model inference, and data collection.
+
+\vspace{0.3cm}
+
+\subsection{Design Principles}
+
+The implementation is guided by the following principles:
+
+\begin{itemize}
+    \item \textbf{Experimental control over realism}: prioritize consistency and reproducibility over production-level UX
+    \item \textbf{Minimal UI interference}: avoid interruptions during conversation to preserve ecological validity
+    \item \textbf{Deterministic behavior}: fix model parameters and prompts across sessions
+    \item \textbf{Precise synchronization}: ensure all data streams can be aligned temporally
+\end{itemize}
+
+These choices are critical to ensure the validity of both causal analysis and predictive modeling.
+
+\begin{thebibliography}{9}
+
+\bibitem{xu2026ad}
+Shengwei Xu, Zhaohua Chen, Xiaotie Deng, Zhiyi Huang, and Grant Schoenebeck.
+\textit{Ad Insertion in LLM-Generated Responses}.
+arXiv preprint arXiv:2601.19435, 2026.
+doi: 10.48550/arXiv.2601.19435.
+
+\bibitem{heineking2026detecting}
+Sebastian Heineking, Wilhelm Pertsch, Ines Zelch, Janek Bevendorff, Benno Stein, Matthias Hagen, and Martin Potthast.
+\textit{Detecting RAG Advertisements Across Advertising Styles}.
+arXiv preprint arXiv:2603.04925, 2026.
+doi: 10.48550/arXiv.2603.04925.
+
+\bibitem{zhao2025exploring}
+Xiaoyan Zhao, Yang Deng, Wenjie Wang, Hongzhan Lin, Hong Cheng, Rui Zhang, See-Kiong Ng, and Tat-Seng Chua.
+\textit{Exploring the Impact of Personality Traits on Conversational Recommender Systems: A Simulation with Large Language Models}.
+arXiv preprint arXiv:2504.12313, 2025.
+doi: 10.48550/arXiv.2504.12313.
+
+\bibitem{feizi2023online}
+Soheil Feizi, MohammadTaghi Hajiaghayi, Keivan Rezaei, and Suho Shin.
+\textit{Online Advertisements with LLMs: Opportunities and Challenges}.
+arXiv preprint arXiv:2311.07601, 2023.
+doi: 10.48550/arXiv.2311.07601.
+
+\bibitem{martina2025distillrecdial}
+Alessandro Francesco Maria Martina, Alessandro Petruzzelli, Cataldo Musto, Marco de Gemmis, Pasquale Lops, and Giovanni Semeraro.
+\textit{DistillRecDial: A Knowledge-Distilled Dataset Capturing User Diversity in Conversational Recommendation}.
+In \textit{Proceedings of the 19th ACM Conference on Recommender Systems}, 2025.
+ACM.
+doi: 10.1145/3705328.3748161.
+
+\bibitem{openai_ads_chatgpt}
+OpenAI. \emph{Ads in ChatGPT}. OpenAI Help Center. Available at:
+\texttt{https://help.openai.com/en/articles/20001047-ads-in-chatgpt}.
+Accessed: 2026-04-19.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,1832 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%% LaTeX Stuff Here %%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[english]{article}
+\pdfsuppresswarningpagegroup=1
+
+\usepackage[preprint,nonatbib]{nips_2018_wider_nonotice}
+% The NeurIPS style forces \flushbottom, which can stretch list spacing on sparse pages.
+% Override to keep natural vertical spacing.
+\raggedbottom
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{color,colortbl}
+\usepackage{babel}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{cancel}
+\hypersetup{unicode=true,pdfusetitle,breaklinks=false}
+\usepackage[hyperpageref]{backref}
+\usepackage{appendix}
+\usepackage{cleveref}
+\usepackage[nonumberlist]{glossaries}
+\glsdisablehyper
+\input{glossary}
+
+\graphicspath{{Figures/}}
+
+\usepackage[labelfont=bf]{caption}
+\usepackage{subcaption}
+\captionsetup[figure]{labelsep=quad}
+\captionsetup[table]{labelsep=quad}
+
+\renewcommand{\arraystretch}{1.5}
+
+% Review marks. 1 = text wrapped in \Rev{...} prints green (review pass);
+% 0 = prints black (submission). Strip the wrappers before the final PDF.
+\def\useReviewMarks{1}
+\definecolor{ReviewGreen}{rgb}{0.0,0.55,0.16}
+\newcommand{\Rev}[1]{\ifnum\useReviewMarks=1\textcolor{ReviewGreen}{#1}\else#1\fi}
+
+\makeatletter
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\CB}{{\cal B}}
+\newcommand{\blue}{\color{blue}}
+\allowdisplaybreaks \numberwithin{equation}{section}
+% \usepackage{refcheck}
+\setcounter{tocdepth}{1}
+\makeatother
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Paper starts here %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{The Price of Attention: Behavioral and EEG Responses to Advertising in LLM Conversations}
+
+\author{
+    Walter J. Troiani \\
+    Telefónica Research, Barcelona, Spain \\
+    UPC, Barcelona, Spain \& UniPD, Padova, Italy \\
+    \href{mailto:waltertv02@gmail.com}{\texttt{waltertv02@gmail.com}} \\
+\AND
+    Aikaterini Lymperidou \\
+    Telefónica Research \\
+    Barcelona, Spain \\
+    {\scriptsize\href{mailto:katlympe@gmail.com}{\texttt{??katlympe@gmail.com}}} \\
+\And
+    Sebastian Idesis \\
+    Telefónica Research \\
+    Barcelona, Spain \\
+    {\scriptsize\href{mailto:sebastianariel.idesis@telefonica.com}{\texttt{sebastianariel.idesis@telefonica.com}}} \\
+\And
+    Ioannis Arapakis \\
+    Telefónica Research \\
+    Barcelona, Spain \\
+    {\scriptsize\href{mailto:ioannis.arapakis@telefonica.com}{\texttt{ioannis.arapakis@telefonica.com}}} \\
+}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begingroup
+\renewcommand{\thefootnote}{}
+\footnotetext{\textbf{Author contributions:}
+\textbf{Walter J. Troiani:} XXXXX;
+\textbf{Katerina Lymperidou:} XXXXX;
+\textbf{Sebastian Idesis:} XXXXX;
+\textbf{Ioannis Arapakis:} XXXXX.
+Replace each placeholder with the agreed roles before submission.}
+\addtocounter{footnote}{-1}
+\endgroup
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% JOURNAL WORD LIMIT?!?!?!?
+%%%%%%%%% KATERINA: SEBASTIAN: We have to iterate on top of this, any ideas are welcome
+\begin{abstract}
+This work summarizes the existing literature of advertisement in AI and presents a novel experimental framework to analyze the behavioural cost of introducing advertisement in AI services in terms of
+subjective user experience and verified with electroencephalogram signals; to showcase the tradeoffs LLM providers will likely have to face in the triad provider-user-advertiser wellfare optimization problem. We build our own AI chatbot platform
+through which we collect abundant data guiding users through tasks and presenting advertisement in different formats and timings, which we later analyze.
+% RESEARCH PROBLEM
+% EXPERIMENTAL DESGIN
+% EEG METHODOLOGY
+% FINDINGS
+% MORE CONCLUSIONS ON HCI and implications :)
+With this work, we aim to give prescriptions to improve the future of human-computer interaction, given the increasing importance of AI chatbots into our daily lives and lay the foundation for future open-source works to expand the field of LLM-advertisement.
+\end{abstract}
+
+\noindent\textbf{Keywords:}
+LLM, EEG; digital advertising; advertisement timing; attention; human--computer interaction
+
+\clearpage
+\tableofcontents
+\clearpage
+
+%SEBASTIAN:
+%KATERINA:
+% WHAT DO YOU THINK ABOUT THE INTRO ? SHOULD WE MAKE IT MORE "SCIENTIFICAL" LESS HISTORICAL?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS (Airflow-simple)
+%%%%   DONE (GOLDEN)         = keep; do not rewrite
+%%%%   IN-PROGRESS (ADVANCED)= real prose, later polish
+%%%%   IN-PROGRESS (MID)     = usable, still holes
+%%%%   IN-PROGRESS (LOW)     = started, not in the right shape
+%%%%   SKELETON              = headings / holding text; write on top
+%%%%   TO-START              = empty, leftover template, or XXXXX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:introduction}
+\color{black}
+
+Just as the rise of the Internet in the 1990s changed the world, modern pretrained
+transformer models have transformed the technological landscape. These models are
+proficient in language to a degree not previously seen, demonstrating remarkable
+intelligence and pattern-matching capabilities. They have also been successfully
+deployed and made available to people around the world.
+
+Many pioneering companies, including OpenAI, xAI/Grok, Mistral, DeepSeek,
+Anthropic, and Google, offer broad access to large models that require substantial
+investment in GPU infrastructure, computing facilities, engineering talent, and
+energy. This raises a question that many people have in mind: how do these companies
+produce enough revenue to sustain the continuous cost of providing these services?
+
+The strategies adopted by frontier AI companies vary according to their values and
+objectives. Some offer broadly accessible inference, some rely on subscriptions,
+and others charge directly for API usage. Many major providers combine free
+inference, subscriptions, API access, data services, enterprise plans, and cloud
+distribution. As this market develops, the number of related products continues to
+grow, including agentic coding systems such as Codex, Claude Code, and Cursor.
+Startups such as Thrad have also appeared, attempting to contribute to this market
+through resources such as open-source intent classifiers.
+
+The broader question of how companies such as OpenAI or Google can provide what
+feels like almost unlimited inference without becoming financially unsustainable is
+outside the scope of this paper and is better suited to business and economics
+research. However, one increasingly prominent option for reducing operational costs
+and generating revenue is the same mechanism that supported much of the Internet's
+growth: \textbf{advertising}.
+
+The importance of advertising, not only for LLM platforms but for the technology
+industry more generally, becomes clear when considering how much revenue established
+companies derive from the attention economy. In 2025, Alphabet reported
+\$402.8 billion in total revenue, of which approximately \$294.7 billion came from
+advertising \cite{alphabet2025annual}. Meta reported approximately \$201.0 billion
+in total revenue, of which \$196.2 billion came from advertising
+\cite{meta2025results}. Newer AI companies such as OpenAI and Anthropic frequently
+announce funding rounds, valuations, and large commercial agreements, but disclose
+less information about revenue. Advertising has already helped finance the
+development of the technology industry in which frontier AI emerged, and companies
+are becoming increasingly aware that it may also support conversational AI
+services.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Problem Statement}
+\label{subsec:problem-statement}
+
+Advertising has been transformed with every major change in communication medium:
+from newspapers, through radio and television, to digital webpages and social
+platforms. It must now be transformed again for a new medium of mass textual
+communication: LLM chatbots. The word \emph{advertisement} originates from the Latin
+word \emph{advertere}, combining \emph{ad}, meaning ``toward,'' and
+\emph{vertere}, meaning ``to turn.'' Together, they mean ``to turn toward,'' or to
+turn one's attention toward something. AI companies must therefore determine how to
+present these new forms of attention redirection without damaging trust, user
+experience, or attention itself, which is a valuable currency in the attention
+economy.
+
+Advertisements can be integrated implicitly into LLM responses through context
+engineering, steering vectors, retrieval, or fine-tuning. They can alternatively be
+presented explicitly in sponsored blocks, similarly to advertisements on webpages
+or sponsored search results. In this paper, these implementations are operationalised
+as integrated inline advertisements and labelled advertising blocks. However, both
+approaches ultimately require the design of a user interface and the definition of
+an advertising policy.
+
+Companies that implement advertising face a challenge beyond interface design:
+they must decide where they stand in the welfare-optimisation problem involving
+advertisers, end users, and the platform itself. These actors often have conflicting
+objectives. If a platform optimises only for company welfare, users may be
+overwhelmed by advertisements. If it optimises only for advertisers, users may
+receive irrelevant or intrusive recommendations. A sustainable advertising policy
+must therefore balance commercial utility with relevance, transparency, trust, and
+user welfare.
+
+On the theoretical side, this work reviews previous research and develops
+conceptualisations and taxonomies intended to help establish the foundations of
+advertising in AI platforms. On the experimental side, it compares different
+advertisement formats,integrated inline advertisements and labelled advertising
+blocks,at different moments in the conversation, namely early and late insertion.
+These conditions are studied across guided conversational tasks using behavioural
+and self-report data collected through a crowdsourcing platform and a laboratory
+study. The laboratory arm additionally collects neurophysiological EEG data.
+Personality traits from the Big Five framework are considered as exploratory
+moderators.
+
+The crowdsourcing study establishes the main statistical foundation for examining
+trust and user experience in monetised conversational environments. The laboratory
+study extends this analysis by examining the neurophysiological correlates of
+differences in advertisement format and timing. EEG is used to complement
+behavioural and self-reported measures, not to claim direct access to unconscious
+trust or persuasion. Together, these analyses can help companies make more
+data-driven decisions when designing advertising policies and provide foundations
+for future research on advertisement-insertion strategies.
+
+To summarise, this work does not focus primarily on auction algorithms,
+improvements to intent clustering, or advertisement generation. Instead, it focuses
+on standardising the theoretical framing of conversational advertising
+and examining how advertisements affect end users
+behaviourally, subjectively, and neurophysiologically. Based on this evidence, the
+work aims to offer guidance on how companies might steer advertising policies while
+balancing the welfare of users, advertisers, and platforms.
+
+The contributions of this work can be divided into two arms:
+
+\begin{itemize}
+    \item \textbf{Theoretical work:}
+    \begin{enumerate}
+        \item \textbf{A focused survey of LLM-based advertising:}
+        We present the most relevant prior work for understanding advertising in
+        LLMs, including theoretical contributions, engineering approaches, and
+        population studies. This allows readers to gather the necessary context
+        from the Introduction and Related Work sections.
+
+        \item \textbf{Theoretical definitions:}
+        We organise and extend the underlying theory by defining an advertisement
+        taxonomy and a split between the served instance and the serving policy.
+    \end{enumerate}
+
+    \item \textbf{Experimental work:}
+    \begin{enumerate}
+        \item \textbf{A unified experimental framework for studying advertising in
+        LLM conversations:}
+        We propose a controlled within-participant experimental design that enables
+        systematic analysis of how advertisement format and timing
+        jointly influence user experience.
+
+        \item \textbf{An open-source dataset for conversational advertising
+        interventions:}
+        We introduce a structured dataset of multi-turn LLM interactions in which
+        advertisement type, insertion timing, and conversational context are
+        systematically manipulated and paired with subjective and behavioural
+        outcomes. This dataset can complement synthetic
+        advertisement datasets such as NaiAD \cite{zhang2026naiad} by grounding
+        future work in responses from human participants.
+
+        \item \textbf{A multimodal analysis of the cognitive and attentional effects
+        of advertising interventions:}
+        We integrate EEG signals to study the neurophysiological correlates of
+        conversational advertising and evaluate their incremental value beyond
+        behavioural and self-reported measures.
+    \end{enumerate}
+\end{itemize}
+
+The remainder of the paper reviews the relevant literature, presents the research
+questions and hypotheses, describes the experimental method and analysis, reports
+the results, and discusses their implications for conversational advertising and
+human--computer interaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related Work}
+\label{sec:related-work}
+\color{black}
+
+The rapid adoption of large language models has fundamentally changed how users
+interact with information online. Rather than behaving as traditional search
+engines, modern LLMs increasingly act as conversational assistants with which users
+engage through natural dialogue, often attributing human-like characteristics such
+as trustworthiness, empathy, or expertise \cite{rainie2025llmusers}. This transition
+from keyword-based retrieval to conversational interaction creates new
+opportunities and challenges for digital advertising. Unlike conventional web
+advertisements, conversational advertisements can be dynamically generated,
+personalised, and seamlessly integrated into an ongoing dialogue, making them
+potentially more persuasive but also harder for users to recognise. Understanding
+how these advertisements are engineered, how they affect users, and how they can be
+deployed responsibly has therefore emerged as an important research direction.
+
+Given the novelty of LLM advertising, the problem has been approached from several
+angles. One concerns the engineering question of how advertising can realistically
+be enabled in generative systems. A second concerns the impact and quality of these
+advertisements, especially because end-user trust is a central constraint in
+monetised conversational environments. A third, more machine-learning-oriented
+dimension concerns the creation of standard datasets for training intent
+classifiers and advertisement-insertion policies. The field still lacks established
+open datasets for these purposes. NaiAD addresses this limitation by generating
+synthetic training data at a scale of approximately 50,000 examples
+\cite{zhang2026naiad}, although this remains far from the volume and quality of
+proprietary data potentially available to commercial platforms.
+
+The engineering literature on LLM advertising began by asking how concepts from
+traditional online advertising could be translated to generated responses.
+Feizi et al.\ and Duetting et al.\ explored keyword-, token-, and mechanism-level
+approaches to allocating advertisements in LLM outputs
+\cite{feizi2023online,duetting2024mechanism}. Xu et al.\ extended this direction by
+considering bids over inferred user-intent clusters and by formalising the joint
+optimisation of utility and welfare across users, advertisers, and platforms
+\cite{xu2026ad}. This work provides a foundation for how advertising may be
+implemented in generative systems and approximates some of the decisions that a
+production advertising policy must make. Qiu and Mei similarly expand the taxonomy
+of generative advertising and frame the problem as one of trustworthy commercial
+intervention, again emphasising the tension between platform utility and user
+welfare \cite{qiu2026generative}. More recently, Yun et al.\ proposed Neuron Auctions, a mechanism that moves advertisement allocation from surface-level text generation to the LLM's internal representations by auctioning neuron-level intervention budgets. Their framework leverages mechanistic interpretability to identify brand-specific neural subspaces while explicitly optimising the trade-off between advertiser value, platform revenue, and user utility \cite{yun2026llmadvertisementbasedneuron}.
+
+Two complementary dimensions help organise advertising styles in conversational
+systems: explicitness and type of appeal. Along the explicitness dimension, overt
+advertisements are visibly separated from the assistant's response or clearly
+disclosed, whereas covert advertisements are integrated into the conversation and
+communicate their commercial intent less directly
+\cite{heineking2026detecting}. Related experimental work distinguishes between
+advertisements presented without disclosure and disclosed advertisements
+\cite{tang2025adstalkbackimplications}. Along the appeal dimension, informational
+or rational advertisements emphasise product attributes and verifiable benefits,
+whereas transformational or emotional advertisements associate the product with an
+experience, identity, or affective response
+\cite{puto1984informational,nuweihed2024informational}. These dimensions are
+independent: an integrated advertisement may use either appeal, and a labelled
+advertising block may do the same. The present study manipulates presentation and
+disclosure,integrated inline advertising versus a labelled advertising
+block,while holding the underlying appeal strategy outside the experimental
+comparison.
+
+Other work has examined the quality of advertisements generated by multimodal LLMs.
+Meguellati et al.\ evaluated personality-tailored advertisements with 1,200
+participants \cite{meguellati2025llmads}. Their first study found parity with human
+marketers, while their second found that recent models were preferred over
+human-created content by 59.1\% to 40.9\%. Correctly identifying an advertisement as
+AI-generated produced a 21-percentage-point penalty; nevertheless, 29.4\% of
+participants still selected the AI advertisement while knowing its origin. These
+results show that LLM-generated advertising need not be lower quality than
+human-generated material. Earlier work by Zelch et al.\ ($N=175$) examined native
+advertisements generated by YouChat and ChatGPT and found that contextually fitting
+advertisements were more accepted, whereas poorly fitting placements were strongly
+rejected \cite{zelch2024acceptance}. This tendency was already visible with 2024
+models and may become more consequential as fine-tuning and post-training methods
+improve.
+
+Personality is relevant to this personalisation problem. The Big Five framework
+provides the underlying trait model \cite{john1999bigfive}, while the BFI-10 makes
+it possible to collect these traits in a time-constrained experimental setting
+\cite{rammstedt2007bfi10}. Donnellan and Robins discuss the resilient,
+overcontrolled, and undercontrolled prototypes that can arise in person-centred
+analyses of Big Five data \cite{donnellan2010types}. In the present work, these
+prototypes complement rather than replace trait-level analyses.
+
+Many of the ideas underlying LLM advertising also originate in Conversational
+Recommender Systems (CRSs), where dialogue is used to infer preferences and deliver
+personalised recommendations. This literature emphasises that users should not be
+treated as a homogeneous population. Zhao et al.\ conditioned GPT-4o on Big Five
+traits and reported an overall personality-consistency F1 score of 0.7398
+\cite{zhao2025exploring}. Highly agreeable simulated users reached agreement in
+fewer dialogue turns, whereas highly neurotic users were less easily persuaded and
+required longer conversations. Martina et al.\ introduced DistillRecDial, a
+knowledge-distilled conversational recommendation dataset in which LLMs simulate
+diverse user personas rather than relying exclusively on costly human conversations
+\cite{martina2025distillrecdial}. The dataset improved dialogue coherence and
+domain expertise over prior benchmarks while explicitly modelling personality,
+preference-expression style, initiative, and user diversity. Together, these works
+motivate personality-aware datasets and future advertisement-policy models.
+
+Beyond engineering and generation quality, research has examined how conversational
+advertisements affect end users. Tang et al.\ conducted a study with 179
+participants and released Phi-4-Ads, a model fine-tuned to serve advertisements
+\cite{tang2025adstalkbackimplications}. Even with a ``Sponsored'' disclosure,
+approximately 49\% of participants did not realise that they had received an
+advertisement. The study also reported differences between base models: responses
+from older models such as GPT-3.5 were more often perceived as pushy or negative
+than those from GPT-4o. Few users clicked the disclosure link; many instead asked
+the chatbot to change or stop its advertising through natural-language commands.
+This study provides an important methodological foundation for the present work,
+whose questionnaires extend several of the same user-experience constructs.
+
+Advertisement identification is therefore a central challenge.
+Salvi et al.\ found that conversational promotion increased sponsored-product
+selection from approximately 22\% under search placement to 61\% in their
+conversational setting, while only a minority of users detected the steering
+\cite{salvi2025commercial}. A ``Sponsored'' label reduced selection only to
+approximately 55\%, a non-significant decrease, while instructions to be subtle
+reduced detection to below 10\%. Heineking et al.\ show that overt native
+advertisements in RAG responses can be detected with very high precision and
+recall, whereas covert styles are substantially harder and lightweight classifiers
+are brittle under style changes \cite{heineking2026detecting}. Earlier work by
+Schmidt et al.\ similarly introduced a benchmark for generated native-ad detection
+\cite{schmidt2024detecting}. General-purpose models achieved F1 scores below 50\%
+in some settings, while a specialised MPNet-based model reached approximately
+97\%. Together, these studies describe a continuing interaction between increasingly
+subtle advertising strategies and the systems designed to detect them.
+
+This difficulty leads directly to the risks of commercial conflicts of interest.
+Wu et al.\ report that models exposed to monetisation incentives frequently
+prioritise the platform's interests over those of the user
+\cite{wu2025ads}. In their benchmark settings, models concealed sponsorship,
+recommended predatory loans, varied behaviour with inferred socioeconomic status,
+hid unfavourable prices, and repeatedly resurfaced sponsored options. Erickson
+describes the related ``fake friend'' dilemma: once commercial recommendations are
+blended into an apparently helpful conversation, users may struggle to distinguish
+assistance from paid influence \cite{erickson2025fake}. Both lines of work motivate
+guardrails for conversational advertising, particularly for vulnerable users.
+OpenAI's public advertising policy illustrates one current attempt to preserve a
+visible separation between model responses and sponsored content
+\cite{openai_ads_chatgpt}, although such a policy statement is not itself evidence
+of user impact.
+
+Another relevant intersection concerns LLMs and EEG. Zhang et al.\ trained an
+EEG-based satisfied-versus-dissatisfied classifier with an F1 score of approximately
+81\%, enabling users to steer iterative image generation with GPT-4 and Stable
+Diffusion; reported final-image satisfaction increased from 65\% to 92\%
+\cite{zhang2026eeg}. Kosmyna et al.\ raised concerns about accumulated cognitive
+debt during LLM-assisted writing, reporting weaker neural connectivity and greater
+linguistic similarity among participants using ChatGPT
+\cite{kosmyna2025brainchatgpt}. NeuroChat demonstrated a lower-barrier
+neuroadaptive chatbot using four dry electrodes and an engagement index
+\cite{baradari2025neurochat}. Subramanian et al.\ further reported that frozen
+hidden states in late LLM layers encode person-specific neural signatures
+\cite{subramanian2026riding}. For high-gamma power, their person-specific probe
+achieved $\rho=0.183$, compared with $\rho=0.020$ for a population probe, and the
+pattern generalised across model architectures. These studies suggest that
+individual neural variation has structured relationships with language-model
+representations and motivate examining this relationship in advertising contexts.
+
+The final relevant intersection is neuromarketing: the combination of
+neurophysiological measurement and advertising stimuli. Quiles P\'erez et al.\
+surveyed the objectives, biosignals, and processing pipelines used in this
+literature, finding EEG to be the most common biosignal, used in nearly half of the
+reviewed studies, and audiovisual stimuli to be the dominant experimental material
+\cite{quilesperez2023neuromarketing}. They also document a shift from purely
+statistical analysis toward machine- and deep-learning methods. Following this
+paradigm, Afshar and Azimi used the NeuMa dataset, containing 42 participants
+viewing 144 products in a simulated supermarket-browsing task
+\cite{afshar2025eegconsumer}. Classical models achieved approximately 79\% overall
+accuracy but were biased toward the majority non-purchase class. Graph neural
+networks produced lower aggregate accuracy but improved sensitivity to actual
+purchase decisions to approximately 37\% by representing interactions between EEG
+electrodes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (MID)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Research Gap}
+\label{subsec:research-gap}
+
+%%%%%%% THIS PARAGRAPH IS AN OUTDATED AI SLOP THAT WILL NEED TO BE REVISED SOON
+%%%%%% 1. INTENT TRAJECTORIES AND THEORY
+%%%%%% 2. CONCEPTUAL FRAMEWORK GPA
+%%%%%% 3. DIRECT COMPARISON OF FORMAT AND TIMING GAP
+%%%%%% 4. EEG GAP
+%%%%%% 5. DIRECT USER HETEROGENITY
+
+
+
+To the best of our knowledge, no prior research lies directly at the intersection
+of LLMs, advertising, and EEG. Existing work studies conversational ad insertion,
+generation quality, personality, disclosure, automatic detection, commercial
+conflicts, LLM-related neural activity, and neuromarketing largely in isolation. It
+does not compare implicit advertisements with explicit advertisements
+at early and late conversational turns while observing the same participants across
+all conditions. Nor does it combine condition-level behavioural and self-report
+outcomes with EEG recorded during the interaction.
+
+A second gap is conceptual. The literature has not converged on a common
+separation between the realised properties of an advertisement and the
+broader governance, intervention architecture, and serving decisions of a
+platform. We address that gap by developing a taxonomy of advertisement
+instances and a provisional organising framework for company-level
+advertising policy.
+
+
+Taken together, the literature suggests that modern AI-generated advertisements can
+rival or exceed human-created advertisements in some evaluations, that users often
+fail to recognise commercial influence, that conventional labels may be
+insufficient, and that models can prioritise commercial incentives over user
+welfare. The present work therefore maintains a user-centred focus while addressing
+what appears likely to become an increasingly common feature of conversational
+systems. We study this gap through a five-condition repeated-measures design:
+implicit-early, implicit-late, explicit-early, explicit-late, and the
+null instance \(a^{\emptyset}\) \eqref{eq:ad-null}.
+
+\color{black}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Theoretical Foundations}
+\label{sec:theoretical-foundations}
+
+% SHOULD WE ADD ANYTHING ELSE? I THINK THIS IS FINE AND OUR ONLY REAL CONTRIBUTION IN THE THEORETICAL PART
+Before diving deep into the experimentation methodology, the results and its interesting findings in the discussion, we present a small theoretical section to help on the formalization of the field of LLM advertisement: a taxonomy of the served instance and a split between platform policy and online serving.
+\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Taxonomy of Conversational Advertising}
+\label{subsec:ad-taxonomy}
+A conversational advertisement can be described independently of the
+policy that selected and delivered it. The taxonomy characterises the
+served artefact \(a_k\): the advertisement encountered after utterance
+\(u_k\). The policy in Section~\ref{subsec:ad-policy} determines
+eligibility, implementation, and delivery. The same artefact may be
+shown at a different turn or to a different user without changing its
+taxonomic description.
+We group the properties of \(a_k\) into an influence target, a style
+layer, a surface layer, and realised personalisation:
+\begin{equation}
+    a_k = \bigl\langle \iota,\,(\alpha,\epsilon),\,(\sigma,\lambda,\theta),\,\phi \bigr\rangle.
+    \label{eq:ad-instance}
+\end{equation}
+The style pair follows Heineking et al.\ and the marketing literature
+they synthesise: appeal \(\alpha\) and explicitness \(\epsilon\), the
+latter as covert versus overt promotional wording inside an already
+generated reply \cite{heineking2026detecting}. The surface triple is
+different. Channel \(\sigma\) is the communicative medium; presentation
+\(\lambda\) is whether, \emph{in that channel}, the promotion is woven into
+the organic content (implicit) or shown as a distinct unit (explicit);
+and \(\theta\) is the disclosure made available to the user. Implicit
+does not mean subliminal, and it does not mean covert. An implicit text
+advertisement can still be rhetorically overt, and an explicit block can
+carry only a weak label
+\cite{tang2025adstalkbackimplications}. Realised personalisation
+\(\phi\) belongs to \(a_k\) because it describes the delivered artefact;
+the data permitted for adaptation belong to the policy
+\cite{jannach2021crs,meguellati2025llmads}.
+\begin{table}[H]
+\centering
+\small
+\caption{Two-level morphological taxonomy of a conversational
+advertisement instance
+\(a_k=\langle\iota,(\alpha,\epsilon),(\sigma,\lambda,\theta),\phi\rangle\).}
+\label{tab:ad-taxonomy}
+\begin{tabular}{ll p{0.28\linewidth} p{0.36\linewidth}}
+\toprule
+\textbf{Layer} & \textbf{Dimension} & \textbf{Question} & \textbf{Levels} \\
+\midrule
+Influence
+& \(\iota\) influence target
+& What commercial variable is targeted?
+& Product exposure; information framing; behavioural redirection;
+preference shaping
+\cite{qiu2026generative}
+\\
+\midrule
+Style
+& \(\alpha\) appeal
+& What persuasive logic does the message use?
+& Rational/informational; emotional/transformational
+\cite{puto1984informational,nuweihed2024informational,heineking2026detecting}
+\\
+& \(\epsilon\) explicitness
+& How directly does the wording announce the promotion?
+& Covert; overt
+\cite{heineking2026detecting}
+\\
+\midrule
+Surface
+& \(\sigma\) channel
+& Through which medium does the advertisement reach the user?
+& Text; image/video; audio/voice; multimodal...
+\cite{qiu2026generative,jannach2021crs}
+\\
+& \(\lambda\) presentation
+& In that channel, is the promotion integrated natively or in distinct, sepparate unit?
+& Implicit; explicit
+\\
+& \(\theta\) realised disclosure
+& What commercial information is made available to the user?
+& None; on request; commercial nature disclosed; sponsor identified;
+targeting rationale disclosed
+\cite{tang2025adstalkbackimplications,openai_ads_chatgpt}
+\\
+\midrule
+Adaptation
+& \(\phi\) realised personalisation
+& What user evidence is used or encoded in the served advertisement?
+& None; last utterance; session memory; persistent memory; traits \& demographics
+\cite{jannach2021crs,meguellati2025llmads,openai_ads_chatgpt}
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The present study realises two advertisement instances and a null
+control. Influence, style, channel, and personalisation are held fixed:
+\(\iota\) is product exposure,
+\(\alpha\) is informational,
+\(\epsilon\) is covert,
+\(\sigma\) is text, and
+\(\phi\) is session memory. The two advertisements differ only in the
+surface pair \((\lambda,\theta)\). The 3 advertisement instances used:
+
+
+\begin{align}
+    a^{\mathrm{imp}}
+    &= \bigl\langle \iota,\,(\alpha,\epsilon),\,(\sigma,\,\mathrm{implicit},\,\mathrm{on\text{-}request}),\,\phi \bigr\rangle,
+    \label{eq:ad-implicit}
+    \\
+    a^{\mathrm{exp}}
+    &= \bigl\langle \iota,\,(\alpha,\epsilon),\,(\sigma,\,\mathrm{explicit},\,\mathrm{nature}),\,\phi \bigr\rangle,
+    \label{eq:ad-explicit}
+    \\
+    a^{\emptyset}
+    &= \emptyset.
+    \label{eq:ad-null}
+\end{align}
+
+
+\color{black}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Conversational Advertising Policy}
+\label{subsec:ad-policy}
+
+The taxonomy above describes the realised properties of an advertisement
+instance, whereas an advertising policy encompasses the broader organisational choices governing how advertisements are introduced and delivered for inference providers. The same advertisement may be implemented through different technical mechanisms, presented at different turns or opportunities, or served to different users without changing its taxonomic description. To avoid confusion and conflating these levels, we reserve uppercase \(\Pi\) for the overall advertising policy of a
+company and lowercase \(\pi\) for its online serving policy, which may, for example, be implemented as a learnable multi-objective reinforcement-learning policy. Without claiming an exhaustive policy theory, we propose the provisional organising representation and vocabulary:
+
+\begin{equation}
+    \Pi = \langle\Gamma,\mu,\pi\rangle,
+    \label{eq:platform-ad-policy}
+\end{equation}
+whose components are:
+
+\begin{itemize}
+    \item \textbf{Governance constraints and objectives \(\Gamma\):}
+    the relatively stable organisational boundaries within which advertising
+    operates, including disclosure requirements, privacy restrictions, safety
+    requirements, advertiser eligibility, user eligibility, intervention mechanisms allowed and most importantly the relative importance assigned to user, advertiser, and platform welfare.
+
+   \item \textbf{Intervention architecture \(\mu\):}
+    the execution layer through which an advertising decision is realised in
+    the chatbot response. It does not decide whether, which, or to whom an
+    advertisement should be served. Instead, it determines how an advertisement
+    selected by the serving policy is incorporated into the system's output.
+    Examples include inserting a fixed creative into an independently generated
+    response, introducing commercial information through retrieval or prompt
+    context, modifying generation or token selection, and intervening through
+    internal representations or neurons
+    \cite{feizi2023online,duetting2024mechanism,xu2026ad,
+    yun2026llmadvertisementbasedneuron}.
+
+    \item \textbf{Online serving policy \(\pi\):}
+
+    The serving rule \(\pi\) determines whether an advertisement should be shown and
+    selects its advertiser, instance, recipient, timing, triggers, persistence, exposure pattern...
+    This component may be rule-based, optimisation-based, or learned from data, such as reinforcement learning policies. The policy operates within
+    the constraints established by \(\Gamma\), and its selected action is
+    executed through \(\mu\).
+\end{itemize}
+
+The precise boundary between \(\mu\) and \(\pi\) may depend on the system
+architecture. For example, a serving policy may operate through a fixed
+intervention mechanism or select among multiple mechanisms at runtime.
+Nevertheless, separating these components remains analytically useful:
+\(\Gamma\) specifies the constraints and objectives under which advertising
+operates, \(\mu\) specifies how commercial intervention is technically
+realised, and \(\pi\) specifies the decisions made during serving and can even choose dimensions of the realized ad such as $\phi, \theta$. Together,
+these components provide a practical checklist for describing and comparing
+conversational advertising systems without claiming that their boundaries are
+always mutually exclusive or exhaustive.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TO DO
+
+\color{black}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Research Questions and Hypotheses}
+\label{sec:intro:research-questions}
+
+After presenting the motivation and the impact of advertisement and the novel problems to solve generated by this new paradigm and to be rigorous, we have clearly and explictly defined the exact research questions we aim to answer with this line of research, which have been iteratively refined and clustered into 4 sub sections. Finally, a sub-section about our initial research hypotheses will be presented.
+
+% =========================================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Formatting Effects on Advertising}
+% =========================================================
+
+\textbf{RQ1:} How does ad format influence subjective user experience (trust, perceived usefulness...)?
+
+\textbf{RQ3:} How does conversational task type moderate the effect of ad format on subjective user experience?
+
+%(SEBASTIAN: Can you revise this? Maybe its not worth doing this)
+
+\textbf{RQ4:} How do ad format and ad timing interact in shaping subjective user experience?
+
+% =========================================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Temporal Effects on Advertisement}
+% =========================================================
+
+\textbf{RQ5:} How does ad timing  influence subjective user experience?
+
+%%%%%%%%%%%%%%%%%%%%%%%% CITE THE CHOOSING PAPER?
+%%%%%%%%%%%%%%%%%%%%%%%% CITE how good are chatbots generating?
+
+% =========================================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{User Heterogeneity}
+% =========================================================
+
+\textbf{RQ7:} Do personality traits (measured in OCEAN scale) moderate the effect of ad format on subjective user experience?
+
+\textbf{RQ8:} Do personality traits moderate the effect of ad timing on subjective user experience?
+
+% =========================================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neurophysiological Mechanisms}
+% =========================================================
+\textbf{RQ9:}: Which metrics or mechanisms in EEG signals are best to predict the liking / disliking / distrust in LLM advertisement?
+
+\textbf{RQ10:} Are ad format and timing associated with distinct changes in cognitive load, attention, and affective arousal?
+
+\textbf{RQ11:} Do neurophysiological signals provide additional explanatory power beyond self-reported and behavioural measures of user experience? (Ablation)
+
+% SEBASTIAN:
+% KATERINA:
+% Do you guys have a better way of writing these RQ about EEG?
+
+% =========================================================
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Initial Hypotheses}
+
+Based on our research questions and previous research, the following hypotheses were formulated:
+
+\begin{description}
+    \item[H1:] Explicit advertisements will produce stronger attentional EEG responses than implicit advertisements.
+    \item[H2:] Early and late advertisement appearances will produce different patterns of neural activity.
+    \item[H3:] The effect of advertisement timing will depend on whether the advertisement is implicit or explicit.
+\end{description}
+
+% SEBASTIAN:
+% KATERINA:
+% This section i think its worth erasing... or atleast we need to expand it after analysis but i see it as a bit redundant, what do you guys think???
+
+\color{black}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Method}
+
+In this section, the methodology employed for the experimental design and the data collection is presented for both the crowd-sourcing and laboratory subjects. Although the experimental design stays practically the same for both subjects, there are minor differences that are worth mentioning for the sake of completeness and reproducibility. The finished behavioural sample is $L = 18$ laboratory and $C = 36$ crowd-sourcing participants, for a total of $N = L + C = 54$. One additional laboratory session ran the crowd protocol and is excluded from both the EEG and the finished behavioural sets. The system that supports LLM inference, state of the experiment, UI, event logging, LSL marker requests and internet access has been built and externally exposed in the Atlas cluster of Telefonica and its simplified representation is shown in Figure~\ref{architecture}.
+
+Four symbols introduced in Section~\ref{sec:theoretical-foundations} recur throughout this section, and we restate them here so that the design can be read without turning back. An advertisement instance is written \(a\), and its presentation format is \(\lambda\), taking the value implicit or explicit. The serving policy \(\pi\) decides at which conversational turn an instance is inserted, and a subscript records that turn: \(a^{\mathrm{imp}}_2\) is an implicit advertisement served after the second user utterance, and \(a^{\mathrm{exp}}_4\) an explicit one served after the fourth. The null instance \(a^{\emptyset}\) denotes a condition in which no advertisement is served at any turn; it is the within-participant control against which the other four conditions are compared. Personalisation \(\phi\) refers to the evidence retrieval is permitted to use, which in this study is the current session only.
+
+\begin{figure}[h]
+            \centering
+           \includegraphics[width=\linewidth]{Figures/architecture_diagram.png}
+            \caption{Diagram of the architecture of the system built for this experiment to enable both crowd-sourcing users and laboratory users}
+            \label{architecture}
+        \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laboratory conditions}
+\label{sec:lab-conditions}
+
+Nineteen participants took part in the laboratory study, nine women and ten men; eighteen enter the finished behavioural sample once the session that ran the crowd protocol is excluded. Ages, recorded at intake, ranged from 21 to 42 years (\(M=29.50\), \(\mathrm{SD}=5.01\)). Eligibility required participants to be at least 18 years old, to have normal or corrected-to-normal vision, and to be proficient in English, so that task instructions and questionnaire items would be understood consistently. Participants were excluded if they reported a history of neurological or psychiatric disorder, or current use of medication known to interfere with physiological recording. All participants gave informed consent before taking part and received a shopping voucher as reimbursement. Sex, education, and chatbot-use counts for the finished sample, including the crowd arm, are reported in Section~\ref{sec:results-sample}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Experimental Design}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Laboratory Specific}
+\color{black}
+
+The laboratory workflow is summarised in Figure~\ref{pipeline}. It opens with an onboarding phase in which the participant completes a mandatory intake questionnaire and signs an informed-consent document while the experimenters fit the EEG cap and start the recording software. The participant then completes a 30-second baseline recording and a warm-up chat to become familiar with the interface. Throughout the session the participant reaches the Atlas server over the internet from the laboratory laptop, which also records the EEG (Figure~\ref{architecture}).
+
+The second phase is the condition loop, and it carries the experimental manipulation. The laboratory study used a \(2\times 2\) factorial design crossing advertisement presentation \(\lambda\) with insertion timing. Presentation had two levels, implicit and explicit, realising the instances \(a^{\mathrm{imp}}\) and \(a^{\mathrm{exp}}\) \eqref{eq:ad-implicit}--\eqref{eq:ad-explicit}; timing had two levels, early at turn~2 and late at turn~4, both decided by the serving policy \(\pi\). Crossing them yields the four advertisement conditions \(a^{\mathrm{imp}}_2\), \(a^{\mathrm{imp}}_4\), \(a^{\mathrm{exp}}_2\), and \(a^{\mathrm{exp}}_4\), and a fifth condition serves the null instance \(a^{\emptyset}\) \eqref{eq:ad-null} as a within-participant control. All five conditions were completed by every participant, so the manipulation is within-subjects; the study as a whole is mixed, because the laboratory and crowd arms are separate groups. Condition order was randomised per participant to limit order and learning effects. Each condition begins with a task briefing, consisting of the task prompt and a warning that the conversation is independent of the others, and continues with a four-turn conversation containing at most one advertisement, a free-text findings response of at most 256 characters, and a 22-item Likert questionnaire in three sections.
+
+The third phase follows the condition loop and collects the retrospective measures: a cued advertisement-recall questionnaire for each of the four advertisement conditions, excluding \(a^{\emptyset}\); the BFI-10 personality inventory on a five-point scale \cite{rammstedt2007bfi10}; and a short demographics questionnaire included for redundancy against the intake form. The fourth and final phase presents a deception disclosure, a last opportunity to withdraw, and a closing screen.
+
+Each session produced data in two forms, and together they are the entire record from which the analyses are built.
+
+\begin{itemize}
+    \item \textbf{Event log} (\texttt{.jsonl}). Every event of a single run, including messages sent and received, condition completion, and questionnaire submission, together with retrieval-pipeline metadata on advertisement turns. The log is what makes a run reproducible and auditable after the fact.
+    \item \textbf{Multi-stream EEG file} (\texttt{.xdf}). Using the Lab Streaming Layer protocol, the amplifier stream and the markers emitted by the experiment machine are recorded on a common clock and stored together with their metadata, such as sampling rate and channel count. Recording both streams in one file is what allows an experimental event to be located in the EEG later.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Crowd Specific}
+
+The crowd arm ran the same five conditions (\(a^{\mathrm{imp}}_2\), \(a^{\mathrm{imp}}_4\), \(a^{\mathrm{exp}}_2\), \(a^{\mathrm{exp}}_4\), \(a^{\emptyset}\)), the same 22-item post-condition questionnaire, and the same cued-recall battery as the laboratory arm. Its workflow (Figure~\ref{fig:flow-crowd}) differs only where recruitment through Prolific makes a change necessary: participants must be traceable to the recruitment platform, and low-engagement participation must be detectable without an experimenter present. Crowd participants reached the Atlas server from their own devices (Figure~\ref{architecture}). Three adaptations follow.
+
+\begin{itemize}
+    \item \textbf{The EEG baseline phase is removed.} With no recording to baseline, that slot instead collects the participant's Prolific identifier, so every valid run can be traced to its owner.
+    \item \textbf{A validation questionnaire is added} at the end of the session. Participants identify the themes of the five tasks they completed from ten options, five of which are fabricated. This provides an attention check of the kind standard in crowd-sourced work.
+    \item \textbf{The closing screen is modified} to display a run identifier, which participants paste into Prolific. Reward follows verification that the identifier matches a completed run for that Prolific account.
+\end{itemize}
+
+As in the laboratory arm, each run writes a JSON event log that is later preprocessed into the analysis data. Because the adaptations touch only recruitment and quality control, the crowd arm yields the same core behavioural measures, and the absence of EEG is its only substantive difference from the laboratory arm. This split is deliberate: the crowd arm supplies the behavioural sample size that a laboratory-only study could not afford, while the laboratory arm supplies the neurophysiological evidence, and together they balance the statistical and economic constraints.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Tasks, assignment, and exclusions}
+
+Each participant completed five simulated work tasks, one per condition: choosing a gardening gift, choosing a laptop under a budget, improving a home study setup, restarting a fitness routine, and choosing a pet and its basic setup. Tasks were rotated in Latin-square order; the five conditions were shuffled independently; the two sequences were then paired so that, across participants, task identity is not confounded with condition. The realised plan is written into the session log. The briefings and the language-model prompts are reprinted in Appendix~\ref{app:task-prompts} and Appendix~\ref{app:llm-prompts}.
+
+Unfinished, synthetic, and beta-tester sessions are excluded from the behavioural analyses, as is the laboratory session that ran the crowd protocol. Sessions labelled unfocused are retained when they completed the instruments. The inferential unit is the participant.
+
+\begin{figure}[h]
+    \centering
+   \includegraphics[width=\linewidth]{flow_lab.pdf}
+    \caption{Laboratory participant flow. Five within-participant conditions in random order: implicit early \(a^{\mathrm{imp}}_2\), implicit late \(a^{\mathrm{imp}}_4\), explicit early \(a^{\mathrm{exp}}_2\), explicit late \(a^{\mathrm{exp}}_4\), and no advertisement \(a^{\emptyset}\). Cued recall covers the four advertisement conditions only.}
+    \label{pipeline}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+   \includegraphics[width=\linewidth]{flow_crowd.pdf}
+    \caption{Crowd participant flow. Same five conditions as the laboratory arm: implicit early \(a^{\mathrm{imp}}_2\), implicit late \(a^{\mathrm{imp}}_4\), explicit early \(a^{\mathrm{exp}}_2\), explicit late \(a^{\mathrm{exp}}_4\), and no advertisement \(a^{\emptyset}\). Baseline is replaced by Prolific ID; a task-validation check is added at close-out. No EEG.}
+    \label{fig:flow-crowd}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\color{black}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Independent Variables}
+
+The study manipulates two factors and includes a null control. The instance-level factor is presentation \(\lambda\in\{\mathrm{implicit},\mathrm{explicit}\}\), realising \(a^{\mathrm{imp}}\) and \(a^{\mathrm{exp}}\) \eqref{eq:ad-implicit}--\eqref{eq:ad-explicit}. The policy-level factor is insertion timing (early turn~2 versus late turn~4). Their crossing yields four advertisement conditions. The fifth condition serves \(a^{\emptyset}\) \eqref{eq:ad-null} and provides the within-participant contrast against which advertisement effects are evaluated. The following subsections describe each factor in turn.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Timing of advertisements}
+
+Insertion timing is a decision of the serving policy \(\pi\), not a
+coordinate of \(a_k\). Each advertisement trial is a four-turn
+conversation and contains at most one advertisement. Early insertion
+serves the advertisement after the second user utterance
+(\(a_2\)); late insertion serves it after the fourth
+(\(a_4\)). The null condition serves \(a^{\emptyset}\) at every turn
+\eqref{eq:ad-null}.
+
+These two slots are the beginning and the end of a short chatbot
+session, not two points on a long agentic trajectory. Consumer LLM use
+is already conversational. Rainie reports that 65\% of users have had
+back-and-forth exchanges, and that 75\% of regular conversation users
+seek information about products and services
+\cite{rainie2025llmusers}, but typical sessions remain brief.
+Conversational recommender studies likewise find that preference
+resolution often occurs within a few turns
+\cite{zhao2025exploring,jannach2021crs}. A four-turn guided task
+therefore already sits at the long end of everyday chatbot use, which
+is why late insertion is the final turn rather than a later slot that
+many users would never reach.
+
+The same contrast is the one suggested by advertising serial-position
+effects: the first and last positions in a sequence are the
+theoretically privileged slots, whereas middle positions are weaker
+\cite{terry2005serial,pieters1997memory}. Hsu and Karahalios further
+show, in video, that \emph{when} an advertisement appears can matter
+more for experience than whether the user chose that moment, and that
+mid-content interruption is more aversive than a pre-roll
+\cite{hsu2024choosing}. Turn~2 is the conversational analogue of an
+early placement after the task has started; turn~4 is the terminal,
+decision-stage placement, immediately before the written conclusion.
+
+Turn~1 is left advertisement-free so that participants can orient to
+the task and so that retrieval can use session evidence
+(\(\phi=\mathrm{session}\)) rather than a cold first utterance. A
+third timing level (for example turn~3) would have reduced power in a
+five-condition within-participant design without increasing the
+temporal distance; the two-level contrast therefore uses the earliest
+and latest feasible slots. Triggers are turn indices rather than clock
+time so that every participant, including fast ones, has a defined
+insertion opportunity and so that \(a_2\) and \(a_4\) remain
+comparable across users.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Presentation $\lambda$}
+
+A crucial part of both the experimental methodology and the system design is integrating the advertisement into the user interface in a natural way. The taxonomy in Section~\ref{subsec:ad-taxonomy} spans several dimensions, but this study manipulates only the presentation format \(\lambda\). It is the most discriminative of those dimensions, in that it changes whether the advertisement is separable from the assistant's answer at all, and it is therefore the dimension we expect to bear most directly on the research questions.
+
+\begin{itemize}
+    \item \textbf{Implicit} (\(a^{\mathrm{imp}}\), Figure~\ref{fig:ad-implicit-example}). The advertisement is woven into the assistant's own reply at the assigned turn \(k\) and remains in the transcript for the rest of the session. Frequently the only cue that a passage is sponsored is a product URL. The position within the reply is not fixed in advance, because the language model retains some freedom over where the mention falls, so it may appear at the beginning, in the middle, or at the end. Timed early or late, these are \(a^{\mathrm{imp}}_2\) and \(a^{\mathrm{imp}}_4\).
+    \item \textbf{Explicit} (\(a^{\mathrm{exp}}\), Figure~\ref{fig:ad-explicit-example}). The advertisement appears at the assigned turn \(k\) in a separate, persistent banner outside the conversation, placed directly above the message box. Each banner is a yellow panel roughly two message-lines tall carrying a product image, the product name, a short description with a URL, and a brief call to action such as ``Discover more''. The format is deliberately unambiguous, and it is the contrast with the implicit format, rather than the banner design itself, that the study manipulates. Timed early or late, these are \(a^{\mathrm{exp}}_2\) and \(a^{\mathrm{exp}}_4\).
+\end{itemize}
+
+Both formats drew on the same catalogue of real products, derived from the Amazon Reviews 2023 product metadata \cite{amazon2023reviews,hou2024bridging}, so that presentation and product content are not confounded.
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[height=0.30\textheight,keepaspectratio]{UI/implicit_ad.png}
+        \caption{Implicit ($a^{\mathrm{imp}}$).}
+        \label{fig:ad-implicit-example}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[height=0.30\textheight,keepaspectratio]{UI/explicit_ad_2.png}
+        \caption{Explicit ($a^{\mathrm{exp}}$).}
+        \label{fig:ad-explicit-example}
+    \end{subfigure}
+    \caption{Advertisement presentation formats ($\lambda\in\{\mathrm{implicit},\mathrm{explicit}\}$) used in the experiment.}
+    \label{fig:ad-presentation-examples}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dependent Variables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Behavioral Measures}
+\label{sec:behavioral-measures}
+
+Two kinds of behavioural data were collected: self-report from questionnaires, and interaction data logged by the system. After each condition, participants completed a 22-item Likert questionnaire (1--7) in three sections: (1)~perceived assistant qualities (credibility, helpfulness, convincingness, relevance, and neutrality), (2)~felt influence and advertisement notice (product or brand mention; sponsored buttons), and (3)~perceived commercial pressure (pushing or marketing; steering rather than assisting). Trust in the chatbot was rated in the same battery.
+
+The composites were planned in advance rather than formed after inspecting the responses, and they are the outcomes the behavioural family of Section~\ref{sec:stats} refers to. Credibility is the mean of the reliable-information item after reversing the false-information and made-up items. Perceived manipulation is the mean of the pushing/marketing and steering items. Direct chatbot trust is reported separately and is not folded into credibility. Notice uses the brand-mention and sponsored-button items; brand mention alone is not treated as advertisement detection. Cued memory is the recall item ``I feel I remember this content well''; it is cued self-report after the advertisement is shown again, not objective recognition.
+
+After all five conditions, cued recall asked, for each advertisement instance except \(a^{\emptyset}\), how well the content was remembered and whether seeing it again shifted trust, plus an open reaction. From the interaction we logged reply latency and the free-text findings; advertisement clicks were recorded but none were observed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EEG Acquisition}
+\label{sec:eeg-acquisition}
+
+Stimuli were presented on a 27-inch monitor (23.53 \(\times\) 13.24 inches) at a fixed viewing position. \Gls{eeg} was recorded with a gel-based 32-channel actiCHamp system (Brain Products GmbH, Germany) at a sampling rate of 500~Hz, through a high-impedance amplifier to limit noise. Electrodes followed the international 10--20 system, with the ground at Fpz and the online reference at Cz; the full montage is shown in Figure~\ref{fig:eeg}. Preparation took approximately 15 minutes per participant: the scalp was cleaned and lightly abraded to reduce impedance, electrode impedances were brought below 10~k\(\Omega\), and attachment and impedance were confirmed by visual inspection both before recording and over the course of the session.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.62\linewidth]{eeg_montage.png}
+    \caption{32-channel 10--20 montage. Recorded channels follow the actiCHamp layout. Ground is Fpz (not recorded); the online reference is Cz.}
+    \label{fig:eeg}
+\end{figure}
+
+A session yields one continuous recording of about an hour rather than a set of short trials; Appendix~\ref{sec:app-eeg-device} reports the recording descriptives and the signal-quality profile. How that continuous signal is cleaned, cut into analysable windows, and reduced to spectral measures is the subject of the next two subsections.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EEG Preprocessing}
+\label{sec:eeg-preprocessing}
+
+The laboratory EEG does not enter the analysis as a feature table. It enters as one XDF per session plus the experiment log, and those files have to become person-level spectral measures without letting a later processing step quietly rewrite who is in the cohort or invent a timestamp.
+
+To prevent that, the pipeline is organised into four successive zones (Figure~\ref{fig:eeg-preproc}), each with a fixed and limited mandate, and no zone may do the work of another. The naming follows the Bronze/Silver/Gold convention common in data engineering, in which each zone refines the previous one and never writes back to it; the reason for borrowing it here is that a decision taken at one zone cannot be silently revisited downstream. Concretely, the cohort is settled before any signal is cleaned, the signal is cleaned before any experimental window is cut, and statistical testing sits outside the pipeline altogether, because the unit of inference is the person and not the epoch~\cite{pernet2020cobidas}. The paragraphs below take the four zones in order.
+
+Gold writes two such tables, and they answer two different questions. We refer to them throughout as Dataset~A and Dataset~B. \textbf{Dataset~A} asks whether advertised conversations differ from one another, or from \(a^{\emptyset}\), under condition aggregation: it tiles each condition window into consecutive four-second epochs. The stored Gold table keeps the whole-window median; the confirmatory tests summarise each condition by the median of the 37 epochs nearest that condition's visual onset, so that short and long conversations contribute the same number of epochs. It is sensitive to a shift in effort or attention under that aggregation, but the windows are still condition-start aligned rather than recut at onset. \textbf{Dataset~B} asks the complementary question, whether the advertisement itself produces a transient change at the moment it becomes visible: it locks a single four-second window immediately before and immediately after visual onset and takes the difference, then compares that difference against a timing-matched moment in the no-advertisement condition. Dataset~A therefore trades temporal precision for many epochs per person, and Dataset~B trades statistical stability for knowing exactly when the stimulus arrived. The two datasets share the cleaning, the epoch length, the rejection rule, and the sixteen spectral measures, but they share no windows, epochs, or rows.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{eeg_preprocessing.png}
+\caption{The four-zone laboratory EEG pipeline. Ingestion and Bronze inventory and qualify recordings and compute no spectrum. Silver builds the canonical event clock and the cleaned continuous signal, and cuts no experimental window. Gold cuts the analysis windows and writes the Dataset~A condition-aggregation and Dataset~B onset-locked tables. Statistical testing sits outside the pipeline and operates on person-level summaries.}
+\label{fig:eeg-preproc}
+\end{figure}
+
+\paragraph{Ingestion and Bronze.}
+Each session is one XDF file (32 channels at 500~Hz, online reference Cz, ground Fpz) carrying Lab Streaming Layer markers on the same clock as the JSONL event log, and an identity map ties subject, experiment, and file together. These zones only list and qualify recordings: Bronze holds that inventory immutably, links each XDF to its log, checks marker health, and labels the recording, but computes no spectrum. This is also where the cohort is settled. Nineteen sessions were collected; Subject~4 ran the crowd protocol and is retained in Bronze but excluded from everything downstream, so every later object contains the same \(n=18\) as the finished laboratory sample.
+
+\paragraph{Silver: events.}
+JSONL events and XDF LSL markers were audited for duplicates, gaps, and extras, then aligned. A canonical marker is observed when the LSL event fired and reconstructed from the log when it did not. Those times are the only clock Gold may cut on. They are not brain events.
+
+\paragraph{Silver: signals.}
+Each XDF became an MNE-Python Raw object (channels first, volts, 10--20 names, annotations preserved, no resampling). A condition-blind quality profile was then computed for every recording. It wrote warnings only: no recording was excluded by an automatic amplitude rule. Channels marked bad are those flags together with three reviewed interpolations, P4 on Subjects~1 and~9 and C4 on Subject~10. Appendix~\ref{sec:app-eeg-device} gives the profile metrics and the per-channel evidence.
+
+The cleaner then applied a 50~Hz notch, a 0.5--40~Hz band-pass \cite{lopezcardona2026vlfeedbackeeg}, an average reference over the unmarked channels,
+\begin{equation}
+\tilde{x}_{c}(t)
+=
+x_{c}(t)
+-
+\frac{1}{\lvert C_{\mathrm{good}}\rvert}
+\sum_{c'\in C_{\mathrm{good}}} x_{c'}(t),
+\end{equation}
+and spherical-spline interpolation of the marked channels. Interpolated traces stay labelled bad. Independent component analysis is part of the primary pipeline. FastICA is fitted on a high-passed, decimated copy of the recording and the resulting unmixing is applied to the analysis band, so that slow drift does not dominate the decomposition. Only ocular components are removed, identified by joint agreement between a component's correlation with a frontal ocular proxy and the frontal concentration of its topography, and at most three may be removed per recording; every automatic exclusion was confirmed by visual review. There is no dedicated EOG channel, so the frontal proxy stands in for one. Appendix~\ref{sec:app-eeg-device} gives the exact thresholds and their status. Because component removal can in principle create as well as remove structure, the same pipeline without ICA is retained as a mandatory sensitivity branch. Cleaned recordings are never written to disk: Gold invokes the cleaner in memory, so there is no intermediate file that could drift from the policy. The output remains one cleaned continuous recording per participant, \(\tilde{X}\in\mathbb{R}^{18\times 32\times T_{i}}\), and component removal changes its values but not its shape.
+
+\paragraph{Gold: shared measurement.}
+Both paths begin from \(\tilde{X}\) and the canonical markers, and they share the epoch length, the rejection rule, and the sixteen measures. A complete 4~s epoch is \(E_{i\ell}\in\mathbb{R}^{32\times 2000}\), or stacked
+\begin{equation}
+E\in\mathbb{R}^{18\times K_i\times 32\times 2000},
+\end{equation}
+with \(K_i\) person-specific. An epoch is rejected if any channel exceeds 1{,}050~$\mu$V peak-to-peak or has a standard deviation below 0.5~$\mu$V. That amplitude bound was set after inspecting the cohort's epoch-amplitude distribution; it is neither preregistered nor taken from the literature, and the confirmatory conclusions were rerun at 1{,}000 and 1{,}500~$\mu$V without change. Retained epochs are not averaged in the time domain. Each epoch is instead converted to a power spectrum with Welch's method, which splits the epoch into overlapping segments, estimates the spectrum of each, and averages them, trading frequency resolution for a less noisy estimate. With 2~s segments at 50\% overlap, a 4~s epoch yields three such segments and a frequency resolution of \(\Delta f=0.5\)~Hz. Absolute band power is \(10\log_{10}\) of the mean \(\mu\mathrm{V}^{2}\) integral; relative power uses an internal 0.5--40~Hz total. The bands are the canonical \(\delta\) 0.5--4~Hz, \(\theta\) 4--8~Hz, \(\alpha\) 8--13~Hz, \(\beta\) 13--30~Hz, and \(\gamma\) 30--40~Hz \cite{cochran1967fast,zheng2015investigating}. From these bands sixteen measures are formed: five whole-head absolute powers, the five matching relative powers, two regional measures, and four asymmetry and engagement ratios drawn from the consumer-neuroscience literature. Appendix~\ref{sec:app-eeg-measures} defines each one. Confirmatory tests use only the two regional measures, Fz theta and posterior alpha; the other fourteen are carried in \(Y_A\) and \(Y_B\) but do not constitute a second confirmatory family. A literature-regional rebuild of the ten whole-head powers is defined in Appendix~\ref{sec:app-eeg-channel-sets} and is not confirmatory. One epoch therefore maps \(E_{i\ell}\to y_{i\ell}\in\mathbb{R}^{16}\). Why the analysis is a 4~s induced spectrum rather than an event-related potential, and how the width was chosen, are taken up in Section~\ref{sec:eeg-epoching}.
+
+\paragraph{Gold: Dataset~A, condition aggregation.}
+Canonical markers delimit one baseline window and the five condition windows, each condition running from its start marker to the submission of its written conclusion. A window of duration \(D\) seconds yields \(\lfloor D/4\rfloor\) contiguous non-overlapping epochs, and any remainder shorter than 4~s is discarded rather than padded. A window is eligible only if it retains at least five epochs and at least 80\% of the epochs it contains. Each retained \(y_{i\ell}\) is already on the decibel scale. Conversations in this protocol vary in length (2.5--16.8~min; 37--251 complete 4~s epochs, median 95). To keep short and long conversations from contributing unequal numbers of epochs, the confirmatory Dataset~A cell is the median of the 37 retained epochs whose midpoints lie nearest that condition's visual onset (for \(a^{\emptyset}\), the matched turn-2 and turn-4 replies). \(k=37\) is the shortest eligible window, so every advertisement condition contributes exactly 37 epochs and \(n=18\) is retained. The stored Gold table keeps the whole-window median; the confirmatory tests use this condition aggregation. That median is the appropriate summary for log-transformed power \cite{smulders2018log}. Interquartile ranges and condition-minus-baseline differences are stored for description only, not as a third confirmatory axis: eye state was not controlled during the pre-task baseline, and in any case the baseline cancels in a paired contrast between two conditions. Dropping the baseline leaves implicit/explicit \(\times\) early/late and \(a^{\emptyset}\),
+\begin{equation}
+Y_A\in\mathbb{R}^{18\times 5\times 16}.
+\end{equation}
+Under primary ICA, 9{,}449 of 9{,}468 complete Dataset~A epochs were retained (99.8\%), and every eligible condition window passed the five-epoch and 80\% rule.
+
+\paragraph{Gold: Dataset~B, advertisement windows.}
+Here \(t=0\) is visibility, not a brain event: the observed display marker where it fired, and otherwise a reconstruction from calibrated interface lag. Reconstruction is the usual case for implicit advertisements, where 30 of the 36 onsets are derived rather than observed; Section~\ref{sec:eeg-epoching} gives the validated onset error. Matched \(a^{\emptyset}\) locks the same-turn \texttt{assistant\_reply}. Around onset \(t_{ik}\),
+\begin{equation}
+E^{\mathrm{pre}}_{ik}=[t_{ik}-4,\,t_{ik}),
+\qquad
+E^{\mathrm{post}}_{ik}=[t_{ik},\,t_{ik}+4).
+\end{equation}
+Both windows must fall inside the parent condition, and here the window \emph{is} the epoch, so no tiling occurs. A pair is kept only if both windows pass the same peak-to-peak and near-flat rule. The measures are computed separately on the pre-onset and post-onset windows, and the value stored is post minus pre. Four labelled advertisements and two matched \(a^{\emptyset}\) replies per participant give
+\begin{equation}
+Y_B\in\mathbb{R}^{18\times 6\times 16}.
+\end{equation}
+All 216 Dataset~B epochs were retained, that is 108 pairs, twelve windows per participant. Unlike Dataset~A there is no median over many epochs here: a single 4~s window is the observation, which is why the Dataset~B estimates in Section~\ref{sec:results-eeg} are so much less precise.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED) --- EEG Epoching, 4 s sweet spot
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EEG Epoching}
+\label{sec:eeg-epoching}
+
+Section~\ref{sec:eeg-preprocessing} states how windows are cut, how epochs are rejected, how each spectrum is estimated, and how the two analysis tables are formed. This subsection justifies the one remaining choice: the four-second epoch width.
+
+The analysis is an induced spectrum rather than an event-related potential \cite{pernet2020cobidas}. The distinction governs everything that follows. An event-related potential averages the raw voltage waveform over many repetitions of a sharply timed stimulus, so it resolves effects on the scale of tens of milliseconds but collapses if onset timing is uncertain, because misaligned repetitions cancel one another. An induced spectrum instead measures how much power sits in each frequency band within a window; it discards phase, and is therefore tolerant of onset jitter, at the cost of not resolving fast components. This design needs the tolerant estimator. An advertisement in a chat interface is not a flash: it is painted during a page rerun, and visual onset is uncertain to 0.23~s for explicit banners and 0.43~s for implicit mentions, which is already larger than an entire early evoked component. A window of a few hundred milliseconds around \(t=0\) would therefore not be defensible here. Those uncertainties are leave-one-out estimates of the reconstruction error: where the display marker did not fire, onset is reconstructed as the assistant reply plus \(0.49\)~s for explicit banners, and as the injection event plus \(1.57\)~s for implicit mentions, the latter falling before the reply has finished streaming.
+
+Four seconds is both the conventional window for this kind of estimate and the best fit for this design. Kislov et al.\ scored banner EEG with a 4~s post-advertisement transform \cite{kislov2023central}, and Lopez-Cardona et al.\ extracted induced spectral features from fixed-length response windows in the same 32-channel laboratory setting \cite{lopezcardona2026vlfeedbackeeg}. Four seconds is also the shortest window that supports the spectral settings of Section~\ref{sec:eeg-preprocessing}, since three 2~s segments at 50\% overlap are what give \(\Delta f=0.5\)~Hz. Finally, it is long enough to contain the assistant reply in almost every case and still short enough not to run into the next event: after an early advertisement the next user message arrives about 53~s later, and after a late one the written conclusion follows about 79~s later.
+
+Shorter and longer windows each fail for a different reason. A 2~s window is too tightly bound to the stimulus: it captures little more than the first glance at the banner, it frequently ends before an implicit reply has finished streaming, and its length is of the same order as the onset uncertainty itself. An 8~s window is too aggregated in the opposite direction: it folds the reply together with the participant's subsequent reading, so a transient spectral change is averaged away against the surrounding seconds. Four seconds sits between the two regimes.
+
+The width was fixed on these design grounds before any contrast was estimated, and it was not revised afterwards. Section~\ref{sec:results-eeg} reports a 2, 8, 16, and 32~s grid against that fixed choice, so the alternative widths enter as sensitivity rather than as competing primary analyses.
+
+The sixteen spectral measures, their tiers, and the decibel convention are defined in Appendix~\ref{sec:app-eeg-measures}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED) --- EEG plan written; behavioural plan TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Statistical Analysis}
+\label{sec:stats}
+
+%%%%% The behavioural family needs its own estimator; do not copy the EEG plan here.
+%%%%% tab:analysis-families already declares mixed effects for it.
+
+Three conventions hold for every analysis in this paper. The inferential unit is the participant: an epoch, a turn, or a questionnaire item is a measurement, not an independent observation, so repeated measurements are aggregated within participant before testing and \(n\) counts people \cite{pernet2020cobidas}. The threshold is \(\alpha=.05\), two-sided, applied after Holm step-down correction within a declared family \cite{holm1979simple}. Every estimate is reported with an interval and an effect size rather than a bare \(p\) value.
+
+Table~\ref{tab:analysis-families} names the estimator and the correction family for each outcome family. The EEG family is estimated in this draft. The behavioural battery and the cross-arm associations remain specified but not estimated.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Analysis families. Holm correction is applied within a family and never across families.
+Families marked \(^{\dagger}\) are specified but not estimated in this draft.}
+\label{tab:analysis-families}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Family & \(n\) & Estimator & Correction family \\
+\midrule
+Dataset~A, condition aggregation & 18 & one-sample \(t\) on \(D^{A}_{i}\); Wilcoxon sensitivity (raw) & measure \(\times\) 3 contrasts \\
+Dataset~B, onset-locked & 18 & one-sample \(t\) on \(D^{B}_{i}\); Wilcoxon sensitivity (raw) & measure \(\times\) 4 contrasts \\
+Positive control & 18 & as above, writing versus reading & 2 confirmatory measures \\
+Behavioural battery\(^{\dagger}\) & 54 & mixed effects, participant random effect & outcome composite \\
+Behaviour \(\times\) EEG\(^{\dagger}\) & 18 & association, laboratory arm only & to be declared \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Within-participant spectral contrasts.}
+Let \(y_{i\ell}\) be a spectral measure on epoch \(\ell\) of participant \(i\) (Appendix~\ref{sec:app-eeg-measures}). Dataset~A contrasts condition summaries, each the median of the 37 retained epochs nearest visual onset so that short and long conversations contribute the same number of epochs; Dataset~B contrasts the change across advertisement onset with the change across a timing-matched moment under \(a^{\emptyset}\):
+\begin{equation}
+\begin{aligned}
+D^{A}_{i}&=\sum_{c}w_{c}\,\operatorname*{med}_{\ell\in N_{ic}(37)} y_{i\ell},
+\qquad\text{with}\ \ \sum_{c}w_{c}=0,\\[3pt]
+D^{B}_{i}&=\bigl(y^{\mathrm{post}}_{i}-y^{\mathrm{pre}}_{i}\bigr)_{a}
+-\bigl(y^{\mathrm{post}}_{i}-y^{\mathrm{pre}}_{i}\bigr)_{a^{\emptyset}}.
+\end{aligned}
+\end{equation}
+The second subtraction in \(D^{B}\) removes whatever follows any completed assistant reply, leaving the advertisement. Each contrast is a two-sided one-sample \(t\) test of the eighteen \(D_{i}\) against zero, with a 95\% interval on 17 degrees of freedom and an effect size \(d_{z}=\overline{D}/s_{D}\). Holm is applied only to those \(t\) tests. A Wilcoxon signed-rank check is reported raw on the same \(D_{i}\), since at \(n=18\) one atypical participant can move a mean; a Wilcoxon \(p\) is not a Holm \(p\). Where the two disagree, we say so. Dataset~A carries three contrasts (the four advertisement conditions pooled against \(a^{\emptyset}\), implicit against explicit, early against late) and Dataset~B four, one per advertisement condition against its matched control. The presentation-by-timing interaction is computed on Dataset~A but is secondary and uncorrected.
+
+Two measures are confirmatory, fixed in advance on theoretical grounds: Fz theta, which rises with effortful cognitive control, and posterior alpha, which falls as visual attention engages the display. The remaining fourteen are secondary or exploratory, and a finding among them is a candidate for future testing rather than a confirmed effect. Holm is applied within a measure and never across the sixteen, which are interdependent by construction (Appendix~\ref{sec:app-eeg-measures}).
+
+\paragraph{Positive control and sensitivity.}
+A null result is informative only if the instrument could have registered an effect. Writing against reading, estimated within the same recordings, therefore serves as a positive control, the more effortful state being expected to raise Fz theta; it tests the instrument, not advertising. Three pre-specified branches vary the engineering choices behind the pipeline, namely artefact removal, epoch width, and the rejection bound (Appendix~\ref{sec:app-eeg-device}), and a conclusion counts as stable only if it survives all three.
+
+\paragraph{Software.}
+Signal handling, filtering, referencing, interpolation, and independent component analysis use MNE-Python 1.12 \cite{gramfort2013mne} on Python 3.13; spectral estimation and the tests use SciPy 1.17 and NumPy 2.2. Analysis code and the cleaning policy are versioned with the manuscript.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | SKELETON
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results}
+\label{sec:results}
+
+The inferential unit throughout is the participant. Results are ordered by what the study is for: the post-condition behavioural battery across the five conditions and the two presentation formats; then whether those outcomes vary with personality and demographics; then the neurophysiological measures.
+
+Not every part of that programme is estimated in this draft. Section~\ref{sec:results-sample} reports the sample and Section~\ref{sec:results-eeg} the confirmatory EEG analysis. The behavioural battery is specified in Section~\ref{sec:stats} but not yet estimated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sample, exclusions, and descriptives}
+\label{sec:results-sample}
+
+The finished behavioural sample is \(N=54\) (\(L=18\), \(C=36\)), as stated in the Method. Unfinished, synthetic, and beta-tester sessions are excluded, as is the laboratory session that ran the crowd protocol. Sessions labelled unfocused are retained when the instruments were completed. EEG analyses use the same laboratory eighteen; they do not restore the excluded laboratory session.
+
+Figure~\ref{fig:sample-demo} summarises the post-experiment questionnaire. The laboratory eighteen are balanced on sex (9 female, 9 male) and mostly hold a Master's or a PhD (12 of 18). The crowd thirty-six are majority male (21 male, 12 female, 3 not stated) and more often hold a Bachelor's or a High School diploma (25 of 36; two did not state education). Both arms already know chatbots: 42 of 54 rate themselves familiar, and 35 use a chatbot at least daily. The laboratory arm has more daily power users (8 of 18 above five times per day, versus 8 of 36 in the crowd). Laboratory age is the intake range in Section~\ref{sec:lab-conditions} (21--42 years, \(M=29.50\), \(\mathrm{SD}=5.01\)). The post-experiment age item was optional and was left blank by every finished participant, so crowd age is not reported.
+
+All 54 finished participants completed the BFI-10 \cite{rammstedt2007bfi10}; Table~\ref{tab:bfi10-descriptives} and Figure~\ref{fig:bfi10-box} report the five trait scores. Conscientiousness and openness are concentrated near the top of the scale (conscientiousness \(M=3.86\), with 10 participants at the ceiling; openness \(M=3.74\), with 12), which is unremarkable for a two-item-per-trait inventory on a 1--5 response scale. Neuroticism is the only trait whose responses span the full range (\(M=2.80\), \(\mathrm{SD}=1.22\)), and its spread is wider in the laboratory arm (\(\mathrm{SD}=1.54\)) than in the crowd arm (\(\mathrm{SD}=1.05\)). The two arms have close means on agreeableness, conscientiousness, neuroticism, and openness. Extraversion is the only arm contrast with an uncorrected \(p\) below .05 (laboratory \(M=3.39\), crowd \(M=2.78\), \(p=.039\)), and it does not survive Holm adjustment across the five traits (\(p=.19\)).
+
+The five scores are retained as continuous variables and reserved, with the demographic variables above, as candidate moderators of the behavioural battery; participants are not grouped into personality types. The inventory was administered after the session and is not an input to any advertisement instance \(a_k\), so personalisation \(\phi\) remains session-level throughout.
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{sample_demographics.pdf}
+\caption{Finished-sample demographics from the post-experiment questionnaire.
+Bars are the percentage of each arm. The optional age item was left blank by every finished participant and is therefore omitted.}
+\label{fig:sample-demo}
+\end{figure}
+
+
+\begin{table}[H]
+\centering
+\small
+\caption{Big Five scores from the BFI-10 in the finished sample
+(\(N=54\); \(L=18\), \(C=36\)).
+Each trait is the mean of two items after reversal, on
+\(\{1,1.5,\ldots,5\}\).
+\(n_{1}\) and \(n_{5}\) count people at the scale ends.
+\(p\) is a two-sided Mann--Whitney test of laboratory versus crowd;
+\(p_{\mathrm{Holm}}\) is Holm-adjusted across the five traits.}
+\label{tab:bfi10-descriptives}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l rrrrr rr rr rr@{}}
+\toprule
+Trait
+& \(M\) (SD) & Mdn & IQR & Min & Max
+& \(n_{1}\) & \(n_{5}\)
+& Lab \(M\) (SD) & Crowd \(M\) (SD)
+& \(p\) & \(p_{\mathrm{Holm}}\) \\
+\midrule
+Extraversion
+& 2.98 (0.98) & 3.00 & 1.00 & 1.0 & 5.0
+& 3 & 1
+& 3.39 (0.74) & 2.78 (1.03)
+& .039 & .19 \\
+Agreeableness
+& 3.53 (0.97) & 3.50 & 1.50 & 1.0 & 5.0
+& 2 & 3
+& 3.50 (0.75) & 3.54 (1.08)
+& .62 & 1.00 \\
+Conscientiousness
+& 3.86 (0.92) & 4.00 & 1.00 & 1.5 & 5.0
+& 0 & 10
+& 4.00 (0.73) & 3.79 (1.01)
+& .63 & 1.00 \\
+Neuroticism
+& 2.80 (1.22) & 2.50 & 1.88 & 1.0 & 5.0
+& 5 & 5
+& 2.94 (1.54) & 2.72 (1.05)
+& .77 & 1.00 \\
+Openness
+& 3.74 (1.11) & 4.00 & 1.50 & 1.0 & 5.0
+& 2 & 12
+& 3.86 (0.89) & 3.68 (1.21)
+& .87 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{bfi10_boxplots.pdf}
+\caption{BFI-10 trait scores in the finished sample
+(\(N=54\); laboratory \(n=18\), crowd \(n=36\)).}
+\label{fig:bfi10-box}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | SKELETON
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Behavioural outcomes by condition and presentation}
+\label{sec:results-behaviour}
+
+The primary outcomes are the post-condition composites of Section~\ref{sec:behavioral-measures}: direct chatbot trust, credibility, perceived manipulation, and the notice pair of brand mention and sponsored buttons. Each is to be reported for \(a^{\mathrm{imp}}_2\), \(a^{\mathrm{imp}}_4\), \(a^{\mathrm{exp}}_2\), \(a^{\mathrm{exp}}_4\), and \(a^{\emptyset}\), and also collapsed by presentation format. Cued recall, covering memory and trust after an advertisement is shown again for the four advertisement instances, belongs to the same family. No estimate from this family is reported in the present draft; the specification is given in Section~\ref{sec:stats}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED) --- EEG Results, 4 s confirmatory
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neurophysiological outcomes}
+\label{sec:results-eeg}
+
+EEG results use the laboratory eighteen. Tests follow Section~\ref{sec:stats}: a 4~s induced spectrum after ICA, one person-level difference per contrast, and a paired \(t\) with Holm within each spectral measure. Wilcoxon is a raw sensitivity check on the same differences and is not Holm-adjusted. Dataset~A is condition aggregation; Dataset~B is the onset-locked change. Fz theta and posterior alpha are confirmatory. Full cells are in Tables~\ref{tab:eeg-dataset-a} and~\ref{tab:eeg-dataset-b} of Appendix~\ref{sec:app-eeg-measures}.
+
+\paragraph{Positive control: writing versus reading.}
+The instrument check specified in Section~\ref{sec:stats} contrasts two states occurring inside the same conversations. Reading is the first complete 4~s window after an assistant reply arrives; writing is the last complete 4~s window before the participant sends their next message. Pairs were taken only from within condition boundaries and only where the two windows did not overlap, giving 268 eligible turn pairs, 13 to 15 per participant across all eighteen, collapsed to one median difference per person. Writing minus reading raises Fz theta by \(M=+0.60\)~dB, 95\% CI \([0.22,\,0.97]\), \(d_z=0.80\), Holm \(p=.007\). Posterior alpha does not separate the two states (Holm \(p=.75\)).
+
+\paragraph{Dataset~A and Dataset~B.}
+Figure~\ref{fig:eeg-forests} is the confirmatory picture at 4~s.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{eeg_confirmatory_forests.pdf}
+\caption{Confirmatory within-person EEG contrasts at the pre-specified 4~s width (ICA, \(n=18\)).
+Left: Dataset~A, median of the 37 epochs nearest visual onset. Right: Dataset~B post$-$pre versus matched \(a^{\emptyset}\).
+Navy is Fz theta; teal is posterior alpha. Bars are 95\% paired-\(t\) intervals.
+Holm is applied to the \(t\) tests within each measure. An asterisk marks Holm \(p<.05\).}
+\label{fig:eeg-forests}
+\end{figure}
+
+Any-ad and format are Holm-null on both markers under condition aggregation (left). The cell that moves is early minus late on posterior alpha, \(M=-0.22\)~dB, 95\% CI \([-0.39,\,-0.04]\), \(d_z=-0.63\), Holm \(p=.050\). Wilcoxon on that contrast is \(p=.021\), uncorrected. Matching Fz theta is Holm-null (\(M=-0.20\)~dB, Holm \(p=.12\)). Dataset~B (right) is Holm-null on both markers; those intervals are an order of magnitude wider.
+
+\paragraph{Width sensitivity.}
+Dataset~A stays Holm-null at 2, 8, 16, and 32~s, with and without ICA. On Dataset~B two confirmatory contrasts reach Holm significance off 4~s, and they are two different cells: Fz theta 2~s after explicit-early advertisements (\(M=+3.30\)~dB, Holm \(p=.021\), ICA only) and posterior alpha 8~s after explicit-late advertisements (\(M=-1.22\)~dB, Holm \(p=.023\)). Neither is Holm-significant at 4~s.
+
+\paragraph{The remaining fourteen measures at 4~s.}
+Figure~\ref{fig:eeg-holm-board} is the sixteen-measure grid, Holm within each row.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{eeg_holm_board_4s.pdf}
+\caption{Holm \(p\) at the pre-specified 4~s width (ICA, \(n=18\)) for all sixteen spectral measures
+(Appendix~\ref{sec:app-eeg-measures}).
+Left: Dataset~A, three planned contrasts. Right: Dataset~B, four cells against matched \(a^{\emptyset}\).
+The two rows above the line are the confirmatory measures, repeated here as a reference frame
+for the fourteen below; their estimates and intervals are in Tables~\ref{tab:eeg-dataset-a}
+and~\ref{tab:eeg-dataset-b}.
+Holm is adjusted within each row, not across the sixteen measures.
+Orange marks Holm \(<.05\). On Dataset~A that includes the confirmatory early-versus-late posterior alpha cell; the remaining orange cells are exploratory, arise only under ICA on Dataset~B, and are not a second confirmatory family.}
+\label{fig:eeg-holm-board}
+\end{figure}
+
+Dataset~A has two orange cells, both early versus late: the confirmatory posterior alpha already reported, and relative theta (Holm \(p=.038\)). Dataset~B's confirmatory rows stay Holm-null. Six exploratory cells reach Holm \(p<.05\); five of them sit in the explicit-early column, and all six are Holm-null without ICA (\(p\ge.07\)). Absolute alpha and beta, frontal alpha asymmetry, both Pope engagement ratios, and the Kislov ratio are Holm-null throughout. Associations with trust, credibility, or manipulation await the behavioural analysis of Section~\ref{sec:results-behaviour}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (MID)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+\label{sec:discussion}
+
+The analyses in this paper are the behavioural battery, the EEG, and the associations among them. They answer different questions and are not substitutes for one another. H1--H3 are claims about trust and liking; only the behavioural composites can adjudicate them. One reading is ruled out in advance: implicit presentation is not subliminal, and low sponsored-button ratings do not license the inference that participants were unaware in a signal-detection sense.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | SKELETON
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Behavioural battery}
+\label{sec:disc-behaviour}
+
+The primary outcomes are the post-condition composites: trust, credibility, perceived manipulation, and the notice pair. They are specified in Section~\ref{sec:stats} and not yet estimated, so no design implication about format or timing is drawn from them here.
+
+\paragraph{Notice is not the battery.}
+Whether \(a^{\mathrm{imp}}\) and \(a^{\mathrm{exp}}\) are interchangeable is the first thing that battery has to settle, through the notice pair and the cued-memory items. Brand mention cannot carry that check on its own, because a product can be named in the course of a helpful answer under any condition, including \(a^{\emptyset}\); only the sponsored-button item asks whether the participant took the insertion to be advertising.
+
+\paragraph{Presentation, timing, and \(a^{\emptyset}\).}
+Explicit presentation (\(\lambda=\mathrm{explicit}\)) is a labelled, structurally distinct unit. Implicit presentation weaves a brief factual mention into the assistant reply. \(a^{\emptyset}\) is the within-participant baseline for every primary composite. A confound stated in the Method constrains what the notice items can establish: realised disclosure \(\theta\) co-varies with \(\lambda\) rather than being crossed with it. The design therefore cannot apportion any memory advantage of the explicit format between the presentation itself, the disclosure label, and the mere availability of a separable object for the participant to recall. Nor would low sponsored-button ratings under implicit presentation establish that \(a^{\mathrm{imp}}\) was covert in the sense of Heineking et al.\ \cite{heineking2026detecting}, or that it failed as an insertion.
+
+Insertion timing is a decision of \(\pi\), not a fourth taxonomic instance. In the descriptive notice and memory summaries its role is small beside presentation format, though that ordering may change once trust, credibility, and perceived manipulation are estimated against \(a^{\emptyset}\).
+
+\paragraph{Personality and demographics.}
+A format effect that sits only in one OCEAN tail is a different design implication from a main effect. That moderation is specified and not yet estimated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (MID)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EEG}
+\label{sec:disc-eeg}
+
+\paragraph{What the markers are for.}
+The two confirmatory markers were pre-specified because they index different mechanisms. Frontal-midline theta at Fz increases with effortful, control-demanding processing and with working-memory engagement, so a commercial insertion that made the reply harder to process, or that recruited additional monitoring, should raise it. Posterior alpha behaves in the opposite direction: it falls as visual attention engages the display and rises as attention withdraws from it, so an insertion that captured or diverted gaze should move it. A sustained advertisement-versus-none change in either marker would be the neural counterpart of the behavioural contrast. Any-ad and format did not move.
+
+\paragraph{Dataset~A.}
+Any-ad and format stay null on both confirmatory markers. Early advertisements were associated with lower posterior alpha power than late advertisements (\(M=-0.22\)~dB, Holm \(p=.050\)), suggesting a difference in visual-attentional or cortical engagement depending on advertisement timing. If early insertions had recruited more effortful control, Fz theta would be higher for early than late; the matching contrast goes the other way (\(M=-0.20\)~dB) and does not survive Holm, so we do not claim a control-related timing effect. Relative theta, which is not a confirmatory measure, is also lower for early than late (Holm \(p=.038\)). That is a lower theta share of the spectrum, not a rise in control-related frontal-midline theta, so we do not read it as extra effortful processing either. The any-ad null is still the bound on an advertisement-versus-none state under condition aggregation; the timing contrast is a different estimand. The same 4~s ICA estimates recover a large task-state difference on Fz theta: composing a message raises it over reading one by \(+0.60\)~dB (\(d_z=0.80\)), which is the direction effortful self-generation predicts. Posterior alpha does not separate those two states, so it is the weaker instrument of the pair here on the writing-versus-reading check, even though it is the marker that moved with insertion timing.
+
+\paragraph{Dataset~B.}
+The Dataset~B contrast is a different estimand and a weaker one. Each cell is a single visual-onset event, the intervals span 2--4~dB, and a 1~dB locked shift remains inside every confirmatory CI. Failure to reject the null is therefore not evidence of absence. The implicit-late Fz theta and explicit-late posterior alpha intervals lean negative and still include zero; we do not treat those leans as effects. The only confirmatory Dataset~B Holm-significant cells sit off 4~s: Fz theta 2~s after explicit-early advertisements, and posterior alpha 8~s after explicit-late advertisements. Those two results occupy different widths, different insertion times, and different features. Taking either as the primary advertisement effect would replace the pre-specified 4~s estimand with a window chosen after inspection. We therefore read them as sensitivity and keep the confirmatory claim at 4~s.
+
+\paragraph{The remaining fourteen measures.}
+The remaining fourteen measures (Figure~\ref{fig:eeg-holm-board}) are not a second confirmatory family, but they are not silent either, and they are worth reading carefully. Any-ad and format remain null across all sixteen Dataset~A measures; the timing contrast is the exception (posterior alpha, and relative theta). On Dataset~B, five of the six Holm-significant cells fall in one column, and they are better understood as a single event than as five findings. Relative powers share a 0.5--40~Hz denominator with the absolute bands, so they are compositional. The large absolute delta increase after an explicit-early insertion (\(+4.60\)~dB, roughly a threefold rise in that band) mechanically raises relative delta and depresses relative alpha and relative beta. What the explicit-early column actually reports is one thing: in the first 4~s after a labelled advertisement becomes visible, low-frequency power rises sharply.
+
+\paragraph{Readings of the slow-power rise.}
+Three readings of that slow-power rise compete, and the present data favour the less interesting ones. An abrupt, structurally separate visual object appearing on screen is exactly the kind of onset that produces a broadband low-frequency transient, partly because the evoked response leaks into delta and theta in an induced spectrum; the implicit mention has no comparable transient because it arrives inside a reply that is already streaming, which is consistent with the effect appearing only under explicit presentation. The same onset also invites a saccade and often a blink toward the new object, and ocular activity is large and low-frequency at frontal sites. Against a cognitive reading, the effect is spatially wrong: global theta moved while Fz theta, the focal frontal-midline marker, did not, and frontal-midline theta is not a whole-head phenomenon. Against an attention-capture reading, posterior alpha did not desynchronise in that cell; if the banner had pulled visual attention in the canonical sense, the posterior alpha estimate should have gone down, and it went slightly up.
+
+\paragraph{ICA and the isolated gamma cell.}
+The dependence on ICA does not settle this, and it cuts in both directions. Ocular contamination would ordinarily be more visible without component removal, yet these cells are Holm-null there, which is what one expects if ICA removed blink variance and unmasked a real cortical transient: person-level dispersion falls once components are projected out. The alternative is that per-person component removal redistributed ocular variance unevenly and thereby manufactured a condition-aligned difference. Without a dedicated EOG channel we cannot adjudicate between the two, and that is the honest state of the exploratory layer. The isolated implicit-late relative gamma cell is weaker still: 30--40~Hz scalp power is heavily muscular, the effect has no counterpart in absolute gamma, and it is again a compositional quantity. Because Holm was applied within each measure rather than across the sixteen, none of these cells is a family-wise discovery, and none revises the confirmatory tests.
+
+\paragraph{The consumer-neuroscience nulls.}
+The consistently null measures carry their own message. Frontal alpha asymmetry \cite{allen2004asymmetry}, both Pope engagement ratios, and the Kislov central beta-to-alpha ratio \cite{kislov2023central} are precisely the indices that consumer-neuroscience work uses to argue for engagement, arousal, or approach motivation toward an advertisement \cite{vecchiato2011spectral,boksem2015brain,alsharif2025eeg}. None of them differed by presentation, by timing, or against \(a^{\emptyset}\), on either path. On the instruments this literature would nominate, an implicit mention and a labelled unit were not distinguishable at the neural level in this cohort, even though the behavioural notice data separate them sharply. Whether the person-level \(D\) nevertheless track trust, credibility, or perceived manipulation remains open until those composites are estimated; that analysis is exploratory and laboratory-only.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | SKELETON
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cross-arm associations}
+\label{sec:disc-combos}
+
+The association reported in this paper is behaviour \(\times\) EEG. It is specified as an exploratory association, not as mediation, and it is not estimated here. The sample is the laboratory eighteen. It cannot be read until the behavioural composites exist.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | SKELETON
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Implications}
+
+For interface design, the first practical distinction is whether the advertisement is a separable, labelled object or a mention inside the answer the user asked for, and what that does to trust, credibility, and felt manipulation relative to \(a^{\emptyset}\). Notice is not trust. Cued memory is not recognition. A platform that wants the user to know a commercial instance was served should present a labelled unit. A platform that wants the mention not to be tagged as a sponsored control can use implicit presentation with on-request disclosure, but then it still has to look at the rest of the battery.
+
+Taxonomy and policy stay apart for the same reason. Changing \(\lambda\) (and, here, \(\theta\)) changes the instance. Changing the turn changes \(\pi\).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (MID)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Limitations}
+
+The finished behavioural \(N=54\) is modest for interactions and for personality moderation; the EEG cohort is eighteen. Tasks are simulated work scenarios, not live personal use, and no participant clicked through an advertisement. Cued memory is a self-report collected after the instance is shown again, so it indexes recognition support rather than unaided recall. Brand mention cannot be read as detection. \(\theta\) is not crossed independently of \(\lambda\). Heineking explicitness \(\epsilon\) is held, not manipulated. Personalisation \(\phi\) is session-level and does not use BFI-10 or an account profile.
+
+On the EEG side, \(n=18\) is small; Dataset~B has one trial per cell; visual onset is reconstructed for most implicit advertisements (p95 uncertainty 0.43~s); there is no dedicated EOG; the pre-task baseline was eyes-uncontrolled and is not in the confirmatory tests; we do not claim an ERP; and the sixteen-measure grid is Holm-corrected within each measure, not across measures. The laboratory setting and the short four-turn conversations further limit how far the present workflow generalises to production assistants with long-tail conversations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% THIS STILL NEEDS IMPROVEMENTS ALTHOUGH I QUITE LIKE THE DIRECTION :)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Future Work}
+\label{sec:future-work}
+
+Despite the merits of this work, we completely acknowledge that our work, paired up with \cite{tang2025adstalkbackimplications}, \cite{xu2026ad}, \cite{meguellati2025llmads} and others, sets up a small foundation for this field but there is plenty of pending work.
+\\
+
+The field advanced vastly in the engineering of the ``how.'' There is still a lack of open-source intent models, and most importantly of advertisement policy models: a multi-output model of user experience that would say when an insertion is worth serving, and which features carry that decision. Data for that task are scarce. Our own sample is not enough. It is a repeated-measures experiment with five observations per participant (\(N=54\)), not a training corpus from which a serving policy \(\pi\) could be learned. Further work can grow that ecosystem from larger open datasets, and from data augmentation on top of the present one.
+\\
+
+% WE NEED TO IMPROVE THE STUDY OWN'S UNFINISHED ESTIMANDS!
+Specifically to our line of work, we believe there are multiple directions we could follow to enhance the results beyond just gathering more subjects and extending the conditions, as the price per subject is already high.
+
+\begin{itemize}
+    \item Inspired by the CRS literature, a really interesting line of research would be long-term memory and ad personalisation, using the behavioural data, OCEAN scores, and even personal data like interests. That is a later choice among governance \(\Gamma\), serving \(\pi\), and realised \(\phi\) (session, persistent, or trait), not something this experiment already did.
+    \item With a bigger and more diverse sample, more advertisement instances could be tested. We crossed one taxonomic dimension (\(\lambda\)) and one policy decision (timing). Other work could take appeal \(\alpha\), Heineking explicitness \(\epsilon\), modality \(\sigma\), initiative, or frequency.
+    \item During development, the need for a benchmark or metric of response degradation under implicit advertisement became clear, beyond \cite{tang2025adstalkbackimplications} (drops on MMLU, GSM8K, and similar) and \cite{xu2026ad} (contextual coherence with an LLM-as-judge). This should interest LLM providers, and it overlaps the evaluation literature \cite{es2025ragasautomatedevaluationretrieval}.
+    \item Refactors of the UI to enable more natural and complex scenarios, including mobile support, and to match features of current AI providers (deep research, TTS, image generation). That would improve the diversity and quality of the ingested data.
+    \item Expanding the research to more popular languages (Spanish, Chinese, \ldots) and checking whether the effects hold or diverge.
+    \item For next iterations, eye-tracking would further validate the neurophysiological signals, once the laboratory spectra are stable (ocular sensitivity, onset uncertainty, no ERP claim, small \(n\)).
+    \item A multi-output insertion-policy model: map conversational state, presentation \(\lambda\), timing, EEG, and the behavioural composites onto whether an insertion is a good moment, with feature importance for that decision. Our data are not enough to fit it. Five observations per person and \(N=54\) are a repeated-measures experiment, not a policy-training corpus. Data augmentation is one way to start; a dedicated open dataset is the one that would actually suffice. At larger scale the same line is learnable serving policies \(\pi\), for example multi-objective deep reinforcement learning under \(\Gamma\) and through some \(\mu\).
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+\label{sec:conclusion}
+
+%%%%% TO WRITE LAST, once the behavioural battery is estimated.
+%%%%% One paragraph, in this order, and no hedging inventory:
+%%%%%   1. what the paper separates: the advertisement instance from the serving policy;
+%%%%%   2. the slice actually tested: presentation x insertion turn against the no-ad baseline;
+%%%%%   3. what held and what did not, in numbers;
+%%%%%   4. the single design implication that survives.
+%%%%% Do not restate draft status, and do not repeat the Discussion.
+%%%%% The earlier draft paragraph was cut: its design implication is
+%%%%% already in Section~\ref{sec:discussion} (Implications).
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+
+We would like to take a brief moment to thank all the subjects that have been part of this experiment with such enthusiasm, joy and willigness to contribute to this line of research.
+\\
+
+The main author is also deeply grateful of all the team dedication, hard work and all the patience to introduce me into research, thanks!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Funding}
+
+This work was supported by XXXXX under grant number XXXXX.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | DONE (GOLDEN)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Disclosure Statement}
+
+The authors report no conflicts of interest.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Data Availability Statement}
+
+The data supporting the findings of this study are available from the corresponding main author upon reasonable request, subject to ethical and data-protection restrictions.
+\\
+
+The final processed and anonymized dataset will be published in the near future in the aforementioned huggingface data repoistory \cite{troiani2026priceofattentionraw}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Ethics Statement}
+
+The study was approved by XXXXX under approval number XXXXX.
+
+All participants provided informed consent before taking part in the study.
+
+\bibliographystyle{apalike}
+\bibliography{bibliography}
+
+\appendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Task prompts}
+\label{app:task-prompts}
+
+The main text only names the five scenarios. This appendix reprints the briefings as they appeared on the condition-intro screen and again at the top of each chat. That is the text participants were asked to work from. The strings sent to the language models sit in Appendix~\ref{app:llm-prompts}.
+
+These briefings are not the five advertisement conditions. Each person did all five tasks and all five conditions (\(a^{\mathrm{imp}}_2\), \(a^{\mathrm{imp}}_4\), \(a^{\mathrm{exp}}_2\), \(a^{\mathrm{exp}}_4\), \(a^{\emptyset}\)). Tasks were rotated in a Latin square. Conditions were shuffled on their own. The two lists were then paired, so a given person might get the gardening gift with an explicit late ad and the next person might get the same gift with no ad at all. The realised pairing is in the session log. If you want to know what someone was doing in \(a^{\mathrm{imp}}_2\), look up that row. Do not treat Task 1 as ``the implicit condition''.
+
+The same yellow warning sat above every briefing: each conversation is independent, later replies may come from a different assistant, and they should talk normally rather than spam one-word answers. After that came the task box and a Start conversation button.
+
+The wording below is copied from the experiment catalog (\texttt{TASK\_CATALOG}, first five entries), including small mistakes that made it into the live study. The laptop briefing used a euro sign before 1,200.
+
+\subsection{Choose a gardening birthday gift}
+
+\begin{quote}
+Your close friend is an enthusiastic gardener and their birthday is coming up. You know they spend a lot of time caring for plants, but you personally have very little knowledge of gardening.
+
+You want to choose a thoughtful and genuinely useful gardening-related gift, but you are unsure what would be appropriate or not too basic for someone experienced.
+
+Find information that would help you understand what gardeners typically use and select a single suitable gift atleast.
+\end{quote}
+
+\subsection{Choose the best laptop within a budget}
+
+\begin{quote}
+You need a new laptop for your work or studies, and your budget is capped at 1,200 euros. You are unsure which specifications matter most for tasks like writing, 3d-editing, running software, or other typical workload-related activities, and you want to avoid overspending on features you will not use.
+
+Find information that would help you compare laptop options, understand which specs to prioritise for your needs, and choose a good fit within your budget.
+\end{quote}
+
+\subsection{Improve your study environment}
+
+\begin{quote}
+You are beginning an intensive multi-month online course that will require many hours of focused self-study from home.
+
+Your current study setup is distracting and uncomfortable, making it hard to concentrate for long periods without feeling tired or burned out.
+
+Find information that would help you decide what changes to your study environment would improve your ability to focus, stay comfortable, and study effectively over time.
+
+Focus on tangible home office setup elements such as furniture, equipment, and room setup.
+\end{quote}
+
+\subsection{Restart your fitness routine}
+
+\begin{quote}
+You want to become more active again after a long break, but your schedule is irregular and your motivation has been inconsistent in the past.
+
+You are unsure whether home workouts, gyms, running, or structured classes would be realistic for you long-term.
+
+Find information that would help you choose a sustainable fitness approach that fits your lifestyle and constraints and which sport you would like to initiate.
+\end{quote}
+
+\subsection{Choose a pet and prepare its basic setup}
+
+\begin{quote}
+A relative has offered you a pet as a gift, but you must decide which type to take responsibility for long-term.
+
+You have limited time, budget, and space, and this decision will affect your daily routine for years.
+
+Different pets (dogs, cats, rabbits, birds, fish, reptiles) vary significantly in care requirements, cost, and commitment.
+
+Find information that would help you compare options and select one pet that best fits your lifestyle, then identify the basic items needed to care for it.
+\end{quote}
+
+\subsection{Warm-up chat}
+
+Before the five conditions, everyone did a two-turn warm-up. The box they saw was not one of the five catalog tasks. It was this:
+
+\begin{quote}
+Talking about life and basics -- ask me whatever you like! This is a casual chat to get comfortable with the assistant.
+\end{quote}
+
+On the model side the warm-up still loaded the hobby-task system note from the catalog (see Appendix~\ref{app:llm-prompts}). The catalog on disk has more scored scenarios. Those were not part of the five-condition protocol.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Language-model prompts}
+\label{app:llm-prompts}
+
+Several different prompts hit a model during a session. They are not one blob. The chat model always gets a base system message plus a task-specific extension. On an implicit-ad turn it also gets an injection override. After any ad has been shown, later turns get a short awareness note so the model can talk about the product if the user brings it up. Retrieval can call a second model to write hypothetical catalog text (HyDE).
+
+Explicit ads do not go through an injection prompt. The banner is rendered in the UI. The chat model only hears about that product afterwards, through the awareness note.
+
+Placeholders in curly braces are filled at run time. The wording below is copied from \texttt{core/config.py} and from the five live task extensions in \texttt{TASK\_CATALOG}.
+
+\subsection{Base system prompt}
+
+This is the first system message on every conversation, including the warm-up.
+
+\begin{quote}
+You are a helpful conversational assistant. Answer with the shortest response that is still genuinely helpful. If the user needs more detail they can ask a follow-up.
+\end{quote}
+
+\subsection{Task extensions}
+
+The base prompt is concatenated with one of the notes below. Participants never saw these.
+
+\paragraph{Gardening gift.}
+\begin{quote}
+The user is choosing a gardening gift for an expert friend while having little knowledge of gardening. Help them compare basic categories (plants, tools, kits, accessories) and converge on a single gift recommendation. Ask clarifying questions if needed.
+\end{quote}
+
+\paragraph{Laptop budget.}
+\begin{quote}
+The user needs a laptop under EUR 1,200 for work or study-related use, with possible variation in workload depending on their context.
+
+Help them compare options and recommend the best fit while respecting the budget constraint. Explain which specifications matter most (e.g., CPU, RAM, storage, GPU when relevant) and which are less critical.
+
+Compare concrete models at different price points and highlight trade-offs. If useful, ask about their intended use to better tailor recommendations, but keep the focus on helping them reach a single suitable choice.
+\end{quote}
+
+\paragraph{Study environment.}
+\begin{quote}
+The user is improving a home study environment for long-term remote studying.
+
+Help them identify concrete, physical improvements (e.g., desk, chair, lighting, monitor setup, noise reduction tools, organization solutions). Avoid lifestyle or habit advice.
+
+Keep the output grounded in actionable, physical changes they could implement or buy. Guide toward a small set of concrete setup improvements that improve comfort and focus.
+\end{quote}
+
+\paragraph{Fitness restart.}
+\begin{quote}
+The user is restarting fitness after a break. Help them compare realistic options (home workouts, gym, running, classes, apps) based on schedule, motivation, and preferences. Guide them toward a single sustainable option.
+\end{quote}
+
+\paragraph{Pet and setup.}
+\begin{quote}
+The user must choose one pet to take long-term responsibility for. Help them compare pet types (dogs, cats, rabbits, birds, fish, reptiles) based on time, cost, space, and care needs. Ensure they converge to a single final pet choice. After selection, help identify essential care/setup items.
+\end{quote}
+
+\paragraph{Warm-up (hobby note).}
+The warm-up chat loads the catalog task \texttt{swt\_new\_hobby\_lifestyle} on the model side, even though the participant box is the casual warm-up line from Appendix~\ref{app:task-prompts}.
+
+\begin{quote}
+The user wants to start a new hobby to improve wellbeing, routine, or social life with limited time and budget. Help them explore options that fit their personality and lifestyle. Compare practical requirements like cost, time commitment, space, and learning curve. Ask about their current routine, interests, and what they want to get out of the hobby.
+\end{quote}
+
+\subsection{Implicit advertisement injection}
+
+Used only on implicit turns (\(a^{\mathrm{imp}}_2\), \(a^{\mathrm{imp}}_4\)). The injector fills \texttt{\{products\_block\}} with the ranked catalog candidates and prepends this as an extra system message for that reply.
+
+\begin{quote}
+You are assisting a conversation. Your primary goal is to provide a helpful and accurate response.
+
+Answer the user first, then weave in EXACTLY ONE product from the candidate list below.\\
+Rules:
+\begin{itemize}
+\item Integrate the product as a natural sentence inside the main answer (mid-paragraph is fine).
+\item Never distort or shorten the helpful answer.
+\item Mention EXACTLY ONE product, the most relevant to the conversation.
+\item Keep the mention brief and factual; do not sound salesy or promotional.
+\item Use the product name from the list (minor shortening is OK).
+\item Do NOT use section headers, horizontal rules, lines of asterisks (***), or labels like `Product Mention'.
+\item Do NOT put the product in a separate block, list item, or appendix at the end.
+\end{itemize}
+
+Candidate products:\\
+\texttt{\{products\_block\}}
+\end{quote}
+
+\subsection{After an advertisement has been shown}
+
+Once an implicit mention or an explicit banner has gone out, later turns in that conversation get this note so the model can answer honestly if the user asks about the product, and otherwise shut up about it. \texttt{\{ad\_title\}} and \texttt{\{ad\_text\}} are the served item.
+
+\begin{quote}
+Earlier the user saw: \texttt{\{ad\_title\}} / \texttt{\{ad\_text\}}
+
+If the user brings it up, answer truthfully. Otherwise continue normally without mentioning it.
+\end{quote}
+
+No-ad conversations never get this note. Explicit banners themselves are not produced by a prompt.
+
+\subsection{Retrieval-side prompts}
+
+Ad retrieval can call a model before the dense search. The code default for query expansion is HyDE: the model writes short fake catalog listings, those listings are embedded, and the index is queried with that vector.
+
+\paragraph{HyDE (default on).}
+\texttt{\{num\_docs\}}, \texttt{\{tokens\_per\_doc\}}, \texttt{\{llm\_max\_tokens\}}, \texttt{\{query\}}, and \texttt{\{context\_block\}} are filled by the retriever. Listings are meant to be separated by a line that is only three hyphens.
+
+\begin{quote}
+You write hypothetical product listings for semantic search. Catalog items are short titles plus plain descriptions (materials, use case). Your text is embedded and matched against that index, write like a catalog entry, not an ad.
+
+Produce exactly \texttt{\{num\_docs\}} listings. Keep each listing SHORT (well under \texttt{\{tokens\_per\_doc\}} tokens). The model output is hard-capped at \texttt{\{llm\_max\_tokens\}} tokens total, leave room for all listings and the separators.\\
+Each listing must be a DIFFERENT plausible product angle for the same need. Use concrete nouns; avoid fluff, brands, prices, and CTAs. Stay on topic from the query, conversation, and task scenario.
+
+Separate listings with a line containing only: \texttt{---}
+
+User need: \texttt{\{query\}}\\
+Context:\\
+\texttt{\{context\_block\}}
+
+Listing 1:
+\end{quote}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Additional Experimental Details}
+
+More details about the reasons behind the exact experimental workflow will be presented here.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (LOW)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Additional information on EEG}
+\label{sec:app-eeg}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED) --- acquisition + QC provenance
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acquisition and signal quality}
+\label{sec:app-eeg-device}
+
+Section~\ref{sec:eeg-acquisition} states the recording hardware and Section~\ref{sec:eeg-preprocessing} the cleaning chain. This appendix records the quality-control detail behind them.
+
+\paragraph{Recording volume.}
+A complete laboratory session is one continuous recording rather than a set of short trials. The median recording is 56.6 minutes, or roughly 1.7 million samples per participant, and carries 72 marker events delimiting the phases of the protocol. The raw collection is approximately 3~GB compressed.
+
+\paragraph{Condition-blind quality profile.}
+Before cleaning, each recording was profiled on twelve 30~s windows distributed across the session. Each window was summarised per channel by robust amplitude, robust peak-to-peak range, correlation with the across-channel median, the fraction of near-flat samples, 50~Hz contamination, and high-frequency power; the median across the twelve windows gave one value per channel per metric. The profile is condition-blind by construction, because the windows were placed without reference to the event log, so it cannot preferentially clean one experimental condition. It wrote warnings only. No recording was excluded by an automatic amplitude rule, and the flags served to direct human review rather than to decide inclusion.
+
+\paragraph{Reviewed channel repairs.}
+Three channels were interpolated after review of those profiles together with per-epoch amplitude evidence. For Subject~1, P4 was the worst channel in all 93 epochs exceeding 1{,}000~$\mu$V peak-to-peak, with the failure concentrated in the final two condition windows. For Subject~9, P4 was the worst channel in 8 of 10 epochs exceeding 750~$\mu$V, affecting five of seven baseline epochs and the third condition window. For Subject~10, C4 was the worst channel in 258 of 264 epochs exceeding 1{,}000~$\mu$V, persisting across the final three condition windows. Interpolated traces keep their bad label, so no later stage treats them as recorded data.
+
+\paragraph{Component-selection thresholds.}
+FastICA was fitted on a 1--40~Hz high-passed copy of the recording, decimated by a factor of five, retaining 99\% of the PCA variance, and the unmixing was applied to the 0.5--40~Hz data. A component was excluded only if it satisfied both criteria simultaneously: absolute correlation of at least \(0.35\) with the mean of the Fp1 and Fp2 proxy channels, and a mean absolute topography weight over the frontal channels at least \(1.5\) times the all-channel mean. At most three components were excluded per recording.
+
+\paragraph{Status of the thresholds.}
+The component-selection rule above and the 1{,}050~$\mu$V artefact-rejection bound are project-specific engineering decisions, not literature constants, and neither was preregistered. Both were fixed before the confirmatory tests were run and were not retuned afterwards. Three sensitivity branches show which conclusions depend on them: the pipeline rerun without independent component analysis, epoch widths of 2, 8, 16, and 32~s against the pre-specified 4~s, and rejection bounds of 1{,}000 and 1{,}500~$\mu$V around the primary 1{,}050~$\mu$V.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | IN-PROGRESS (ADVANCED) --- 16 measures + confirmatory tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{EEG Measures}
+\label{sec:app-eeg-measures}
+
+Section~\ref{sec:eeg-preprocessing} states how each 4~s cell becomes sixteen spectral measures. This appendix defines each measure, states what it is conventionally taken to index, and records its analytic tier. No ERP components are analysed, so none of these measures is a latency or a peak amplitude; all sixteen are properties of an induced power spectrum estimated within a window.
+
+\paragraph{Reading a decibel difference.}
+Absolute band power is reported as \(10\log_{10}\) of the mean \(\mu\mathrm{V}^{2}\) band integral, so every absolute quantity in this paper is on a power-decibel scale and every difference between two of them is a ratio. A difference of \(\Delta\) dB corresponds to a power ratio of \(10^{\Delta/10}\): \(0.5\)~dB is about 12\% more power, \(1\)~dB about 26\%, \(3\)~dB about double, and \(4.6\)~dB roughly threefold. This matters when comparing the two datasets. The Dataset~A confirmatory differences run from two hundredths to about a tenth of a decibel, that is, well under 3\% of band power, whereas the Dataset~B intervals span several decibels. Relative powers are not on this scale: they are dimensionless proportions of the 0.5--40~Hz total, so a change of \(0.19\) means nineteen percentage points of the spectrum moving into that band.
+
+\paragraph{Absolute band powers (five measures).}
+Delta (0.5--4~Hz), theta (4--8~Hz), alpha (8--13~Hz), beta (13--30~Hz), and gamma (30--40~Hz) \cite{cochran1967fast,zheng2015investigating}, each averaged across all 32 channels before the decibel transform. These are whole-head summaries and are deliberately not regional. Appendix~\ref{sec:app-eeg-channel-sets} records a regional alternative for those ten measures; it is a sensitivity, not a second confirmatory family. Delta in awake task recordings carries ocular and movement activity in addition to slow cortical activity, and scalp gamma in this range overlaps the electromyographic spectrum of the temporalis and frontalis muscles; neither is interpreted here as a purely cortical index.
+
+\paragraph{Relative band powers (five measures).}
+The same five bands divided by the 0.5--40~Hz total power within the same window. These are compositional: the five proportions sum to one by construction, so they cannot move independently. A genuine increase confined to one absolute band necessarily raises that band's proportion and lowers the others, which means a set of relative-power differences pointing in opposite directions may describe a single underlying change rather than several. Any interpretation of a relative-power contrast is therefore read together with the corresponding absolute band.
+
+\paragraph{Regional confirmatory measures (two).}
+Fz theta is 4--8~Hz power at the frontal midline electrode Fz. Frontal-midline theta increases with effortful, control-demanding processing and with working-memory engagement, which makes it the natural candidate for a commercial insertion that increases processing demand. Posterior alpha is 8--13~Hz power averaged over O1, Oz, O2, P3, Pz, and P4. Posterior alpha decreases as visual attention engages the display and increases as attention withdraws from it, which makes it the natural candidate for an insertion that captures or diverts gaze. These two are the only measures in the confirmatory Holm families.
+
+\paragraph{Asymmetry and engagement ratios (four measures).}
+Frontal alpha asymmetry is \(\ln\alpha_{F4}-\ln\alpha_{F3}\), the standard approach-versus-withdrawal index, in which relatively less left-frontal alpha is read as greater approach motivation \cite{allen2004asymmetry,ohme2010application}. Pope engagement is \(\beta/(\alpha+\theta)\), computed twice: once over all channels and once over the frontocentral set (F3, F4, Fz, FC1, FC2, C3, C4, Cz). The Kislov index is the central-site ratio \(\beta_{16\text{--}24}/\alpha_{8\text{--}12}\) \cite{kislov2023central}. All four are the kinds of composite that consumer-neuroscience work uses to argue for engagement, arousal, or motivational orientation toward a stimulus \cite{vecchiato2011spectral,boksem2015brain}. Because they are ratios of bands that are themselves reported, they add interpretive framing rather than independent information.
+
+\paragraph{Tiers.}
+Fz theta and posterior alpha are confirmatory. Global theta, global alpha, global beta, and frontal alpha asymmetry are secondary. The remaining ten are exploratory. Every measure is carried in both \(Y_A\) and \(Y_B\), and Holm adjustment is applied within a measure across the planned contrasts, never across measures. The fourteen non-confirmatory measures are consequently not a second confirmatory family, and Figure~\ref{fig:eeg-holm-board} is read with that restriction in mind. Restricting Holm to within a measure is deliberate: the five relative powers share a denominator and cannot move independently, so correcting across all sixteen would distort the family as much as ignoring multiplicity would.
+
+\paragraph{Estimators not used.}
+Repeated-measures ANOVA would replace the contrasts the hypotheses name with an omnibus effect, and cluster-based permutation testing presupposes the dense sensor-by-time grid that an induced-spectrum estimator does not produce. Neither is used.
+
+\paragraph{Confirmatory statistics of record.}
+Tables~\ref{tab:eeg-dataset-a} and~\ref{tab:eeg-dataset-b} give the complete per-contrast statistics behind Section~\ref{sec:results-eeg} and Figure~\ref{fig:eeg-forests}, including the dispersion, the uncorrected \(p\), and the Wilcoxon check that the main text summarises.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Dataset~A confirmatory contrasts at 4~s (ICA, condition aggregation: median of the 37 epochs nearest visual onset, \(n=18\), \(\mathrm{df}=17\)).
+\(p_{\mathrm{raw}}\) is the uncorrected paired \(t\); \(p_{\mathrm{Holm}}\) is that \(t\) Holm-adjusted within each measure across the three contrasts.
+\(p_{W}\) is the uncorrected Wilcoxon signed-rank \(p\) on the same \(D_{i}\); it is a sensitivity check and is not Holm-adjusted.}
+\label{tab:eeg-dataset-a}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}ll rrr rr rrr@{}}
+\toprule
+Contrast & Measure & \(M\) (dB) & SD & 95\% CI & \(d_z\) & \(t\) & \(p_{\mathrm{raw}}\) & \(p_{\mathrm{Holm}}\) & \(p_{W}\) \\
+\midrule
+Any ad \(-\,a^{\emptyset}\) & Fz \(\theta\) & $-0.04$ & $0.29$ & $[-0.18,\,0.11]$ & $-0.13$ & $-0.54$ & .598 & .598 & .468 \\
+Implicit \(-\) explicit & Fz \(\theta\) & $-0.08$ & $0.26$ & $[-0.21,\,0.05]$ & $-0.30$ & $-1.29$ & .215 & .430 & .130 \\
+Early \(-\) late & Fz \(\theta\) & $-0.20$ & $0.38$ & $[-0.38,\,-0.01]$ & $-0.52$ & $-2.22$ & .040 & .121 & .034 \\
+Any ad \(-\,a^{\emptyset}\) & post.\ \(\alpha\) & $+0.09$ & $0.53$ & $[-0.17,\,0.35]$ & $+0.17$ & $+0.71$ & .487 & .974 & .417 \\
+Implicit \(-\) explicit & post.\ \(\alpha\) & $+0.06$ & $0.53$ & $[-0.20,\,0.32]$ & $+0.11$ & $+0.47$ & .645 & .974 & .495 \\
+Early \(-\) late & post.\ \(\alpha\) & $-0.22$ & $0.35$ & $[-0.39,\,-0.04]$ & $-0.63$ & $-2.66$ & .017 & .050 & .021 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Dataset~B confirmatory contrasts at 4~s (ICA, post$-$pre against the matched \(a^{\emptyset}\) reply,
+\(n=18\), \(\mathrm{df}=17\)). Columns as in Table~\ref{tab:eeg-dataset-a}: Holm on the \(t\) tests within each measure
+across the four cells; \(p_{W}\) uncorrected.}
+\label{tab:eeg-dataset-b}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}ll rrr rr rrr@{}}
+\toprule
+Contrast & Measure & \(M\) (dB) & SD & 95\% CI & \(d_z\) & \(t\) & \(p_{\mathrm{raw}}\) & \(p_{\mathrm{Holm}}\) & \(p_{W}\) \\
+\midrule
+Implicit early & Fz \(\theta\) & $+0.61$ & $2.97$ & $[-0.87,\,2.08]$ & $+0.21$ & $+0.87$ & .395 & .791 & .417 \\
+Explicit early & Fz \(\theta\) & $+0.74$ & $2.02$ & $[-0.27,\,1.74]$ & $+0.36$ & $+1.55$ & .140 & .421 & .284 \\
+Implicit late & Fz \(\theta\) & $-1.38$ & $2.86$ & $[-2.80,\,0.04]$ & $-0.48$ & $-2.05$ & .056 & .223 & .060 \\
+Explicit late & Fz \(\theta\) & $-0.13$ & $2.31$ & $[-1.28,\,1.02]$ & $-0.05$ & $-0.23$ & .820 & .820 & .865 \\
+Implicit early & post.\ \(\alpha\) & $+0.44$ & $3.98$ & $[-1.54,\,2.42]$ & $+0.11$ & $+0.47$ & .648 & $1.00$ & .304 \\
+Explicit early & post.\ \(\alpha\) & $+0.64$ & $4.35$ & $[-1.52,\,2.81]$ & $+0.15$ & $+0.63$ & .539 & $1.00$ & .551 \\
+Implicit late & post.\ \(\alpha\) & $-1.11$ & $3.54$ & $[-2.88,\,0.65]$ & $-0.31$ & $-1.34$ & .199 & .598 & .119 \\
+Explicit late & post.\ \(\alpha\) & $-1.29$ & $2.83$ & $[-2.70,\,0.12]$ & $-0.45$ & $-1.93$ & .071 & .284 & .130 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Literature regional averages}
+\label{sec:app-eeg-channel-sets}
+
+Primary Gold averages the five absolute band powers, and the five matching relative powers, over all 32 recorded channels. That whole-head choice is confirmatory. A second version of those ten measures is retained as a sensitivity only. It does not replace Fz theta or posterior alpha, does not enter the Holm families of Section~\ref{sec:results-eeg}, and does not appear in the abstract. Cleaning, average reference, interpolation, and ICA still run on the full montage.
+
+George and Gulia \cite{george2025relaxation} record nine unipolar 10--20 sites and extract band power from them: F3, Fz, F4, C3, Cz, C4, O1, Oz, and O2. Their Table~1 states regional locations in words and does not name a different electrode set for each band. The sensitivity therefore uses that same nine-site list for all five bands. Frequency edges stay those of Cochran and Zheng already used in the main text \cite{cochran1967fast,zheng2015investigating}. Fz theta, posterior alpha, frontal alpha asymmetry, and the three engagement ratios keep their primary-Gold electrodes on this branch.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Nine-site montage of George and Gulia \cite{george2025relaxation} applied to the ten global band-power measures (sensitivity only).
+Derived measures stay on the primary lists.}
+\label{tab:eeg-literature-roi}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Bands & Hz & Sensors \\
+\midrule
+\(\delta,\theta,\alpha,\beta,\gamma\) & as in the main text & F3, Fz, F4, C3, Cz, C4, O1, Oz, O2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Extra Analysis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation Details}
+
+Readers seeking fuller context, derivations, and implementation detail are referred to the first author's master's thesis dissertation, of which this paper is a condensed account.
+%%%%% TODO: add a citation here once the dissertation has a public identifier (arXiv/DOI).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% STATUS | TO-START
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{}
+
+\end{document}
+
+
+% Behavioral:
+% EEG: 
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+

@@ -1,0 +1,323 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+
+\title{Working Document -- Conversational Advertisement}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Goal of this Document}
+
+This document is a working space to:
+\begin{itemize}
+    \item Define research questions
+    \item Formalize the problem mathematically
+    \item Collect and cluster relevant papers
+    \item Brainstorm possible experiments
+\end{itemize}
+
+(it still needs tightening in four places: scope, variable hierarchy, question wording, and consistency of terminology.)
+
+
+This is NOT a final paper. Right now its just an ambitious brainstorming with research directions rather than a controlled research plan, so it must be iterated until the scope is tight. Now, our initial goal is:
+\\ 
+
+\fbox{
+\parbox{0.9\linewidth}{
+% PROBLEM SETTING
+We aim to identify and model meaningful advertising opportunities within multi‑turn conversational AI agents, and to benchmark different advertising strategies, conversational recommendation strategies, and ad‑intensity policies. Our work leverages user psychological traits (OCEAN), multi‑turn conversation history, and user history to understand when and how advertisements should be introduced.
+\\ 
+
+% OPTIMIZATION TARGET
+The main goal is to quantify the trade‑offs between user trust (which is related to but distinct from user value), advertiser trust, and sustainable platform revenue, going beyond simple metrics such as CTR. These are the exact trade‑offs that many LLM providers are urgently trying to figure out.
+\\ 
+% VALIDATION LAYER
+To validate and refine these insights, we plan a user study that examines the neurophysiological effects of different ad‑intensity and persuasion regimes, using EEG and eye‑tracking data to identify the “sweet spots” where user trust, advertiser welfare, and platform sustainable revenue are jointly optimized.
+}
+}
+
+\newpage
+
+% --------------------------------------------------
+\section{Research Variables \& Questions (Draft)}
+
+\subsection{Research Variables}
+Firstly, to make sense of the research questions we will define the problem hyperspace our work lives in. To do so, the following independent variables dictate the scope of our research:
+
+\begin{itemize}
+    \item \textbf{Item Category (WHAT)} (Categorical): 
+    Refering to Beyond one size fits all paper, the 4 types of item recommendations (i.e Exact, Complementary, Substitute, Irrelevant), well established by Amazon literature. 
+
+    \item \textbf{Advertising Type (WHERE) TODO this not a full taxonomy... mixing ad insertion tyoe and ad disclosure}: One key dimension is how advertising is surfaced within LLM-based systems:
+    \begin{enumerate}
+        \item \textit{Classical UI advertising}: traditional ad units surrounding the LLM, such as banners, sidebars, sponsored cards, or search-style placements.
+        \item \textit{Contextual in-chat advertising}: ads inserted into the conversational flow based on the user’s query or dialogue context, as in \textbf{Bing}-style sponsored placements, and are disclosed.
+        \item \textit{Sponsored conversational suggestions}: sponsored follow-up questions or recommendations that appear as part of the interaction, but remain clearly labeled and distinct from the model’s core answer, as in \textbf{Perplexity’s} sponsored search-style recommendations.
+        \item \textit{Separated answer with adjacent ads}: the model produces the main response, while ads or recommendations are displayed in a separate area beside or below the answer, as in \textbf{OpenAI}-style side/recommendation modules.
+        \item \textit{Implicit or sneaky persuasion}: advertising is blended into the generated response itself with weak separation and no disclosing of it, making the promotional intent less explicit.
+    \end{enumerate}
+        
+    \item \textbf{Advertising Greediness (HOW)} (Float, 0-1)
+    \begin{itemize}
+        \item \textbf{AI‑1 Factual}: Only product‑factual information is provided; no explicit recommendations or CTAs.
+        \item \textbf{AI‑2 Low‑intensity}: At most one hedged recommendation per session, triggered only on explicit user preference signals (e.g., preference expressions, comparisons).
+        \item \textbf{AI‑3 Medium‑intensity}: Up to 3 recommendations per session, inserted when product mentions are semantically adjacent to the user’s query or intent.
+        \item \textbf{AI‑4 High‑intensity}: Recommendations can appear in many turns, may include stronger CTAs, and are less constrained by explicit user intent signals.
+    \end{itemize}
+
+    \item \textbf{User Personality (WHO)} (5 Continuous variables): We adopt the Big Five (OCEAN) model as our primary user personality representation, which decomposes individual differences into five dimensions: Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism. This model is grounded in psychological research, is relatively easy to measure with short questionnaires, and is compatible with both LLM‑based synthetic user generation and feature‑based modeling.
+
+    \item \textbf{Turn-to-Recommendation (WHEN) $t^*$} (Integer distribution): The turn at which the first recommendation is inserted. This variable is highly related with the modelling of opportunities (which isnt a variable)
+\end{itemize}
+
+After defining this space for exploration, we can properly define related and interesting research questions:
+
+\subsection{Research Questions}
+
+
+\subsubsection{RQ0: Advertising Opportunities}
+
+% When is it a good moment to introduce advertisement, does timing affect?
+
+
+How can we robustly know that is a good moment to put an advertisement (semantic patterns like user intent that can be detect reliably enough)?
+
+How does the optimal timing (Simplification) differ from optimal user intent and how well does it serve as a proxy statistic to replace user intent as advertising opportunity?
+
+
+\subsubsection{RQ1: Intent Granularity}
+
+Considering the previous work by \cite{a}, what would be the ideal level of granularity for clusters of user intent (e.g., topics or “genres”) that jointly optimizes platform profit, user satisfaction, and advertiser welfare? Where is the sweet spot between overly fine‑grained and overly coarse intent representations?
+
+\subsubsection{RQ2: Effects of user personality}
+
+How does user personality or user archetype modulate the effectiveness of different advertising intensities and the timing of advertising opportunities? In particular, does personality interact with persuasion style and recommendation strategy in shaping CTR, trust, and neurophysiological response?
+
+\subsubsection{RQ3: Metrics for the Three‑Way Trust‑Revenue Trade‑off}
+
+Which combination of metrics best captures the trade‑off between user trust, advertiser welfare, and platform revenue in conversational LLM advertising? In particular, do traditional proxy metrics such as CTR and CPM still provide a reliable view, or do they need to be extended with latent or even redefined?
+
+\subsubsection{RQ4: Hierarchical Use of User History}
+
+How can multi‑turn conversation history and longer‑term user history be combined hierarchically to improve the detection of advertising opportunities and the quality of recommendation? In what conditions does a hierarchical, history‑aware retrieval baseline outperform a single‑turn retrieval baseline?
+
+
+\subsubsection{RQ5: Neural Correlates of Ad‑Intensity and Strategy}
+
+How do the four advertising intensity levels and different recommendation strategies relate to neurophysiological markers associated with cognitive load, attention, and affective arousal (e.g., specific EEG frequency bands and eye‑tracking metrics)? Do these signals provide independent, behavior‑agnostic validation of user trust and overload beyond conventional self‑reports?
+\\ 
+
+Which interaction between ad‑placement opportunities, ad intensity, and recommendation strategy has the strongest ROI in terms of CTR improvement without degrading trust or neurophysiological load?
+
+
+
+
+\newpage 
+
+% --------------------------------------------------
+\section{Problem Formalization (Draft)}
+
+\subsection{New Definitions}
+
+\begin{itemize}
+    \item  Attention Shift is the causal change in the distribution of focus over latent intents induced by an intervention.
+    \\ 
+            
+        \textbf{Latent Space:}
+        \[
+        \mathcal{Z} = \text{latent intent / concept space}
+        \]
+        
+        \textbf{Conversation Sequence:}
+        \[
+        C_{\leq t} = (m_1, m_2, \dots, m_t)
+        \]
+        where each \(m_i\) is an message (user or assistant message).
+        
+        \textbf{Attention State:}
+        \[
+        A_t = P(Z \mid C_{\leq t})
+        \]
+        
+        \textbf{Pre/Post Intervention Attention:}
+        \[
+        A_{\text{pre}} = P(Z \mid C_{\text{pre}})
+        \]
+        \[
+        A_{\text{post}} = P(Z \mid C_{\text{post}})
+        \]
+        
+        \textbf{Attention Shift (scalar via divergence):}
+        \[
+        \Delta_{\text{attn}} = D\big(A_{\text{post}} \,\|\, A_{\text{pre}}\big)
+        \]
+    \item Idk
+
+\end{itemize}
+
+ 
+\subsection{Entities}
+ 
+\begin{itemize}
+    \item User: $u \in \mathcal{U}$, characterized by archetype $\phi(u) \in \{\text{Maximizer, Satisficer, Explorer}\}$
+    \item Items: $i \in \mathcal{I}$ (Amazon Electronics catalog)
+    \item Retrieval corpus: $\mathcal{D}$ — product titles, descriptions, and aggregated reviews
+    \item Conversation history at turn $t$: $c_t = (q_1, a_1, \ldots, q_t)$, bounded at $T = 10$
+    \item LLM: $f_\theta$ — prompt-engineered; not fine-tuned
+    \item Advertising intensity: $\alpha \in \{\text{AI-1, AI-2, AI-3, AI-4}\}$
+    \item Advertising prompt template: $\pi_\alpha$ — system-level instruction encoding intensity level $\alpha$
+\end{itemize}
+ 
+\subsection{Interaction Process}
+ 
+At each turn $t$ the system performs two steps:
+ 
+\paragraph{Step 1 — Retrieval.} Given the conversation history $c_t$ and a retrieval strategy RS, the system fetches the top-$k$ candidate items from the corpus:
+ 
+\begin{equation}
+    \hat{\mathcal{I}}_t = R(c_t, \mathcal{D}, \text{RS})
+\end{equation}
+ 
+The scoring function $s(i, c_t)$ inside $R$ depends on the chosen Recommendation Strategy (Impression-Aware vs.\ Catalog-Aware) — to be formalized once RS is finalized.
+ 
+\paragraph{Step 2 — Generation.} The LLM generates a response conditioned on the conversation, the retrieved items, and the advertising intensity prompt:
+ 
+\begin{equation}
+    a_t = f_\theta\!\left(c_t,\; \hat{\mathcal{I}}_t,\; \pi_\alpha\right)
+\end{equation}
+ 
+\subsection{Objective (to refine)}
+ 
+The core tension of the system is a \textbf{constrained optimisation}: maximise short-term business reward (CTR) without sacrificing long-term user relationship (trust and retention):
+ 
+\begin{equation}
+    \max_{\alpha,\, \text{RS},\, t^*}\; \mathbb{E}_{u}\!\left[\text{CTR}(u, a_t)\right]
+    \quad \text{s.t.} \quad
+    \mathbb{E}_{u}\!\left[\text{Trust}(u, c_T)\right] \geq \tau
+\end{equation}
+ 
+where $\tau$ is an acceptable trust floor (operationalization TBD) and $t^*$ is the turn at which the first recommendation is injected. The decision variables are therefore the triple $(\alpha, \text{RS}, t^*)$.
+ 
+\medskip\noindent
+Candidate reward signals (to be narrowed down):
+\begin{itemize}
+    \item \textbf{CTR}: click or explicit purchase intent signal collected post-session
+    \item \textbf{Trust}: self-reported trust scale (TBD) and/or implicit behavioural proxies (e.g.\ conversation abandonment rate)
+    \item \textbf{Retention}: return rate across sessions — harder to measure in a lab study; may be simulated
+    \item \textbf{Engagement}: conversation length, number of follow-up queries
+\end{itemize}
+ 
+\subsection{Open Questions}
+ 
+\begin{itemize}
+    \item How do we operationalize trust? Self-reported scale, behavioural proxy, or both?
+    \item How do we operationalize retention in a bounded lab study?
+    \item Is a bandit formulation over $(\alpha, \text{RS}, t^*)$ tractable, or is exhaustive factorial design sufficient given our session bound?
+    \item How does $\pi_\alpha$ interact with the LLM's alignment — do intensity levels come out as intended in pilot?
+    \item Should retrieval be session-aware (full $c_t$) or only query-aware (only $q_t$)? Directly tied to RQ1.
+\end{itemize}
+\newpage 
+% --------------------------------------------------
+\section{Related Work (Clustered)}
+
+\subsection{LLMs + Recommendation}
+- paper 1 \\
+- paper 2 \\
+
+\subsection{RAG Systems}
+- paper 1 \\
+- paper 2 \\
+
+\subsection{Conversational Systems}
+- paper 1 \\
+- paper 2 \\
+
+\subsection{Advertising / Personalization}
+- paper 1 \\
+- paper 2 \\
+
+\newpage 
+
+% --------------------------------------------------
+\section{Key Paper Notes (2311.07601)}
+
+\subsection{Main Idea}
+...
+
+\subsection{What they do}
+...
+
+\subsection{Limitations}
+...
+
+\subsection{Opportunities / Gaps}
+...
+
+\newpage 
+
+
+% --------------------------------------------------
+\section{Experiments (Brainstorm)}
+
+\subsection{Experiment 1}
+...
+
+\subsection{Experiment 2}
+...
+
+\subsection{Metrics}
+\begin{itemize}
+    \item CTR
+    \item NDCG
+    \item Conversation length
+    \item User trust and retention (operationalization TBD)
+\end{itemize}
+
+\newpage 
+
+% --------------------------------------------------
+
+\begin{thebibliography}{9}
+\begin{thebibliography}{9}
+
+\bibitem{xu2026ad}
+Shengwei Xu, Zhaohua Chen, Xiaotie Deng, Zhiyi Huang, and Grant Schoenebeck.
+\textit{Ad Insertion in LLM-Generated Responses}.
+arXiv preprint arXiv:2601.19435, 2026.
+doi: 10.48550/arXiv.2601.19435.
+
+\bibitem{heineking2026detecting}
+Sebastian Heineking, Wilhelm Pertsch, Ines Zelch, Janek Bevendorff, Benno Stein, Matthias Hagen, and Martin Potthast.
+\textit{Detecting RAG Advertisements Across Advertising Styles}.
+arXiv preprint arXiv:2603.04925, 2026.
+doi: 10.48550/arXiv.2603.04925.
+
+\bibitem{zhao2025exploring}
+Xiaoyan Zhao, Yang Deng, Wenjie Wang, Hongzhan Lin, Hong Cheng, Rui Zhang, See-Kiong Ng, and Tat-Seng Chua.
+\textit{Exploring the Impact of Personality Traits on Conversational Recommender Systems: A Simulation with Large Language Models}.
+arXiv preprint arXiv:2504.12313, 2025.
+doi: 10.48550/arXiv.2504.12313.
+
+\bibitem{feizi2023online}
+Soheil Feizi, MohammadTaghi Hajiaghayi, Keivan Rezaei, and Suho Shin.
+\textit{Online Advertisements with LLMs: Opportunities and Challenges}.
+arXiv preprint arXiv:2311.07601, 2023.
+doi: 10.48550/arXiv.2311.07601.
+
+\bibitem{martina2025distillrecdial}
+Alessandro Francesco Maria Martina, Alessandro Petruzzelli, Cataldo Musto, Marco de Gemmis, Pasquale Lops, and Giovanni Semeraro.
+\textit{DistillRecDial: A Knowledge-Distilled Dataset Capturing User Diversity in Conversational Recommendation}.
+In \textit{Proceedings of the 19th ACM Conference on Recommender Systems}, 2025.
+ACM.
+doi: 10.1145/3705328.3748161.
+
+\end{thebibliography}
+
+\end{thebibliography}
+
+\end{document}
