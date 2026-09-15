@@ -1,13 +1,66 @@
 # Paper rebuild: golden inventory, skeleton, and build plan
 
-Date: 15 September 2026. Dig only. Paper source
-(`docs/overleaf/publication/main.tex`) is unchanged except for the
-`\Rev` macro (preamble). The rebuild itself starts when thesis **v3**
-is frozen (after the 17 Sep PDF and the second jury round).
+Date: 15 September 2026. **Status: v1 built and pushed the same
+evening** (paper `4c1f3bc`, from thesis v2 `bbff12d`). Section 0 below is
+the live state; sections 1–9 are the dig that preceded it and are
+history. Any v3 delta from the thesis is applied on top of this v1 with
+`\Rev{}`; the paper is not rebuilt again.
 
 Ground truth at the dig: paper HEAD `b28b698` (Walter, 14 Sep), thesis
 HEAD `920abd8` (loop 3b, v2 in construction; local tree dirty, not
 touched).
+
+## 0. v1 as built (15 Sep evening) — Live now
+
+Layout in `docs/overleaf/publication/`:
+
+| File | Content | Origin |
+| --- | --- | --- |
+| `main.tex` | preamble, title, authors, **new abstract**, `\input` list | new; abstract condensed from thesis `frontmatter/abstract.tex` minus trajectories |
+| `sections/01_introduction.tex` | motivation, *advertere* paragraph, triad, what the paper does, 4 contributions, **7 RQs** | thesis Ch 1 cut; RQ2/RQ4 (trajectories) dropped and renumbered |
+| `sections/02_related_work.tex` | five spine paragraphs + user-first closer | thesis Ch 2 cut ~60%; Sebastian's appeal/explicitness paragraph verbatim |
+| `sections/03_theory.tex` | taxonomy (table, three instances) + policy `\Pi` | Walter's golden text verbatim; policy itemize compressed to one paragraph |
+| `sections/04_method.tex` | participants, design, assistant, timing (short), presentation, DVs, EEG measures, statistical framework | Katerina/Sebastian golden text; framework from thesis 6.3 minus trajectory rows |
+| `sections/05_results.tex` | sample, `tab:beh-planned`, localisation, notice, moderation, EEG forests, board text, trust × α | thesis Ch 7 minus 7.5 (trajectories); numbers copied verbatim |
+| `sections/06_discussion.tex` | behaviour, EEG, trust at onset, implications, `tab:rq-answers` (7 rows), limitations | thesis Ch 8 minus 8.4; ~35% shorter |
+| `sections/07_conclusion.tex` | conclusion + one future-work paragraph | thesis Ch 9 cut |
+| `sections/08_statements.tex` | acknowledgements (Walter verbatim), funding/ethics `XXXXX`, data availability | old paper |
+| `sections/appendix_a_tasks.tex` | lab flow figure, task briefings, **Sebastian's full timing rationale** (`app:timing-rationale`) | thesis App. A + old paper |
+| `sections/appendix_b_prompts.tex` | LLM prompts | thesis App. B |
+| `sections/appendix_c_behaviour.tex` | `tab:analysis-families`, demographics figure, BFI table, thesis App. E in full (descriptives, reliability, items, post hoc, personality board + table, demographics table, design tables, assumptions) | thesis |
+| `sections/appendix_d_eeg.tex` | thesis App. D + old paper per-cell tables (`tab:eeg-dataset-a/b`) + Holm board figure + channel-set sensitivity | thesis + old paper |
+| `sections/appendix_e_eeg_pipeline.tex` | architecture diagram, acquisition, Bronze/Silver/Gold pipeline, epoch-width rationale | old paper golden EEG text verbatim |
+| `figures/results/` | Gold PDFs copied from `thesis/figures/results/` (same paths, so thesis text ports unchanged) | thesis |
+| `bibliography.bib` | copy of thesis `references.bib` (superset of the paper keys) | thesis |
+| `old_backups/main_2026-09-15_pre-rebuild.tex` | the pre-rebuild draft, whole | archive |
+
+Build: `docker run … texlive/texlive:latest latexmk -pdf main.tex`
+(script used: `/tmp/buildpaper.sh`, not in repo). Compiles with 0
+errors, 0 undefined refs. **44 pages total, ~14.5 body + references
+p. 16, appendices 28 pp.** Target was 5–10 body pages; the NeurIPS wide
+preprint runs ~650 words/page and the body carries 6 figures + 2 tables.
+
+Decisions taken without asking (routine): H1–H3 dropped for RQs;
+`\Pi` itemize → prose; BFI table → App. C; funding/ethics placeholders
+kept; `main.tex` split into `sections/`; `glossary.tex` and
+`Questions for analysis.tex` moved to `old_backups/`; stale
+`Figures/{traj_*,s24_*,gold_tables,pipeline_temporary,eda_analysis}`
+removed from git.
+
+Open for Walter (to reach ≤ 10 body pages, his call because it touches
+hand-written text):
+
+1. Move Theory §3.2 (policy `\Pi`) to an appendix, keep one sentence in 3.1 — ~0.4 pp.
+2. Cut Related Work to three paragraphs (engineering; users/detection/conflicts; gap) — ~0.5 pp.
+3. Drop `fig:beh-localisation` from the body (numbers already in text) — ~0.4 pp.
+4. Drop the Sample subsection (one sentence into Participants) — ~0.2 pp.
+5. Discussion: remove "Who the user is" and fold into Limitations; shorten the onset-response paragraph — ~0.5 pp.
+6. Method: shorten Design and procedure to one paragraph; point to App. A — ~0.3 pp.
+7. Author contributions footnote and funding/ethics `XXXXX` still to fill.
+
+`\Rev{}` from here: `\useReviewMarks{1}` is on; v1 has no wrappers
+(everything is new). Every edit from v2 onwards goes inside `\Rev{}`;
+strip before submission.
 
 ## 1. How authorship was traced, and why blame alone is wrong
 

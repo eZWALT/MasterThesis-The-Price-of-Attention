@@ -22,8 +22,8 @@ Visible board. Science 1–5 is frozen. Details:
 - [x] **Ch 2 closer** — user-first; leftover paper heading was already gone
 - [x] **Statistics attack** — accepted as v1; all `% WALTER:` / `% WALTER+:` / `% [AI:]` stripped from the `.tex` (14 Sep evening)
 - [x] **Five juries** — dumps under `.agents/context/writing/review-3/`; index `jury-README.md`
-- [ ] **Loop 3b** — apply the five juries only. Abstract and Ch 9 last, one agent, no wholesale rewrite. Do not put review comments back in the `.tex`
-- [ ] **Mechanical leftovers** — `models.tex` still mentions an FDR \(q\); Results still prints a Gold filename; boxplot-vs-profile on `fig:beh-profiles` is still his call
+- [x] **Loop 3b** — v2 juries applied; `\rev{}` stripped and source frozen 15 Sep evening. Teacher comments still welcome; no wrappers go back in.
+- [x] **Mechanical leftovers** — FDR \(q\) gone; Gold filenames are `% NUMBERS:` only; `fig:beh-profiles` stays as boxplots (his call 15 Sep)
 - [x] **Chapter titles** (his 12 Sep Overleaf note) — Related Work & Context → Related Work; Dataset → Datasets; shorten “AI System Design & Engineering”; unify title case
 - [x] **Methods 6.2** — put dependent variables next to independent variables; reorder the subsection
 - [x] **Results / Discussion titles** — match 100% (genre trajectories is the example)
@@ -68,11 +68,16 @@ it this week. Strategy:
 ## Live now
 
 Thesis PDF **Thu 17 Sep**. Defence **Wed 23 Sep** morning, Padova.
-Paper after 25 Sep; rebuild plan, golden inventory, and `\Rev` loop:
-`.agents/context/writing/2026-09-15-paper-rebuild-golden-inventory.md`.
+Paper **v1 built 15 Sep evening** (paper `4c1f3bc`, `sections/` split,
+~14.5 body pages). Iterate with `\Rev{}` after 25 Sep; inventory, layout,
+and the page-cut options for Walter:
+`.agents/context/writing/2026-09-15-paper-rebuild-golden-inventory.md` §0.
 
 **Open this, then stop:**
 `.agents/context/writing/2026-09-12-weekend-finish-board.md`
+
+Defence deck Results sync (15 Sep evening):
+`.agents/context/writing/2026-09-15-presentation-results-sync.md`.
 
 Thesis **v1** source clean (14 Sep evening):
 `.agents/context/writing/2026-09-14-thesis-v1-source-clean.md`.

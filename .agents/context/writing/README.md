@@ -3,11 +3,43 @@
 This directory holds durable writing decisions, Overleaf workflow notes, and
 handovers for thesis and publication prose.
 
-## Live now (14 September, evening)
+## Live now
+
+**15 Sep evening, paper v1 rebuilt from thesis v2** (paper `4c1f3bc`,
+pushed). `main.tex` → `sections/01…08` + appendices A–E; new abstract,
+7 RQs, no trajectories, Gold figures under `figures/results/`. ~14.5
+body pages; seven page-cut options wait for Walter in
+`2026-09-15-paper-rebuild-golden-inventory.md` §0. Edits from here go
+in `\Rev{}`.
+
+**15 Sep evening, thesis text frozen.** All `\rev{}` wrappers
+stripped; review-mark macro gone. Boxplots stay on
+`fig:beh-profiles`. Still open: teacher comments if any, float /
+page-break pass, cover flag, Thu 17 PDF.
+
+**15 Sep evening.** Defence deck synced to the 15 Sep thesis
+PDF: Goal 1 / personality / combos filled, rehearsal cut
+applied (intent theory → appendix; retrieval before system).
+`2026-09-15-presentation-results-sync.md`.
 
 Newest first. Dated notes below this box are history; they do not
 re-open a closed lock.
 
+0. **Loop 3b reconciled, green pass in the source** (15 Sep midday).
+   Ten jury dumps mapped onto one taxonomy
+   (`review-3/reconcile/issue-taxonomy-seed.md`,
+   `map-GM-MU-KK.md`, `map-DS-GX-CG-CS.md`), every claim checked
+   against the `.tex` and frozen Gold, then ranked:
+   `review-3/reconcile/ranked-issues.md` (canvas
+   `loop-3b-jury-reconciliation`). Tier 1 (26 verified, cheap
+   items, incl. Abstract and Ch 9 sentence-level) is applied in
+   `\rev{}` green; `\useReviewMarks=1` is back in
+   `dissertation.tex`. Tier 0 (nine science decisions, first the
+   \(k\)-sweep on the early−late posterior \(\alpha\) cell) waits
+   for Walter. Local compile:
+   `docs/overleaf/thesis/_build/dissertation-rev-15sep.pdf`.
+   Flip `\useReviewMarks` to 0 and strip `\rev{}` before the
+   submission PDF. Not pushed.
 0. **Five-LLM jury, two iterations** (15 Sep). Plan: judge on v1 →
    apply v2 → judge on v2 → apply v3 → final. Prompt:
    `2026-09-11-thesis-review-metaprompt.md`. Index:
