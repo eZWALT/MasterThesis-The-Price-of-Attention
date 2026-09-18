@@ -68,10 +68,14 @@ it this week. Strategy:
 ## Live now
 
 Thesis PDF **Thu 17 Sep**. Defence **Wed 23 Sep** morning, Padova.
-Paper **v1 built 15 Sep evening** (paper `4c1f3bc`, `sections/` split,
-~14.5 body pages). Iterate with `\Rev{}` after 25 Sep; inventory, layout,
-and the page-cut options for Walter:
-`.agents/context/writing/2026-09-15-paper-rebuild-golden-inventory.md` §0.
+Paper **round 2 + jury v1/v2 applied 16 Sep evening** (paper `7698241`;
+MR1 was `19c2b95`). Jury scores and what is still his:
+`.agents/context/writing/review-paper/jury-v2-README.md`; page map of
+edits `review-paper/2026-09-16-page-map.md`. `sections/` split,
+body p.17). Gold assets only under `Figures/results/` (capital F).
+Round 2 is his: statements + appendices. Note:
+`.agents/context/writing/2026-09-16-paper-mr-round-1.md`; page-cut
+options: `2026-09-15-paper-rebuild-golden-inventory.md` §0.
 
 **Open this, then stop:**
 `.agents/context/writing/2026-09-12-weekend-finish-board.md`

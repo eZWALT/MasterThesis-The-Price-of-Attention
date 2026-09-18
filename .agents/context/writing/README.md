@@ -5,10 +5,42 @@ handovers for thesis and publication prose.
 
 ## Live now
 
+**18 Sep, defence checkpoint.** Script, breadcrumbs, and Q&A crib are
+the missing artifacts; list and seeds:
+`2026-09-18-defence-checkpoint.md`. Narrative and 20-min cut:
+`2026-09-18-defence-narrative.md`. Parked frames stay behind
+`\ifsecondplane`; red section cards are on. Rehearse once 1–3 on that
+list exist. Do not open the paper in the talk.
+
+**16 Sep, paper jury metaprompt ready.** Copy-paste block for chatbots
+that get the paper PDF only: `2026-09-16-paper-review-metaprompt.md`.
+Thesis jury prompt stays `2026-09-11-thesis-review-metaprompt.md`.
+Do not apply from one jury unless Walter says so.
+
+**16 Sep evening, paper round 2 + jury v1/v2** (paper `7698241`).
+All his round-2 `% WALTER:` applied (abstract close, contributions
+mirror thesis, RQ wording = thesis, interaction/exploratory
+definitions, limitations in paragraphs, numbers in Conclusion).
+Two no-context jury passes on the PDF (mean overall 5.7 → 6.3);
+consistency fixes applied, science asks left for him:
+`review-paper/jury-v2-README.md`. Page map of every edit:
+`review-paper/2026-09-16-page-map.md`. British English only; title now
+*Behavioural* (paper and thesis `\PaperTitle`).
+
+**16 Sep, paper appendix / Troiani cite** (paper `867b6f0`).
+A–E each start on a new page; 60/70 written as 5×3×4 outcomes
+(not 22 items); cites print Troiani. Note:
+`2026-09-16-paper-mr-round-1.md`.
+
+**16 Sep, paper MR round 1 applied** (paper `8d21a0b` + `19c2b95`).
+All `% WALTER:` through the Conclusion flipped to `% WALTER+:`; Gold
+assets only under `Figures/results/` (capital F; Overleaf merges the
+lowercase folder into it). Body p.17. Round 2 leftover = statements.
+Note: `2026-09-16-paper-mr-round-1.md`.
+
 **15 Sep evening, paper v1 rebuilt from thesis v2** (paper `4c1f3bc`,
 pushed). `main.tex` → `sections/01…08` + appendices A–E; new abstract,
-7 RQs, no trajectories, Gold figures under `figures/results/`. ~14.5
-body pages; seven page-cut options wait for Walter in
+7 RQs, no trajectories. Page-cut options wait for Walter in
 `2026-09-15-paper-rebuild-golden-inventory.md` §0. Edits from here go
 in `\Rev{}`.
 

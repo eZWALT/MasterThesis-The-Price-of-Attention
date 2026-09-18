@@ -27,6 +27,39 @@ Presentation Overleaf:
 - **Takeaways** filled from the abstract / `tab:rq-answers`.
   His `%` comments were not rewritten.
 
+## Evening pass: landscape figures, RQ-mirrored skeleton
+
+His note: the two-panel figures stacked vertically look wrong on a
+4:3 slide; the skeleton after section 2 may change for flow.
+
+- **Landscape deck variants.** The thesis draws page-width portrait
+  figures; the deck now uses
+  `images/results/beh_confirmatory_forests_wide.pdf` (composites left,
+  cued recall top-right, Holm legend bottom-right) and
+  `images/results/effects_matrix_wide.pdf` (matrix transposed: outcomes
+  as columns, seven contrasts as rows). Both come from
+  `images/results/make_deck_figures.py`, which imports the thesis
+  plotting code (`make_thesis_figures._forest`,
+  `make_effects_matrix.build_cells`) and reads the same frozen CSVs.
+  Thesis figures untouched. Re-run the script, not the thesis one.
+- **Results skeleton** mirrors the RQ summary slide, numbered 1–4:
+  Experience (planned, who notices) → User → Unconscious (two markers,
+  onset by format) → **1 + 3 Trust meets the scalp** (combos, moved up
+  because it reuses the posterior \(\alpha\) just shown) → Trajectory
+  (genre, transitions, descriptives, \(\tilde\delta\)). Trajectory
+  closes on “the classifier sees conversational depth, not the
+  advertisement”, which hands off to the Discussion claim.
+- **Discussion:** “Every estimated effect on one grid” (wide matrix)
+  then “What moved, what did not” in RQ order, with a one-line User
+  beat added. His `%` spoken notes kept in place.
+- Frame titles shortened to one line in the UniPD bar
+  (“3 - Unconscious: the two markers”, not “The Unconscious: …”).
+- Build recipe for the deck: copy the folder to `/tmp/deck_src`, then
+  `docker run --rm -v /tmp/deck_src:/work -v /tmp/deck_build:/out -w
+  /work texlive/texlive:latest bash -lc 'latexmk -f -pdf
+  -interaction=nonstopmode -output-directory=/out main.tex'`.
+  72 pages full; changed slides are 23–35.
+
 ## Do not
 
 - Invent extra Likert cells or reopen Gold.
