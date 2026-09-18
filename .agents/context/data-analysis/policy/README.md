@@ -5,8 +5,12 @@ before 17 September.
 
 - **Ad-moment scorer.** Insertion-policy \(\pi\) stays dropped from the
   manuscripts (`../2026-08-24-insertion-policy-model-dropped.md`).
-- **Dataset release.** Parked 12 Sep. Strategy only:
-  `2026-09-12-dataset-release-side-quest.md`. Do not upload this week.
+- **Dataset release.** Parked until the thesis PDF is in. Hub layout
+  (16 Sep): `2026-09-16-hf-dataset-strategy.md` — nine public Gold
+  repos (one per filled cell of the grains figure: behavioural /
+  trajectories / EEG / joins), two gated (`events`, `eeg-recordings`),
+  collection `price-of-attention`. Older two-bucket note:
+  `2026-09-12-dataset-release-side-quest.md`.
 
 Start here, then the newest dated note in this directory.
 

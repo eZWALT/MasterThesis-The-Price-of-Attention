@@ -1,5 +1,10 @@
 # Dataset release (side quest)
 
+**Superseded for hub layout** by
+`2026-09-16-hf-dataset-strategy.md` (streams × grains × lineage;
+`gold` / `events` / `eeg-recordings`; no RAW/PROCESSED). This file
+keeps the inventory of what exists on disk.
+
 **Not this weekend. Not a thesis goal.** Same shelf as the ad-moment
 scorer: do not put a release plan in the abstract, Ch 9, or the deck
 before 17 September. Open this only after the PDF is in.
