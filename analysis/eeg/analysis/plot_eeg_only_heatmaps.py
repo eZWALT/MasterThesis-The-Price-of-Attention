@@ -110,6 +110,7 @@ def draw(
     title: str,
     show_ylabels: bool,
     annotate: bool = True,
+    signs: np.ndarray | None = None,
 ) -> None:
     ny, nx = values.shape
     axis.pcolormesh(
@@ -133,16 +134,19 @@ def draw(
     axis.set_title(title)
     axis.axhline(1.5, color=NAVY, linewidth=0.8)
     if annotate:
-        fontsize = 7 if values.shape[1] <= 3 else 6.5
+        fontsize = 6.2 if signs is not None else (7 if values.shape[1] <= 3 else 6.5)
         for y in range(values.shape[0]):
             for x in range(values.shape[1]):
                 value = values[y, x]
                 if np.isnan(value):
                     continue
+                arrow = ""
+                if signs is not None and not np.isnan(signs[y, x]) and signs[y, x] != 0:
+                    arrow = "▲ " if signs[y, x] > 0 else "▼ "
                 axis.text(
                     x,
                     y,
-                    apa_p(value),
+                    arrow + apa_p(value),
                     ha="center",
                     va="center",
                     color="white" if value < 0.05 else INK,
@@ -245,8 +249,9 @@ def plot_board(grid: pd.DataFrame) -> None:
 def matrix_from_contrasts(
     tests: pd.DataFrame,
     contrasts: list[tuple[str, str]],
-) -> np.ndarray:
+) -> tuple[np.ndarray, np.ndarray]:
     values = np.full((len(FEATURES), len(contrasts)), np.nan)
+    signs = np.full((len(FEATURES), len(contrasts)), np.nan)
     primary = tests[tests["contrast_tier"] == "primary"]
     for i, (feature, _) in enumerate(FEATURES):
         for j, (contrast, _) in enumerate(contrasts):
@@ -257,7 +262,8 @@ def matrix_from_contrasts(
             if hit.empty or pd.isna(hit.iloc[0]["p_t_holm"]):
                 continue
             values[i, j] = float(hit.iloc[0]["p_t_holm"])
-    return values
+            signs[i, j] = np.sign(float(hit.iloc[0]["mean_difference"]))
+    return values, signs
 
 
 def plot_board_4s(grid: pd.DataFrame) -> None:
@@ -272,19 +278,23 @@ def plot_board_4s(grid: pd.DataFrame) -> None:
         figsize=(12.6, 8.8),
         gridspec_kw={"wspace": 0.28, "width_ratios": [3, 4]},
     )
+    values_a, signs_a = matrix_from_contrasts(condition, DATASET_A)
+    values_b, signs_b = matrix_from_contrasts(ad, DATASET_B)
     draw(
         axes[0],
-        matrix_from_contrasts(condition, DATASET_A),
+        values_a,
         DATASET_A,
         title="Dataset A: condition aggregation",
         show_ylabels=True,
+        signs=signs_a,
     )
     draw(
         axes[1],
-        matrix_from_contrasts(ad, DATASET_B),
+        values_b,
         DATASET_B,
         title="Dataset B: onset-locked, versus matched no-ad",
         show_ylabels=False,
+        signs=signs_b,
     )
     cax = figure.add_axes([0.93, 0.12, 0.016, 0.76])
     n = 64
