@@ -28,10 +28,10 @@ picture"; paper abstract, §Implications, §Conclusion.
 
 | Block | Slides | Time | Beat |
 | --- | --- | --- | --- |
-| Hook | Era, Free, Big Tech, OpenAI, Triad, Literature | 5:00 | mass medium → inference is not free → ads already fund Alphabet/Meta → OpenAI switched them on → triad tension → literature: nobody notices, labels barely help → so, user-centric |
+| Hook | Era, Free, Big Tech, OpenAI, Triad, Literature | 5:00 | mass medium → inference is not free → ads already fund Alphabet/Meta → OpenAI switched them on → triad tension → literature: nobody notices, labels barely help → so, user-centric. AI Race parked 22 Sep. |
 | Question | Theoretical Work (1), RQ summary | 1:30 | instance vs policy (why λ and timing); four RQ blocks |
 | Method | Formats, 2×2 + control, Flow (N = 54 / 18), Variables, Retrieval pipeline, Platform | 4:00 | what a subject lived through; what I built. Name the stack, do not walk the boxes. |
-| Results | Experience forest, Who notices, User, EEG two markers, EEG onset by format, Trust meets the scalp, Trajectory (one slide) | 7:00 | 1–4 in RQ order; combos right after EEG; trajectory closes on "depth, not the ad" |
+| Results | Experience forest, Who notices, User, Unconscious, Trust meets the scalp | 5:30 | Trajectory block, including "no steering seen", parked 22 Sep for time. One sentence stays on Takeaways. |
 | Discussion | Effects matrix (wide), Limits | 1:30 | four beats spoken over the matrix |
 | Close | Takeaways, Future work, Thanks | 1:30 | the price of attention; measure it, disclose it |
 
@@ -61,16 +61,14 @@ The old `\iffasttalk\else … \fi` wrappers were converted to
 ## Parked, in the order to bring back
 
 1. Discussion: *What moved, what did not*
-2. Intro: *The AI Race* (its "sprint vs marathon" line moved into the
-   Big Tech slide script)
-3. Results: trajectory transitions heatmap
-4. Results: trajectory descriptives table
-5. Results: trajectory genre example (definition slide)
-6. Results: original δ̃ single-result slide (merged into the new one)
-7. Close: *Artifacts* (one spoken line on Takeaways)
-8. Question: *High-Level Goals*
+2. Results: trajectory transitions heatmap
+3. Results: trajectory descriptives table
+4. Results: trajectory genre example (definition slide)
+5. Results: original δ̃ single-result slide (merged into the new one)
+6. Close: *Artifacts* (one spoken line on Takeaways)
+7. Question: *High-Level Goals*
 
-Items 3–6 are one `\ifsecondplane` block; move the `\fi` up to recover
+Items 2–5 are one `\ifsecondplane` block; move the `\fi` up to recover
 a subset.
 
 ## New / changed frames
